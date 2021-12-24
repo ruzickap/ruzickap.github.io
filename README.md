@@ -14,14 +14,14 @@ List of my GitHub projects
 * CI/CD status:
 
   [![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/peru/my-broken-link-checker.svg)](https://hub.docker.com/r/peru/my-broken-link-checker)
-  [![GitHub Actions status - check-broken-links](https://github.com/ruzickap/action-my-broken-link-checker/workflows/check-broken-links/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions?query=workflow%3A"check-broken-links")
-  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-broken-link-checker/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions?query=workflow%3A"commands")
-  [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-broken-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions?query=workflow%3A"docker-image")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-broken-link-checker/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-broken-link-checker/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-broken-link-checker/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-broken-link-checker/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions?query=workflow%3A"tests")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-broken-link-checker/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - check-broken-links](https://github.com/ruzickap/action-my-broken-link-checker/workflows/check-broken-links/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/check-broken-links.yml)
+  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-broken-link-checker/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/commands.yml)
+  [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-broken-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/docker-image.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/linter.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-broken-link-checker/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/markdown.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-broken-link-checker/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-broken-link-checker/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/tests.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-broken-link-checker/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -49,13 +49,13 @@ List of my GitHub projects
 * CI/CD status:
 
   [![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/peru/my-markdown-link-checker.svg)](https://hub.docker.com/r/peru/my-markdown-link-checker)
-  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions?query=workflow%3A"commands")
-  [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions?query=workflow%3A"docker-image")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions?query=workflow%3A"tests")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/commands.yml)
+  [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/docker-image.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/linter.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/markdown.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/tests.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -83,13 +83,13 @@ List of my GitHub projects
 * CI/CD status:
 
   [![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/peru/my-markdown-linter.svg)](https://hub.docker.com/r/peru/my-markdown-linter)
-  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-markdown-linter/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions?query=workflow%3A"commands")
-  [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-linter/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions?query=workflow%3A"docker-image")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-linter/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-markdown-linter/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-markdown-linter/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-markdown-linter/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions?query=workflow%3A"tests")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-markdown-linter/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-markdown-linter/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/commands.yml)
+  [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-linter/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/docker-image.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/linter.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-markdown-linter/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/markdown.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-markdown-linter/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-markdown-linter/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/tests.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-markdown-linter/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -115,14 +115,14 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/packer-templates/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/packer-templates/actions?query=workflow%3A"ansible-lint")
-  [![GitHub Actions status - build](https://github.com/ruzickap/packer-templates/workflows/build/badge.svg)](https://github.com/ruzickap/packer-templates/actions?query=workflow%3A"build")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/packer-templates/workflows/markdown/badge.svg)](https://github.com/ruzickap/packer-templates/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - packer-templates](https://github.com/ruzickap/packer-templates/workflows/packer-templates/badge.svg)](https://github.com/ruzickap/packer-templates/actions?query=workflow%3A"packer-templates")
-  [![GitHub Actions status - periodic-markdown-links-check](https://github.com/ruzickap/packer-templates/workflows/periodic-markdown-links-check/badge.svg)](https://github.com/ruzickap/packer-templates/actions?query=workflow%3A"periodic-markdown-links-check")
-  [![GitHub Actions status - remote_build_server](https://github.com/ruzickap/packer-templates/workflows/remote_build_server/badge.svg)](https://github.com/ruzickap/packer-templates/actions?query=workflow%3A"remote_build_server")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/packer-templates/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/packer-templates/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/packer-templates/workflows/yamllint/badge.svg)](https://github.com/ruzickap/packer-templates/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/packer-templates/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/ansible-lint.yml)
+  [![GitHub Actions status - build](https://github.com/ruzickap/packer-templates/workflows/build/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/build.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/packer-templates/workflows/markdown/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/markdown.yml)
+  [![GitHub Actions status - packer-templates](https://github.com/ruzickap/packer-templates/workflows/packer-templates/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/packer-templates.yml)
+  [![GitHub Actions status - periodic-markdown-links-check](https://github.com/ruzickap/packer-templates/workflows/periodic-markdown-links-check/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/periodic-markdown-links-check.yml)
+  [![GitHub Actions status - remote_build_server](https://github.com/ruzickap/packer-templates/workflows/remote_build_server/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/remote_build_server.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/packer-templates/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/packer-templates/workflows/yamllint/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -148,10 +148,10 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/packer-virt-sysprep/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/packer-virt-sysprep/workflows/markdown/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/packer-virt-sysprep/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/packer-virt-sysprep/workflows/yamllint/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/linter.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/packer-virt-sysprep/workflows/markdown/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/markdown.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/packer-virt-sysprep/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/packer-virt-sysprep/workflows/yamllint/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -177,12 +177,12 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - checks](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/checks/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions?query=workflow%3A"checks")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/markdown/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - periodic-markdown-links-check](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/periodic-markdown-links-check/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions?query=workflow%3A"periodic-markdown-links-check")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/yamllint/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - checks](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/checks/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/checks.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/linter.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/markdown/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/markdown.yml)
+  [![GitHub Actions status - periodic-markdown-links-check](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/periodic-markdown-links-check/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/periodic-markdown-links-check.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/yamllint/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -208,9 +208,9 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/yamllint/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/linter.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/yamllint/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -236,11 +236,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions?query=workflow%3A"ansible-lint")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions?query=workflow%3A"molecule")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/ansible-lint.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/markdown.yml)
+  [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/molecule.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -266,12 +266,12 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions?query=workflow%3A"ansible-lint")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions?query=workflow%3A"molecule")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/ansible-lint.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/linter.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/markdown.yml)
+  [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/molecule.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -297,12 +297,12 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-role-virtio-win/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions?query=workflow%3A"ansible-lint")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-role-virtio-win/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-virtio-win/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-virtio-win/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions?query=workflow%3A"molecule")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-virtio-win/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-role-virtio-win/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-role-virtio-win/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/ansible-lint.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/linter.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-virtio-win/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/markdown.yml)
+  [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-virtio-win/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/molecule.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-virtio-win/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-role-virtio-win/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -328,11 +328,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions?query=workflow%3A"ansible-lint")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions?query=workflow%3A"molecule")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions/workflows/ansible-lint.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions/workflows/markdown.yml)
+  [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions/workflows/molecule.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-role-vmwaretools/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -358,13 +358,13 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-my_workstation/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions?query=workflow%3A"ansible-lint")
-  [![GitHub Actions status - fedora](https://github.com/ruzickap/ansible-my_workstation/workflows/fedora/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions?query=workflow%3A"fedora")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-my_workstation/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - macos](https://github.com/ruzickap/ansible-my_workstation/workflows/macos/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions?query=workflow%3A"macos")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-my_workstation/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-my_workstation/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-my_workstation/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-my_workstation/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/ansible-lint.yml)
+  [![GitHub Actions status - fedora](https://github.com/ruzickap/ansible-my_workstation/workflows/fedora/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/fedora.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/linter.yml)
+  [![GitHub Actions status - macos](https://github.com/ruzickap/ansible-my_workstation/workflows/macos/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/macos.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-my_workstation/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/markdown.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-my_workstation/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-my_workstation/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -390,10 +390,10 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-openwrt/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions?query=workflow%3A"ansible-lint")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-openwrt/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-openwrt/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-openwrt/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-openwrt/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/ansible-lint.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-openwrt/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/linter.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-openwrt/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-openwrt/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -419,10 +419,10 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-raspbian/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions?query=workflow%3A"ansible-lint")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-raspbian/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-raspbian/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-raspbian/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-raspbian/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/ansible-lint.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-raspbian/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/linter.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-raspbian/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-raspbian/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -450,10 +450,10 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - hugo-build](https://github.com/awsugcz/awsug.cz/workflows/hugo-build/badge.svg)](https://github.com/awsugcz/awsug.cz/actions?query=workflow%3A"hugo-build")
-  [![GitHub Actions status - markdown](https://github.com/awsugcz/awsug.cz/workflows/markdown/badge.svg)](https://github.com/awsugcz/awsug.cz/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/awsugcz/awsug.cz/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/awsugcz/awsug.cz/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - yamllint](https://github.com/awsugcz/awsug.cz/workflows/yamllint/badge.svg)](https://github.com/awsugcz/awsug.cz/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - hugo-build](https://github.com/awsugcz/awsug.cz/workflows/hugo-build/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/hugo-build.yml)
+  [![GitHub Actions status - markdown](https://github.com/awsugcz/awsug.cz/workflows/markdown/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/markdown.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/awsugcz/awsug.cz/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/periodic-broken-link-checks.yml)
+  [![GitHub Actions status - yamllint](https://github.com/awsugcz/awsug.cz/workflows/yamllint/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -481,10 +481,10 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - hugo-build](https://github.com/ruzickap/petr.ruzicka.dev/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions?query=workflow%3A"hugo-build")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/petr.ruzicka.dev/workflows/markdown/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/petr.ruzicka.dev/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/petr.ruzicka.dev/workflows/yamllint/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - hugo-build](https://github.com/ruzickap/petr.ruzicka.dev/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/hugo-build.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/petr.ruzicka.dev/workflows/markdown/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/markdown.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/petr.ruzicka.dev/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/periodic-broken-link-checks.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/petr.ruzicka.dev/workflows/yamllint/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -512,11 +512,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - hugo-build](https://github.com/ruzickap/xvx.cz/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/xvx.cz/actions?query=workflow%3A"hugo-build")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/xvx.cz/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/xvx.cz/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/xvx.cz/workflows/markdown/badge.svg)](https://github.com/ruzickap/xvx.cz/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/xvx.cz/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/xvx.cz/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/xvx.cz/workflows/yamllint/badge.svg)](https://github.com/ruzickap/xvx.cz/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - hugo-build](https://github.com/ruzickap/xvx.cz/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/hugo-build.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/xvx.cz/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/linter.yml)
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/xvx.cz/workflows/markdown/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/markdown.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/xvx.cz/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/periodic-broken-link-checks.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/xvx.cz/workflows/yamllint/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -544,12 +544,12 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - command](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/command/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions?query=workflow%3A"command")
-  [![GitHub Actions status - kube-linter](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/kube-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions?query=workflow%3A"kube-linter")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/linter.yml)
+  [![GitHub Actions status - command](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/command/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/command.yml)
+  [![GitHub Actions status - kube-linter](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/kube-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/kube-linter.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/periodic-broken-link-checks.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -577,11 +577,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions?query=workflow%3A"terraform")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/periodic-broken-link-checks.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/terraform.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -609,11 +609,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/linter.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/periodic-broken-links-check.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -641,11 +641,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-harbor/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-harbor/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-harbor/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-harbor/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-harbor/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-harbor/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/linter.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-harbor/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/periodic-broken-links-check.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-harbor/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-harbor/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-harbor/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -673,9 +673,9 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/k8s-harbor-presentation/workflows/markdown/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions?query=workflow%3A"markdown")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-harbor-presentation/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-harbor-presentation/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - markdown](https://github.com/ruzickap/k8s-harbor-presentation/workflows/markdown/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/markdown.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-harbor-presentation/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/periodic-broken-links-check.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-harbor-presentation/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -703,9 +703,9 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - checks](https://github.com/ruzickap/k8s-istio-demo/workflows/checks/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions?query=workflow%3A"checks")
-  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-istio-demo/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions?query=workflow%3A"terraform")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-istio-demo/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - checks](https://github.com/ruzickap/k8s-istio-demo/workflows/checks/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/checks.yml)
+  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-istio-demo/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/terraform.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-istio-demo/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -733,11 +733,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-istio-webinar/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-istio-webinar/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-istio-webinar/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-istio-webinar/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-istio-webinar/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-istio-webinar/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions/workflows/linter.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-istio-webinar/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions/workflows/periodic-broken-link-checks.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-istio-webinar/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-istio-webinar/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-istio-webinar/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-istio-webinar/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -765,9 +765,9 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-istio-workshop/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - vuepress-build](https://github.com/ruzickap/k8s-istio-workshop/workflows/vuepress-build/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions?query=workflow%3A"vuepress-build")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-istio-workshop/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-istio-workshop/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/periodic-broken-links-check.yml)
+  [![GitHub Actions status - vuepress-build](https://github.com/ruzickap/k8s-istio-workshop/workflows/vuepress-build/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/build-test.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-istio-workshop/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -795,11 +795,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-jenkins-x/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-jenkins-x/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-jenkins-x/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-jenkins-x/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-jenkins-x/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-jenkins-x/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions/workflows/linter.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-jenkins-x/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions/workflows/periodic-broken-links-check.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-jenkins-x/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-jenkins-x/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-jenkins-x/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-jenkins-x/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -827,11 +827,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions/workflows/linter.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions/workflows/periodic-broken-links-check.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-knative-gitlab-harbor/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -859,11 +859,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-postgresql/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-postgresql/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-postgresql/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions?query=workflow%3A"terraform")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-postgresql/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-postgresql/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-postgresql/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions/workflows/periodic-broken-links-check.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-postgresql/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-postgresql/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions/workflows/terraform.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-postgresql/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-postgresql/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-postgresql/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -891,11 +891,11 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-sockshop/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions?query=workflow%3A"periodic-broken-link-checks")
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-sockshop/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions?query=workflow%3A"shellcheck")
-  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-sockshop/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions?query=workflow%3A"terraform")
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-sockshop/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions?query=workflow%3A"vuepress-build-check-deploy")
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-sockshop/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions?query=workflow%3A"yamllint")
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-sockshop/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions/workflows/periodic-broken-links-check.yml)
+  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-sockshop/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-sockshop/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions/workflows/terraform.yml)
+  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-sockshop/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions/workflows/vuepress-build-check-deploy.yml)
+  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-sockshop/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-sockshop/actions/workflows/yamllint.yml)
 
 * Issue tracking:
 
@@ -921,9 +921,9 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-atom/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions?query=workflow%3A"build")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-atom/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-atom/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions?query=workflow%3A"release")
+  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-atom/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/build.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/linter.yml)
+  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-atom/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/release.yml)
 
 * Issue tracking:
 
@@ -949,9 +949,10 @@ List of my GitHub projects
 
 * CI/CD status:
 
-  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-systemd/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions?query=workflow%3A"build")
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-systemd/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions?query=workflow%3A"Lint+Code+Base")
-  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-systemd/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions?query=workflow%3A"release")
+  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-systemd/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/build.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/linter.yml)
+  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-systemd/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/release.yml)
+  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-systemd/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/release.yml)
 
 * Issue tracking:
 
