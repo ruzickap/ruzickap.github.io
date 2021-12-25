@@ -1,6 +1,9 @@
 # My projects on GitHub
 
-List of my GitHub projects
+List of my GitHub projects: [https://ruzickap.github.io/](https://ruzickap.github.io/)
+
+[![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/linter.yml)
+[![GitHub Actions status - markdown](https://github.com/ruzickap/ruzickap.github.io/workflows/markdown/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/markdown.yml)
 
 ## [GitHub Actions: My Broken Link Checker ✔](https://github.com/ruzickap/action-my-broken-link-checker)
 
