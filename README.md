@@ -1,4 +1,4 @@
-# My projects on GitHub
+# My Projects
 
 List of my GitHub projects: [https://ruzickap.github.io/](https://ruzickap.github.io/)
 
@@ -626,7 +626,6 @@ URL: [https://ruzickap.github.io/k8s-flagger-istio-flux/](https://ruzickap.githu
 
 * CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/linter.yml)
   [![GitHub Actions status - pages-build-deployment](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/pages/pages-build-deployment/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/pages/pages-build-deployment)
   [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/periodic-broken-link-checks.yml)
   [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/shellcheck.yml)
