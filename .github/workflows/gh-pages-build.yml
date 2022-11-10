@@ -1,0 +1,76 @@
+name: gh-pages-build
+
+on:
+  workflow_call:
+  push:
+
+jobs:
+  gh-pages-build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      deployments: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Prepare public directory
+        run: |
+          mkdir public
+          cp CNAME LICENSE README.md public/
+          touch public/.nojekyll
+
+      - name: Set Variables
+        id: variables
+        run: |
+          set -euo pipefail
+          CLOUDFLARE_PAGES_PROJECT=$(echo "${GITHUB_REPOSITORY#*/}" | tr . - )
+
+          if [[ "${GITHUB_REF_NAME}" = "main" ]]; then
+            BASE_DOMAIN="${GITHUB_REPOSITORY#*/}"
+          else
+            BASE_DOMAIN="${CLOUDFLARE_PAGES_PROJECT}.pages.dev"
+          fi
+
+          echo "BASE_DOMAIN=${BASE_DOMAIN}" | tee -a "${GITHUB_OUTPUT}"
+          echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_OUTPUT}"
+
+      - name: Cache
+        uses: actions/cache@v2
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
+          restore-keys: |
+            ${{ runner.os }}-gems-
+
+      - name: Build jekyll page
+        uses: helaili/jekyll-action@v2
+        with:
+          build_only: true
+          build_dir: public
+
+      - name: Publish to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          force_orphan: true
+
+      - name: Web Page
+        run: |
+          cat << EOF | tee -a "${GITHUB_STEP_SUMMARY}"
+          * :low_brightness: <https://${{ steps.variables.outputs.BASE_DOMAIN }}>
+          EOF
+
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@1
+        if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/gh-pages' }}
+        with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          branch: main
+          directory: ./public
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          projectName: ${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}

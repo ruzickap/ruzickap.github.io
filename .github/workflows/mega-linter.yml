@@ -1,0 +1,34 @@
+name: MegaLinter
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  build:
+    name: MegaLinter
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: MegaLinter
+        uses: megalinter/megalinter@v6.14.0
+        env:
+          BASH_SHFMT_ARGUMENTS: --indent 2 --space-redirects
+          DISABLE_LINTERS: SPELL_CSPELL
+          FORMATTERS_DISABLE_ERRORS: false
+          GITHUB_COMMENT_REPORTER: false
+          GITHUB_STATUS_REPORTER: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HTML_HTMLHINT_FILTER_REGEX_EXCLUDE: ^index.html
+          JSON_PRETTIER_FILTER_REGEX_EXCLUDE: ^.markdown-link-check.json
+          PRINT_ALPACA: false
+          RUBY_RUBOCOP_FILTER_REGEX_EXCLUDE: ^_plugins
+          SPELL_CSPELL_FILTER_REGEX_INCLUDE: (^README.md|^_posts/)
+          SPELL_MISSPELL_FILTER_REGEX_EXCLUDE: ^_data/locales
+          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' }}
+          YAML_PRETTIER_FILTER_REGEX_EXCLUDE: (^_data/|^_config.yml)
+          YAML_V8R_FILTER_REGEX_EXCLUDE: (^_data/|^_config.yml)
