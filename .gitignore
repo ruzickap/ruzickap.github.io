@@ -1,0 +1,10 @@
+# pre-commit configuration file
+.pre-commit-config.yaml
+
+# release-it configuration file
+.release-it.yml
+
+# Generated files by Jekyll
+.jekyll-cache
+_site
+Gemfile.lock

@@ -1,0 +1,8 @@
+---
+# Line length - https://github.com/DavidAnson/markdownlint/blob/master/doc/Rules.md#md013---line-length
+MD013:
+  code_blocks: false
+  tables: false
+
+# First line in a file should be a top-level heading - https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md#md041---first-line-in-a-file-should-be-a-top-level-heading
+MD041: false
