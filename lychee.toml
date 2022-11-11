@@ -1,0 +1,14 @@
+# Exclude all mail addresses from checking
+exclude_mail = true
+
+exclude = [
+  "https://fonts.(googleapis|gstatic).com/",
+]
+
+exclude_path = [
+  "_tabs/projects.md",
+  "public/projects/index.html",
+  "./_tabs/",
+  "./vendor/",
+  "./_site/",
+]
