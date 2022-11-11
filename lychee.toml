@@ -1,3 +1,6 @@
+# Comma-separated list of accepted status codes for valid links.
+accept = [ 999 ]
+
 # Exclude all mail addresses from checking
 exclude_mail = true
 
