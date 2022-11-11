@@ -27,7 +27,7 @@ description: >- # used by seo meta and the atom feed
   Blogging about DevOps, Kubernets, RPi, tips, ...
 
 # fill in the protocol & hostname for your site, e.g., 'https://username.github.io'
-url: 'https://blog.ruzicka.com'
+url: 'https://blog.ruzicka.dev'
 
 github:
   username: ruzickap # change to your github username
