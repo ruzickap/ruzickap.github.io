@@ -1,13 +1,23 @@
-# Comma-separated list of accepted status codes for valid links.
+# Comma-separated list of accepted status codes for valid links
 accept = [ 999 ]
+
+# Enable link caching. This can be helpful to avoid checking the same links on
+# multiple runs
+cache = true
+
+# Exclude all private IPs from checking
+exclude-all-private = true
 
 # Exclude all mail addresses from checking
 exclude_mail = true
 
+# Exclude URLs and mail addresses from checking (supports regex)
 exclude = [
   "https://fonts.(googleapis|gstatic).com/",
+  "https://blog.ruzicka.dev/projects/",
 ]
 
+# Exclude these filesystem paths from getting checked
 exclude_path = [
   "_tabs/projects.md",
   "public/projects/index.html",
@@ -15,3 +25,9 @@ exclude_path = [
   "./vendor/",
   "./_site/",
 ]
+
+# Discard all cached requests older than this duration
+max-cache-age = "1d"
+
+# Don't show interactive progress bar while checking links
+no-progress = true
