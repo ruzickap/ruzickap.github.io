@@ -62,7 +62,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: "--cache --max-cache-age 1d --no-progress --exclude-all-private ."
           fail: true
 
       - name: Publish to GitHub Pages
