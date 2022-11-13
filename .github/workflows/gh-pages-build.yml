@@ -37,7 +37,7 @@ jobs:
           echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_OUTPUT}"
 
       - name: Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: vendor/bundle
           key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
