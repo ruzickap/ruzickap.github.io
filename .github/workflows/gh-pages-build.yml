@@ -51,6 +51,7 @@ jobs:
           build_dir: public
 
       - name: Restore lychee cache
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: actions/cache@v3
         with:
           path: .lycheecache
@@ -58,6 +59,7 @@ jobs:
           restore-keys: cache-lychee-
 
       - name: Link Checker
+        if: ${{ github.ref == 'refs/heads/main' }}
         uses: lycheeverse/lychee-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
