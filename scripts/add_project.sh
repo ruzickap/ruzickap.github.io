@@ -3,6 +3,16 @@
 set -eu
 
 GITHUB_REPOSITORIES=(
+  "ruzickap/blog-test.ruzicka.dev"
+  "ruzickap/cheatsheet-macos"
+  "ruzickap/container-build"
+  "ruzickap/k8s-eks-rancher"
+  "ruzickap/k8s-tf-eks-gitops"
+  "ruzickap/malware-cryptominer-container"
+  "ruzickap/myteam-adr"
+  "ruzickap/popular-containers-vulnerability-checks"
+  "ruzickap/raw-photo-tools-container"
+  "ruzickap/ruzickap.github.io"
   "ruzickap/action-my-broken-link-checker"
   "ruzickap/action-my-markdown-link-checker"
   "ruzickap/action-my-markdown-linter"
@@ -55,7 +65,7 @@ Description: ${GITHUB_REPOSITORY_DESCRIPTION}
 
 * CI/CD status:
 
-$( curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r '.workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + ( if .html_url | contains("/dynamic/pages/pages-build-deployment") then .html_url | gsub("/blob/.*/dynamic/"; "/actions/workflows/") else .html_url | gsub("/blob/.*/.github/"; "/actions/") end ) + ")"' | sort --ignore-case )
+$(curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r '.workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + ( if .html_url | contains("/dynamic/pages/pages-build-deployment") then .html_url | gsub("/blob/.*/dynamic/"; "/actions/workflows/") else .html_url | gsub("/blob/.*/.github/"; "/actions/") end ) + ")"' | sort --ignore-case)
 
 * Issue tracking:
 
@@ -69,6 +79,5 @@ $( curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GI
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/${GITHUB_REPOSITORY}/latest)](https://github.com/${GITHUB_REPOSITORY}/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/${GITHUB_REPOSITORY}.svg)](https://github.com/${GITHUB_REPOSITORY}/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/${GITHUB_REPOSITORY}.svg)](https://github.com/${GITHUB_REPOSITORY})
-  [![GitHub download latest release](https://img.shields.io/github/downloads/${GITHUB_REPOSITORY}/total.svg)](https://github.com/${GITHUB_REPOSITORY}/releases/latest)
 EOF
 done
