@@ -1,5 +1,7 @@
 # ruzickap.github.io
 
+[![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml)
+
 ## Overview
 
 My test personal site and blog...

@@ -6,7 +6,7 @@ order: 4
 
 List of my GitHub projects: [https://ruzickap.github.io/](https://ruzickap.github.io/)
 
-[![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/linter.yml/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/linter.yml)
+[![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml)
 [![GitHub Actions status - markdown](https://github.com/ruzickap/ruzickap.github.io/workflows/markdown/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/markdown.yml)
 
 ## [GitHub Actions: My Broken Link Checker ✔](https://github.com/ruzickap/action-my-broken-link-checker)
@@ -22,7 +22,6 @@ Description: A GitHub Action for checking broken links
 
 * CI/CD status:
 
-  [![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/peru/my-broken-link-checker.svg)](https://hub.docker.com/r/peru/my-broken-link-checker)
   [![GitHub Actions status - check-broken-links](https://github.com/ruzickap/action-my-broken-link-checker/workflows/check-broken-links/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/check-broken-links.yml)
   [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-broken-link-checker/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/commands.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-broken-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/docker-image.yml)
@@ -45,7 +44,6 @@ Description: A GitHub Action for checking broken links
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/action-my-broken-link-checker/latest)](https://github.com/ruzickap/action-my-broken-link-checker/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/action-my-broken-link-checker/total.svg)](https://github.com/ruzickap/action-my-broken-link-checker/releases/latest)
 
 ## [GitHub Actions: My Markdown Link Checker ✔](https://github.com/ruzickap/action-my-markdown-link-checker)
 
@@ -60,7 +58,6 @@ Description: A GitHub Action for checking broken links in Markdown files
 
 * CI/CD status:
 
-  [![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/peru/my-markdown-link-checker.svg)](https://hub.docker.com/r/peru/my-markdown-link-checker)
   [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/commands.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/docker-image.yml)
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/linter.yml)
@@ -82,7 +79,6 @@ Description: A GitHub Action for checking broken links in Markdown files
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/action-my-markdown-link-checker/latest)](https://github.com/ruzickap/action-my-markdown-link-checker/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/action-my-markdown-link-checker/total.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/releases/latest)
 
 ## [GitHub Actions: My Markdown Linter ✔](https://github.com/ruzickap/action-my-markdown-linter)
 
@@ -97,7 +93,6 @@ Description: Style checking and linting for Markdown files
 
 * CI/CD status:
 
-  [![Docker Hub Build Status](https://img.shields.io/docker/cloud/build/peru/my-markdown-linter.svg)](https://hub.docker.com/r/peru/my-markdown-linter)
   [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-markdown-linter/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/commands.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-linter/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/docker-image.yml)
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-linter/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/linter.yml)
@@ -119,7 +114,6 @@ Description: Style checking and linting for Markdown files
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/action-my-markdown-linter/latest)](https://github.com/ruzickap/action-my-markdown-linter/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/action-my-markdown-linter/total.svg)](https://github.com/ruzickap/action-my-markdown-linter/releases/latest)
 
 ## [Packer templates](https://github.com/ruzickap/packer-templates)
 
@@ -155,7 +149,6 @@ Description: Scripts and Templates used for generating Vagrant images
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/packer-templates/latest)](https://github.com/ruzickap/packer-templates/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/packer-templates/total.svg)](https://github.com/ruzickap/packer-templates/releases/latest)
 
 ## [Packer-Virt-Sysprep](https://github.com/ruzickap/packer-virt-sysprep)
 
@@ -186,7 +179,6 @@ Description: Reproduce the functionality of virt-sysprep for use with Packer bui
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/packer-virt-sysprep/latest)](https://github.com/ruzickap/packer-virt-sysprep/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/packer-virt-sysprep/total.svg)](https://github.com/ruzickap/packer-virt-sysprep/releases/latest)
 
 ## [Darktable Video Tutorials with screenshots](https://github.com/ruzickap/darktable_video_tutorials_list)
 
@@ -219,7 +211,6 @@ Description: Links to Darktable Video Tutorials with screenshots
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/darktable_video_tutorials_list/latest)](https://github.com/ruzickap/darktable_video_tutorials_list/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/darktable_video_tutorials_list/total.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/releases/latest)
 
 ## [USB Stick for TV testing](https://github.com/ruzickap/test_usb_stick_for_tv)
 
@@ -250,7 +241,6 @@ Stick which can be used for testing TVs
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/test_usb_stick_for_tv/latest)](https://github.com/ruzickap/test_usb_stick_for_tv/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/test_usb_stick_for_tv/total.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/releases/latest)
 
 ## [Ansible role my_common_defaults](https://github.com/ruzickap/ansible-role-my_common_defaults)
 
@@ -282,7 +272,6 @@ Description: My Ansible role which sets some "favorite" defaults on the server
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-role-my_common_defaults/latest)](https://github.com/ruzickap/ansible-role-my_common_defaults/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/ansible-role-my_common_defaults/total.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/releases/latest)
 
 ## [Ansible role proxy_settings](https://github.com/ruzickap/ansible-role-proxy_settings)
 
@@ -315,7 +304,6 @@ Description: Ansible role for configuring proxy settings for Linux based systems
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-role-proxy_settings/latest)](https://github.com/ruzickap/ansible-role-proxy_settings/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/ansible-role-proxy_settings/total.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/releases/latest)
 
 ## [Ansible role virtio-win](https://github.com/ruzickap/ansible-role-virtio-win)
 
@@ -349,7 +337,6 @@ for Windows
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-role-virtio-win/latest)](https://github.com/ruzickap/ansible-role-virtio-win/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/ansible-role-virtio-win/total.svg)](https://github.com/ruzickap/ansible-role-virtio-win/releases/latest)
 
 ## [Ansible role vmwaretools](https://github.com/ruzickap/ansible-role-vmwaretools)
 
@@ -382,7 +369,6 @@ form Vmware or fallback to Open VMware Tools (open-vm-tools).
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-role-vmwaretools/latest)](https://github.com/ruzickap/ansible-role-vmwaretools/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/ansible-role-vmwaretools/total.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/releases/latest)
 
 ## [Ansible - My Workstation](https://github.com/ruzickap/ansible-my_workstation)
 
@@ -416,7 +402,6 @@ Description: Ansible playbooks to configure my workstation base on Fedora / macO
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-my_workstation/latest)](https://github.com/ruzickap/ansible-my_workstation/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/ansible-my_workstation/total.svg)](https://github.com/ruzickap/ansible-my_workstation/releases/latest)
 
 ## [Ansible - OpenWRT](https://github.com/ruzickap/ansible-openwrt)
 
@@ -447,7 +432,6 @@ Description: Ansible playbooks configuring Openwrt devices (Wi-Fi routers)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-openwrt/latest)](https://github.com/ruzickap/ansible-openwrt/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/ansible-openwrt/total.svg)](https://github.com/ruzickap/ansible-openwrt/releases/latest)
 
 ## [Ansible - Raspbian](https://github.com/ruzickap/ansible-raspbian)
 
@@ -478,7 +462,6 @@ Description: Configure Raspbian (RPi) using Ansible
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-raspbian/latest)](https://github.com/ruzickap/ansible-raspbian/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/ansible-raspbian/total.svg)](https://github.com/ruzickap/ansible-raspbian/releases/latest)
 
 ## [awsug.cz](https://github.com/awsugcz/awsug.cz)
 
@@ -511,7 +494,6 @@ URL: [https://awsug.cz](https://awsug.cz)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/awsugcz/awsug.cz/latest)](https://github.com/awsugcz/awsug.cz/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/awsugcz/awsug.cz/total.svg)](https://github.com/awsugcz/awsug.cz/releases/latest)
 
 ## [petr.ruzicka.dev](https://github.com/ruzickap/petr.ruzicka.dev)
 
@@ -529,7 +511,7 @@ URL: [https://petr.ruzicka.dev](https://petr.ruzicka.dev)
 
   [![GitHub Actions status - hugo-build](https://github.com/ruzickap/petr.ruzicka.dev/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/hugo-build.yml)
   [![GitHub Actions status - markdown](https://github.com/ruzickap/petr.ruzicka.dev/workflows/markdown/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/markdown.yml)
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/petr.ruzicka.dev/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/periodic-broken-link-checks.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/petr.ruzicka.dev/workflows/links/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/links.yml)
   [![GitHub Actions status - yamllint](https://github.com/ruzickap/petr.ruzicka.dev/workflows/yamllint/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/yamllint.yml)
 
 * Issue tracking:
@@ -544,7 +526,6 @@ URL: [https://petr.ruzicka.dev](https://petr.ruzicka.dev)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/petr.ruzicka.dev/latest)](https://github.com/ruzickap/petr.ruzicka.dev/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/petr.ruzicka.dev/total.svg)](https://github.com/ruzickap/petr.ruzicka.dev/releases/latest)
 
 ## [xvx.cz](https://github.com/ruzickap/xvx.cz)
 
@@ -578,7 +559,6 @@ URL: [https://xvx.cz](https://xvx.cz)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/xvx.cz/latest)](https://github.com/ruzickap/xvx.cz/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/xvx.cz/total.svg)](https://github.com/ruzickap/xvx.cz/releases/latest)
 
 ## [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
@@ -614,7 +594,6 @@ URL: [https://ruzickap.github.io/k8s-eks-bottlerocket-fargate/](https://ruzickap
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-eks-bottlerocket-fargate/latest)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-eks-bottlerocket-fargate/total.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/releases/latest)
 
 ## [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux)
 
@@ -649,7 +628,6 @@ URL: [https://ruzickap.github.io/k8s-flagger-istio-flux/](https://ruzickap.githu
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-flagger-istio-flux/latest)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-flagger-istio-flux/total.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases/latest)
 
 ## [k8s-flux-istio-gitlab-harbor](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
 
@@ -685,7 +663,6 @@ URL: [https://ruzickap.github.io/k8s-flux-istio-gitlab-harbor/](https://ruzickap
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-flux-istio-gitlab-harbor/latest)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-flux-istio-gitlab-harbor/total.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/releases/latest)
 
 ## [k8s-harbor](https://github.com/ruzickap/k8s-harbor)
 
@@ -720,7 +697,6 @@ URL: [https://ruzickap.github.io/k8s-harbor/](https://ruzickap.github.io/k8s-har
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-harbor/latest)](https://github.com/ruzickap/k8s-harbor/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-harbor/total.svg)](https://github.com/ruzickap/k8s-harbor/releases/latest)
 
 ## [k8s-harbor-presentation](https://github.com/ruzickap/k8s-harbor-presentation)
 
@@ -753,7 +729,6 @@ URL: [https://ruzickap.github.io/k8s-harbor-presentation/](https://ruzickap.gith
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-harbor-presentation/latest)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-harbor-presentation/total.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases/latest)
 
 ## [k8s-istio-demo](https://github.com/ruzickap/k8s-istio-demo)
 
@@ -785,7 +760,6 @@ URL: [https://ruzickap.gitbook.io/k8s-istio-demo/](https://ruzickap.gitbook.io/k
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-istio-demo/latest)](https://github.com/ruzickap/k8s-istio-demo/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-istio-demo/total.svg)](https://github.com/ruzickap/k8s-istio-demo/releases/latest)
 
 ## [k8s-istio-webinar](https://github.com/ruzickap/k8s-istio-webinar)
 
@@ -820,7 +794,6 @@ URL: [https://ruzickap.github.io/k8s-istio-webinar/](https://ruzickap.github.io/
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-istio-webinar/latest)](https://github.com/ruzickap/k8s-istio-webinar/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-istio-webinar/total.svg)](https://github.com/ruzickap/k8s-istio-webinar/releases/latest)
 
 ## [k8s-istio-workshop](https://github.com/ruzickap/k8s-istio-workshop)
 
@@ -853,7 +826,6 @@ URL: [https://ruzickap.github.io/k8s-istio-workshop/](https://ruzickap.github.io
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-istio-workshop/latest)](https://github.com/ruzickap/k8s-istio-workshop/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-istio-workshop/total.svg)](https://github.com/ruzickap/k8s-istio-workshop/releases/latest)
 
 ## [k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x)
 
@@ -888,7 +860,6 @@ URL: [https://ruzickap.github.io/k8s-jenkins-x/](https://ruzickap.github.io/k8s-
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-jenkins-x/latest)](https://github.com/ruzickap/k8s-jenkins-x/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-jenkins-x/total.svg)](https://github.com/ruzickap/k8s-jenkins-x/releases/latest)
 
 ## [k8s-knative-gitlab-harbor](https://github.com/ruzickap/k8s-knative-gitlab-harbor)
 
@@ -924,7 +895,6 @@ URL: [https://ruzickap.github.io/k8s-knative-gitlab-harbor/](https://ruzickap.gi
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-knative-gitlab-harbor/latest)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-knative-gitlab-harbor/total.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/releases/latest)
 
 ## [k8s-postgresql](https://github.com/ruzickap/k8s-postgresql)
 
@@ -959,7 +929,6 @@ URL: [https://ruzickap.github.io/k8s-postgresql/](https://ruzickap.github.io/k8s
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-postgresql/latest)](https://github.com/ruzickap/k8s-postgresql/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-postgresql/total.svg)](https://github.com/ruzickap/k8s-postgresql/releases/latest)
 
 ## [k8s-sockshop](https://github.com/ruzickap/k8s-sockshop)
 
@@ -994,7 +963,6 @@ URL: [https://ruzickap.github.io/k8s-sockshop/](https://ruzickap.github.io/k8s-s
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-sockshop/latest)](https://github.com/ruzickap/k8s-sockshop/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/k8s-sockshop/total.svg)](https://github.com/ruzickap/k8s-sockshop/releases/latest)
 
 ## [Cheatsheet - Atom](https://github.com/ruzickap/cheatsheet-atom)
 
