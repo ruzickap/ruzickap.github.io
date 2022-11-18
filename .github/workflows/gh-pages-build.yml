@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       skip_link_checker:
-        description: "Push the image to Container Registry"
+        description: "Skip Link Checker"
         type: boolean
         required: false
         default: false
@@ -57,7 +57,6 @@ jobs:
           build_dir: public
 
       - name: Restore lychee cache
-        if: ${{ github.ref == 'refs/heads/main' }}
         uses: actions/cache@v3
         with:
           path: .lycheecache
@@ -65,12 +64,11 @@ jobs:
           restore-keys: cache-lychee-
 
       - name: Link Checker
-        if: ${{ github.ref == 'refs/heads/main' }}
         uses: lycheeverse/lychee-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          fail: ${{ inputs.skip_link_checker || true }}
+          fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
