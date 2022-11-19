@@ -9,8 +9,6 @@ jobs:
   linkChecker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-
       - name: Get GH Pages URL
         id: gh_pages_url
         uses: actions/github-script@v6
