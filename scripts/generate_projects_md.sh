@@ -26,7 +26,6 @@ GITHUB_REPOSITORIES_DESCRIPTIONS=(
   "ruzickap/myteam-adr|myteam-adr"
   "awsugcz/awsug.cz|Prague AWS User Group Web Pages"
   "ruzickap/ruzickap.github.io|ruzickap.github.io"
-  "ruzickap/blog-test.ruzicka.dev|blog-test.ruzicka.dev"
   "ruzickap/petr.ruzicka.dev|petr.ruzicka.dev"
   "ruzickap/xvx.cz|xvx.cz"
   "ruzickap/k8s-tf-eks-gitops|k8s-tf-eks-gitops"

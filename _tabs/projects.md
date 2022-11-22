@@ -681,37 +681,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io)
 
-## [blog-test.ruzicka.dev](https://github.com/ruzickap/blog-test.ruzicka.dev)
-
-- Description: My test personal web site and blog
-- URL: <https://blog-test.ruzicka.dev>
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/blog-test.ruzicka.dev.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/blog-test.ruzicka.dev.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/blog-test.ruzicka.dev.svg?style=social)](https://github.com/ruzickap/blog-test.ruzicka.dev/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/blog-test.ruzicka.dev.svg?style=social)](https://github.com/ruzickap/blog-test.ruzicka.dev/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/blog-test.ruzicka.dev.svg?style=social)](https://github.com/ruzickap/blog-test.ruzicka.dev)
-
-- CI/CD status:
-
-  [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/blog-test.ruzicka.dev/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/actions/workflows/gh-pages-build.yml)
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/blog-test.ruzicka.dev/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/blog-test.ruzicka.dev/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/actions/workflows/periodic-broken-link-checks.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/blog-test.ruzicka.dev/workflows/Renovate/badge.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/actions/workflows/renovate.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/blog-test.ruzicka.dev.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/blog-test.ruzicka.dev.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/blog-test.ruzicka.dev.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/blog-test.ruzicka.dev.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/blog-test.ruzicka.dev/latest)](https://github.com/ruzickap/blog-test.ruzicka.dev/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/blog-test.ruzicka.dev.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/blog-test.ruzicka.dev.svg)](https://github.com/ruzickap/blog-test.ruzicka.dev)
-
 ## [petr.ruzicka.dev](https://github.com/ruzickap/petr.ruzicka.dev)
 
 - Description: Personal page
