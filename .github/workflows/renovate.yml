@@ -24,7 +24,7 @@ on:
       - .github/workflows/renovate.yml
       - .github/renovate.json5
   schedule:
-    - cron: "0 0,1 * * *"
+    - cron: "0 0,2,4 * * *"
 
 env:
   LOG_LEVEL: info
