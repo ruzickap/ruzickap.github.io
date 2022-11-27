@@ -41,6 +41,7 @@ jobs:
 
           echo "BASE_DOMAIN=${BASE_DOMAIN}" | tee -a "${GITHUB_OUTPUT}"
           echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_OUTPUT}"
+          sed -i "s@^url: .*@url: 'https://${BASE_DOMAIN}'@" _config.yml
 
       - name: Cache
         uses: actions/cache@v3
@@ -56,20 +57,12 @@ jobs:
           build_only: true
           build_dir: public
 
-      - name: Restore lychee cache
-        uses: actions/cache@v3
+      - name: Check broken links
+        uses: ruzickap/action-my-broken-link-checker@v2
         with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-
-      - name: Link Checker
-        uses: lycheeverse/lychee-action@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: "--cache --max-cache-age 1d ."
-          fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
+          url: https://${{ steps.variables.outputs.BASE_DOMAIN }}
+          pages_path: public
+          cmd_params: '--exclude=(linkedin.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/) --color=always --header="User-Agent:curl/7.54.0" --buffer-size=8192 --skip-tls-verification'
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -95,3 +88,18 @@ jobs:
           directory: ./public
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           projectName: ${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
+
+      - name: Restore lychee cache
+        uses: actions/cache@v3
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: Link Checker
+        uses: lycheeverse/lychee-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: "--cache --max-cache-age 1d ."
+          fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
