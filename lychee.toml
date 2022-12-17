@@ -1,15 +1,25 @@
-# Comma-separated list of accepted status codes for valid links
-accept = [ 999 ]
+# https://lychee.cli.rs/#/usage/config
+
+#############################  Cache  ###############################
 
 # Enable link caching. This can be helpful to avoid checking the same links on
 # multiple runs
 cache = true
 
-# Exclude all private IPs from checking
-exclude-all-private = true
+# Discard all cached requests older than this duration
+max_cache_age = "1d"
 
-# Exclude all mail addresses from checking
-exclude_mail = true
+#############################  Runtime  #############################
+
+# Maximum number of concurrent link checks
+max_concurrency = 128
+
+#############################  Requests  ############################
+
+# Comma-separated list of accepted status codes for valid links.
+accept = [999]
+
+#############################  Exclusions  ##########################
 
 # Exclude URLs and mail addresses from checking (supports regex)
 # https://github.com/cotes2020/jekyll-theme-chirpy/issues/758
@@ -21,14 +31,16 @@ exclude = [
 # Exclude these filesystem paths from getting checked
 exclude_path = [
   "_tabs/projects.md",
-  "public/projects/index.html",
-  "./_tabs/",
+  # ignore due to https://github.com/lycheeverse/lychee/issues/259
+  "./public/",
   "./vendor/",
   "./_site/",
 ]
 
-# Discard all cached requests older than this duration
-max-cache-age = "1d"
+# Exclude all private IPs from checking.
+# Equivalent to setting `exclude_private`, `exclude_link_local`, and
+# `exclude_loopback` to true
+exclude_all_private = false
 
-# Don't show interactive progress bar while checking links
-no-progress = true
+# Exclude all mail addresses from checking
+exclude_mail = true
