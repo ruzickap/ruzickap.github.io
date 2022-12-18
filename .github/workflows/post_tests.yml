@@ -1,0 +1,66 @@
+name: post_tests
+
+on:
+  # checkov:skip=CKV_GHA_7:The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty.
+  workflow_dispatch:
+    inputs:
+      posts:
+        type: choice
+        description: Select post
+        default: 2022-11-27-cheapest-amazon-eks
+        required: true
+        options:
+          - 2022-11-27-cheapest-amazon-eks
+      action:
+        type: choice
+        description: Select action
+        default: build + destroy
+        required: true
+        options:
+          - build
+          - destroy
+          - build + destroy
+
+jobs:
+  post-pipeline:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    name: "${{ inputs.action }} | ${{ inputs.posts }}"
+    concurrency:
+      group: post-pipeline
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-session-name: GitHubOidcFederatedRole
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+
+      - name: Check out repository code
+        uses: actions/checkout@v3
+
+      - name: "${{ inputs.action }} | ${{ inputs.posts }}"
+        run: |
+          set -euo pipefail
+
+          POST_FILES_ARRAY=()
+          # shellcheck disable=SC2043
+          for POST_FILE in ${{ inputs.action }} ; do
+            POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POST_FILE}*.md")")
+          done
+
+          if [[ "${{ inputs.action }}" =~ 'build' ]]; then
+            for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
+              echo "*** ${POST_FILE} | build"
+              sed -n "/^\`\`\`bash$/,/^\`\`\`$/p" "${POST_FILE}" | sed "/^\`\`\`*/d" | bash -euo pipefail
+            done
+          fi
+
+          if [[ "${{ inputs.action }}" =~ 'destroy' ]]; then
+            for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
+              echo "*** ${POST_FILES_ARRAY[idx]} | destroy"
+              sed -n "/^\`\`\`sh$/,/^\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed "/^\`\`\`*/d" | bash -euo pipefail
+            done
+          fi

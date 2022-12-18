@@ -34,12 +34,6 @@ Requirements:
 
 ## Build Amazon EKS cluster
 
-<!---
-Run all commands using:
-sed -n "/^\`\`\`bash$/,/^\`\`\`$/p" 2022-11-27-cheapest-amazon-eks.md | sed "/^\`\`\`*/d" | bash -euxo pipefail
-sed -n "/^\`\`\`sh$/,/^\`\`\`$/p"   2022-11-27-cheapest-amazon-eks.md | sed "/^\`\`\`*/d" | bash -euxo pipefail
--->
-
 ### Requirements
 
 If you would like to follow this documents and it's task you will need to set up
