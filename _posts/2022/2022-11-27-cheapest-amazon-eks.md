@@ -424,7 +424,7 @@ Service account `cert-manager` was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-CERT_MANAGER_HELM_CHART_VERSION="1.10.0"
+CERT_MANAGER_HELM_CHART_VERSION="1.10.1"
 
 helm repo add --force-update jetstack https://charts.jetstack.io
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values - cert-manager jetstack/cert-manager << EOF
