@@ -93,18 +93,9 @@ echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAG
 Required:
 
 - [AWS CLI](https://aws.amazon.com/cli/)
+- [eksctl](https://eksctl.io/)
 - [Helm](https://helm.sh/)
 - [kubectl](https://github.com/kubernetes/kubectl)
-
-Install [eksctl](https://eksctl.io/):
-
-```bash
-if ! command -v eksctl &> /dev/null; then
-  # renovate: datasource=github-tags depName=weaveworks/eksctl
-  EKSCTL_VERSION="0.118.0"
-  curl -s -L "https://github.com/weaveworks/eksctl/releases/download/v${EKSCTL_VERSION}/eksctl_$(uname)_amd64.tar.gz" | sudo tar xz -C /usr/local/bin/
-fi
-```
 
 ## Configure AWS Route 53 Domain delegation
 
@@ -530,7 +521,7 @@ and modify the
 INGRESS_NGINX_HELM_CHART_VERSION="4.4.0"
 
 helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --values - ingress-nginx ingress-nginx/ingress-nginx << EOF
+helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values - ingress-nginx ingress-nginx/ingress-nginx << EOF
 controller:
   replicaCount: 2
   watchIngressWithoutClass: true
@@ -686,7 +677,7 @@ ip-192-168-11-210.ec2.internal  t4g.medium  arm64
 ip-192-168-91-66.ec2.internal   t3a.small   amd64
 ```
 
-```bash
+```shell
 kubectl resource-capacity --sort cpu.util --util --pods --pod-count
 ```
 

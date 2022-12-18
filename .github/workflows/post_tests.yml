@@ -21,6 +21,11 @@ on:
           - destroy
           - build + destroy
 
+env:
+  AWS_DEFAULT_REGION: us-east-1
+  # renovate: datasource=github-tags depName=weaveworks/eksctl
+  EKSCTL_VERSION: 0.123.0
+
 jobs:
   post-pipeline:
     runs-on: ubuntu-latest
@@ -30,6 +35,7 @@ jobs:
     name: "${{ inputs.action }} | ${{ inputs.posts }}"
     concurrency:
       group: post-pipeline
+    timeout-minutes: 60
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -41,26 +47,33 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
+      - name: Install eksctl
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euxo pipefail
+          gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz "v${EKSCTL_VERSION}" --output - | sudo tar xz -C /usr/local/bin/
+
       - name: "${{ inputs.action }} | ${{ inputs.posts }}"
         run: |
           set -euo pipefail
 
           POST_FILES_ARRAY=()
           # shellcheck disable=SC2043
-          for POST_FILE in ${{ inputs.action }} ; do
+          for POST_FILE in ${{ inputs.posts }} ; do
             POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POST_FILE}*.md")")
           done
 
           if [[ "${{ inputs.action }}" =~ 'build' ]]; then
             for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
               echo "*** ${POST_FILE} | build"
-              sed -n "/^\`\`\`bash$/,/^\`\`\`$/p" "${POST_FILE}" | sed "/^\`\`\`*/d" | bash -euo pipefail
+              sed -n "/^\`\`\`bash$/,/^\`\`\`$/p" "${POST_FILE}" | sed "/^\`\`\`*/d" | bash -euxo pipefail
             done
           fi
 
           if [[ "${{ inputs.action }}" =~ 'destroy' ]]; then
             for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
               echo "*** ${POST_FILES_ARRAY[idx]} | destroy"
-              sed -n "/^\`\`\`sh$/,/^\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed "/^\`\`\`*/d" | bash -euo pipefail
+              sed -n "/^\`\`\`sh$/,/^\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed "/^\`\`\`*/d" | bash -euxo pipefail
             done
           fi
