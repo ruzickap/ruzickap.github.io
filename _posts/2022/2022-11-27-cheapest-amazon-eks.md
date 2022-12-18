@@ -495,7 +495,7 @@ Service account `external-dns` was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
-EXTERNAL_DNS_HELM_CHART_VERSION="1.11.0"
+EXTERNAL_DNS_HELM_CHART_VERSION="1.12.0"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --values - external-dns external-dns/external-dns << EOF
