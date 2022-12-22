@@ -599,7 +599,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=podinfo registryUrl=https://stefanprodan.github.io/podinfo
-PODINFO_HELM_CHART_VERSION="6.2.3"
+PODINFO_HELM_CHART_VERSION="6.3.0"
 
 helm repo add --force-update sp https://stefanprodan.github.io/podinfo
 helm upgrade --install --version "${PODINFO_HELM_CHART_VERSION}" --namespace podinfo --create-namespace --wait --values - podinfo sp/podinfo << EOF
