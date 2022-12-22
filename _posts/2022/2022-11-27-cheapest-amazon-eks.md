@@ -65,6 +65,7 @@ and other secrets/variables.
 export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AWS_SESSION_TOKEN="xxxxxxxx"
+export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
 ```
 
 Verify if all the necessary variables were set:
@@ -73,6 +74,7 @@ Verify if all the necessary variables were set:
 : "${AWS_ACCESS_KEY_ID?}"
 : "${AWS_DEFAULT_REGION?}"
 : "${AWS_SECRET_ACCESS_KEY?}"
+: "${AWS_ROLE_TO_ASSUME?}"
 : "${BASE_DOMAIN?}"
 : "${CLUSTER_FQDN?}"
 : "${CLUSTER_NAME?}"
@@ -323,6 +325,8 @@ Get the kubeconfig to access the cluster:
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
     eksctl create cluster --config-file "tmp/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
+    # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
+    eksctl create iamidentitymapping --cluster="${CLUSTER_NAME}" --region="${AWS_DEFAULT_REGION}" --arn="${AWS_ROLE_TO_ASSUME}" --group system:masters --username admin
   else
     eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
   fi
@@ -370,6 +374,9 @@ spec:
   providerRef:
     name: default
   ttlSecondsAfterEmpty: 30
+  labels:
+    managedBy: karpenter
+    provisioner: default
 ---
 apiVersion: karpenter.k8s.aws/v1alpha1
 kind: AWSNodeTemplate
@@ -564,6 +571,19 @@ spec:
           requests:
             cpu: 1
             memory: 16Mi
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: managedBy
+                operator: In
+                values:
+                - karpenter
+              - key: provisioner
+                operator: In
+                values:
+                - default
       nodeSelector:
         kubernetes.io/arch: amd64
 EOF
@@ -721,6 +741,27 @@ ip-192-168-90-242.ec2.internal   kube-system     aws-node-dzm8h                 
 ip-192-168-90-242.ec2.internal   podinfo         podinfo-7d56b99d4-tpdck                     1000m (51%)    0Mi (0%)       3m (0%)     16Mi (1%)         0Mi (0%)        15Mi (1%)
 ip-192-168-90-242.ec2.internal   kube-system     kube-proxy-7vp5f                            100m (5%)      0Mi (0%)       1m (0%)     0Mi (0%)          0Mi (0%)        11Mi (0%)
 ip-192-168-90-242.ec2.internal   kube-system     ebs-csi-node-gzbwl                          30m (1%)       300m (15%)     1m (0%)     120Mi (8%)        768Mi (56%)     19Mi (1%)
+```
+
+```shell
+eks-node-viewer --resources cpu,memory
+```
+
+Output:
+
+```text
+4 nodes 5540m/7720m      71.8% cpu    █████████████████████████████░░░░░░░░░░░ 0.103/hour $75.044/month
+        3560Mi/9664820Ki 37.7% memory ███████████████░░░░░░░░░░░░░░░░░░░░░░░░░
+27 pods (0 pending 27 running 27 bound)
+
+ip-192-168-2-146.ec2.internal  cpu    ███████████████████████████████░░░░  89% (10 pods) t4g.medium/$0.034 On-Demand Ready
+                               memory ██████████████████░░░░░░░░░░░░░░░░░  52%
+ip-192-168-16-110.ec2.internal cpu    ███████████████████████████░░░░░░░░  78% (9 pods)  t4g.medium/$0.034 On-Demand Ready
+                               memory █████████████████░░░░░░░░░░░░░░░░░░  48%
+ip-192-168-74-86.ec2.internal  cpu    █████████████████████░░░░░░░░░░░░░░  60% (4 pods)  t3a.small/$0.019  On-Demand Ready
+                               memory ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   9%
+ip-192-168-83-78.ec2.internal  cpu    █████████████████████░░░░░░░░░░░░░░  60% (4 pods)  t4g.small/$0.017  On-Demand Ready
+                               memory ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  10%
 ```
 
 ## Clean-up
