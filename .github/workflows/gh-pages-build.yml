@@ -19,12 +19,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
+          fetch-depth: 0
           submodules: true
 
       - name: Prepare public directory
         run: |
           mkdir public
-          cp CNAME LICENSE README.md public/
+          cp LICENSE README.md public/
           touch public/.nojekyll
 
       - name: Set Variables
@@ -43,19 +44,20 @@ jobs:
           echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_OUTPUT}"
           sed -i "s@^url: .*@url: 'https://${BASE_DOMAIN}'@" _config.yml
 
-      - name: Cache
-        uses: actions/cache@v3
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
+          ruby-version: 3
+          bundler-cache: true
 
-      - name: Build jekyll page
-        uses: helaili/jekyll-action@v2
-        with:
-          build_only: true
-          build_dir: public
+      - name: Build site
+        run: bundle exec jekyll build --destination "public"
+        env:
+          JEKYLL_ENV: "production"
+
+      - name: Test site
+        run: |
+          bundle exec htmlproofer public --disable-external --check-html --allow_hash_href
 
       - name: Check broken links
         uses: ruzickap/action-my-broken-link-checker@v2
