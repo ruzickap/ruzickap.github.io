@@ -6,9 +6,9 @@
 
 My test personal site and blog...
 
-[**blog.ruzicka.dev →**](https://blog.ruzicka.dev)
+[**ruzickap.github.io →**](https://ruzickap.github.io/)
 
-- Main Page: <https://blog.ruzicka.dev>
+- Main Page: <https://blog.ruzicka.dev>, <https://ruzickap.github.io>
 - Dev Page: <https://ruzickap-github-io.pages.dev>
 
 [![Build and Deploy](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml/badge.svg?branch=main)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)

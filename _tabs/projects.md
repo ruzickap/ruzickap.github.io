@@ -653,7 +653,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [ruzickap.github.io](https://github.com/ruzickap/ruzickap.github.io)
 
 - Description: blog.ruzicka.dev | personal blog
-- URL: <https://blog.ruzicka.dev>
+- URL: <https://blog.ruzicka.dev>, <https://ruzickap.github.io>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/blob/main/LICENSE)
