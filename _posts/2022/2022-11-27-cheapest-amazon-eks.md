@@ -7,8 +7,7 @@ categories: [Kubernetes, Amazon EKS]
 tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl, cert-manager, external-dns, podinfo]
 image:
   path: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
-  width: 20%
-  height: 20%
+  width: 200
   alt: Amazon EKS
 ---
 
@@ -41,7 +40,7 @@ few environment variables.
 
 `BASE_DOMAIN` (`k8s.mylabs.dev`) contains DNS records for all your Kubernetes
 clusters. The cluster names will look like `CLUSTER_NAME`.`BASE_DOMAIN`
-(`kube1.k8s.mylabs.dev`).
+(`k01.k8s.mylabs.dev`).
 
 ```bash
 # AWS Region
@@ -66,6 +65,8 @@ export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AWS_SESSION_TOKEN="xxxxxxxx"
 export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
+export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
+export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```
 
 Verify if all the necessary variables were set:
@@ -78,6 +79,8 @@ Verify if all the necessary variables were set:
 : "${BASE_DOMAIN?}"
 : "${CLUSTER_FQDN?}"
 : "${CLUSTER_NAME?}"
+: "${GOOGLE_CLIENT_ID?}"
+: "${GOOGLE_CLIENT_SECRET?}"
 : "${KUBECONFIG?}"
 : "${LETSENCRYPT_ENVIRONMENT?}"
 : "${MY_EMAIL?}"
@@ -96,7 +99,6 @@ Required:
 
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
-- [Helm](https://helm.sh/)
 - [kubectl](https://github.com/kubernetes/kubectl)
 
 ## Configure AWS Route 53 Domain delegation
@@ -260,7 +262,7 @@ fi
 I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/c365149fc1a0b8d357139cbd6cda5aee8841c16c/logo/eksctl.png
-"eksctl"){: width="700" }{: .shadow }
+"eksctl"){: width="700" }
 
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
 
@@ -336,10 +338,10 @@ aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 echo -e "***************\n export KUBECONFIG=${KUBECONFIG} \n***************"
 ```
 
-Configure [Karpenter](https://karpenter.sh/)
+Configure [Karpenter](https://karpenter.sh/):
 
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
-"Karpenter"){: width="600" }{: .shadow }
+"Karpenter"){: width="500" }
 
 ```bash
 cat << EOF | kubectl apply -f -
@@ -395,13 +397,247 @@ spec:
 EOF
 ```
 
----
+## Prometheus, DNS, Ingress, Certificates and others
 
-## DNS, Ingress, Certificates
+There are many k8s services / applications which can export metrics to
+Prometheus. That is the reason why the prometheus should be "first" application
+which should be installed on the k8s cluster.
 
-Install the basic tools, before running some applications like DNS integration
-([external-dns](https://github.com/kubernetes-sigs/external-dns)), Ingress ([ingress-nginx](https://kubernetes.github.io/ingress-nginx/)),
-certificate management ([cert-manager](https://cert-manager.io/)), ...
+Then you will need some basic tools / integrations, like [external-dns](https://github.com/kubernetes-sigs/external-dns),
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/),
+[cert-manager](https://cert-manager.io/), [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/),
+...
+
+### kube-prometheus-stack
+
+Install `kube-prometheus-stack`
+[helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+and modify the
+[default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml):
+
+![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg
+"prometheus"){: width="500" }
+
+```bash
+# renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="43.1.4"
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --create-namespace --values - kube-prometheus-stack prometheus-community/kube-prometheus-stack << EOF
+defaultRules:
+  rules:
+    etcd: false
+    kubernetesSystem: false
+    kubeScheduler: false
+alertmanager:
+  config:
+    global:
+      smtp_smarthost: "mailhog.mailhog.svc.cluster.local:1025"
+      smtp_from: "alertmanager@${CLUSTER_FQDN}"
+    route:
+      group_by: ["alertname", "job"]
+      receiver: email-notifications
+      routes:
+        - match:
+            severity: warning
+          receiver: email-notifications
+    receivers:
+      - name: email-notifications
+        email_configs:
+          - to: "notification@${CLUSTER_FQDN}"
+            require_tls: false
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      forecastle.stakater.com/expose: "true"
+      forecastle.stakater.com/icon: https://raw.githubusercontent.com/stakater/ForecastleIcons/master/alert-manager.png
+      forecastle.stakater.com/appName: Alert Manager
+      nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+      nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+    hosts:
+      - alertmanager.${CLUSTER_FQDN}
+    paths: ["/"]
+    pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - alertmanager.${CLUSTER_FQDN}
+# https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
+grafana:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      forecastle.stakater.com/expose: "true"
+      forecastle.stakater.com/icon: https://raw.githubusercontent.com/stakater/ForecastleIcons/master/grafana.png
+      forecastle.stakater.com/appName: Grafana
+      nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+      nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+      nginx.ingress.kubernetes.io/configuration-snippet: |
+        auth_request_set \$email \$upstream_http_x_auth_request_email;
+        proxy_set_header X-Email \$email;
+    hosts:
+      - grafana.${CLUSTER_FQDN}
+    paths: ["/"]
+    pathType: ImplementationSpecific
+    tls:
+      - hosts:
+          - grafana.${CLUSTER_FQDN}
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: "default"
+          orgId: 1
+          folder: ""
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+  dashboards:
+    default:
+      k8s-cluster-summary:
+        gnetId: 8685
+        revision: 1
+        datasource: Prometheus
+      node-exporter-full:
+        gnetId: 1860
+        revision: 27
+        datasource: Prometheus
+      prometheus-2-0-overview:
+        gnetId: 3662
+        revision: 2
+        datasource: Prometheus
+      stians-disk-graphs:
+        gnetId: 9852
+        revision: 1
+        datasource: Prometheus
+      kubernetes-apiserver:
+        gnetId: 12006
+        revision: 1
+        datasource: Prometheus
+      ingress-nginx:
+        gnetId: 9614
+        revision: 1
+        datasource: Prometheus
+      ingress-nginx2:
+        gnetId: 11875
+        revision: 1
+        datasource: Prometheus
+      external-dns:
+        gnetId: 15038
+        revision: 1
+        datasource: Prometheus
+      kubernetes-monitor:
+        gnetId: 15398
+        revision: 6
+        datasource: Prometheus
+      cluster-autoscaler-stats:
+        gnetId: 12623
+        revision: 1
+        datasource: Prometheus
+      kubernetes-nginx-ingress-prometheus-nextgen:
+        gnetId: 14314
+        revision: 2
+        datasource: Prometheus
+      portefaix-kubernetes-cluster-overview:
+        gnetId: 13473
+        revision: 2
+        datasource: Prometheus
+      # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
+      kubernetes-views-pods:
+        gnetId: 15760
+        revision: 10
+        datasource: Prometheus
+      kubernetes-views-global:
+        gnetId: 15757
+        revision: 14
+        datasource: Prometheus
+      kubernetes-views-namespaces:
+        gnetId: 15758
+        revision: 12
+        datasource: Prometheus
+      kubernetes-views-nodes:
+        gnetId: 15759
+        revision: 8
+        datasource: Prometheus
+      kubernetes-system-api-server:
+        gnetId: 15761
+        revision: 8
+        datasource: Prometheus
+      kubernetes-system-coredns:
+        gnetId: 15762
+        revision: 6
+        datasource: Prometheus
+  grafana.ini:
+    server:
+      root_url: https://grafana.${CLUSTER_FQDN}
+    # Use oauth2-proxy instead of default Grafana Oauth
+    auth.basic:
+      enabled: false
+    auth.proxy:
+      auto_sign_up: true
+      enabled: true
+      header_name: X-Email
+      header_property: email
+    users:
+      allow_sign_up: false
+      auto_assign_org: true
+      auto_assign_org_role: Admin
+  smtp:
+    enabled: true
+    host: "mailhog.mailhog.svc.cluster.local:1025"
+    from_address: grafana@${CLUSTER_FQDN}
+kubeControllerManager:
+  enabled: false
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+prometheusOperator:
+  tls:
+    enabled: false
+  admissionWebhooks:
+    enabled: false
+prometheus:
+  ingress:
+    enabled: true
+    ingressClassName: nginx
+    annotations:
+      forecastle.stakater.com/expose: "true"
+      forecastle.stakater.com/icon: https://raw.githubusercontent.com/cncf/artwork/master/projects/prometheus/icon/color/prometheus-icon-color.svg
+      forecastle.stakater.com/appName: Prometheus
+      nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+      nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+    paths: ["/"]
+    pathType: ImplementationSpecific
+    hosts:
+      - prometheus.${CLUSTER_FQDN}
+    tls:
+      - hosts:
+          - prometheus.${CLUSTER_FQDN}
+  prometheusSpec:
+    externalLabels:
+      cluster: ${CLUSTER_FQDN}
+    externalUrl: https://prometheus.${CLUSTER_FQDN}
+    ruleSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    retentionSize: 1GB
+    walCompression: true
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 2Gi
+EOF
+```
 
 ### cert-manager
 
@@ -412,20 +648,26 @@ and modify the
 Service account `cert-manager` was created by `eksctl`.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg
-"cert-manager"){: width="200" }{: .shadow }
+"cert-manager"){: width="200" }
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.10.1"
 
-helm repo add --force-update jetstack https://charts.jetstack.io
+helm repo add jetstack https://charts.jetstack.io
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values - cert-manager jetstack/cert-manager << EOF
 installCRDs: true
 serviceAccount:
   create: false
   name: cert-manager
 extraArgs:
+  - --cluster-resource-namespace=cert-manager
   - --enable-certificate-owner-ref=true
+securityContext:
+  fsGroup: 1001
+prometheus:
+  servicemonitor:
+    enabled: true
 EOF
 ```
 
@@ -476,6 +718,27 @@ EOF
 kubectl wait --namespace cert-manager --timeout=10m --for=condition=Ready clusterissuer --all
 ```
 
+Create certificate:
+
+```bash
+kubectl apply -f - << EOF
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ingress-cert-${LETSENCRYPT_ENVIRONMENT}
+  namespace: cert-manager
+spec:
+  secretName: ingress-cert-${LETSENCRYPT_ENVIRONMENT}
+  issuerRef:
+    name: letsencrypt-${LETSENCRYPT_ENVIRONMENT}-dns
+    kind: ClusterIssuer
+  commonName: "*.${CLUSTER_FQDN}"
+  dnsNames:
+    - "*.${CLUSTER_FQDN}"
+    - "${CLUSTER_FQDN}"
+EOF
+```
+
 ### metrics-server
 
 Install `metrics-server`
@@ -500,19 +763,28 @@ and modify the
 `external-dns` will take care about DNS records.
 Service account `external-dns` was created by `eksctl`.
 
+![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png
+"external-dns"){: width="300" }
+
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.12.0"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --values - external-dns external-dns/external-dns << EOF
+aws:
+  region: ${AWS_DEFAULT_REGION}
+domainFilters:
+  - ${CLUSTER_FQDN}
+interval: 20s
+policy: sync
 serviceAccount:
   create: false
   name: external-dns
-interval: 20s
-policy: sync
-domainFilters:
-  - ${CLUSTER_FQDN}
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
 EOF
 ```
 
@@ -527,241 +799,182 @@ and modify the
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
 INGRESS_NGINX_HELM_CHART_VERSION="4.4.0"
 
-helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values - ingress-nginx ingress-nginx/ingress-nginx << EOF
 controller:
-  replicaCount: 2
-  watchIngressWithoutClass: true
+  ingressClassResource:
+    default: true
+  extraArgs:
+    default-ssl-certificate: "cert-manager/ingress-cert-${LETSENCRYPT_ENVIRONMENT}"
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
       service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "$(echo "${TAGS}" | tr " " ,)"
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+    prometheusRule:
+      enabled: true
+      rules:
+        - alert: NGINXConfigFailed
+          expr: count(nginx_ingress_controller_config_last_reload_successful == 0) > 0
+          for: 1s
+          labels:
+            severity: critical
+          annotations:
+            description: bad ingress config - nginx config test failed
+            summary: uninstall the latest ingress changes to allow config reloads to resume
+        - alert: NGINXCertificateExpiry
+          expr: (avg(nginx_ingress_controller_ssl_expire_time_seconds) by (host) - time()) < 604800
+          for: 1s
+          labels:
+            severity: critical
+          annotations:
+            description: ssl certificate(s) will expire in less then a week
+            summary: renew expiring certificates to avoid downtime
+        - alert: NGINXTooMany500s
+          expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"5.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            description: Too many 5XXs
+            summary: More than 5% of all requests returned 5XX, this requires your attention
+        - alert: NGINXTooMany400s
+          expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"4.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            description: Too many 4XXs
+            summary: More than 5% of all requests returned 4XX, this requires your attention
 EOF
 ```
 
-## Workloads
+### mailhog
 
-Run some workload on the K8s...
-
-Start the amd64 only container:
-
-```bash
-kubectl apply -f - << EOF
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  selector:
-    matchLabels:
-      app: nginx
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:1.14.2
-        ports:
-        - containerPort: 80
-        resources:
-          requests:
-            cpu: 1
-            memory: 16Mi
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: managedBy
-                operator: In
-                values:
-                - karpenter
-              - key: provisioner
-                operator: In
-                values:
-                - default
-      nodeSelector:
-        kubernetes.io/arch: amd64
-EOF
-```
-
-Install `podinfo`
-[helm chart](https://artifacthub.io/packages/helm/podinfo/podinfo)
+Install `mailhog`
+[helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
 and modify the
-[default values](https://github.com/stefanprodan/podinfo/blob/master/charts/podinfo/values.yaml).
+[default values](https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml).
 
-![podinfo](https://raw.githubusercontent.com/stefanprodan/podinfo/a7be119f20369b97f209d220535506af7c49b4ea/screens/podinfo-ui-v3.png
-"podinfo"){: width="500" }{: .shadow }
+![MailHog](https://avatars.githubusercontent.com/u/10258541?s=200&v=4
+"mailhog"){: width="200" }
 
 ```bash
-# renovate: datasource=helm depName=podinfo registryUrl=https://stefanprodan.github.io/podinfo
-PODINFO_HELM_CHART_VERSION="6.3.0"
+# renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
+MAILHOG_HELM_CHART_VERSION="5.2.2"
 
-helm repo add --force-update sp https://stefanprodan.github.io/podinfo
-helm upgrade --install --version "${PODINFO_HELM_CHART_VERSION}" --namespace podinfo --create-namespace --wait --values - podinfo sp/podinfo << EOF
-certificate:
-  create: true
-  issuerRef:
-    kind: ClusterIssuer
-    name: letsencrypt-${LETSENCRYPT_ENVIRONMENT}-dns
-  dnsNames:
-    - podinfo.${CLUSTER_FQDN}
+helm repo add codecentric https://codecentric.github.io/helm-charts
+helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mailhog --create-namespace --values - mailhog codecentric/mailhog << EOF
+image:
+  repository: docker.io/allthings/mailhog
+  tag: multiarch
 ingress:
   enabled: true
-  className: nginx
+  annotations:
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/icon: https://avatars.githubusercontent.com/u/10258541?s=200&v=4
+    forecastle.stakater.com/appName: Mailhog
+    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+  ingressClassName: nginx
   hosts:
-    - host: podinfo.${CLUSTER_FQDN}
+    - host: mailhog.${CLUSTER_FQDN}
       paths:
         - path: /
           pathType: ImplementationSpecific
   tls:
-    - secretName: podinfo-tls
-      hosts:
-        - podinfo.${CLUSTER_FQDN}
-resources:
-  requests:
-    cpu: 1
-    memory: 16Mi
+    - hosts:
+        - mailhog.${CLUSTER_FQDN}
 EOF
-
-kubectl scale deployment -n podinfo podinfo --replicas 1
 ```
 
-Check cluster + node details:
+### forecastle
+
+Install `forecastle`
+[helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
+and modify the
+[default values](https://github.com/stakater/Forecastle/blob/master/deployments/kubernetes/chart/forecastle/values.yaml).
+
+![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png
+"forecastle"){: width="200" }
 
 ```bash
-kubectl get nodes -o wide
+# renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
+FORECASTLE_HELM_CHART_VERSION="1.0.113"
+
+helm repo add stakater https://stakater.github.io/stakater-charts
+helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace forecastle --create-namespace --values - forecastle stakater/forecastle << EOF
+forecastle:
+  config:
+    namespaceSelector:
+      any: true
+    title: Launch Pad
+  ingress:
+    enabled: true
+    annotations:
+      nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+      nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    className: nginx
+    hosts:
+      - host: ${CLUSTER_FQDN}
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - ${CLUSTER_FQDN}
+EOF
 ```
 
-Output:
+### oauth2-proxy
 
-```text
-NAME                             STATUS   ROLES    AGE     VERSION               INTERNAL-IP      EXTERNAL-IP     OS-IMAGE                                KERNEL-VERSION   CONTAINER-RUNTIME
-ip-192-168-11-210.ec2.internal   Ready    <none>   21m     v1.24.6-eks-4360b32   192.168.11.210   54.89.253.185   Bottlerocket OS 1.11.1 (aws-k8s-1.24)   5.15.59          containerd://1.6.8+bottlerocket
-ip-192-168-17-24.ec2.internal    Ready    <none>   21m     v1.24.6-eks-4360b32   192.168.17.24    3.88.130.104    Bottlerocket OS 1.11.1 (aws-k8s-1.24)   5.15.59          containerd://1.6.8+bottlerocket
-ip-192-168-90-242.ec2.internal   Ready    <none>   9m10s   v1.24.6-eks-4360b32   192.168.90.242   <none>          Bottlerocket OS 1.11.1 (aws-k8s-1.24)   5.15.59          containerd://1.6.8+bottlerocket
-ip-192-168-91-66.ec2.internal    Ready    <none>   9m16s   v1.24.6-eks-4360b32   192.168.91.66    <none>          Bottlerocket OS 1.11.1 (aws-k8s-1.24)   5.15.59          containerd://1.6.8+bottlerocket
-```
+Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
+the endopints by Google Authentication.
+
+![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg
+"oauth2-proxy"){: width="400" }
+
+Install `oauth2-proxy`
+[helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
+and modify the
+[default values](https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml).
 
 ```bash
-kubectl get pods -A -o wide --sort-by='.status.hostIP'
-```
+# renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
+OAUTH2_PROXY_HELM_CHART_VERSION="6.7.0"
 
-Output:
-
-```text
-NAMESPACE       NAME                                        READY   STATUS    RESTARTS   AGE     IP               NODE                             NOMINATED NODE   READINESS GATES
-kube-system     aws-node-tckpq                              1/1     Running   0          21m     192.168.11.210   ip-192-168-11-210.ec2.internal   <none>           <none>
-kube-system     ebs-csi-node-szg4l                          3/3     Running   0          17m     192.168.0.255    ip-192-168-11-210.ec2.internal   <none>           <none>
-kube-system     metrics-server-7cd9d56884-54l69             1/1     Running   0          10m     192.168.25.190   ip-192-168-11-210.ec2.internal   <none>           <none>
-kube-system     kube-proxy-rgb82                            1/1     Running   0          21m     192.168.11.210   ip-192-168-11-210.ec2.internal   <none>           <none>
-cert-manager    cert-manager-cainjector-86f7f4749-4j49w     1/1     Running   0          11m     192.168.1.116    ip-192-168-11-210.ec2.internal   <none>           <none>
-kube-system     ebs-csi-controller-6b894589bd-m64jn         6/6     Running   0          17m     192.168.23.73    ip-192-168-11-210.ec2.internal   <none>           <none>
-ingress-nginx   ingress-nginx-controller-777c5c9d68-z29nc   1/1     Running   0          9m52s   192.168.14.14    ip-192-168-11-210.ec2.internal   <none>           <none>
-karpenter       karpenter-57595c57c5-mtbcg                  2/2     Running   0          12m     192.168.12.13    ip-192-168-11-210.ec2.internal   <none>           <none>
-cert-manager    cert-manager-webhook-66c85f8577-5c9kk       1/1     Running   0          11m     192.168.2.165    ip-192-168-11-210.ec2.internal   <none>           <none>
-kube-system     coredns-79989457d9-r6f7d                    1/1     Running   0          32m     192.168.20.61    ip-192-168-17-24.ec2.internal    <none>           <none>
-karpenter       karpenter-57595c57c5-vf6nt                  2/2     Running   0          12m     192.168.23.69    ip-192-168-17-24.ec2.internal    <none>           <none>
-external-dns    external-dns-6df56bcbb5-2c6lh               1/1     Running   0          10m     192.168.17.251   ip-192-168-17-24.ec2.internal    <none>           <none>
-kube-system     coredns-79989457d9-d2qh6                    1/1     Running   0          32m     192.168.15.109   ip-192-168-17-24.ec2.internal    <none>           <none>
-cert-manager    cert-manager-7d57b6576b-slv5h               1/1     Running   0          11m     192.168.7.107    ip-192-168-17-24.ec2.internal    <none>           <none>
-kube-system     ebs-csi-controller-6b894589bd-r9zkg         6/6     Running   0          17m     192.168.26.132   ip-192-168-17-24.ec2.internal    <none>           <none>
-ingress-nginx   ingress-nginx-controller-777c5c9d68-qbqh8   1/1     Running   0          9m52s   192.168.6.199    ip-192-168-17-24.ec2.internal    <none>           <none>
-kube-system     kube-proxy-cxmcx                            1/1     Running   0          21m     192.168.17.24    ip-192-168-17-24.ec2.internal    <none>           <none>
-kube-system     ebs-csi-node-w5vkx                          3/3     Running   0          17m     192.168.8.186    ip-192-168-17-24.ec2.internal    <none>           <none>
-kube-system     aws-node-mwrmh                              1/1     Running   0          21m     192.168.17.24    ip-192-168-17-24.ec2.internal    <none>           <none>
-kube-system     kube-proxy-7vp5f                            1/1     Running   0          9m22s   192.168.90.242   ip-192-168-90-242.ec2.internal   <none>           <none>
-kube-system     aws-node-dzm8h                              1/1     Running   0          9m22s   192.168.90.242   ip-192-168-90-242.ec2.internal   <none>           <none>
-podinfo         podinfo-7d56b99d4-tpdck                     1/1     Running   0          9m26s   192.168.77.89    ip-192-168-90-242.ec2.internal   <none>           <none>
-kube-system     ebs-csi-node-gzbwl                          3/3     Running   0          9m22s   192.168.81.188   ip-192-168-90-242.ec2.internal   <none>           <none>
-kube-system     ebs-csi-node-6pmkx                          3/3     Running   0          9m28s   192.168.80.127   ip-192-168-91-66.ec2.internal    <none>           <none>
-kube-system     aws-node-4bpvh                              1/1     Running   0          9m28s   192.168.91.66    ip-192-168-91-66.ec2.internal    <none>           <none>
-kube-system     kube-proxy-crj2t                            1/1     Running   0          9m28s   192.168.91.66    ip-192-168-91-66.ec2.internal    <none>           <none>
-default         nginx-deployment-5c7f597d98-xw9tw           1/1     Running   0          9m33s   192.168.89.194   ip-192-168-91-66.ec2.internal    <none>           <none>
-```
-
-```bash
-kubectl get nodes -o json | jq -Cjr '.items[] | .metadata.name," ",.metadata.labels."node.kubernetes.io/instance-type"," ",.metadata.labels."kubernetes.io/arch", "\n"' | sort -k2 -r | column -t
-```
-
-Output:
-
-```text
-ip-192-168-90-242.ec2.internal  t4g.small   arm64
-ip-192-168-17-24.ec2.internal   t4g.medium  arm64
-ip-192-168-11-210.ec2.internal  t4g.medium  arm64
-ip-192-168-91-66.ec2.internal   t3a.small   amd64
-```
-
-```shell
-kubectl resource-capacity --sort cpu.util --util --pods --pod-count
-```
-
-Output:
-
-```text
-NODE                             NAMESPACE       POD                                         CPU REQUESTS   CPU LIMITS     CPU UTIL    MEMORY REQUESTS   MEMORY LIMITS   MEMORY UTIL    POD COUNT
-*                                *               *                                           5540m (71%)    4800m (62%)    181m (2%)   3560Mi (37%)      8732Mi (92%)    2130Mi (22%)   27/53
-
-ip-192-168-11-210.ec2.internal   *               *                                           1515m (78%)    2100m (108%)   55m (2%)    1574Mi (47%)      3428Mi (104%)   678Mi (20%)    9/17
-ip-192-168-11-210.ec2.internal   karpenter       karpenter-57595c57c5-mtbcg                  1200m (62%)    1200m (62%)    3m (0%)     1124Mi (34%)      1124Mi (34%)    99Mi (3%)
-ip-192-168-11-210.ec2.internal   kube-system     ebs-csi-controller-6b894589bd-m64jn         60m (3%)       600m (31%)     3m (0%)     240Mi (7%)        1536Mi (46%)    51Mi (1%)
-ip-192-168-11-210.ec2.internal   kube-system     metrics-server-7cd9d56884-54l69             0Mi (0%)       0Mi (0%)       3m (0%)     0Mi (0%)          0Mi (0%)        18Mi (0%)
-ip-192-168-11-210.ec2.internal   kube-system     aws-node-tckpq                              25m (1%)       0Mi (0%)       3m (0%)     0Mi (0%)          0Mi (0%)        28Mi (0%)
-ip-192-168-11-210.ec2.internal   cert-manager    cert-manager-cainjector-86f7f4749-4j49w     0Mi (0%)       0Mi (0%)       2m (0%)     0Mi (0%)          0Mi (0%)        16Mi (0%)
-ip-192-168-11-210.ec2.internal   kube-system     ebs-csi-node-szg4l                          30m (1%)       300m (15%)     1m (0%)     120Mi (3%)        768Mi (23%)     19Mi (0%)
-ip-192-168-11-210.ec2.internal   kube-system     kube-proxy-rgb82                            100m (5%)      0Mi (0%)       1m (0%)     0Mi (0%)          0Mi (0%)        10Mi (0%)
-ip-192-168-11-210.ec2.internal   cert-manager    cert-manager-webhook-66c85f8577-5c9kk       0Mi (0%)       0Mi (0%)       1m (0%)     0Mi (0%)          0Mi (0%)        10Mi (0%)
-ip-192-168-11-210.ec2.internal   ingress-nginx   ingress-nginx-controller-777c5c9d68-z29nc   100m (5%)      0Mi (0%)       1m (0%)     90Mi (2%)         0Mi (0%)        64Mi (1%)
-
-ip-192-168-17-24.ec2.internal    *               *                                           1715m (88%)    2100m (108%)   52m (2%)    1714Mi (52%)      3768Mi (114%)   623Mi (18%)    10/17
-ip-192-168-17-24.ec2.internal    kube-system     aws-node-mwrmh                              25m (1%)       0Mi (0%)       3m (0%)     0Mi (0%)          0Mi (0%)        28Mi (0%)
-ip-192-168-17-24.ec2.internal    kube-system     ebs-csi-controller-6b894589bd-r9zkg         60m (3%)       600m (31%)     2m (0%)     240Mi (7%)        1536Mi (46%)    51Mi (1%)
-ip-192-168-17-24.ec2.internal    kube-system     coredns-79989457d9-r6f7d                    100m (5%)      0Mi (0%)       2m (0%)     70Mi (2%)         170Mi (5%)      12Mi (0%)
-ip-192-168-17-24.ec2.internal    kube-system     ebs-csi-node-w5vkx                          30m (1%)       300m (15%)     1m (0%)     120Mi (3%)        768Mi (23%)     19Mi (0%)
-ip-192-168-17-24.ec2.internal    kube-system     coredns-79989457d9-d2qh6                    100m (5%)      0Mi (0%)       1m (0%)     70Mi (2%)         170Mi (5%)      12Mi (0%)
-ip-192-168-17-24.ec2.internal    karpenter       karpenter-57595c57c5-vf6nt                  1200m (62%)    1200m (62%)    1m (0%)     1124Mi (34%)      1124Mi (34%)    32Mi (0%)
-ip-192-168-17-24.ec2.internal    kube-system     kube-proxy-cxmcx                            100m (5%)      0Mi (0%)       1m (0%)     0Mi (0%)          0Mi (0%)        10Mi (0%)
-ip-192-168-17-24.ec2.internal    cert-manager    cert-manager-7d57b6576b-slv5h               0Mi (0%)       0Mi (0%)       1m (0%)     0Mi (0%)          0Mi (0%)        25Mi (0%)
-ip-192-168-17-24.ec2.internal    external-dns    external-dns-6df56bcbb5-2c6lh               0Mi (0%)       0Mi (0%)       1m (0%)     0Mi (0%)          0Mi (0%)        18Mi (0%)
-ip-192-168-17-24.ec2.internal    ingress-nginx   ingress-nginx-controller-777c5c9d68-qbqh8   100m (5%)      0Mi (0%)       1m (0%)     90Mi (2%)         0Mi (0%)        65Mi (1%)
-
-ip-192-168-91-66.ec2.internal    *               *                                           1155m (59%)    300m (15%)     42m (2%)    136Mi (9%)        768Mi (51%)     433Mi (29%)    4/8
-ip-192-168-91-66.ec2.internal    kube-system     aws-node-4bpvh                              25m (1%)       0Mi (0%)       5m (0%)     0Mi (0%)          0Mi (0%)        29Mi (1%)
-ip-192-168-91-66.ec2.internal    kube-system     ebs-csi-node-6pmkx                          30m (1%)       300m (15%)     1m (0%)     120Mi (8%)        768Mi (51%)     20Mi (1%)
-ip-192-168-91-66.ec2.internal    kube-system     kube-proxy-crj2t                            100m (5%)      0Mi (0%)       1m (0%)     0Mi (0%)          0Mi (0%)        10Mi (0%)
-ip-192-168-91-66.ec2.internal    default         nginx-deployment-5c7f597d98-xw9tw           1000m (51%)    0Mi (0%)       0m (0%)     16Mi (1%)         0Mi (0%)        2Mi (0%)
-
-ip-192-168-90-242.ec2.internal   *               *                                           1155m (59%)    300m (15%)     34m (1%)    136Mi (9%)        768Mi (56%)     399Mi (29%)    4/11
-ip-192-168-90-242.ec2.internal   kube-system     aws-node-dzm8h                              25m (1%)       0Mi (0%)       4m (0%)     0Mi (0%)          0Mi (0%)        25Mi (1%)
-ip-192-168-90-242.ec2.internal   podinfo         podinfo-7d56b99d4-tpdck                     1000m (51%)    0Mi (0%)       3m (0%)     16Mi (1%)         0Mi (0%)        15Mi (1%)
-ip-192-168-90-242.ec2.internal   kube-system     kube-proxy-7vp5f                            100m (5%)      0Mi (0%)       1m (0%)     0Mi (0%)          0Mi (0%)        11Mi (0%)
-ip-192-168-90-242.ec2.internal   kube-system     ebs-csi-node-gzbwl                          30m (1%)       300m (15%)     1m (0%)     120Mi (8%)        768Mi (56%)     19Mi (1%)
-```
-
-```shell
-eks-node-viewer --resources cpu,memory
-```
-
-Output:
-
-```text
-4 nodes 5540m/7720m      71.8% cpu    █████████████████████████████░░░░░░░░░░░ 0.103/hour $75.044/month
-        3560Mi/9664820Ki 37.7% memory ███████████████░░░░░░░░░░░░░░░░░░░░░░░░░
-27 pods (0 pending 27 running 27 bound)
-
-ip-192-168-2-146.ec2.internal  cpu    ███████████████████████████████░░░░  89% (10 pods) t4g.medium/$0.034 On-Demand Ready
-                               memory ██████████████████░░░░░░░░░░░░░░░░░  52%
-ip-192-168-16-110.ec2.internal cpu    ███████████████████████████░░░░░░░░  78% (9 pods)  t4g.medium/$0.034 On-Demand Ready
-                               memory █████████████████░░░░░░░░░░░░░░░░░░  48%
-ip-192-168-74-86.ec2.internal  cpu    █████████████████████░░░░░░░░░░░░░░  60% (4 pods)  t3a.small/$0.019  On-Demand Ready
-                               memory ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░   9%
-ip-192-168-83-78.ec2.internal  cpu    █████████████████████░░░░░░░░░░░░░░  60% (4 pods)  t4g.small/$0.017  On-Demand Ready
-                               memory ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  10%
+helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
+helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values - oauth2-proxy oauth2-proxy/oauth2-proxy << EOF
+config:
+  clientID: ${GOOGLE_CLIENT_ID}
+  clientSecret: ${GOOGLE_CLIENT_SECRET}
+  cookieSecret: "$(openssl rand -base64 32 | head -c 32 | base64)"
+  configFile: |-
+    cookie_domains = ".${CLUSTER_FQDN}"
+    set_authorization_header = "true"
+    set_xauthrequest = "true"
+    upstreams = [ "file:///dev/null" ]
+    whitelist_domains = ".${CLUSTER_FQDN}"
+authenticatedEmailsFile:
+  enabled: true
+  restricted_access: |-
+    ${MY_EMAIL}
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - oauth2-proxy.${CLUSTER_FQDN}
+  tls:
+    - hosts:
+        - oauth2-proxy.${CLUSTER_FQDN}
+metrics:
+  servicemonitor:
+    enabled: true
+EOF
 ```
 
 ## Clean-up
