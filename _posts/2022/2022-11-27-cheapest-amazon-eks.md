@@ -351,6 +351,8 @@ metadata:
   namespace: karpenter
   name: default
 spec:
+  # Enables consolidation which attempts to reduce cluster cost by both removing
+  # un-needed nodes and down-sizing those that can't be removed.
   # Bug: version 0.20.0 is not supported yet: https://github.com/weaveworks/eksctl/issues/6033
   # https://youtu.be/OB7IZolZk78?t=2629
   # consolidation:
@@ -370,12 +372,17 @@ spec:
     - key: karpenter.k8s.aws/instance-family
       operator: In
       values: [t3a, t4g]
+  # Resource limits constrain the total size of the cluster.
+  # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
     resources:
-      cpu: 1000
+      cpu: 10
+      memory: 32Gi
   providerRef:
     name: default
+  # If omitted, the feature is disabled, nodes will never scale down due to low utilization
   ttlSecondsAfterEmpty: 30
+  # Labels are arbitrary key-values that are applied to all nodes
   labels:
     managedBy: karpenter
     provisioner: default
@@ -394,6 +401,21 @@ spec:
   tags:
     KarpenerProvisionerName: "default"
     Name: ${CLUSTER_NAME}-karpenter
+EOF
+```
+
+Install `aws-node-termination-handler`
+[helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
+and modify the
+[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
+
+```bash
+# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
+AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.20.2"
+
+helm repo add eks https://aws.github.io/eks-charts/
+helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values - aws-node-termination-handler eks/aws-node-termination-handler << EOF
+awsRegion: ${AWS_DEFAULT_REGION}
 EOF
 ```
 
