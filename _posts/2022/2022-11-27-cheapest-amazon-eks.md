@@ -926,7 +926,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
-FORECASTLE_HELM_CHART_VERSION="1.0.116"
+FORECASTLE_HELM_CHART_VERSION="1.0.118"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
 helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace forecastle --create-namespace --values - forecastle stakater/forecastle << EOF
