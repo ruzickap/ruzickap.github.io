@@ -452,7 +452,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="43.1.4"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="43.3.1"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --create-namespace --values - kube-prometheus-stack prometheus-community/kube-prometheus-stack << EOF
