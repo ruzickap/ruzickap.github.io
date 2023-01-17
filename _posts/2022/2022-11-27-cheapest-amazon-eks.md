@@ -101,6 +101,16 @@ Required:
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
 
+## Create the EC2 Spot Service Linked Role
+
+> This step is only necessary if this is the first time you're using EC2 Spot in
+> this account. Details [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html).
+{: .prompt-info }
+
+```shell
+aws iam create-service-linked-role --aws-service-name spot.amazonaws.com
+```
+
 ## Configure AWS Route 53 Domain delegation
 
 > DNS delegation should be done only once.
@@ -316,6 +326,8 @@ managedNodeGroups:
     maxSize: 5
     volumeSize: 20
     volumeType: gp3
+    tags:
+      <<: *tags
     volumeEncrypted: true
     disableIMDSv1: true
 EOF
@@ -360,9 +372,7 @@ spec:
   requirements:
     - key: karpenter.sh/capacity-type
       operator: In
-      # Not working due to bug: https://github.com/weaveworks/eksctl/issues/6064
-      # values: ["on-demand","spot"]
-      values: ["on-demand"]
+      values: ["on-demand","spot"]
     - key: kubernetes.io/arch
       operator: In
       values: ["amd64","arm64"]
