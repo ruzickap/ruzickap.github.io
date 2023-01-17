@@ -977,7 +977,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="6.7.3"
+OAUTH2_PROXY_HELM_CHART_VERSION="6.8.0"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
 helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values - oauth2-proxy oauth2-proxy/oauth2-proxy << EOF
