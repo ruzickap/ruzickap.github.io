@@ -26,7 +26,7 @@ env:
   AWS_DEFAULT_REGION: us-east-1
   AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   # renovate: datasource=github-tags depName=weaveworks/eksctl
-  EKSCTL_VERSION: 0.125.0
+  EKSCTL_VERSION: 0.126.0
   # renovate: datasource=github-tags depName=kubernetes-sigs/krew
   KREW_VERSION: 0.4.3
   KREW_PLUGINS: cost resource-capacity
