@@ -53,7 +53,7 @@ export KUBECONFIG="${PWD}/tmp/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
 export LETSENCRYPT_ENVIRONMENT="staging" # production
 export MY_EMAIL="petr.ruzicka@gmail.com"
 # Tags used to tag the AWS resources
-export TAGS="Owner=${MY_EMAIL} Environment=dev"
+export TAGS="Owner=${MY_EMAIL},Environment=dev"
 ```
 
 You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
@@ -100,16 +100,6 @@ Required:
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
-
-## Create the EC2 Spot Service Linked Role
-
-> This step is only necessary if this is the first time you're using EC2 Spot in
-> this account. Details [here](https://docs.aws.amazon.com/batch/latest/userguide/spot_fleet_IAM_role.html).
-{: .prompt-info }
-
-```shell
-aws iam create-service-linked-role --aws-service-name spot.amazonaws.com
-```
 
 ## Configure AWS Route 53 Domain delegation
 
@@ -263,7 +253,7 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
     --parameters "ParameterKey=BaseDomain,ParameterValue=${BASE_DOMAIN} ParameterKey=ClusterFQDN,ParameterValue=${CLUSTER_FQDN}" \
     --stack-name "${CLUSTER_NAME}-route53" \
     --template-body "file://tmp/${CLUSTER_FQDN}/cf-route53.yml" \
-    --tags "$(echo "${TAGS}" | sed -e 's/\([^ =]*\)=\([^ ]*\)/Key=\1,Value=\2/g')" || true
+    --tags "$(echo "${TAGS}" | sed -e 's/\([^=]*\)=\([^,]*\),*/Key=\1,Value=\2 /g')" || true
 fi
 ```
 
@@ -286,7 +276,7 @@ metadata:
   version: "1.24"
   tags: &tags
     karpenter.sh/discovery: ${CLUSTER_NAME}
-$(echo "${TAGS}" | sed "s/ /\\n    /g; s/^/    /g; s/=/: /g")
+$(echo "${TAGS}" | sed "s/,/\\n    /g; s/^/    /g; s/=/: /g")
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
@@ -304,8 +294,8 @@ iam:
       wellKnownPolicies:
         externalDNS: true
 karpenter:
-  # Bug: version 0.20.0 is not supported yet: https://github.com/weaveworks/eksctl/issues/6033
-  version: v0.18.1
+  # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
+  version: v0.22.1
   createServiceAccount: true
 addons:
   - name: vpc-cni
@@ -365,10 +355,9 @@ metadata:
 spec:
   # Enables consolidation which attempts to reduce cluster cost by both removing
   # un-needed nodes and down-sizing those that can't be removed.
-  # Bug: version 0.20.0 is not supported yet: https://github.com/weaveworks/eksctl/issues/6033
   # https://youtu.be/OB7IZolZk78?t=2629
-  # consolidation:
-  #   enabled: true
+  consolidation:
+    enabled: true
   requirements:
     - key: karpenter.sh/capacity-type
       operator: In
@@ -390,8 +379,6 @@ spec:
       memory: 32Gi
   providerRef:
     name: default
-  # If omitted, the feature is disabled, nodes will never scale down due to low utilization
-  ttlSecondsAfterEmpty: 30
   # Labels are arbitrary key-values that are applied to all nodes
   labels:
     managedBy: karpenter
@@ -411,6 +398,7 @@ spec:
   tags:
     KarpenerProvisionerName: "default"
     Name: ${CLUSTER_NAME}-karpenter
+$(echo "${TAGS}" | sed "s/,/\\n    /g; s/^/    /g; s/=/: /g")
 EOF
 ```
 
@@ -602,6 +590,14 @@ grafana:
         gnetId: 15762
         revision: 6
         datasource: Prometheus
+      cluster-capacity-karpenter:
+        gnetId: 16237
+        revision: 1
+        datasource: Prometheus
+      pod-statistic-karpenter:
+        gnetId: 16236
+        revision: 1
+        datasource: Prometheus
   grafana.ini:
     server:
       root_url: https://grafana.${CLUSTER_FQDN}
@@ -668,6 +664,27 @@ prometheus:
           resources:
             requests:
               storage: 2Gi
+EOF
+```
+
+### karpenter
+
+Change [karpenter](https://karpenter.sh/) default installation by upgrading:
+[helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
+and modify the
+[default values](https://github.com/aws/karpenter/blob/main/charts/karpenter/values.yaml).
+
+![karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
+"karpenter"){: width="200" }
+
+```bash
+# renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
+KARPENTER_HELM_CHART_VERSION="v0.22.1"
+
+helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values - karpenter oci://public.ecr.aws/karpenter/karpenter << EOF
+replicas: 1
+serviceMonitor:
+  enabled: true
 EOF
 ```
 
@@ -842,7 +859,7 @@ controller:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
-      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "$(echo "${TAGS}" | tr " " ,)"
+      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "${TAGS}"
   metrics:
     enabled: true
     serviceMonitor:
