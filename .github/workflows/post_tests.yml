@@ -29,7 +29,7 @@ env:
   EKSCTL_VERSION: 0.127.0-rc.0
   # renovate: datasource=github-tags depName=kubernetes-sigs/krew
   KREW_VERSION: 0.4.3
-  KREW_PLUGINS: cost resource-capacity
+  KREW_PLUGINS: cost resource-capacity view-allocations viewnode
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
@@ -86,6 +86,7 @@ jobs:
               source <(echo "set -euxo pipefail" ; sed -n "/^\`\`\`bash$/,/^\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed "/^\`\`\`*/d")
               if [[ "${POST_FILES_ARRAY[*]}" =~ eks && ${idx} -eq ${#POST_FILES_ARRAY[@]}-1 ]]; then
                 (
+                  echo "<https://${CLUSTER_FQDN}>"
                   echo '```'
                   # shellcheck disable=SC2028
                   echo "eval \"\$(aws sts assume-role --role-arn \"\${AWS_ROLE_TO_ASSUME}\" --role-session-name \"\$USER@\$(hostname -f)-k8s-\$(date +%s)\" --duration-seconds 36000 | jq -r '.Credentials | \"export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\\nexport AWS_SESSION_TOKEN=\(.SessionToken)\\n\"')\""
