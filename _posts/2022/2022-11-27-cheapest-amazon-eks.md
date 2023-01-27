@@ -295,7 +295,7 @@ iam:
         externalDNS: true
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.22.1
+  version: v0.23.0
   createServiceAccount: true
 addons:
   - name: vpc-cni
@@ -679,7 +679,7 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.22.1"
+KARPENTER_HELM_CHART_VERSION="v0.23.0"
 
 helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values - karpenter oci://public.ecr.aws/karpenter/karpenter << EOF
 replicas: 1
