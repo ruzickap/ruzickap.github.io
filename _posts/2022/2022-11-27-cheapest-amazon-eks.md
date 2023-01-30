@@ -7,7 +7,6 @@ categories: [Kubernetes, Amazon EKS]
 tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl, cert-manager, external-dns, podinfo]
 image:
   path: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
-  width: 200
   alt: Amazon EKS
 ---
 
@@ -261,7 +260,7 @@ fi
 
 I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 
-![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/c365149fc1a0b8d357139cbd6cda5aee8841c16c/logo/eksctl.png
+![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png
 "eksctl"){: width="700" }
 
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):

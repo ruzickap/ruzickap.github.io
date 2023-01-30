@@ -10,14 +10,12 @@
       "ignoreTests": true,
       "automerge": true,
     },
-
     {
       "description": "Ignore frequent renovate updates",
       "matchPackageNames": ["renovatebot/github-action"],
       "matchUpdateTypes": ["patch"],
       "enabled": false
     },
-
     {
       "description": "Ignore html-proofer update to latest stable major version - required by chirpy",
       "datasources": ["rubygems"],
@@ -25,7 +23,6 @@
       "matchUpdateTypes": ["major"],
       "enabled": false
     },
-
     {
       "matchPackageNames": ["renovatebot/github-action"],
       "matchUpdateTypes": ["minor"],
