@@ -361,7 +361,7 @@ spec:
   requirements:
     - key: karpenter.sh/capacity-type
       operator: In
-      values: ["on-demand","spot"]
+      values: ["spot","on-demand"]
     - key: kubernetes.io/arch
       operator: In
       values: ["amd64","arm64"]
@@ -375,7 +375,7 @@ spec:
   # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
     resources:
-      cpu: 10
+      cpu: 8
       memory: 32Gi
   providerRef:
     name: default
@@ -909,7 +909,7 @@ Install `mailhog`
 and modify the
 [default values](https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml).
 
-![MailHog](https://avatars.githubusercontent.com/u/10258541?s=200&v=4
+![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
 "mailhog"){: width="200" }
 
 ```bash
@@ -925,7 +925,7 @@ ingress:
   enabled: true
   annotations:
     forecastle.stakater.com/expose: "true"
-    forecastle.stakater.com/icon: https://avatars.githubusercontent.com/u/10258541?s=200&v=4
+    forecastle.stakater.com/icon: https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
     forecastle.stakater.com/appName: Mailhog
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
@@ -1028,7 +1028,7 @@ EOF
 
 ## Clean-up
 
-![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg?sanitize=true
+![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg
 "Clean-up"){: width="400" }
 
 Set necessary variables and verify if all the necessary variables were set:

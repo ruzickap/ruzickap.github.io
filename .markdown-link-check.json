@@ -5,6 +5,9 @@
   ],
   "ignorePatterns": [
     {
+      "pattern": "^/assets/img/posts/"
+    },
+    {
       "pattern": "^https://img.shields.io/"
     },
     {
