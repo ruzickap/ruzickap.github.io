@@ -40,6 +40,10 @@ Variables which are being used in the next steps.
 ```bash
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+export TMP_DIR="${TMP_DIR:-${PWD}}"
+export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
+
+test -d "${TMP_DIR}/${CLUSTER_FQDN}" || mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
 ## Workloads
@@ -53,7 +57,7 @@ Start the amd64 [nginx](https://hub.docker.com/_/nginx) pods in `test-karpenter`
 namespace:
 
 ```bash
-kubectl apply -f - << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-deployment-nginx.yml" << EOF | kubectl apply -f -
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -132,7 +136,7 @@ Output:
 Karpenter logs:
 
 ```bash
-kubectl logs -n karpenter --since=2m "$(kubectl get pods -n karpenter -l app.kubernetes.io/name=karpenter -o=jsonpath="{.items[0].metadata.name}")"
+kubectl logs -n karpenter --since=2m -l app.kubernetes.io/name=karpenter
 ```
 
 Outputs:
@@ -191,7 +195,7 @@ kubectl view-allocations --namespace test-karpenter --utilization --resource-nam
 Karpenter logs:
 
 ```bash
-kubectl logs -n karpenter --since=2m "$(kubectl get pods -n karpenter -l app.kubernetes.io/name=karpenter -o=jsonpath="{.items[0].metadata.name}")"
+kubectl logs -n karpenter --since=2m -l app.kubernetes.io/name=karpenter
 ```
 
 Outputs:
@@ -221,7 +225,7 @@ function (described in [AWS re:Invent 2022 - Kubernetes virtually anywhere, for 
 logs will look like:
 
 ```bash
-kubectl logs -n karpenter --since=2m "$(kubectl get pods -n karpenter -l app.kubernetes.io/name=karpenter -o=jsonpath="{.items[0].metadata.name}")"
+kubectl logs -n karpenter --since=2m -l app.kubernetes.io/name=karpenter
 ```
 
 Output:
@@ -284,7 +288,7 @@ and modify the
 PODINFO_HELM_CHART_VERSION="6.3.0"
 
 helm repo add --force-update sp https://stefanprodan.github.io/podinfo
-helm upgrade --install --version "${PODINFO_HELM_CHART_VERSION}" --namespace podinfo --create-namespace --wait --values - podinfo sp/podinfo << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-podinfo.yml" << EOF
 certificate:
   create: true
   issuerRef:
@@ -313,6 +317,7 @@ resources:
     cpu: 1
     memory: 16Mi
 EOF
+helm upgrade --install --version "${PODINFO_HELM_CHART_VERSION}" --namespace podinfo --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-podinfo.yml" podinfo sp/podinfo
 ```
 
 Check cluster + node details:
