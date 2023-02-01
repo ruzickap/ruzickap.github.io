@@ -804,10 +804,7 @@ and modify the
 METRICS_SERVER_HELM_CHART_VERSION="3.8.3"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
-# hostNetwork: true
-EOF
-helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
+helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system metrics-server metrics-server/metrics-server
 ```
 
 ### external-dns
@@ -930,8 +927,8 @@ MAILHOG_HELM_CHART_VERSION="5.2.2"
 helm repo add codecentric https://codecentric.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
 image:
-  repository: docker.io/allthings/mailhog
-  tag: multiarch
+  repository: docker.io/cd2team/mailhog
+  tag: "1663459324"
 ingress:
   enabled: true
   annotations:
