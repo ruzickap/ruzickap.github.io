@@ -408,7 +408,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
-AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.20.3"
+AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
 helm repo add eks https://aws.github.io/eks-charts/
 helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values - aws-node-termination-handler eks/aws-node-termination-handler << EOF
