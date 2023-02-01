@@ -48,11 +48,12 @@ export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-export KUBECONFIG="${PWD}/tmp/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
 export LETSENCRYPT_ENVIRONMENT="staging" # production
 export MY_EMAIL="petr.ruzicka@gmail.com"
+export TMP_DIR="${TMP_DIR:-${PWD}}"
+export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
 # Tags used to tag the AWS resources
-export TAGS="Owner=${MY_EMAIL},Environment=dev"
+export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev}"
 ```
 
 You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
@@ -209,13 +210,13 @@ Create temporary directory for files used for creating/configuring EKS Cluster
 and it's components:
 
 ```bash
-mkdir -p "tmp/${CLUSTER_FQDN}"
+mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
 Create Route53 zone:
 
 ```bash
-cat > "tmp/${CLUSTER_FQDN}/cf-route53.yml" << \EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/cf-route53.yml" << \EOF
 AWSTemplateFormatVersion: 2010-09-09
 Description: Route53 entries
 
@@ -251,7 +252,7 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
   eval aws cloudformation "create-stack" \
     --parameters "ParameterKey=BaseDomain,ParameterValue=${BASE_DOMAIN} ParameterKey=ClusterFQDN,ParameterValue=${CLUSTER_FQDN}" \
     --stack-name "${CLUSTER_NAME}-route53" \
-    --template-body "file://tmp/${CLUSTER_FQDN}/cf-route53.yml" \
+    --template-body "file://${TMP_DIR}/${CLUSTER_FQDN}/cf-route53.yml" \
     --tags "$(echo "${TAGS}" | sed -e 's/\([^=]*\)=\([^,]*\),*/Key=\1,Value=\2 /g')" || true
 fi
 ```
@@ -266,7 +267,7 @@ I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
 
 ```bash
-cat > "tmp/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -274,8 +275,8 @@ metadata:
   region: ${AWS_DEFAULT_REGION}
   version: "1.24"
   tags: &tags
-    karpenter.sh/discovery: ${CLUSTER_NAME}
-$(echo "${TAGS}" | sed "s/,/\\n    /g; s/^/    /g; s/=/: /g")
+    karpenter.sh/discovery: "${CLUSTER_NAME}"
+$(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
@@ -327,7 +328,7 @@ Get the kubeconfig to access the cluster:
 ```bash
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
-    eksctl create cluster --config-file "tmp/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
+    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
     # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
     eksctl create iamidentitymapping --cluster="${CLUSTER_NAME}" --region="${AWS_DEFAULT_REGION}" --arn="${AWS_ROLE_TO_ASSUME}" --group system:masters --username admin
   else
@@ -345,7 +346,7 @@ Configure [Karpenter](https://karpenter.sh/):
 "Karpenter"){: width="500" }
 
 ```bash
-cat << EOF | kubectl apply -f -
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-provisioner.yml" << EOF | kubectl apply -f -
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
@@ -396,8 +397,8 @@ spec:
     karpenter.sh/discovery: ${CLUSTER_NAME}
   tags:
     KarpenerProvisionerName: "default"
-    Name: ${CLUSTER_NAME}-karpenter
-$(echo "${TAGS}" | sed "s/,/\\n    /g; s/^/    /g; s/=/: /g")
+    Name: "${CLUSTER_NAME}-karpenter"
+$(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
 EOF
 ```
 
@@ -408,12 +409,13 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
-AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.20.3"
+AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
 helm repo add eks https://aws.github.io/eks-charts/
-helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values - aws-node-termination-handler eks/aws-node-termination-handler << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
 awsRegion: ${AWS_DEFAULT_REGION}
 EOF
+helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
 ```
 
 ## Prometheus, DNS, Ingress, Certificates and others
@@ -442,7 +444,7 @@ and modify the
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="44.3.0"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --create-namespace --values - kube-prometheus-stack prometheus-community/kube-prometheus-stack << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
 defaultRules:
   rules:
     etcd: false
@@ -664,6 +666,7 @@ prometheus:
             requests:
               storage: 2Gi
 EOF
+helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" kube-prometheus-stack prometheus-community/kube-prometheus-stack
 ```
 
 ### karpenter
@@ -680,11 +683,12 @@ and modify the
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
 KARPENTER_HELM_CHART_VERSION="v0.23.0"
 
-helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values - karpenter oci://public.ecr.aws/karpenter/karpenter << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
 serviceMonitor:
   enabled: true
 EOF
+helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" karpenter oci://public.ecr.aws/karpenter/karpenter
 ```
 
 ### cert-manager
@@ -703,7 +707,7 @@ Service account `cert-manager` was created by `eksctl`.
 CERT_MANAGER_HELM_CHART_VERSION="1.11.0"
 
 helm repo add jetstack https://charts.jetstack.io
-helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values - cert-manager jetstack/cert-manager << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
   create: false
@@ -717,12 +721,13 @@ prometheus:
   servicemonitor:
     enabled: true
 EOF
+helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
 
 Add ClusterIssuers for Let's Encrypt staging and production:
 
 ```bash
-kubectl apply -f - << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
@@ -769,7 +774,7 @@ kubectl wait --namespace cert-manager --timeout=10m --for=condition=Ready cluste
 Create certificate:
 
 ```bash
-kubectl apply -f - << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -799,7 +804,10 @@ and modify the
 METRICS_SERVER_HELM_CHART_VERSION="3.8.3"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system metrics-server metrics-server/metrics-server
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
+# hostNetwork: true
+EOF
+helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
 ```
 
 ### external-dns
@@ -819,7 +827,7 @@ Service account `external-dns` was created by `eksctl`.
 EXTERNAL_DNS_HELM_CHART_VERSION="1.12.0"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
-helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --values - external-dns external-dns/external-dns << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
 aws:
   region: ${AWS_DEFAULT_REGION}
 domainFilters:
@@ -834,6 +842,7 @@ metrics:
   serviceMonitor:
     enabled: true
 EOF
+helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
 ```
 
 ### ingress-nginx
@@ -847,8 +856,10 @@ and modify the
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
 INGRESS_NGINX_HELM_CHART_VERSION="4.4.2"
 
+kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate "ingress-cert-${LETSENCRYPT_ENVIRONMENT}"
+
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values - ingress-nginx ingress-nginx/ingress-nginx << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   ingressClassResource:
     default: true
@@ -899,6 +910,7 @@ controller:
             description: Too many 4XXs
             summary: More than 5% of all requests returned 4XX, this requires your attention
 EOF
+helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
 ```
 
 ### mailhog
@@ -916,7 +928,7 @@ and modify the
 MAILHOG_HELM_CHART_VERSION="5.2.2"
 
 helm repo add codecentric https://codecentric.github.io/helm-charts
-helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mailhog --create-namespace --values - mailhog codecentric/mailhog << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
 image:
   repository: docker.io/allthings/mailhog
   tag: multiarch
@@ -938,6 +950,7 @@ ingress:
     - hosts:
         - mailhog.${CLUSTER_FQDN}
 EOF
+helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mailhog --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" mailhog codecentric/mailhog
 ```
 
 ### forecastle
@@ -955,7 +968,7 @@ and modify the
 FORECASTLE_HELM_CHART_VERSION="1.0.118"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
-helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace forecastle --create-namespace --values - forecastle stakater/forecastle << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
 forecastle:
   config:
     namespaceSelector:
@@ -976,6 +989,7 @@ forecastle:
       - hosts:
           - ${CLUSTER_FQDN}
 EOF
+helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace forecastle --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" forecastle stakater/forecastle
 ```
 
 ### oauth2-proxy
@@ -996,7 +1010,7 @@ and modify the
 OAUTH2_PROXY_HELM_CHART_VERSION="6.8.0"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
-helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values - oauth2-proxy oauth2-proxy/oauth2-proxy << EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
 config:
   clientID: ${GOOGLE_CLIENT_ID}
   clientSecret: ${GOOGLE_CLIENT_SECRET}
@@ -1023,6 +1037,7 @@ metrics:
   servicemonitor:
     enabled: true
 EOF
+helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" oauth2-proxy oauth2-proxy/oauth2-proxy
 ```
 
 ## Clean-up
@@ -1039,7 +1054,8 @@ export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-export KUBECONFIG="${PWD}/tmp/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
+export TMP_DIR="${TMP_DIR:-/tmp}"
+export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
 
 : "${AWS_ACCESS_KEY_ID?}"
 : "${AWS_DEFAULT_REGION?}"
@@ -1128,10 +1144,10 @@ for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:kubernetes.io/cluste
 done
 ```
 
-Remove `tmp/${CLUSTER_FQDN}` directory:
+Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
-[[ -d "tmp/${CLUSTER_FQDN}" ]] && rm -rf "tmp/${CLUSTER_FQDN}" && [[ -d tmp ]] && rmdir tmp || true
+[[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]] && rm -rf "${TMP_DIR}/${CLUSTER_FQDN}" && [[ -d "${TMP_DIR}" ]] && rmdir "${TMP_DIR}" || true
 ```
 
 Enjoy ... 😉

@@ -4,7 +4,7 @@
 
 ## Overview
 
-My test personal site and blog...
+My personal site and blog...
 
 [**ruzickap.github.io →**](https://ruzickap.github.io/)
 

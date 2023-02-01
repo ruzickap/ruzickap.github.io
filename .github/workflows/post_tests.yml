@@ -84,6 +84,7 @@ jobs:
               echo "*** ${POST_FILES_ARRAY[idx]} | build"
               # shellcheck disable=SC1090
               source <(echo "set -euxo pipefail" ; sed -n "/^\`\`\`bash$/,/^\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed "/^\`\`\`*/d")
+              helm ls --all-namespaces
               if [[ "${POST_FILES_ARRAY[*]}" =~ eks && ${idx} -eq ${#POST_FILES_ARRAY[@]}-1 ]]; then
                 (
                   echo "<https://${CLUSTER_FQDN}>"
