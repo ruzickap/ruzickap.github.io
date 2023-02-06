@@ -1,6 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "branchPrefix": "renovate/",
+  // ignore chirpy dependencies
+  // https://renovatebot.com/docs/configuration-options/#ignoredeps
+  "ignoreDeps": [
+    "jekyll-sass-converter",
+    "http_parser.rb",
+    "html-proofer",
+  ],
   "labels": ["renovate", "renovate/{{replace '.*/' '' depName}}", "renovate/{{updateType}}"],
   "packageRules": [
     {
