@@ -103,5 +103,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: "--cache --max-cache-age 1d ."
+          args: "--cache --max-cache-age 1d https://${{ steps.variables.outputs.BASE_DOMAIN }}"
           fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
