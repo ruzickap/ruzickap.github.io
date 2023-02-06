@@ -11,6 +11,8 @@ image:
   alt: Karpenter
 ---
 
+<!-- markdownlint-disable-file blanks-around-fences -->
+
 In the previous post related to
 [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
 I decided to install [Karpenter](https://karpenter.sh/) to improve
@@ -132,6 +134,7 @@ Output:
      ├─ nginx-deployment-589b44547-6k82l        2.6Mi       16.0Mi     __           __      __
      └─ nginx-deployment-589b44547-ssp97        2.7Mi       16.0Mi     __           __      __
 ```
+{: .nolineno }
 
 Karpenter logs:
 
@@ -150,6 +153,7 @@ Outputs:
 2023-01-29T18:35:17.352Z  DEBUG  controller.provisioner.cloudprovider  created launch template  {"commit": "5a7faa0-dirty", "provisioner": "default", "launch-template-name": "Karpenter-k01-2845501446139737819", "launch-template-id": "lt-0a4dbdf22b4e80f45"}
 2023-01-29T18:35:19.382Z  INFO  controller.provisioner.cloudprovider  launched new instance  {"commit": "5a7faa0-dirty", "provisioner": "default", "id": "i-059d06b02509680a0", "hostname": "ip-192-168-66-142.ec2.internal", "instance-type": "t3a.small", "zone": "us-east-1a", "capacity-type": "spot"}
 ```
+{: .nolineno }
 
 Increase replicas to `5` - this will add a new spot worker node which is going
 to run `3` new "nginx" pods:
@@ -191,6 +195,7 @@ kubectl view-allocations --namespace test-karpenter --utilization --resource-nam
      ├─ nginx-deployment-589b44547-5jhkb        2.7Mi       16.0Mi     __           __      __
      └─ nginx-deployment-589b44547-vjzns        2.6Mi       16.0Mi     __           __      __
 ```
+{: .nolineno }
 
 Karpenter logs:
 
@@ -208,6 +213,7 @@ Outputs:
 2023-01-29T18:38:07.392Z  INFO  controller.provisioner  launching node with 2 pods requesting {"cpu":"1155m","memory":"152Mi","pods":"7"} from types t3a.medium, t3a.large, t3a.xlarge, t3a.2xlarge, t3a.small  {"commit": "5a7faa0-dirty", "provisioner": "default"}
 2023-01-29T18:38:09.682Z  INFO  controller.provisioner.cloudprovider  launched new instance  {"commit": "5a7faa0-dirty", "provisioner": "default", "id": "i-008c19ef038857a28", "hostname": "ip-192-168-94-105.ec2.internal", "instance-type": "t3a.small", "zone": "us-east-1a", "capacity-type": "spot"}
 ```
+{: .nolineno }
 
 If the number of replicas goes again to `3` Karpenter will find out, that
 workload running on `2` spot nodes can be "merged" to single one:
@@ -236,6 +242,7 @@ Output:
 2023-01-29T18:41:03.982Z  INFO  controller.termination  cordoned node  {"commit": "5a7faa0-dirty", "node": "ip-192-168-66-142.ec2.internal"}
 2023-01-29T18:41:06.715Z  INFO  controller.termination  deleted node  {"commit": "5a7faa0-dirty", "node": "ip-192-168-66-142.ec2.internal"}
 ```
+{: .nolineno }
 
 Check the details:
 
@@ -260,6 +267,7 @@ kubectl view-allocations --namespace test-karpenter --utilization --resource-nam
      ├─ nginx-deployment-589b44547-lnskq        2.6Mi       16.0Mi     __           __      __
      └─ nginx-deployment-589b44547-vjzns        2.6Mi       16.0Mi     __           __      __
 ```
+{: .nolineno }
 
 Remove the nginx workload and the `test-karpenter` namespace:
 
@@ -334,6 +342,7 @@ ip-192-168-14-250.ec2.internal   Ready    <none>   46h   v1.24.9-eks-4f83af2   1
 ip-192-168-16-172.ec2.internal   Ready    <none>   46h   v1.24.9-eks-4f83af2   192.168.16.172   3.90.15.21      Bottlerocket OS 1.12.0 (aws-k8s-1.24)   5.15.79          containerd://1.6.15+bottlerocket
 ip-192-168-84-230.ec2.internal   Ready    <none>   79s   v1.24.9-eks-4f83af2   192.168.84.230   <none>          Bottlerocket OS 1.12.0 (aws-k8s-1.24)   5.15.79          containerd://1.6.15+bottlerocket
 ```
+{: .nolineno }
 
 Display details about node size and architecture:
 
@@ -348,6 +357,7 @@ ip-192-168-84-230.ec2.internal  t4g.small   arm64
 ip-192-168-16-172.ec2.internal  t4g.medium  arm64
 ip-192-168-14-250.ec2.internal  t4g.medium  arm64
 ```
+{: .nolineno }
 
 Details about node capacity:
 
@@ -364,6 +374,7 @@ ip-192-168-14-250.ec2.internal   715m (37%)     1300m (67%)   299m (15%)   750Mi
 ip-192-168-16-172.ec2.internal   1415m (73%)    1900m (98%)   82m (4%)     1524Mi (46%)      3668Mi (111%)   1024Mi (31%)   13/17
 ip-192-168-84-230.ec2.internal   1155m (59%)    300m (15%)    37m (1%)     136Mi (9%)        768Mi (55%)     453Mi (32%)    6/11
 ```
+{: .nolineno }
 
 Graphical view of cpu + memory utilization per node (+ prices) produced by [eks-node-viewer](https://github.com/awslabs/eks-node-viewer):
 
@@ -385,6 +396,7 @@ ip-192-168-14-250.ec2.internal cpu    █████████████░
 ip-192-168-84-230.ec2.internal cpu    █████████████████████░░░░░░░░░░░░░░  60% (6 pods)  t4g.small         Spot      - Ready
                                memory ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  10%
 ```
+{: .nolineno }
 
 Other details produced by [viewnode](https://github.com/NTTDATA-DACH/viewnode):
 
@@ -438,6 +450,7 @@ Output:
   * kube-system: kube-proxy-2gblp (running | mem usage: 12.7 MiB)
   * podinfo: podinfo-59d6468db-jmwxh (running | mem usage: 13.4 MiB)
 ```
+{: .nolineno }
 
 Other details produced by [kubectl-view-allocations](https://github.com/davidB/kubectl-view-allocations):
 
@@ -542,6 +555,7 @@ Output:
   ├─ ip-192-168-16-172.ec2.internal                                           __     (76%) 13.0     (76%) 13.0         17.0      4.0
   └─ ip-192-168-84-230.ec2.internal                                           __      (55%) 6.0      (55%) 6.0         11.0      5.0
 ```
+{: .nolineno }
 
 Uninstall [Podinfo](https://github.com/stefanprodan/podinfo):
 
