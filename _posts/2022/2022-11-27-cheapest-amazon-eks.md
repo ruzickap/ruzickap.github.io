@@ -444,7 +444,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
-MAILHOG_HELM_CHART_VERSION="5.2.2"
+MAILHOG_HELM_CHART_VERSION="5.2.3"
 
 helm repo add codecentric https://codecentric.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
