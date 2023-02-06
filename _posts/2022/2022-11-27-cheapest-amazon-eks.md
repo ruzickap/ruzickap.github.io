@@ -140,6 +140,7 @@ ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev
 
 Output:
 
+<!-- markdownlint-disable blanks-around-fences -->
 ```text
 localhost | CHANGED => {
     "ansible_facts": {
@@ -198,6 +199,8 @@ localhost | CHANGED => {
     }
 }
 ```
+{: .nolineno }
+<!-- markdownlint-enable blanks-around-fences -->
 
 ### Create Route53
 
@@ -361,16 +364,16 @@ spec:
   requirements:
     - key: karpenter.sh/capacity-type
       operator: In
-      values: ["spot","on-demand"]
+      values: ["spot", "on-demand"]
     - key: kubernetes.io/arch
       operator: In
-      values: ["amd64","arm64"]
+      values: ["amd64", "arm64"]
     - key: "topology.kubernetes.io/zone"
       operator: In
       values: ["${AWS_DEFAULT_REGION}a"]
     - key: karpenter.k8s.aws/instance-family
       operator: In
-      values: [t3a, t4g]
+      values: ["t3a", "t4g"]
   # Resource limits constrain the total size of the cluster.
   # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
@@ -429,6 +432,46 @@ Then you will need some basic tools / integrations, like [external-dns](https://
 [cert-manager](https://cert-manager.io/), [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/),
 ...
 
+### mailhog
+
+Install `mailhog`
+[helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
+and modify the
+[default values](https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml).
+
+![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
+"mailhog"){: width="200" }
+
+```bash
+# renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
+MAILHOG_HELM_CHART_VERSION="5.2.2"
+
+helm repo add codecentric https://codecentric.github.io/helm-charts
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
+image:
+  repository: docker.io/cd2team/mailhog
+  tag: "1663459324"
+ingress:
+  enabled: true
+  annotations:
+    forecastle.stakater.com/expose: "true"
+    forecastle.stakater.com/icon: https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
+    forecastle.stakater.com/appName: Mailhog
+    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+  ingressClassName: nginx
+  hosts:
+    - host: mailhog.${CLUSTER_FQDN}
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls:
+    - hosts:
+        - mailhog.${CLUSTER_FQDN}
+EOF
+helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mailhog --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" mailhog codecentric/mailhog
+```
+
 ### kube-prometheus-stack
 
 Install `kube-prometheus-stack`
@@ -459,9 +502,8 @@ alertmanager:
       group_by: ["alertname", "job"]
       receiver: email-notifications
       routes:
-        - match:
-            severity: warning
-          receiver: email-notifications
+        - receiver: email-notifications
+          matchers: [ '{severity=~"warning|critical"}' ]
     receivers:
       - name: email-notifications
         email_configs:
@@ -910,46 +952,6 @@ EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
 ```
 
-### mailhog
-
-Install `mailhog`
-[helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
-and modify the
-[default values](https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml).
-
-![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
-"mailhog"){: width="200" }
-
-```bash
-# renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
-MAILHOG_HELM_CHART_VERSION="5.2.3"
-
-helm repo add codecentric https://codecentric.github.io/helm-charts
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
-image:
-  repository: docker.io/cd2team/mailhog
-  tag: "1663459324"
-ingress:
-  enabled: true
-  annotations:
-    forecastle.stakater.com/expose: "true"
-    forecastle.stakater.com/icon: https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
-    forecastle.stakater.com/appName: Mailhog
-    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
-    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
-  ingressClassName: nginx
-  hosts:
-    - host: mailhog.${CLUSTER_FQDN}
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls:
-    - hosts:
-        - mailhog.${CLUSTER_FQDN}
-EOF
-helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mailhog --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" mailhog codecentric/mailhog
-```
-
 ### forecastle
 
 Install `forecastle`
@@ -1072,7 +1074,7 @@ if eksctl get cluster --name="${CLUSTER_NAME}" 2> /dev/null; then
 fi
 ```
 
-Remove orphan EC2 created by Karpenter:
+Remove orphan EC2s created by Karpenter:
 
 ```sh
 for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do

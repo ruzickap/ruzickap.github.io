@@ -32,6 +32,14 @@
       "schedule": ["* 0,2,4 1-7 * 0"],
     },
     {
+      "description": "autoMerge eksctl",
+      "matchPackageNames": ["weaveworks/eksctl"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "ignoreTests": true,
+      "automergeType": "branch",
+      "automerge": true,
+    },
+    {
       "description": "Update all github-actions by default",
       "matchManagers": ["github-actions"],
       "automergeType": "branch",
