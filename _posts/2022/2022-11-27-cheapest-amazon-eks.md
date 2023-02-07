@@ -863,7 +863,7 @@ Service account `external-dns` was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
-EXTERNAL_DNS_HELM_CHART_VERSION="1.12.0"
+EXTERNAL_DNS_HELM_CHART_VERSION="1.12.1"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
