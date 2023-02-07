@@ -24,5 +24,5 @@ gem "http_parser.rb", "~> 0.6.0", :platforms => [:jruby]
 
 # Lock jekyll-sass-converter to 2.x on Linux-musl
 if RUBY_PLATFORM =~ /linux-musl/
-  gem "jekyll-sass-converter", "~> 2.0"
+  gem "jekyll-sass-converter", "~> 3.0"
 end
