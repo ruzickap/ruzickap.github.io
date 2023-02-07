@@ -46,7 +46,7 @@ cat > /tmp/sftpgo-initprovider-data.json << EOF
       "status": 1,
       "username": "test",
       "password": "test123",
-      "home_dir": "$HOME/Pictures/ftp",
+      "home_dir": "${HOME}/Pictures/ftp",
       "uid": 501,
       "gid": 20,
       "permissions": {
@@ -106,10 +106,10 @@ EOF
 sudo brew services restart sftpgo
 ```
 
-Start the [SFTPGo](https://github.com/drakkan/sftpgo):
+Restart the [SFTPGo](https://github.com/drakkan/sftpgo):
 
 ```bash
-sudo brew services start sftpgo
+sudo brew services restart sftpgo
 ```
 
 You can check the WebAdmin interface to see the details about created user:
@@ -141,7 +141,8 @@ WiFi + Configure FTP Transfer.
 > Make sure your Mac is connected to the same WiFi as your Sony camera
 {: .prompt-warning }
 
-- Find your local IP address on the Mac by running command on the [terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac):
+- Find your local IP address on the Mac by running the `ifconfig` command on the
+[terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac):
 
   ```bash
   ❯ ifconfig en0
@@ -150,7 +151,7 @@ WiFi + Configure FTP Transfer.
   ...
   ```
 
-- Configure FTP
+- Configure FTP:
 
   ```mermaid
   flowchart LR
@@ -162,7 +163,7 @@ WiFi + Configure FTP Transfer.
           E1 --> F1(Password) --> F2(test123)
   ```
 
-- Enable FTP
+- Enable FTP:
 
   ```mermaid
   flowchart LR
@@ -173,7 +174,7 @@ WiFi + Configure FTP Transfer.
   ![Sony A7 IV FTP Configuration](/assets/img/posts/2023/2023-01-15-ftp-and-sony-camera/sony-camera-02-ftp-configuration.avif){:width="550"}
   _Sony A7 IV FTP Configuration_
 
-- Initiate FTP transfer (copy photos from your camera to your Mac)
+- Initiate FTP transfer (copy photos from your camera to your Mac):
 
   ```mermaid
   flowchart LR
