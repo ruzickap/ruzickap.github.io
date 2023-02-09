@@ -19,14 +19,14 @@ with lowest price.
 Requirements:
 
 - Single AZ only - no payments for cross availability zones traffic
-- [Not done] Spot instances "everywhere"
+- Spot instances "everywhere"
 - Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type - ARM Graviton based `t4g.medium`
   (2 x CPU, 4GB RAM)
 - Use ARM based EC2 instances
 - Use Bottlerocket - small operation system / CPU / Memory footprint
 - Use Network Load Balancer (NLB) as a most cost efficient + cost optimized LB
-- [Not done] Allow as many pods as needed on worker nodes `max-pods-per-node`
+- Run as many pods as possible on worker nodes `max-pods-per-node`
   - <https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks>
   - <https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/>
 
@@ -319,10 +319,14 @@ managedNodeGroups:
     maxSize: 5
     volumeSize: 20
     volumeType: gp3
+    disablePodIMDS: true
     tags:
       <<: *tags
     volumeEncrypted: true
     disableIMDSv1: true
+    # For instances with less than 30 vCPUs the maximum number is 110 and for all other instances the maximum number is 250
+    # https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
+    maxPodsPerNode: 110
 EOF
 ```
 
@@ -341,6 +345,13 @@ fi
 
 aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 echo -e "***************\n export KUBECONFIG=${KUBECONFIG} \n***************"
+```
+
+Enable the parameter to assign prefixes to network interfaces for the
+Amazon VPC CNI:
+
+```bash
+kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true
 ```
 
 Configure [Karpenter](https://karpenter.sh/):
@@ -893,7 +904,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.4.3"
+INGRESS_NGINX_HELM_CHART_VERSION="4.4.2"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate "ingress-cert-${LETSENCRYPT_ENVIRONMENT}"
 
