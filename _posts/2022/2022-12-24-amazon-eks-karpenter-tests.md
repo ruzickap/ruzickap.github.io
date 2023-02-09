@@ -221,6 +221,7 @@ workload running on `2` spot nodes can be "merged" to single one:
 ```bash
 kubectl scale deployment nginx-deployment --namespace test-karpenter --replicas 3
 kubectl wait --for=condition=Available=True --timeout=5m --namespace test-karpenter deployment nginx-deployment
+sleep 20
 ```
 
 ![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-03-replicas-3.avif

@@ -1,10 +1,10 @@
 ---
-title: Transfer photos wirelessly from Sony Cameras
+title: Transfer photos wirelessly from Sony cameras
 author: Petr Ruzicka
 date: 2023-01-15
-description: Run FTP server for transferring photos from Sony camera
-categories: [Photography, Camera]
-tags: [settings, photo, ftp, camera]
+description: Run FTP server for transferring photos from Sony cameras
+categories: [Photography, Cameras]
+tags: [settings, photo, ftp, cameras, wireless]
 mermaid: true
 image:
   path: https://raw.githubusercontent.com/ruzickap/ruzickap.github.io/70de7d813c51bbe21762a340c3fa76ced79dedb0/assets/img/posts/2022/2022-09-02-my-sony-a7-iv-settings/Sony_A7_IV_(ILCE-7M4)_-_by_Henry_S%C3%B6derlund_(51739988735).avif

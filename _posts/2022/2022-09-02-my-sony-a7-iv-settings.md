@@ -3,8 +3,8 @@ title: My Sony A7 IV settings
 author: Petr Ruzicka
 date: 2022-09-02
 description: My Photo and Video Sony A7 IV settings
-categories: [Photography, Camera]
-tags: [Sony A7 IV, settings, video, photo]
+categories: [Photography, Cameras]
+tags: [Sony A7 IV, settings, video, photo, cameras]
 mermaid: true
 image:
   path: /assets/img/posts/2022/2022-09-02-my-sony-a7-iv-settings/Sony_A7_IV_(ILCE-7M4)_-_by_Henry_Söderlund_(51739988735).avif
