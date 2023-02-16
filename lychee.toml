@@ -26,6 +26,8 @@ accept = [999]
 exclude = [
   "https://fonts.(googleapis|gstatic).com/",
   "https://ruzickap.github.io/projects/",
+  # Due to: [TIMEOUT] https://twitter.com/Ruzicka_Petr | Timeout
+  "https://twitter.com/Ruzicka_Petr",
 ]
 
 # Exclude these filesystem paths from getting checked
