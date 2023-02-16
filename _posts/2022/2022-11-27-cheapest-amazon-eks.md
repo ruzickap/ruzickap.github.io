@@ -347,6 +347,12 @@ aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 echo -e "***************\n export KUBECONFIG=${KUBECONFIG} \n***************"
 ```
 
+Update helm repositories (if needed):
+
+```bash
+helm repo update > /dev/null
+```
+
 Enable the parameter to assign prefixes to network interfaces for the
 Amazon VPC CNI:
 
