@@ -1115,8 +1115,7 @@ Remove orphan Target Groups (if exists):
 
 ```sh
 for TARGET_GROUP_ARN in $(aws elbv2 describe-target-groups --region=eu-central-1 --query "TargetGroups[].TargetGroupArn" --output=text) ; do
-  if [[ "$(aws elbv2 describe-tags --resource-arns "${TARGET_GROUP_ARN}" --query "TagDescriptions[].Tags[?Key == \`kubernetes.io/cluster/${CLUSTER_NAME}\`]" --output
-text)" =~ ${CLUSTER_NAME} ]]; then
+  if [[ "$(aws elbv2 describe-tags --resource-arns "${TARGET_GROUP_ARN}" --query "TagDescriptions[].Tags[?Key == \`kubernetes.io/cluster/${CLUSTER_NAME}\`]" --output text)" =~ ${CLUSTER_NAME} ]]; then
     echo "*** Deleting Target Group: ${TARGET_GROUP_ARN}"
     aws elbv2 delete-target-group --target-group-arn "${TARGET_GROUP_ARN}"
   fi
