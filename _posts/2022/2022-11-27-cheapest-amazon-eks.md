@@ -347,12 +347,6 @@ aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 echo -e "***************\n export KUBECONFIG=${KUBECONFIG} \n***************"
 ```
 
-Update helm repositories (if needed):
-
-```bash
-helm repo update > /dev/null
-```
-
 Enable the parameter to assign prefixes to network interfaces for the
 Amazon VPC CNI:
 
@@ -431,7 +425,7 @@ and modify the
 # renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
 AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
-helm repo add eks https://aws.github.io/eks-charts/
+helm repo add eks https://aws.github.io/eks-charts/ && helm repo update > /dev/null
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
 awsRegion: ${AWS_DEFAULT_REGION}
 EOF
