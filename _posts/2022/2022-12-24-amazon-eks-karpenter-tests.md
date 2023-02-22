@@ -294,7 +294,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=podinfo registryUrl=https://stefanprodan.github.io/podinfo
-PODINFO_HELM_CHART_VERSION="6.3.3"
+PODINFO_HELM_CHART_VERSION="6.3.4"
 
 helm repo add --force-update sp https://stefanprodan.github.io/podinfo
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-podinfo.yml" << EOF
