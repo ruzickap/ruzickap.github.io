@@ -298,7 +298,7 @@ iam:
         externalDNS: true
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.24.0
+  version: v0.25.0
   createServiceAccount: true
 addons:
   - name: vpc-cni
@@ -734,7 +734,7 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.24.0"
+KARPENTER_HELM_CHART_VERSION="v0.25.0"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
