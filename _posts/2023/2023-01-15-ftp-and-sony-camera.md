@@ -141,7 +141,7 @@ WiFi + Configure FTP Transfer.
 > Make sure your Mac is connected to the same WiFi as your Sony camera
 {: .prompt-warning }
 
-- Find your local IP address on the Mac by running the `ifconfig` command on the
+- Find your local IP address on the Mac by running the `ifconfig` command in the
 [terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac):
 
   ```bash

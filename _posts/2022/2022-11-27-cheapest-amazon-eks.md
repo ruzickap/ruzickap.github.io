@@ -276,7 +276,7 @@ kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
   region: ${AWS_DEFAULT_REGION}
-  version: "1.24"
+  version: "1.25"
   tags: &tags
     karpenter.sh/discovery: "${CLUSTER_NAME}"
 $(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
@@ -298,7 +298,7 @@ iam:
         externalDNS: true
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.25.0
+  version: v0.26.1
   createServiceAccount: true
 addons:
   - name: vpc-cni
@@ -734,7 +734,7 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.25.0"
+KARPENTER_HELM_CHART_VERSION="v0.26.1"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
