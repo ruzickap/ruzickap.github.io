@@ -10,6 +10,8 @@ on:
         default: false
   push:
 
+permissions: read-all
+
 jobs:
   gh-pages-build:
     runs-on: ubuntu-latest

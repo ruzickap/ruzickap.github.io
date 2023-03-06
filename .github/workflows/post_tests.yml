@@ -33,6 +33,8 @@ env:
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
+permissions: read-all
+
 jobs:
   post-pipeline:
     runs-on: ubuntu-latest
