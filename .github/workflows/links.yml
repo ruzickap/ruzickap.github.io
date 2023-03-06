@@ -5,6 +5,8 @@ on:
   schedule:
     - cron: "0 0 * * 1"
 
+permissions: read-all
+
 jobs:
   linkChecker:
     runs-on: ubuntu-latest
