@@ -12,6 +12,7 @@ on:
         options:
           - 2022-11-27-cheapest-amazon-eks
           - 2022-12-24-amazon-eks-karpenter-tests 2022-11-27-cheapest-amazon-eks
+          - 2023-03-08-trivy-operator-grafana 2022-11-27-cheapest-amazon-eks
       action:
         type: choice
         description: Select action
@@ -86,7 +87,6 @@ jobs:
               echo "*** ${POST_FILES_ARRAY[idx]} | build"
               # shellcheck disable=SC1090
               source <(echo "set -euxo pipefail" ; sed -n "/^\`\`\`bash$/,/^\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed "/^\`\`\`*/d")
-              helm ls --all-namespaces
               if [[ "${POST_FILES_ARRAY[*]}" =~ eks && ${idx} -eq ${#POST_FILES_ARRAY[@]}-1 ]]; then
                 (
                   echo "<https://${CLUSTER_FQDN}>"

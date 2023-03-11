@@ -1,0 +1,5 @@
+[extend]
+useDefault = true
+
+[allowlist]
+paths = ['''_posts/2023/2023-03-08-trivy-operator-grafana.md$''']

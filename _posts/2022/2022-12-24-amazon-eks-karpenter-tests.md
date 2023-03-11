@@ -42,10 +42,11 @@ Variables which are being used in the next steps.
 ```bash
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
-export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
-test -d "${TMP_DIR}/${CLUSTER_FQDN}" || mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
+mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
 ## Workloads
@@ -117,9 +118,7 @@ Karpenter will start new [t3a.small](https://aws.amazon.com/ec2/instance-types/t
 kubectl view-allocations --namespace test-karpenter --utilization --resource-name=memory --resource-name=cpu
 ```
 
-Output:
-
-```text
+```console
  Resource                                 Utilization    Requested  Limit  Allocatable    Free
   cpu                                     (3%) 194.0m    (17%) 1.0     __          5.8     4.8
   ├─ ip-192-168-14-250.ec2.internal                __           __     __          1.9      __
@@ -134,7 +133,6 @@ Output:
      ├─ nginx-deployment-589b44547-6k82l        2.6Mi       16.0Mi     __           __      __
      └─ nginx-deployment-589b44547-ssp97        2.7Mi       16.0Mi     __           __      __
 ```
-{: .nolineno }
 
 Karpenter logs:
 
@@ -144,7 +142,7 @@ kubectl logs -n karpenter --since=2m -l app.kubernetes.io/name=karpenter
 
 Outputs:
 
-```text
+```console
 ...
 2023-01-29T18:35:16.902Z  DEBUG  controller.provisioner  390 out of 599 instance types were excluded because they would breach provisioner limits  {"commit": "5a7faa0-dirty"}
 2023-01-29T18:35:16.905Z  INFO  controller.provisioner  found provisionable pod(s)  {"commit": "5a7faa0-dirty", "pods": 2}
@@ -153,7 +151,6 @@ Outputs:
 2023-01-29T18:35:17.352Z  DEBUG  controller.provisioner.cloudprovider  created launch template  {"commit": "5a7faa0-dirty", "provisioner": "default", "launch-template-name": "Karpenter-k01-2845501446139737819", "launch-template-id": "lt-0a4dbdf22b4e80f45"}
 2023-01-29T18:35:19.382Z  INFO  controller.provisioner.cloudprovider  launched new instance  {"commit": "5a7faa0-dirty", "provisioner": "default", "id": "i-059d06b02509680a0", "hostname": "ip-192-168-66-142.ec2.internal", "instance-type": "t3a.small", "zone": "us-east-1a", "capacity-type": "spot"}
 ```
-{: .nolineno }
 
 Increase replicas to `5` - this will add a new spot worker node which is going
 to run `3` new "nginx" pods:
@@ -172,7 +169,7 @@ Check the details:
 kubectl view-allocations --namespace test-karpenter --utilization --resource-name=memory --resource-name=cpu
 ```
 
-```text
+```console
  Resource                                 Utilization    Requested  Limit  Allocatable    Free
   cpu                                     (3%) 208.0m    (32%) 2.5     __          7.7     5.2
   ├─ ip-192-168-14-250.ec2.internal                __           __     __          1.9      __
@@ -195,7 +192,6 @@ kubectl view-allocations --namespace test-karpenter --utilization --resource-nam
      ├─ nginx-deployment-589b44547-5jhkb        2.7Mi       16.0Mi     __           __      __
      └─ nginx-deployment-589b44547-vjzns        2.6Mi       16.0Mi     __           __      __
 ```
-{: .nolineno }
 
 Karpenter logs:
 
@@ -205,7 +201,7 @@ kubectl logs -n karpenter --since=2m -l app.kubernetes.io/name=karpenter
 
 Outputs:
 
-```text
+```console
 ...
 2023-01-29T18:38:07.389Z  DEBUG  controller.provisioner  391 out of 599 instance types were excluded because they would breach provisioner limits  {"commit": "5a7faa0-dirty"}
 2023-01-29T18:38:07.392Z  INFO  controller.provisioner  found provisionable pod(s)  {"commit": "5a7faa0-dirty", "pods": 2}
@@ -213,7 +209,6 @@ Outputs:
 2023-01-29T18:38:07.392Z  INFO  controller.provisioner  launching node with 2 pods requesting {"cpu":"1155m","memory":"152Mi","pods":"7"} from types t3a.medium, t3a.large, t3a.xlarge, t3a.2xlarge, t3a.small  {"commit": "5a7faa0-dirty", "provisioner": "default"}
 2023-01-29T18:38:09.682Z  INFO  controller.provisioner.cloudprovider  launched new instance  {"commit": "5a7faa0-dirty", "provisioner": "default", "id": "i-008c19ef038857a28", "hostname": "ip-192-168-94-105.ec2.internal", "instance-type": "t3a.small", "zone": "us-east-1a", "capacity-type": "spot"}
 ```
-{: .nolineno }
 
 If the number of replicas goes again to `3` Karpenter will find out, that
 workload running on `2` spot nodes can be "merged" to single one:
@@ -235,15 +230,12 @@ logs will look like:
 kubectl logs -n karpenter --since=2m -l app.kubernetes.io/name=karpenter
 ```
 
-Output:
-
-```text
+```console
 ...
 2023-01-29T18:41:03.918Z  INFO  controller.deprovisioning  deprovisioning via consolidation delete, terminating 1 nodes ip-192-168-66-142.ec2.internal/t3a.small/spot  {"commit": "5a7faa0-dirty"}
 2023-01-29T18:41:03.982Z  INFO  controller.termination  cordoned node  {"commit": "5a7faa0-dirty", "node": "ip-192-168-66-142.ec2.internal"}
 2023-01-29T18:41:06.715Z  INFO  controller.termination  deleted node  {"commit": "5a7faa0-dirty", "node": "ip-192-168-66-142.ec2.internal"}
 ```
-{: .nolineno }
 
 Check the details:
 
@@ -251,7 +243,7 @@ Check the details:
 kubectl view-allocations --namespace test-karpenter --utilization --resource-name=memory --resource-name=cpu
 ```
 
-```text
+```console
  Resource                                 Utilization    Requested  Limit  Allocatable    Free
   cpu                                     (2%) 121.0m    (26%) 1.5     __          5.8     4.3
   ├─ ip-192-168-14-250.ec2.internal                __           __     __          1.9      __
@@ -268,11 +260,10 @@ kubectl view-allocations --namespace test-karpenter --utilization --resource-nam
      ├─ nginx-deployment-589b44547-lnskq        2.6Mi       16.0Mi     __           __      __
      └─ nginx-deployment-589b44547-vjzns        2.6Mi       16.0Mi     __           __      __
 ```
-{: .nolineno }
 
 Remove the nginx workload and the `test-karpenter` namespace:
 
-```bash
+```sh
 kubectl delete namespace test-karpenter
 ```
 
@@ -335,15 +326,12 @@ Check cluster + node details:
 kubectl get nodes -o wide
 ```
 
-Output:
-
-```text
+```console
 NAME                             STATUS   ROLES    AGE   VERSION               INTERNAL-IP      EXTERNAL-IP     OS-IMAGE                                KERNEL-VERSION   CONTAINER-RUNTIME
 ip-192-168-14-250.ec2.internal   Ready    <none>   46h   v1.24.9-eks-4f83af2   192.168.14.250   54.158.242.60   Bottlerocket OS 1.12.0 (aws-k8s-1.24)   5.15.79          containerd://1.6.15+bottlerocket
 ip-192-168-16-172.ec2.internal   Ready    <none>   46h   v1.24.9-eks-4f83af2   192.168.16.172   3.90.15.21      Bottlerocket OS 1.12.0 (aws-k8s-1.24)   5.15.79          containerd://1.6.15+bottlerocket
 ip-192-168-84-230.ec2.internal   Ready    <none>   79s   v1.24.9-eks-4f83af2   192.168.84.230   <none>          Bottlerocket OS 1.12.0 (aws-k8s-1.24)   5.15.79          containerd://1.6.15+bottlerocket
 ```
-{: .nolineno }
 
 Display details about node size and architecture:
 
@@ -351,14 +339,11 @@ Display details about node size and architecture:
 kubectl get nodes -o json | jq -Cjr '.items[] | .metadata.name," ",.metadata.labels."node.kubernetes.io/instance-type"," ",.metadata.labels."kubernetes.io/arch", "\n"' | sort -k2 -r | column -t
 ```
 
-Output:
-
-```text
+```console
 ip-192-168-84-230.ec2.internal  t4g.small   arm64
 ip-192-168-16-172.ec2.internal  t4g.medium  arm64
 ip-192-168-14-250.ec2.internal  t4g.medium  arm64
 ```
-{: .nolineno }
 
 Details about node capacity:
 
@@ -366,16 +351,13 @@ Details about node capacity:
 kubectl resource-capacity --sort cpu.util --util --pod-count
 ```
 
-Output:
-
-```text
+```console
 NODE                             CPU REQUESTS   CPU LIMITS    CPU UTIL     MEMORY REQUESTS   MEMORY LIMITS   MEMORY UTIL    POD COUNT
 *                                3285m (56%)    3500m (60%)   417m (7%)    2410Mi (30%)      6840Mi (85%)    3112Mi (39%)   36/45
 ip-192-168-14-250.ec2.internal   715m (37%)     1300m (67%)   299m (15%)   750Mi (22%)       2404Mi (72%)    1635Mi (49%)   17/17
 ip-192-168-16-172.ec2.internal   1415m (73%)    1900m (98%)   82m (4%)     1524Mi (46%)      3668Mi (111%)   1024Mi (31%)   13/17
 ip-192-168-84-230.ec2.internal   1155m (59%)    300m (15%)    37m (1%)     136Mi (9%)        768Mi (55%)     453Mi (32%)    6/11
 ```
-{: .nolineno }
 
 Graphical view of cpu + memory utilization per node (+ prices) produced by [eks-node-viewer](https://github.com/awslabs/eks-node-viewer):
 
@@ -383,9 +365,7 @@ Graphical view of cpu + memory utilization per node (+ prices) produced by [eks-
 eks-node-viewer --resources cpu,memory
 ```
 
-Output:
-
-```text
+```console
 3 nodes 3285m/5790m      56.7% cpu    ███████████████████████░░░░░░░░░░░░░░░░░ 0.067/hour $49.056/month
         2410Mi/8163424Ki 30.2% memory ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 36 pods (0 pending 36 running 36 bound)
@@ -397,7 +377,6 @@ ip-192-168-14-250.ec2.internal cpu    █████████████░
 ip-192-168-84-230.ec2.internal cpu    █████████████████████░░░░░░░░░░░░░░  60% (6 pods)  t4g.small         Spot      - Ready
                                memory ███░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░  10%
 ```
-{: .nolineno }
 
 Other details produced by [viewnode](https://github.com/NTTDATA-DACH/viewnode):
 
@@ -405,9 +384,7 @@ Other details produced by [viewnode](https://github.com/NTTDATA-DACH/viewnode):
 kubectl viewnode --all-namespaces --show-metrics
 ```
 
-Output:
-
-```text
+```console
 36 pod(s) in total
 0 unscheduled pod(s)
 3 running node(s) with 36 scheduled pod(s):
@@ -451,7 +428,6 @@ Output:
   * kube-system: kube-proxy-2gblp (running | mem usage: 12.7 MiB)
   * podinfo: podinfo-59d6468db-jmwxh (running | mem usage: 13.4 MiB)
 ```
-{: .nolineno }
 
 Other details produced by [kubectl-view-allocations](https://github.com/davidB/kubectl-view-allocations):
 
@@ -459,9 +435,7 @@ Other details produced by [kubectl-view-allocations](https://github.com/davidB/k
 kubectl view-allocations --utilization
 ```
 
-Output:
-
-```text
+```console
  Resource                                                            Utilization      Requested          Limit  Allocatable     Free
   attachable-volumes-aws-ebs                                                  __             __             __        117.0       __
   ├─ ip-192-168-14-250.ec2.internal                                           __             __             __         39.0       __
@@ -556,12 +530,13 @@ Output:
   ├─ ip-192-168-16-172.ec2.internal                                           __     (76%) 13.0     (76%) 13.0         17.0      4.0
   └─ ip-192-168-84-230.ec2.internal                                           __      (55%) 6.0      (55%) 6.0         11.0      5.0
 ```
-{: .nolineno }
+
+## Clean-up
 
 Uninstall [Podinfo](https://github.com/stefanprodan/podinfo):
 
-```bash
-kubectl delete namespace podinfo
+```sh
+kubectl delete namespace podinfo || true
 ```
 
 Enjoy ... 😉
