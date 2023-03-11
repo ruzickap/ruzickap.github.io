@@ -138,10 +138,8 @@ ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev
 ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS2} solo=false proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
 ```
 
-Output:
-
 <!-- markdownlint-disable blanks-around-fences -->
-```text
+```console
 localhost | CHANGED => {
     "ansible_facts": {
         "discovered_interpreter_python": "/usr/bin/python"
@@ -199,7 +197,6 @@ localhost | CHANGED => {
     }
 }
 ```
-{: .nolineno }
 <!-- markdownlint-enable blanks-around-fences -->
 
 ### Create Route53
@@ -495,7 +492,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="45.6.0"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="45.7.1"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
@@ -538,6 +535,8 @@ alertmanager:
           - alertmanager.${CLUSTER_FQDN}
 # https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 grafana:
+  serviceMonitor:
+    enabled: true
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -557,6 +556,15 @@ grafana:
     tls:
       - hosts:
           - grafana.${CLUSTER_FQDN}
+  datasources:
+    datasources.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://kube-prometheus-stack-prometheus:9090
+          access: proxy
+          isDefault: true
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -650,6 +658,14 @@ grafana:
         datasource: Prometheus
       pod-statistic-karpenter:
         gnetId: 16236
+        revision: 1
+        datasource: Prometheus
+      trivy-operator-reports:
+        gnetId: 16652
+        revision: 1
+        datasource: Prometheus
+      trivy-image-vulnerability-overview:
+        gnetId: 16742
         revision: 1
         datasource: Prometheus
   grafana.ini:
