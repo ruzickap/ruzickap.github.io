@@ -273,7 +273,6 @@ kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
   region: ${AWS_DEFAULT_REGION}
-  version: "1.25"
   tags: &tags
     karpenter.sh/discovery: "${CLUSTER_NAME}"
 $(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
@@ -556,15 +555,6 @@ grafana:
     tls:
       - hosts:
           - grafana.${CLUSTER_FQDN}
-  datasources:
-    datasources.yaml:
-      apiVersion: 1
-      datasources:
-        - name: Prometheus
-          type: prometheus
-          url: http://kube-prometheus-stack-prometheus:9090
-          access: proxy
-          isDefault: true
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -658,14 +648,6 @@ grafana:
         datasource: Prometheus
       pod-statistic-karpenter:
         gnetId: 16236
-        revision: 1
-        datasource: Prometheus
-      trivy-operator-reports:
-        gnetId: 16652
-        revision: 1
-        datasource: Prometheus
-      trivy-image-vulnerability-overview:
-        gnetId: 16742
         revision: 1
         datasource: Prometheus
   grafana.ini:
