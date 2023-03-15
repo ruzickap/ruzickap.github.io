@@ -16,7 +16,7 @@ image:
 In the previous post related to
 [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
 I decided to install [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-to enable cluster montiroing containing [Grafana](https://grafana.com/), [Prometheus](https://prometheus.io/)
+to enable cluster monitoring containing [Grafana](https://grafana.com/), [Prometheus](https://prometheus.io/)
 and few other components.
 
 There are many tools which allows you to scan container images and show their
