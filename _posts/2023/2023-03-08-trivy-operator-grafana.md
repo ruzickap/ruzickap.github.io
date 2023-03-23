@@ -7,7 +7,6 @@ categories: [Kubernetes, Amazon EKS, Security]
 tags: [Amazon EKS, k8s, kubernetes, grafana, trivy-operator, dashboard]
 image:
   path: https://raw.githubusercontent.com/aquasecurity/trivy-vscode-extension/02fa1bf2b5e1333647ebd1bced679f4e94f8bf39/media/trivy.svg
-  width: 600
   alt: Trivy Operator
 ---
 
@@ -50,7 +49,7 @@ Links:
 Variables which are being used in the next steps.
 
 ```bash
-# Hostname / FQDN definitions
+export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
@@ -358,7 +357,7 @@ EOF
 echo -n "Waiting for trivy-operator to create ConfigAuditReports: "
 until kubectl get configauditreports -n test-trivy2 -o go-template='{{.items | len}}' | grep -qxF 1; do
   echo -n "."
-  sleep 3
+  sleep 5
 done
 ```
 
@@ -1079,8 +1078,30 @@ Events:              <none>
 
 ## Grafana
 
+Add Trivy Grafana Dashboards:
+
+```bash
+# renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="45.7.1"
+
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-trivy-operator-grafana.yml" << EOF
+grafana:
+  dashboards:
+    default:
+      trivy-operator-dashboard:
+        gnetId: 17813
+        revision: 2
+        datasource: Prometheus
+EOF
+helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-trivy-operator-grafana.yml" kube-prometheus-stack prometheus-community/kube-prometheus-stack
+```
+
 Add the following Grafana Dashboards to existng [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 helm chart:
+
+* [16652] - [Trivy Operator Dashboard](https://grafana.com/grafana/dashboards/17813-trivy-operator-dashboard/)
+  ![Trivy Operator Dashboard](/assets/img/posts/2023/2023-03-08-trivy-operator-grafana/grafana-dashboard-17813-trivy-operator-dashboard.avif)
+  _Trivy Operator Dashboard_
 
 * [16742] - [Trivy Image Vulnerability Overview](https://grafana.com/grafana/dashboards/16742-trivy-image-vulnerability-overview/)
   ![Trivy Image Vulnerability Overview](/assets/img/posts/2023/2023-03-08-trivy-operator-grafana/grafana-dashboard-16742-trivy-image-vulnerability-overview.avif)
