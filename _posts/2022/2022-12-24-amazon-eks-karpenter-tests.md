@@ -7,7 +7,6 @@ categories: [Kubernetes, Amazon EKS, Karpenter]
 tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl]
 image:
   path: https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
-  width: 600
   alt: Karpenter
 ---
 
@@ -40,7 +39,7 @@ examples.
 Variables which are being used in the next steps.
 
 ```bash
-# Hostname / FQDN definitions
+export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
@@ -289,13 +288,6 @@ PODINFO_HELM_CHART_VERSION="6.3.5"
 
 helm repo add --force-update sp https://stefanprodan.github.io/podinfo
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-podinfo.yml" << EOF
-certificate:
-  create: true
-  issuerRef:
-    kind: ClusterIssuer
-    name: letsencrypt-${LETSENCRYPT_ENVIRONMENT}-dns
-  dnsNames:
-    - podinfo.${CLUSTER_FQDN}
 ingress:
   enabled: true
   className: nginx
@@ -309,8 +301,7 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   tls:
-    - secretName: podinfo-tls
-      hosts:
+    - hosts:
         - podinfo.${CLUSTER_FQDN}
 resources:
   requests:

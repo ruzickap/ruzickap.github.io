@@ -48,7 +48,6 @@ export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-export LETSENCRYPT_ENVIRONMENT="staging" # production
 export MY_EMAIL="petr.ruzicka@gmail.com"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
@@ -82,7 +81,6 @@ Verify if all the necessary variables were set:
 : "${GOOGLE_CLIENT_ID?}"
 : "${GOOGLE_CLIENT_SECRET?}"
 : "${KUBECONFIG?}"
-: "${LETSENCRYPT_ENVIRONMENT?}"
 : "${MY_EMAIL?}"
 : "${TAGS?}"
 
@@ -287,11 +285,13 @@ iam:
         namespace: cert-manager
       wellKnownPolicies:
         certManager: true
+      roleName: eksctl-${CLUSTER_NAME}-irsa-cert-manager
     - metadata:
         name: external-dns
         namespace: external-dns
       wellKnownPolicies:
         externalDNS: true
+      roleName: eksctl-${CLUSTER_NAME}-irsa-external-dns
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
   version: v0.27.0
@@ -534,6 +534,7 @@ alertmanager:
           - alertmanager.${CLUSTER_FQDN}
 # https://github.com/grafana/helm-charts/blob/main/charts/grafana/values.yaml
 grafana:
+  defaultDashboardsEnabled: false
   serviceMonitor:
     enabled: true
   ingress:
@@ -555,6 +556,15 @@ grafana:
     tls:
       - hosts:
           - grafana.${CLUSTER_FQDN}
+  datasources:
+    datasource.yaml:
+      apiVersion: 1
+      datasources:
+        - name: Prometheus
+          type: prometheus
+          url: http://kube-prometheus-stack-prometheus.kube-prometheus-stack:9090/
+          access: proxy
+          isDefault: true
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -575,7 +585,7 @@ grafana:
         datasource: Prometheus
       node-exporter-full:
         gnetId: 1860
-        revision: 27
+        revision: 30
         datasource: Prometheus
       prometheus-2-0-overview:
         gnetId: 3662
@@ -605,10 +615,6 @@ grafana:
         gnetId: 15398
         revision: 6
         datasource: Prometheus
-      cluster-autoscaler-stats:
-        gnetId: 12623
-        revision: 1
-        datasource: Prometheus
       kubernetes-nginx-ingress-prometheus-nextgen:
         gnetId: 14314
         revision: 2
@@ -620,7 +626,7 @@ grafana:
       # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
       kubernetes-views-pods:
         gnetId: 15760
-        revision: 10
+        revision: 22
         datasource: Prometheus
       kubernetes-views-global:
         gnetId: 15757
@@ -628,19 +634,19 @@ grafana:
         datasource: Prometheus
       kubernetes-views-namespaces:
         gnetId: 15758
-        revision: 12
+        revision: 15
         datasource: Prometheus
       kubernetes-views-nodes:
         gnetId: 15759
-        revision: 8
+        revision: 14
         datasource: Prometheus
       kubernetes-system-api-server:
         gnetId: 15761
-        revision: 8
+        revision: 11
         datasource: Prometheus
       kubernetes-system-coredns:
         gnetId: 15762
-        revision: 6
+        revision: 11
         datasource: Prometheus
       cluster-capacity-karpenter:
         gnetId: 16237
@@ -775,41 +781,23 @@ EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
 
-Add ClusterIssuers for Let's Encrypt staging and production:
+Add ClusterIssuers for Let's Encrypt staging:
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer.yml" << EOF | kubectl apply -f -
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-staging.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-staging-dns
   namespace: cert-manager
+  labels:
+    letsencrypt: staging
 spec:
   acme:
     server: https://acme-staging-v02.api.letsencrypt.org/directory
     email: ${MY_EMAIL}
     privateKeySecretRef:
       name: letsencrypt-staging-dns
-    solvers:
-      - selector:
-          dnsZones:
-            - ${CLUSTER_FQDN}
-        dns01:
-          route53:
-            region: ${AWS_DEFAULT_REGION}
----
-# Create ClusterIssuer for production to get real signed certificates
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-production-dns
-  namespace: cert-manager
-spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: ${MY_EMAIL}
-    privateKeySecretRef:
-      name: letsencrypt-production-dns
     solvers:
       - selector:
           dnsZones:
@@ -825,16 +813,21 @@ kubectl wait --namespace cert-manager --timeout=10m --for=condition=Ready cluste
 Create certificate:
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate.yml" << EOF | kubectl apply -f -
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-staging.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: ingress-cert-${LETSENCRYPT_ENVIRONMENT}
+  name: ingress-cert-staging
   namespace: cert-manager
+  labels:
+    letsencrypt: staging
 spec:
-  secretName: ingress-cert-${LETSENCRYPT_ENVIRONMENT}
+  secretName: ingress-cert-staging
+  secretTemplate:
+    labels:
+      letsencrypt: staging
   issuerRef:
-    name: letsencrypt-${LETSENCRYPT_ENVIRONMENT}-dns
+    name: letsencrypt-staging-dns
     kind: ClusterIssuer
   commonName: "*.${CLUSTER_FQDN}"
   dnsNames:
@@ -861,9 +854,9 @@ helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namesp
 ### external-dns
 
 Install `external-dns`
-[helm chart](https://artifacthub.io/packages/helm/bitnami/external-dns)
+[helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
 and modify the
-[default values](https://github.com/bitnami/charts/blob/master/bitnami/external-dns/values.yaml).
+[default values](https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/values.yaml).
 `external-dns` will take care about DNS records.
 Service account `external-dns` was created by `eksctl`.
 
@@ -876,8 +869,6 @@ EXTERNAL_DNS_HELM_CHART_VERSION="1.12.1"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
-aws:
-  region: ${AWS_DEFAULT_REGION}
 domainFilters:
   - ${CLUSTER_FQDN}
 interval: 20s
@@ -885,10 +876,8 @@ policy: sync
 serviceAccount:
   create: false
   name: external-dns
-metrics:
+serviceMonitor:
   enabled: true
-  serviceMonitor:
-    enabled: true
 EOF
 helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
 ```
@@ -902,9 +891,9 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.5.4"
+INGRESS_NGINX_HELM_CHART_VERSION="4.6.0"
 
-kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate "ingress-cert-${LETSENCRYPT_ENVIRONMENT}"
+kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
 
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
@@ -912,7 +901,7 @@ controller:
   ingressClassResource:
     default: true
   extraArgs:
-    default-ssl-certificate: "cert-manager/ingress-cert-${LETSENCRYPT_ENVIRONMENT}"
+    default-ssl-certificate: "cert-manager/ingress-cert-staging"
   service:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp

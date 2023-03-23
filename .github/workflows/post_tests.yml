@@ -13,6 +13,7 @@ on:
           - 2022-11-27-cheapest-amazon-eks
           - 2022-12-24-amazon-eks-karpenter-tests 2022-11-27-cheapest-amazon-eks
           - 2023-03-08-trivy-operator-grafana 2022-11-27-cheapest-amazon-eks
+          - 2023-03-20-velero-and-cert-manager 2022-11-27-cheapest-amazon-eks
       action:
         type: choice
         description: Select action
@@ -28,8 +29,6 @@ env:
   AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   # renovate: datasource=github-tags depName=weaveworks/eksctl
   EKSCTL_VERSION: 0.135.0
-  # renovate: datasource=github-tags depName=kubernetes-sigs/krew
-  KREW_VERSION: 0.4.3
   KREW_PLUGINS: cost resource-capacity view-allocations viewnode
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -57,15 +56,16 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
-      - name: Install eksctl, krew and eks-node-viewer
+      - name: Install eksctl, krew, eks-node-viewer, velero
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euxo pipefail
           gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz "v${EKSCTL_VERSION}" --output - | sudo tar xz -C /usr/local/bin/
-          gh release download --repo kubernetes-sigs/krew --pattern krew-linux_amd64.tar.gz "v${KREW_VERSION}" --output - | sudo tar xz -C /tmp/
+          gh release download --repo kubernetes-sigs/krew --pattern krew-linux_amd64.tar.gz --output - | sudo tar xz -C /tmp/
           /tmp/krew-linux_amd64 install krew
           echo "${HOME}/.krew/bin" >> "${GITHUB_PATH}"
+          gh release download --repo vmware-tanzu/velero --pattern "velero-*-linux-amd64.tar.gz" --output - | sudo tar xz -C /usr/local/bin/ --strip-components 1 --wildcards "*/velero"
 
       - name: Install krew plugins
         run: |
@@ -102,6 +102,13 @@ jobs:
           fi
 
           if [[ "${{ inputs.action }}" =~ 'destroy' ]]; then
+            export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+            export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+            export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
+            export KUBECONFIG="/tmp/kubeconfig-${CLUSTER_NAME}.conf"
+            aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
+            kubectl get nodes
+
             for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
               echo "*** ${POST_FILE} | destroy"
               sed -n "/^\`\`\`sh$/,/^\`\`\`$/p" "${POST_FILE}" | sed "/^\`\`\`*/d" | bash -euxo pipefail
