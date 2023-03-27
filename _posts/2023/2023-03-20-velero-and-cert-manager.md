@@ -217,7 +217,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="3.1.4"
+VELERO_HELM_CHART_VERSION="3.1.5"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
