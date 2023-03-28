@@ -5,13 +5,16 @@
   ],
   "ignorePatterns": [
     {
-      "pattern": "^/assets/img/posts/"
-    },
-    {
       "pattern": "^https://img.shields.io/"
     },
     {
       "pattern": "^https://www.instagram.com/"
+    }
+  ],
+  "replacementPatterns": [
+    {
+      "pattern": "^/assets/",
+      "replacement": "../../assets/"
     }
   ],
   "retryCount": 10,
