@@ -12,6 +12,9 @@ jobs:
   build:
     name: MegaLinter
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      statuses: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -31,7 +34,7 @@ jobs:
           chmod a+x README.sh
 
       - name: MegaLinter
-        uses: megalinter/megalinter@v6.20.1
+        uses: oxsecurity/megalinter/flavors/documentation@v6.21.0
         env:
           BASH_SHFMT_ARGUMENTS: --indent 2 --space-redirects
           DISABLE_LINTERS: REPOSITORY_DEVSKIM,SPELL_CSPELL
