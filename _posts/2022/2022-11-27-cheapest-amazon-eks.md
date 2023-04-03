@@ -992,7 +992,7 @@ helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace 
 ### oauth2-proxy
 
 Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
-the endopints by Google Authentication.
+the endpoints by Google Authentication.
 
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg
 "oauth2-proxy"){: width="400" }
