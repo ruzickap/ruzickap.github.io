@@ -10,8 +10,6 @@ image:
   alt: Karpenter
 ---
 
-<!-- markdownlint-disable-file blanks-around-fences -->
-
 In the previous post related to
 [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
 I decided to install [Karpenter](https://karpenter.sh/) to improve

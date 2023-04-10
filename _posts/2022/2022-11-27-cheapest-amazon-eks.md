@@ -296,6 +296,7 @@ karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
   version: v0.27.1
   createServiceAccount: true
+  withSpotInterruptionQueue: true
 addons:
   - name: vpc-cni
   - name: kube-proxy
