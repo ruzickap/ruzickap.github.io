@@ -10,8 +10,6 @@ image:
   alt: Velero
 ---
 
-<!-- markdownlint-disable-file blanks-around-fences -->
-
 In the previous post related to
 [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
 I'm using the [cert-manager](https://cert-manager.io/) to get the wildcard
@@ -31,11 +29,9 @@ Links:
 
 ## Requirements
 
-* Amazon EKS cluster with [cert-manager](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-  installed (described in
+* Amazon EKS cluster (described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
 * [Helm](https://helm.sh/)
-* [Velero CLI](https://velero.io/docs/main/velero-install/)
 
 Variables which are being used in the next steps.
 
