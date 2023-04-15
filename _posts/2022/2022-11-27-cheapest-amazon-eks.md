@@ -7,7 +7,6 @@ categories: [Kubernetes, Amazon EKS]
 tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl, cert-manager, external-dns, podinfo]
 image:
   path: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
-  alt: Amazon EKS
 ---
 
 Sometimes it is necessary to save costs and run the [Amazon EKS](https://aws.amazon.com/eks/)
@@ -75,14 +74,8 @@ Verify if all the necessary variables were set:
 : "${AWS_DEFAULT_REGION?}"
 : "${AWS_SECRET_ACCESS_KEY?}"
 : "${AWS_ROLE_TO_ASSUME?}"
-: "${BASE_DOMAIN?}"
-: "${CLUSTER_FQDN?}"
-: "${CLUSTER_NAME?}"
 : "${GOOGLE_CLIENT_ID?}"
 : "${GOOGLE_CLIENT_SECRET?}"
-: "${KUBECONFIG?}"
-: "${MY_EMAIL?}"
-: "${TAGS?}"
 
 echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
 ```
@@ -208,7 +201,7 @@ Create temporary directory for files used for creating/configuring EKS Cluster
 and it's components:
 
 ```bash
-mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
+mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
 Create Route53 zone:
@@ -431,9 +424,9 @@ helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERS
 
 ## Prometheus, DNS, Ingress, Certificates and others
 
-There are many k8s services / applications which can export metrics to
+There are many K8s services / applications which can export metrics to
 Prometheus. That is the reason why the prometheus should be "first" application
-which should be installed on the k8s cluster.
+which should be installed on the K8s cluster.
 
 Then you will need some basic tools / integrations, like [external-dns](https://github.com/kubernetes-sigs/external-dns),
 [ingress-nginx](https://kubernetes.github.io/ingress-nginx/),
@@ -808,7 +801,7 @@ spec:
             region: ${AWS_DEFAULT_REGION}
 EOF
 
-kubectl wait --namespace cert-manager --timeout=10m --for=condition=Ready clusterissuer --all
+kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
 ```
 
 Create certificate:
@@ -1043,32 +1036,10 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 ![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg
 "Clean-up"){: width="400" }
 
-Set necessary variables and verify if all the necessary variables were set:
-
-```sh
-# AWS Region
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
-# Hostname / FQDN definitions
-export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
-export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
-export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-export TMP_DIR="${TMP_DIR:-/tmp}"
-export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
-
-: "${AWS_ACCESS_KEY_ID?}"
-: "${AWS_DEFAULT_REGION?}"
-: "${AWS_SECRET_ACCESS_KEY?}"
-: "${BASE_DOMAIN?}"
-: "${CLUSTER_FQDN?}"
-: "${CLUSTER_NAME?}"
-: "${KUBECONFIG?}"
-```
-
 Remove EKS cluster and created components:
 
 ```sh
 if eksctl get cluster --name="${CLUSTER_NAME}" 2> /dev/null; then
-  eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
   eksctl delete cluster --name="${CLUSTER_NAME}" --force
 fi
 ```
@@ -1079,28 +1050,6 @@ Remove orphan EC2s created by Karpenter:
 for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do
   echo "Removing EC2: ${EC2}"
   aws ec2 terminate-instances --instance-ids "${EC2}"
-done
-```
-
-Remove orphan Remove Network ELBs (if exists):
-
-```sh
-for NETWORK_ELB_ARN in $(aws elbv2 describe-load-balancers --query "LoadBalancers[].LoadBalancerArn" --output=text) ; do
-  if [[ "$(aws elbv2 describe-tags --resource-arns "${NETWORK_ELB_ARN}" --query "TagDescriptions[].Tags[?Key == \`kubernetes.io/cluster/${CLUSTER_NAME}\`]" --output text)" =~ ${CLUSTER_NAME} ]]; then
-    echo "*** Deleting Network ELB: ${NETWORK_ELB_ARN}"
-    aws elbv2 delete-load-balancer --load-balancer-arn "${NETWORK_ELB_ARN}"
-  fi
-done
-```
-
-Remove orphan Target Groups (if exists):
-
-```sh
-for TARGET_GROUP_ARN in $(aws elbv2 describe-target-groups --region=eu-central-1 --query "TargetGroups[].TargetGroupArn" --output=text) ; do
-  if [[ "$(aws elbv2 describe-tags --resource-arns "${TARGET_GROUP_ARN}" --query "TagDescriptions[].Tags[?Key == \`kubernetes.io/cluster/${CLUSTER_NAME}\`]" --output text)" =~ ${CLUSTER_NAME} ]]; then
-    echo "*** Deleting Target Group: ${TARGET_GROUP_ARN}"
-    aws elbv2 delete-target-group --target-group-arn "${TARGET_GROUP_ARN}"
-  fi
 done
 ```
 
@@ -1119,7 +1068,7 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
 fi
 ```
 
-Remove CloudFormation stacks:
+Remove CloudFormation stack:
 
 ```sh
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53"

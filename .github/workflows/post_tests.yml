@@ -14,6 +14,7 @@ on:
           - 2022-12-24-amazon-eks-karpenter-tests 2022-11-27-cheapest-amazon-eks
           - 2023-03-08-trivy-operator-grafana 2022-11-27-cheapest-amazon-eks
           - 2023-03-20-velero-and-cert-manager 2022-11-27-cheapest-amazon-eks
+          - 2023-04-01-secrets-store-csi-driver-reloader 2023-03-20-velero-and-cert-manager 2022-11-27-cheapest-amazon-eks
       action:
         type: choice
         description: Select action
@@ -44,7 +45,7 @@ jobs:
     name: "${{ inputs.action }} | ${{ inputs.posts }}"
     concurrency:
       group: post-pipeline
-    timeout-minutes: 60
+    timeout-minutes: 100
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -56,33 +57,40 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v3
 
-      - name: Install eksctl, krew, eks-node-viewer, velero
+      - name: "${{ inputs.action }} | ${{ inputs.posts }}"
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euxo pipefail
-          gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz "v${EKSCTL_VERSION}" --output - | sudo tar xz -C /usr/local/bin/
-          gh release download --repo kubernetes-sigs/krew --pattern krew-linux_amd64.tar.gz --output - | sudo tar xz -C /tmp/
-          /tmp/krew-linux_amd64 install krew
-          echo "${HOME}/.krew/bin" >> "${GITHUB_PATH}"
-          gh release download --repo vmware-tanzu/velero --pattern "velero-*-linux-amd64.tar.gz" --output - | sudo tar xz -C /usr/local/bin/ --strip-components 1 --wildcards "*/velero"
 
-      - name: Install krew plugins
-        run: |
-          set -euxo pipefail
-          kubectl krew install ${{ env.KREW_PLUGINS }}
-
-      - name: "${{ inputs.action }} | ${{ inputs.posts }}"
-        run: |
-          set -euxo pipefail
+          export TMP_DIR="${PWD}/mytmp"
 
           POST_FILES_ARRAY=()
           # shellcheck disable=SC2043
-          for POST_FILE in ${{ inputs.posts }} ; do
+          for POST_FILE in ${{ inputs.posts }}; do
             POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POST_FILE}*.md")")
           done
 
+          if grep -q eksctl "${POST_FILES_ARRAY[@]}" && ! command -v eksctl &> /dev/null ; then
+            echo "*** Installing eksctl"
+            gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz "v${EKSCTL_VERSION}" --output - | sudo tar xz -C /usr/local/bin/
+          fi
+
+          if grep -q krew "${POST_FILES_ARRAY[@]}" && ! command -v krew &> /dev/null ; then
+            echo "*** Installing krew"
+            gh release download --repo kubernetes-sigs/krew --pattern krew-linux_amd64.tar.gz --output - | sudo tar xz -C /tmp/
+            /tmp/krew-linux_amd64 install krew
+            export PATH="${HOME}/.krew/bin:${PATH}"
+            kubectl krew install ${{ env.KREW_PLUGINS }}
+          fi
+
+          if grep -q velero "${POST_FILES_ARRAY[@]}" && ! command -v velero &> /dev/null ; then
+            echo "*** Installing velero"
+            gh release download --repo vmware-tanzu/velero --pattern "velero-*-linux-amd64.tar.gz" --output - | sudo tar xz -C /usr/local/bin/ --strip-components 1 --wildcards "*/velero"
+          fi
+
           if [[ "${{ inputs.action }}" =~ 'build' ]]; then
+            echo -e "********************\n*** Create\n********************"
             for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
               echo "*** ${POST_FILES_ARRAY[idx]} | build"
               # shellcheck disable=SC1090
@@ -102,15 +110,17 @@ jobs:
           fi
 
           if [[ "${{ inputs.action }}" =~ 'destroy' ]]; then
+            echo -e "********************\n*** Destroy\n********************"
             export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
             export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
             export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-            export KUBECONFIG="/tmp/kubeconfig-${CLUSTER_NAME}.conf"
-            aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
-            kubectl get nodes
+            export TMP_DIR="${TMP_DIR:-${PWD}}"
+            export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
+            aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 
             for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
               echo "*** ${POST_FILE} | destroy"
-              sed -n "/^\`\`\`sh$/,/^\`\`\`$/p" "${POST_FILE}" | sed "/^\`\`\`*/d" | bash -euxo pipefail
+              # shellcheck disable=SC1090
+              source <(echo "set -ux" ; sed -n "/^\`\`\`sh$/,/^\`\`\`$/p" "${POST_FILE}" | sed "/^\`\`\`*/d") || true
             done
           fi

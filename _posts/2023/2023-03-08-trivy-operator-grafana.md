@@ -7,7 +7,6 @@ categories: [Kubernetes, Amazon EKS, Security]
 tags: [Amazon EKS, k8s, kubernetes, grafana, trivy-operator, dashboard]
 image:
   path: https://raw.githubusercontent.com/aquasecurity/trivy-vscode-extension/02fa1bf2b5e1333647ebd1bced679f4e94f8bf39/media/trivy.svg
-  alt: Trivy Operator
 ---
 
 In the previous post related to
@@ -21,13 +20,13 @@ vulnerabilities like [Trivy](https://trivy.dev/), [Grype](https://github.com/anc
 or [Clair](https://github.com/quay/clair).
 
 Unfortunately there are not so many OSS tools which can show you vulnerabilities
-of the container images running inside the k8s.
+of the container images running inside the K8s.
 This is usually paid offering provided by 3rd party vendors like [Palo Alto](https://www.paloaltonetworks.com/prisma/cloud),
 [Aqua](https://www.aquasec.com/), [Wiz](https://www.wiz.io/), and many others...
 
 Let's looks at the [Trivy Operator](https://github.com/aquasecurity/trivy-operator)
 which can help you build the security posture (Compliance, Vulnerabilities,
-RBAC, ...) for your kubernetes cluster.
+RBAC, ...) for your Kubernetes cluster.
 
 I'll walk you through the installation, integration it with Prometheus+Grafana
 and some examples to better understand how it works...
@@ -44,7 +43,7 @@ Links:
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
 * [Helm](https://helm.sh/)
 
-Variables which are being used in the next steps.
+Variables which are being used in the next steps:
 
 ```bash
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
@@ -53,7 +52,7 @@ export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
-mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
+mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
 ## Install Trivy Operator
@@ -107,7 +106,7 @@ trivy-operator-56bdc96f8-dls8c              1/1     Running     0          15s
 ## Trivy Operator details
 
 Let's take some examples to see how the [Trivy Operator](https://github.com/aquasecurity/trivy-operator)
-can help with identifying the security issues in the k8s cluster.
+can help with identifying the security issues in the K8s cluster.
 
 > The outputs below were created on the 2023-03-12 and will be different in the
 > future...
@@ -120,6 +119,8 @@ to the cluster:
 
 [//]: # (https://github.com/kubernetes/kubernetes/issues/83242)
 
+{% raw %}
+
 ```bash
 kubectl create namespace test-trivy1
 kubectl run nginx --namespace=test-trivy1 --image=nginx:1.22.0
@@ -130,6 +131,8 @@ until kubectl get vulnerabilityreports -n test-trivy1 -o go-template='{{.items |
   sleep 3
 done
 ```
+
+{% endraw %}
 
 See the summary of the container image vulnerabilities which are present in old
 version of nginx:
@@ -317,6 +320,8 @@ kubectl get clustercompliancereports cis -o json | jq '.spec.compliance.controls
 Let's create new namespace with the pod which has `hostIPC: true` parameter
 present k8s yaml manifest:
 
+{% raw %}
+
 ```bash
 kubectl create namespace test-trivy2
 kubectl apply --namespace=test-trivy2 -f - << \EOF
@@ -358,6 +363,8 @@ until kubectl get configauditreports -n test-trivy2 -o go-template='{{.items | l
   sleep 5
 done
 ```
+
+{% endraw %}
 
 An instance of the [ConfigAuditReports](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/configaudit-report/)
 represents checks performed by [Trivy](https://trivy.dev/), against a Kubernetes
@@ -489,6 +496,8 @@ workload.
 
 Look at the example of the container which has ssh keys inside it:
 
+{% raw %}
+
 ```bash
 kubectl create namespace test-trivy3
 kubectl run ubuntu-sshd-exposed-secrets --namespace=test-trivy3 --image=peru/ubuntu_sshd --overrides='{"spec": { "nodeSelector": {"kubernetes.io/arch": "amd64"}}}'
@@ -499,6 +508,8 @@ until kubectl get exposedsecretreports -n test-trivy3 -o go-template='{{.items |
   sleep 3
 done
 ```
+
+{% endraw %}
 
 After looking into the [ExposedSecretReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/exposedsecret-report/)
 details it should be easy to identify the problem:
@@ -596,6 +607,8 @@ RBAC Assessment Report exists in two "versions" (CRDs):
 
 Let's have example with role which allows manipulation and reading the secrets:
 
+{% raw %}
+
 ```bash
 kubectl create namespace test-trivy4
 kubectl apply --namespace=test-trivy4 -f - << \EOF
@@ -615,6 +628,8 @@ until kubectl get rbacassessmentreport -n test-trivy4 -o go-template='{{.items |
   sleep 3
 done
 ```
+
+{% endraw %}
 
 The generated [RbacAssessmentReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/rbacassessment-report/)
 will look contain the CRITICAL issue about secret management:
@@ -1109,7 +1124,7 @@ helm chart:
   ![Trivy Operator Reports](/assets/img/posts/2023/2023-03-08-trivy-operator-grafana/grafana-dashboard-16652-trivy-operator-reports.avif)
   _Trivy Operator Reports_
 
-## Clean-up
+---
 
 Delete previously created namespaces:
 

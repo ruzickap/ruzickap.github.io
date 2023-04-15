@@ -28,6 +28,7 @@ exclude = [
   "https://ruzickap.github.io/projects/",
   # Due to: [TIMEOUT] https://twitter.com/Ruzicka_Petr | Timeout
   "https://twitter.com/Ruzicka_Petr",
+  "https://*k01.k8s.mylabs.dev/*",
 ]
 
 # Exclude these filesystem paths from getting checked

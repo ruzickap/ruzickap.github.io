@@ -9,6 +9,9 @@
     },
     {
       "pattern": "^https://www.instagram.com/"
+    },
+    {
+      "pattern": "^https://.*k01.k8s.mylabs.dev/.*"
     }
   ],
   "replacementPatterns": [

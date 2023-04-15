@@ -53,3 +53,32 @@ mega-linter-runner --flavor documentation \
   -e YAML_PRETTIER_FILTER_REGEX_EXCLUDE="(^_data/|^_config.yml)" \
   -e YAML_V8R_FILTER_REGEX_EXCLUDE="(^_data/|^_config.yml)"
 ```
+
+## Notes
+
+- Use ```` ```bash ```` to run commands during the [post_tests](./.github/workflows/post_tests.yml)
+  "create" execution:
+
+  ````md
+  ```bash
+  <some create commands>
+  ```
+  ````
+
+- Use ```` ```shell ```` not to run commands during the [post_tests](./.github/workflows/post_tests.yml)
+  execution (they will be only displayed on the web pages):
+
+  ````md
+  ```shell
+  some commands
+  ```
+  ````
+
+- Use ```` ```sh```` to run commands during the [post_tests](./.github/workflows/post_tests.yml)
+  "destroy" execution:
+
+  ````md
+  ```sh
+  <some clean-up/destroy commands>
+  ```
+  ````
