@@ -294,7 +294,7 @@ iam:
       roleName: eksctl-${CLUSTER_NAME}-irsa-external-dns
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.27.2
+  version: v0.27.3
   createServiceAccount: true
   withSpotInterruptionQueue: true
 addons:
@@ -739,7 +739,7 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.27.2"
+KARPENTER_HELM_CHART_VERSION="v0.27.3"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
