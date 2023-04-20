@@ -7,7 +7,6 @@ categories: [Kubernetes, Amazon EKS, Karpenter]
 tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl]
 image:
   path: https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
-  alt: Karpenter
 ---
 
 In the previous post related to
@@ -34,7 +33,7 @@ examples.
 - [kube-capacity](https://github.com/robscott/kube-capacity)
   (`kubectl krew install resource-capacity`)
 
-Variables which are being used in the next steps.
+Variables which are being used in the next steps:
 
 ```bash
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
@@ -43,7 +42,7 @@ export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
-mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
+mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
 ## Workloads
@@ -520,7 +519,7 @@ kubectl view-allocations --utilization
   └─ ip-192-168-84-230.ec2.internal                                           __      (55%) 6.0      (55%) 6.0         11.0      5.0
 ```
 
-## Clean-up
+---
 
 Uninstall [Podinfo](https://github.com/stefanprodan/podinfo):
 

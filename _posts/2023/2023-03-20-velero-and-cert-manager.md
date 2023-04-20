@@ -7,7 +7,6 @@ categories: [Kubernetes, Amazon EKS, Velero, cert-manager]
 tags: [Amazon EKS, k8s, kubernetes, velero, cert-manager, certificates]
 image:
   path: https://raw.githubusercontent.com/cncf/landscape/17f2dc0c7ceba8c0655f6039942d9566feec87f5/cached_logos/velero.svg
-  alt: Velero
 ---
 
 In the previous post related to
@@ -33,7 +32,7 @@ Links:
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
 * [Helm](https://helm.sh/)
 
-Variables which are being used in the next steps.
+Variables which are being used in the next steps:
 
 ```bash
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
@@ -42,7 +41,7 @@ export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
-mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
+mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
 ### Create Let's Encrypt production certificate
@@ -77,7 +76,7 @@ spec:
           route53:
             region: ${AWS_DEFAULT_REGION}
 EOF
-kubectl wait --namespace cert-manager --timeout=10m --for=condition=Ready clusterissuer --all
+kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
@@ -211,6 +210,8 @@ and modify the
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
 "velero"){: width="600" }
 
+{% raw %}
+
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
 VELERO_HELM_CHART_VERSION="3.1.6"
@@ -279,6 +280,8 @@ schedules:
 EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" velero vmware-tanzu/velero
 ```
+
+{% endraw %}
 
 Add Velero Grafana Dashboard:
 
@@ -565,12 +568,18 @@ Here is the report form [SSL Labs](https://www.ssllabs.com):
 ![ssl-labs-report](/assets/img/posts/2023/2023-03-20-velero-and-cert-manager/ssl-labs-report.avif
 "ssl-labs-report")
 
+---
+
 Backup certificate before deleting the cluster (in case it was renewed):
+
+{% raw %}
 
 ```sh
 if ! kubectl get certificaterequests.cert-manager.io -n cert-manager --selector letsencrypt=production -o go-template='{{.items | len}}' | grep -qxF 0; then
   velero backup create --labels letsencrypt=production --from-schedule velero-weekly-backup-cert-manager
 fi
 ```
+
+{% endraw %}
 
 Enjoy ... 😉

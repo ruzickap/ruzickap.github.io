@@ -8,7 +8,6 @@ tags: [settings, photo, ftp, cameras, wireless]
 mermaid: true
 image:
   path: /assets/img/posts/2022/2022-09-02-my-sony-a7-iv-settings/Sony_A7_IV_(ILCE-7M4)_-_by_Henry_Söderlund_(51739988735).avif
-  alt: Sony A7 IV (ILCE-7M4) by Henry Söderlund
 ---
 
 FTP is protocol which I haven't used for many years. I configured FTP
