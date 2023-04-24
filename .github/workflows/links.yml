@@ -28,17 +28,17 @@ jobs:
             return result.data.html_url
           result-encoding: string
 
-      # - name: Restore lychee cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: .lycheecache
-      #     key: cache-lychee-${{ github.sha }}
-      #     restore-keys: cache-lychee-
+      - name: Restore lychee cache
+        uses: actions/cache@v3
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
 
       - name: Link Checker
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: lycheeverse/lychee-action@v1
         with:
-          args: "--cache --max-cache-age 1d . ${{ steps.gh_pages_url.outputs.result }}"
+          args: ". ${{ steps.gh_pages_url.outputs.result }}"
           fail: true

@@ -93,12 +93,12 @@ jobs:
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           projectName: ${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
 
-      # - name: Restore lychee cache
-      #   uses: actions/cache@v3
-      #   with:
-      #     path: .lycheecache
-      #     key: cache-lychee-${{ github.sha }}
-      #     restore-keys: cache-lychee-
+      - name: Restore lychee cache
+        uses: actions/cache@v3
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
 
       - name: Link Checker
         uses: lycheeverse/lychee-action@v1
