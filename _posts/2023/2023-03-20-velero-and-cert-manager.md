@@ -214,7 +214,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="3.2.0"
+VELERO_HELM_CHART_VERSION="4.0.1"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
@@ -248,12 +248,18 @@ metrics:
         labels:
           severity: warning
 configuration:
-  provider: aws
   backupStorageLocation:
-    bucket: ${CLUSTER_FQDN}
-    prefix: velero
-    config:
-      region: ${AWS_DEFAULT_REGION}
+    - name:
+      provider: aws
+      bucket: ${CLUSTER_FQDN}
+      prefix: velero
+      config:
+        region: ${AWS_DEFAULT_REGION}
+  volumeSnapshotLocation:
+    - name:
+      provider: aws
+      config:
+        region: ${AWS_DEFAULT_REGION}
 serviceAccount:
   server:
     # Use exiting IRSA service account
