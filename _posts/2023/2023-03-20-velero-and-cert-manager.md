@@ -104,7 +104,7 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 
 ### Create S3 bucket
 
-> These steps should be done only once
+> The following step should be done only once
 {: .prompt-info }
 
 Use CloudFormation to create S3 bucket which will be used to store backups from
@@ -124,7 +124,7 @@ Resources:
   S3Policy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      ManagedPolicyName: !Sub "${S3BucketName}-S3"
+      ManagedPolicyName: !Sub "${S3BucketName}-s3"
       Description: !Sub "Policy required by Velero to write to S3 bucket ${S3BucketName}"
       PolicyDocument:
         Version: "2012-10-17"
@@ -143,6 +143,26 @@ Resources:
           - s3:ListMultipartUploadParts
           - s3:AbortMultipartUpload
           Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
+        # S3 Bucket policy does not deny HTTP requests
+        - Sid: ForceSSLOnlyAccess
+          Effect: Deny
+          Action: "s3:*"
+          Resource:
+            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}"
+            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}/*"
+          Condition:
+            Bool:
+              aws:SecureTransport: "false"
+        # S3 Bucket policy does not deny TLS version lower than 1.2
+        - Sid: EnforceTLSv12orHigher
+          Effect: Deny
+          Action: "s3:*"
+          Resource:
+            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}"
+            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}/*"
+          Condition:
+            NumericLessThan:
+              s3:TlsVersion: 1.2
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -326,7 +346,7 @@ default   aws        k01.k8s.mylabs.dev/velero   Available   2023-03-23 20:16:20
 Initiate backup process and save the necessary cert-manager object to S3:
 
 ```shell
-velero backup create --labels letsencrypt=production --from-schedule velero-weekly-backup-cert-manager
+velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
 ```
 
 Check the backup details:
