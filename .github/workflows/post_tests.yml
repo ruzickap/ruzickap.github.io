@@ -25,6 +25,7 @@ on:
           - my-favourite-krew-plugins-kubectl cheapest-amazon-eks
           - cilium-amazon-eks
           - secure-cheap-amazon-eks
+          - argocd-vault-plugin-and-aws-secret-manager velero-and-cert-manager cheapest-amazon-eks
       action:
         type: choice
         description: Select action
@@ -98,6 +99,13 @@ jobs:
             gh release download --repo vmware-tanzu/velero --pattern "velero-*-linux-amd64.tar.gz" --output - | sudo tar xz -C /usr/local/bin/ --strip-components 1 --wildcards "*/velero"
           fi
 
+          if grep -q argocd "${POST_FILES_ARRAY[@]}" && ! command -v argocd &> /dev/null ; then
+            echo "*** Installing Argo CD CLI"
+            gh release download --repo argoproj/argo-cd --pattern "argocd-linux-amd64" --output /tmp/argocd
+            chmod a+x /tmp/argocd
+            sudo mv /tmp/argocd /usr/local/bin/
+          fi
+
           if [[ "${GH_ACTION}" =~ 'build' ]]; then
             echo -e "********************\n*** Create\n********************"
             for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
@@ -133,3 +141,10 @@ jobs:
               source <(echo "set -euxo pipefail" ; sed -n "/^\`\`\`sh$/,/^\`\`\`$/p" "${POST_FILE}" | sed "/^\`\`\`*/d") || true
             done
           fi
+
+      # - name: Setup tmate session
+      #   if: ${{ failure() }}
+      #   uses: mxschmitt/action-tmate@v3
+      #   with:
+      #     limit-access-to-actor: true
+      #     timeout-minutes: 15
