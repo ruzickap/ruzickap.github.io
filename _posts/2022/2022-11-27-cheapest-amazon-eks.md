@@ -280,6 +280,11 @@ iam:
         certManager: true
       roleName: eksctl-${CLUSTER_NAME}-irsa-cert-manager
     - metadata:
+        name: cluster-autoscaler
+        namespace: cluster-autoscaler
+      wellKnownPolicies:
+        autoScaler: true
+    - metadata:
         name: external-dns
         namespace: external-dns
       wellKnownPolicies:
@@ -843,6 +848,46 @@ METRICS_SERVER_HELM_CHART_VERSION="3.10.0"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system metrics-server metrics-server/metrics-server
+```
+
+### cluster-autoscaler
+
+Install `cluster-autoscaler`
+[helm chart](https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler)
+and modify the
+[default values](https://github.com/kubernetes/autoscaler/blob/master/charts/cluster-autoscaler/values.yaml).
+
+Service account `cluster-autoscaler` was created by `eksctl`.
+
+![cluster-autoscaler](https://raw.githubusercontent.com/ExamProCo/Kubernetes-Architecture-Icons/f999dc8b7e667b75c600427f07d47b1ccb0bb58a/icons/svg/cluster-autoscaler.svg
+"cluster-autoscaler"){: width="200" }
+
+```bash
+# renovate: datasource=helm depName=cluster-autoscaler registryUrl=https://kubernetes.github.io/autoscaler
+CLUSTER_AUTOSCALER_HELM_CHART_VERSION="9.29.0"
+
+helm repo add autoscaler https://kubernetes.github.io/autoscaler
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cluster-autoscaler.yml" << EOF
+autoDiscovery:
+  clusterName: ${CLUSTER_NAME}
+awsRegion: ${AWS_DEFAULT_REGION}
+# Required to fix IMDSv2 issue: https://github.com/kubernetes/autoscaler/issues/3592
+# extraArgs:
+#   aws-use-static-instance-list: true
+rbac:
+  serviceAccount:
+    create: false
+    name: cluster-autoscaler
+prometheusRule:
+  enabled: true
+  namespace: kube-prometheus-stack
+serviceMonitor:
+  enabled: true
+  namespace: kube-prometheus-stack
+vpa:
+   enabled: true
+EOF
+helm upgrade --install --version "${CLUSTER_AUTOSCALER_HELM_CHART_VERSION}" --namespace cluster-autoscaler --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cluster-autoscaler.yml" cluster-autoscaler autoscaler/cluster-autoscaler
 ```
 
 ### external-dns
