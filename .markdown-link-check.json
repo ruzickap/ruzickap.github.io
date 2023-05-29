@@ -1,8 +1,5 @@
 {
-  "aliveStatusCodes": [
-    200,
-    999
-  ],
+  "aliveStatusCodes": [200, 999],
   "ignorePatterns": [
     {
       "pattern": "^https://img.shields.io/"
