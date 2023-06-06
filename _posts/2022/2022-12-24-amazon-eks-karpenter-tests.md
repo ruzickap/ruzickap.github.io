@@ -25,13 +25,6 @@ examples.
 - Amazon EKS cluster with Karpenter configuration described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
 - [Helm](https://helm.sh/)
-- [eks-node-viewer](https://github.com/awslabs/eks-node-viewer)
-- [viewnode](https://github.com/NTTDATA-DACH/viewnode)
-  (`kubectl krew install viewnode`)
-- [kubectl-view-allocations](https://github.com/davidB/kubectl-view-allocations)
-  (`kubectl krew install view-allocations`)
-- [kube-capacity](https://github.com/robscott/kube-capacity)
-  (`kubectl krew install resource-capacity`)
 
 Variables which are being used in the next steps:
 
@@ -43,6 +36,22 @@ export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
+```
+
+## Install tools
+
+Install handy tools:
+
+- [eks-node-viewer](https://github.com/awslabs/eks-node-viewer)
+- [viewnode](https://github.com/NTTDATA-DACH/viewnode)
+- [kubectl-view-allocations](https://github.com/davidB/kubectl-view-allocations)
+- [kube-capacity](https://github.com/robscott/kube-capacity)
+
+```bash
+gh release download --repo kubernetes-sigs/krew --pattern krew-linux_amd64.tar.gz --output - | sudo tar xz -C /tmp/
+/tmp/krew-linux_amd64 install krew
+export PATH="${HOME}/.krew/bin:${PATH}"
+kubectl krew install resource-capacity view-allocations viewnode
 ```
 
 ## Workloads

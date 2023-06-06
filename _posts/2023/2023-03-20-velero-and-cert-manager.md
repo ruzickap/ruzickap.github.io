@@ -6,7 +6,7 @@ description: Deploy Trivy Operator and Grafana Dashboard
 categories: [Kubernetes, Amazon EKS, Velero, cert-manager]
 tags: [Amazon EKS, k8s, kubernetes, velero, cert-manager, certificates]
 image:
-  path: https://raw.githubusercontent.com/cncf/landscape/17f2dc0c7ceba8c0655f6039942d9566feec87f5/cached_logos/velero.svg
+  path: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
 ---
 
 In the previous post related to
