@@ -1,8 +1,9 @@
+# frozen_string_literal: true
 # https://github.com/cotes2020/chirpy-starter/blob/main/Gemfile
 
 source "https://rubygems.org"
 
-gem "jekyll-theme-chirpy", "~> 5.6", ">= 5.6.0"
+gem "jekyll-theme-chirpy", "~> 6.0", ">= 6.0.1"
 
 group :test do
   gem "html-proofer", "~> 3.19"
