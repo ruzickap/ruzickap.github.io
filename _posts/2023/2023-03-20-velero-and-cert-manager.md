@@ -313,7 +313,7 @@ Add Velero Grafana Dashboard:
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="47.0.1"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="47.1.0"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" << EOF
 grafana:
