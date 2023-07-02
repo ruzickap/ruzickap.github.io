@@ -7,3 +7,7 @@ paths = [
   '''^assets/js/data/search.json$''',
   '''^posts/trivy-operator-grafana/index.html$''',
 ]
+regexes = [
+  "de727a48df31c3a650df9f8523df57374b5d2e65", # Let's Encrypt Staging "Serial Number"
+  "6ad5d66e8d4e46409107d6af11283ef603f5113b", # Let's Encrypt Staging "Authority Key ID"
+]

@@ -62,7 +62,6 @@
     },
   ],
   "prBodyTemplate": "{{{table}}}{{{notes}}}{{{changelogs}}}",
-  "concurrentRequestLimit": 20,
   "rebaseWhen": "behind-base-branch",
   "regexManagers": [
     {

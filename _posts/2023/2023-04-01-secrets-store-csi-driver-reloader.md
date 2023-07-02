@@ -31,7 +31,7 @@ Links:
 
 * [Use AWS Secrets Manager secrets in Amazon Elastic Kubernetes Service](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html)
 * [How to use AWS Secrets & Configuration Provider with your Kubernetes Secrets Store CSI driver](https://aws.amazon.com/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/)
-* [Stakater Reloader](https://medium.com/stakater/stakater-reloader-4c985ac23e3b)
+* [Stakater Reloader docs](https://github.com/stakater/Reloader/tree/master/docs)
 
 ## Requirements
 
