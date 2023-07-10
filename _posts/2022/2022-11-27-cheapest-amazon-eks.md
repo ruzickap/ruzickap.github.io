@@ -1039,8 +1039,8 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 Remove EKS cluster and created components:
 
 ```sh
-if eksctl get cluster --name="${CLUSTER_NAME}" 2> /dev/null; then
-  eksctl delete cluster --name="${CLUSTER_NAME}" --force
+if eksctl get cluster --name="${CLUSTER_NAME}"; then
+  eksctl delete cluster --name="${CLUSTER_NAME}" --wait --force
 fi
 ```
 
