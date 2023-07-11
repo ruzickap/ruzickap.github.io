@@ -30,7 +30,7 @@ env:
   AWS_DEFAULT_REGION: us-east-1
   AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   # renovate: datasource=github-tags depName=weaveworks/eksctl
-  EKSCTL_VERSION: 0.146.0
+  EKSCTL_VERSION: 0.148.0
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
