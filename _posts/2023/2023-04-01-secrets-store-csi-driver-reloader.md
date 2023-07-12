@@ -507,7 +507,6 @@ To clean up the environment - delete IRSA, remove CloudFormation stack
 and namespace:
 
 ```sh
-kubectl delete namespace kuard
 eksctl delete iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret"
 ```
