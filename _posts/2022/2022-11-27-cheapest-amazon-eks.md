@@ -313,7 +313,6 @@ managedNodeGroups:
     tags:
       <<: *tags
     volumeEncrypted: true
-    disableIMDSv1: true
     # For instances with less than 30 vCPUs the maximum number is 110 and for all other instances the maximum number is 250
     # https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
     maxPodsPerNode: 110
