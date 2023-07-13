@@ -54,7 +54,9 @@ Generating the production ready Let's Encrypt certificates should be done only
 once. The goal is to backup the certificate and then restore it whenever is it
 needed to "new" cluster.
 
-```shell
+Create Let's Encrupt production `ClusterIssuer`:
+
+```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-production.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -78,7 +80,11 @@ spec:
             region: ${AWS_DEFAULT_REGION}
 EOF
 kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
+```
 
+Create new certificate and let it sign by Let's Encrypt to validate it:
+
+```shell
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -443,7 +449,7 @@ velero restore create --from-schedule velero-weekly-backup-cert-manager --labels
 
 Details about the restore process:
 
-```shell
+```bash
 velero restore describe --selector letsencrypt=production --details
 ```
 
