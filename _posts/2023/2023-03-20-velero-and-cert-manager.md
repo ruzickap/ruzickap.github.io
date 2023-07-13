@@ -235,7 +235,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="4.0.3"
+VELERO_HELM_CHART_VERSION="4.1.3"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
@@ -325,7 +325,7 @@ grafana:
         revision: 1
         datasource: Prometheus
 EOF
-helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" kube-prometheus-stack prometheus-community/kube-prometheus-stack
+helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --reuse-values --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" kube-prometheus-stack prometheus-community/kube-prometheus-stack
 ```
 
 ## Backup cert-manager objects
@@ -352,7 +352,7 @@ velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-sche
 
 Check the backup details:
 
-```shell
+```bash
 velero backup describe --selector letsencrypt=production --details
 ```
 
@@ -413,8 +413,8 @@ Velero-Native Snapshots: <none included>
 
 See the files in S3 bucket:
 
-```shell
-aws s3 ls --recursive "s3://${CLUSTER_FQDN}/velero/"
+```bash
+aws s3 ls --recursive "s3://${CLUSTER_FQDN}/velero/backups"
 ```
 
 ```console
