@@ -842,7 +842,13 @@ and modify the
 METRICS_SERVER_HELM_CHART_VERSION="3.10.0"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system metrics-server metrics-server/metrics-server
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
+metrics:
+  enabled: true
+serviceMonitor:
+  enabled: true
+EOF
+helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
 ```
 
 ### external-dns
@@ -1040,17 +1046,8 @@ Remove EKS cluster and created components:
 
 ```sh
 if eksctl get cluster --name="${CLUSTER_NAME}"; then
-  eksctl delete cluster --name="${CLUSTER_NAME}" --wait --force
+  eksctl delete cluster --name="${CLUSTER_NAME}" --force
 fi
-```
-
-Remove orphan EC2s created by Karpenter:
-
-```sh
-for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do
-  echo "Removing EC2: ${EC2}"
-  aws ec2 terminate-instances --instance-ids "${EC2}"
-done
 ```
 
 Remove Route 53 DNS records from DNS Zone:
@@ -1074,6 +1071,15 @@ Remove CloudFormation stack:
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53"
 ```
 
+Remove orphan EC2s created by Karpenter:
+
+```sh
+for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do
+  echo "Removing EC2: ${EC2}"
+  aws ec2 terminate-instances --instance-ids "${EC2}"
+done
+```
+
 Wait for all CloudFormation stacks to be deleted:
 
 ```sh
@@ -1081,7 +1087,7 @@ aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-rout
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
 ```
 
-Remove Volumes and Snapshots related to the cluster:
+Remove Volumes and Snapshots related to the cluster (just in case):
 
 ```sh
 for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do

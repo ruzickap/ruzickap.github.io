@@ -29,8 +29,6 @@ on:
 env:
   AWS_DEFAULT_REGION: us-east-1
   AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-  # renovate: datasource=github-tags depName=weaveworks/eksctl
-  EKSCTL_VERSION: 0.149.0
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
 
@@ -51,6 +49,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-duration-seconds: 6000
           role-session-name: GitHubOidcFederatedRole
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
 
@@ -73,7 +72,7 @@ jobs:
 
           if grep -q eksctl "${POST_FILES_ARRAY[@]}" && ! command -v eksctl &> /dev/null ; then
             echo "*** Installing eksctl"
-            gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz "v${EKSCTL_VERSION}" --output - | sudo tar xz -C /usr/local/bin/
+            gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
           fi
 
           if grep -q velero "${POST_FILES_ARRAY[@]}" && ! command -v velero &> /dev/null ; then
