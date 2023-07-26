@@ -280,6 +280,34 @@ iam:
         certManager: true
       roleName: eksctl-${CLUSTER_NAME}-irsa-cert-manager
     - metadata:
+        name: cilium-operator
+        namespace: kube-system
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+      # https://github.com/kubernetes/kops/blob/bfefb0cd97dae82df189eb70655e1150f8955e1a/pkg/model/iam/iam_builder.go#L1162
+      # attachPolicy:
+      #   Version: "2012-10-17"
+      #   Statement:
+      #     - Effect: Allow
+      #       Action:
+      #         - "ec2:AssignPrivateIpAddresses"
+      #         - "ec2:AttachNetworkInterface"
+      #         - "ec2:CreateNetworkInterface"
+      #         - "ec2:CreateTags"
+      #         - "ec2:DeleteNetworkInterface"
+      #         - "ec2:DescribeNetworkInterfaces"
+      #         - "ec2:DescribeSecurityGroups"
+      #         - "ec2:DescribeSubnets"
+      #         - "ec2:DescribeVpcPeeringConnections"
+      #         - "ec2:DescribeVpcs"
+      #         - "ec2:DetachNetworkInterface"
+      #         - "ec2:ModifyNetworkInterfaceAttribute"
+      #         - "ec2:UnassignPrivateIpAddresses"
+      #       Resource: '*'
+      roleName: eksctl-${CLUSTER_NAME}-irsa-cilium
+      roleOnly: true
+    - metadata:
         name: external-dns
         namespace: external-dns
       wellKnownPolicies:
@@ -316,6 +344,13 @@ managedNodeGroups:
     # For instances with less than 30 vCPUs the maximum number is 110 and for all other instances the maximum number is 250
     # https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
     maxPodsPerNode: 110
+    taints:
+     - key: "node.cilium.io/agent-not-ready"
+       value: "true"
+       effect: "NoExecute"
+  - name: mng02
+    instanceType: t4g.medium
+    desiredCapacity: 2
 EOF
 ```
 
@@ -336,11 +371,45 @@ aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 echo -e "***************\n export KUBECONFIG=${KUBECONFIG} \n***************"
 ```
 
-Enable the parameter to assign prefixes to network interfaces for the
-Amazon VPC CNI:
+Install Cilium:
+
+<https://github.com/littlejo/cilium-eks-cookbook/tree/main>
+
+<https://github.com/cilium/cilium/blob/main/install/kubernetes/cilium/values.yaml>
 
 ```bash
-kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true
+CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN=$(eksctl get iamserviceaccount --cluster "${CLUSTER_NAME}" --output json | jq -r ".[] | select(.metadata.name==\"cilium-operator\") .status.roleARN")
+cat > "/tmp/helm_values-cilium.yml" << EOF
+cluster:
+  name: ${CLUSTER_NAME}
+serviceAccounts:
+  operator:
+    name: cilium-operator
+    annotations:
+      eks.amazonaws.com/role-arn: ${CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN}
+egressMasqueradeInterfaces: eth0
+encryption:
+  enabled: true
+  nodeEncryption: false
+  type: wireguard
+eni:
+  enabled: true
+  iamRole: ${CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN}
+ipam:
+  mode: eni
+kubeProxyReplacement: disabled
+l7Proxy: false
+operator:
+  replicas: 1
+tunnel: disabled
+EOF
+
+cilium version
+cilium install --helm-values /tmp/helm_values-cilium.yml
+
+exit 0
+
+eksctl delete nodegroup mng02 --cluster "${CLUSTER_NAME}"
 ```
 
 Configure [Karpenter](https://karpenter.sh/):

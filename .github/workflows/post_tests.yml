@@ -78,6 +78,11 @@ jobs:
             gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
           fi
 
+          if grep -q cilium "${POST_FILES_ARRAY[@]}" && ! command -v cilium &> /dev/null ; then
+            echo "*** Installing cilium"
+            gh release download --repo cilium/cilium-cli --pattern cilium-linux-amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
+          fi
+
           if grep -q velero "${POST_FILES_ARRAY[@]}" && ! command -v velero &> /dev/null ; then
             echo "*** Installing velero"
             gh release download --repo vmware-tanzu/velero --pattern "velero-*-linux-amd64.tar.gz" --output - | sudo tar xz -C /usr/local/bin/ --strip-components 1 --wildcards "*/velero"
