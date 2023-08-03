@@ -285,26 +285,6 @@ iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
         - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-      # https://github.com/kubernetes/kops/blob/bfefb0cd97dae82df189eb70655e1150f8955e1a/pkg/model/iam/iam_builder.go#L1162
-      # attachPolicy:
-      #   Version: "2012-10-17"
-      #   Statement:
-      #     - Effect: Allow
-      #       Action:
-      #         - "ec2:AssignPrivateIpAddresses"
-      #         - "ec2:AttachNetworkInterface"
-      #         - "ec2:CreateNetworkInterface"
-      #         - "ec2:CreateTags"
-      #         - "ec2:DeleteNetworkInterface"
-      #         - "ec2:DescribeNetworkInterfaces"
-      #         - "ec2:DescribeSecurityGroups"
-      #         - "ec2:DescribeSubnets"
-      #         - "ec2:DescribeVpcPeeringConnections"
-      #         - "ec2:DescribeVpcs"
-      #         - "ec2:DetachNetworkInterface"
-      #         - "ec2:ModifyNetworkInterfaceAttribute"
-      #         - "ec2:UnassignPrivateIpAddresses"
-      #       Resource: '*'
       roleName: eksctl-${CLUSTER_NAME}-irsa-cilium
       roleOnly: true
     - metadata:
@@ -348,6 +328,7 @@ managedNodeGroups:
      - key: "node.cilium.io/agent-not-ready"
        value: "true"
        effect: "NoExecute"
+  # Second node group is needed to allow karpenter to start
   - name: mng02
     instanceType: t4g.medium
     desiredCapacity: 2
@@ -404,12 +385,10 @@ operator:
 tunnel: disabled
 EOF
 
-cilium version
-cilium install --helm-values /tmp/helm_values-cilium.yml
+cilium install --wait --helm-values /tmp/helm_values-cilium.yml
+eksctl delete nodegroup mng02 --cluster "${CLUSTER_NAME}"
 
 exit 0
-
-eksctl delete nodegroup mng02 --cluster "${CLUSTER_NAME}"
 ```
 
 Configure [Karpenter](https://karpenter.sh/):
