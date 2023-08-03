@@ -45,7 +45,6 @@ jobs:
           HTML_HTMLHINT_FILTER_REGEX_EXCLUDE: ^index.html
           JSON_PRETTIER_FILTER_REGEX_EXCLUDE: ^.markdown-link-check.json
           PRINT_ALPACA: false
-          REPOSITORY_TRUFFLEHOG_ARGUMENTS: --only-verified
           RUBY_RUBOCOP_FILTER_REGEX_EXCLUDE: ^_plugins
           SPELL_CSPELL_FILTER_REGEX_INCLUDE: (^README.md|^_posts/)
           # Needed for scanning generated README.sh file
