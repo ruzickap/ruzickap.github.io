@@ -838,7 +838,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
-METRICS_SERVER_HELM_CHART_VERSION="3.10.0"
+METRICS_SERVER_HELM_CHART_VERSION="3.11.0"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
