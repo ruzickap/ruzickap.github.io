@@ -19,6 +19,7 @@ on:
           - velero-and-cert-manager cheapest-amazon-eks
           - secrets-store-csi-driver-reloader velero-and-cert-manager cheapest-amazon-eks
           - my-favourite-krew-plugins-kubectl cheapest-amazon-eks
+          - cilium-amazon-eks
       action:
         type: choice
         description: Select action
@@ -76,6 +77,11 @@ jobs:
           if grep -q eksctl "${POST_FILES_ARRAY[@]}" && ! command -v eksctl &> /dev/null ; then
             echo "*** Installing eksctl"
             gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
+          fi
+
+          if grep -q cilium "${POST_FILES_ARRAY[@]}" && ! command -v cilium &> /dev/null ; then
+            echo "*** Installing cilium"
+            gh release download --repo cilium/cilium-cli --pattern cilium-linux-amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
           fi
 
           if grep -q velero "${POST_FILES_ARRAY[@]}" && ! command -v velero &> /dev/null ; then

@@ -1,21 +1,22 @@
 ---
-title: Run the cheapest Amazon EKS
+title: Secure Amazon EKS with Cilium and network encryption
 author: Petr Ruzicka
-date: 2022-11-27
-description: Start cheapest Amazon EKS using eksctl
-categories: [Kubernetes, Amazon EKS]
-tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl, cert-manager, external-dns, podinfo]
+date: 2023-08-03
+description: Build "cheap and secure" Amazon EKS with Karpenter and Cilium
+categories: [Kubernetes, Amazon EKS, Cilium]
+tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl, cert-manager, external-dns, podinfo, cilium, prometheus, sso, oauth2-proxy, metrics-server]
 image:
-  path: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
+  path: https://raw.githubusercontent.com/cncf/artwork/ac38e11ed57f017a06c9dcb19013bcaed92115a9/projects/cilium/icon/color/cilium_icon-color.svg
 ---
 
-Sometimes it is necessary to save costs and run the [Amazon EKS](https://aws.amazon.com/eks/)
-the "cheapest way".
+Sometimes it is handy to overcome some disadvantages of managed k8s like limited
+amount of pods running on worker nodes or encrypted traffic between k8s nodes in
+[Amazon EKS](https://aws.amazon.com/eks/).
 
-The following notes are about running [Amazon EKS](https://aws.amazon.com/eks/)
-with lowest price.
+I'm going to describe how to install Amazon EKS with Karpenter and Cilium as
+CNI.
 
-Requirements:
+Amazon EKS should meet these "cheap" requirements:
 
 - Single AZ only - no payments for cross availability zones traffic
 - Spot instances "everywhere"
@@ -29,24 +30,45 @@ Requirements:
 - Run as many pods as possible on worker nodes `max-pods-per-node`
   - <https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks>
   - <https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/>
+- [Karpenter](https://karpenter.sh/) - autoscale with right size of the nodes
+  matching pod requirements
+
+Amazon EKS should meet the security requirements:
+
+- Amazon EKS must be [encrypted by KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
+- Worker node [EBS volumes needs to be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
+- Cluster logging ([CloudWatch](https://aws.amazon.com/cloudwatch/)) needs to be
+  configured
+- [Wiz] Default security group should have no rules configured
+
+The Cilium installation should meet these requirements:
+
+- [Transparent network encryption](https://isovalent.com/videos/wireguard-node-to-node-encryption-on-cilium/)
+  (node to node traffic) should be enabled
+- Encryption should use [Wireguard](https://www.wireguard.com/) as a "fastest
+  encryption method"
+- Use [Elastic Network Interface (ENI)](https://docs.cilium.io/en/v1.14/network/concepts/ipam/eni/#aws-eni)
+  integration
+- [Layer 7 network](https://docs.cilium.io/en/v1.14/observability/visibility/)
+  observability should be enabled
+- Cilium [Hubble](https://github.com/cilium/hubble) UI should be protected by
+  SSO
 
 ## Build Amazon EKS cluster
 
 ### Requirements
 
 If you would like to follow this documents and it's task you will need to set up
-few environment variables.
-
-`BASE_DOMAIN` (`k8s.mylabs.dev`) contains DNS records for all your Kubernetes
-clusters. The cluster names will look like `CLUSTER_NAME`.`BASE_DOMAIN`
-(`k01.k8s.mylabs.dev`).
+few environment variables like.
 
 ```bash
 # AWS Region
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+# Base Domain: k8s.mylabs.dev
 export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
+# Cluster Name: k01
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export MY_EMAIL="petr.ruzicka@gmail.com"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
@@ -92,7 +114,8 @@ Required:
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
-- [helm](https://helm.sh/)
+- [cilium](https://github.com/cilium/cilium-cli)
+- [helm](https://github.com/helm/helm)
 
 ## Configure AWS Route 53 Domain delegation
 
@@ -250,6 +273,100 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
 fi
 ```
 
+### Create KMS key
+
+Create CloudFormation template for KMS and save KMS key details to environment
+variables:
+
+```bash
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-kms.yml" << \EOF
+Description: "KMS key"
+Parameters:
+  ClusterName:
+    Description: "Cluster Name Ex: k01"
+    Type: String
+Resources:
+  KMSAlias:
+    Type: AWS::KMS::Alias
+    Properties:
+      AliasName: !Sub "alias/eks-${ClusterName}"
+      TargetKeyId: !Ref KMSKey
+  KMSKey:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: !Sub "KMS key related to ${ClusterName}"
+      EnableKeyRotation: true
+      PendingWindowInDays: 7
+      KeyPolicy:
+        Version: "2012-10-17"
+        Id: !Sub "eks-key-policy-${ClusterName}"
+        Statement:
+        - Sid: Enable IAM User Permissions
+          Effect: Allow
+          Principal:
+            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+          Action: kms:*
+          Resource: "*"
+        - Sid: Allow use of the key
+          Effect: Allow
+          Principal:
+            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+          Action:
+          - kms:Encrypt
+          - kms:Decrypt
+          - kms:ReEncrypt*
+          - kms:GenerateDataKey*
+          - kms:DescribeKey
+          Resource: "*"
+        - Sid: Allow attachment of persistent resources
+          Effect: Allow
+          Principal:
+            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+          Action:
+          - kms:CreateGrant
+          Resource: "*"
+          Condition:
+            Bool:
+              kms:GrantIsForAWSResource: true
+        - Sid: Alow CloudWatch to use the KMS key
+          Effect: Allow
+          Principal:
+            Service:
+              - !Sub logs.${AWS::Region}.amazonaws.com
+          Action:
+          - "kms:Encrypt*"
+          - "kms:Decrypt*"
+          - "kms:ReEncrypt*"
+          - "kms:GenerateDataKey*"
+          - "kms:Describe*"
+          Resource: "*"
+          Condition:
+            ArnEquals:
+              kms:EncryptionContext:aws:logs:arn: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/eks/${ClusterName}/cluster"
+Outputs:
+  KMSKeyArn:
+    Description: The ARN of the created KMS Key to encrypt EKS related services
+    Value: !GetAtt KMSKey.Arn
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-KMSKeyArn"
+  KMSKeyId:
+    Description: The ID of the created KMS Key to encrypt EKS related services
+    Value: !Ref KMSKey
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-KMSKeyId"
+EOF
+
+eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
+  --parameter-overrides "ClusterName=${CLUSTER_NAME}" \
+  --stack-name "${CLUSTER_NAME}-kms" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-kms.yml" --tags "${TAGS//,/ }"
+
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-kms")
+AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
+AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
+```
+
 ## Create Amazon EKS
 
 I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
@@ -268,7 +385,7 @@ metadata:
   region: ${AWS_DEFAULT_REGION}
   tags: &tags
     karpenter.sh/discovery: "${CLUSTER_NAME}"
-$(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
@@ -276,11 +393,25 @@ iam:
   withOIDC: true
   serviceAccounts:
     - metadata:
+        name: ebs-csi-controller-sa
+        namespace: aws-ebs-csi-driver
+      wellKnownPolicies:
+        ebsCSIController: true
+      roleName: eksctl-${CLUSTER_NAME}-irsa-aws-ebs-csi-driver
+    - metadata:
         name: cert-manager
         namespace: cert-manager
       wellKnownPolicies:
         certManager: true
       roleName: eksctl-${CLUSTER_NAME}-irsa-cert-manager
+    - metadata:
+        name: cilium-operator
+        namespace: cilium
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+      roleName: eksctl-${CLUSTER_NAME}-irsa-cilium
+      roleOnly: true
     - metadata:
         name: external-dns
         namespace: external-dns
@@ -296,14 +427,12 @@ addons:
   - name: vpc-cni
   - name: kube-proxy
   - name: coredns
-  - name: aws-ebs-csi-driver
 managedNodeGroups:
   - name: mng01
     amiFamily: Bottlerocket
     # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     instanceType: t4g.medium
-    # Due to karpenter we need 2 instances
     desiredCapacity: 2
     availabilityZones:
       - ${AWS_DEFAULT_REGION}a
@@ -315,9 +444,31 @@ managedNodeGroups:
     tags:
       <<: *tags
     volumeEncrypted: true
+    volumeKmsKeyID: ${AWS_KMS_KEY_ID}
     # For instances with less than 30 vCPUs the maximum number is 110 and for all other instances the maximum number is 250
     # https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
     maxPodsPerNode: 110
+    taints:
+     - key: "node.cilium.io/agent-not-ready"
+       value: "true"
+       effect: "NoExecute"
+  # Second node group is needed to allow karpenter to start
+  - name: mng02
+    instanceType: t4g.medium
+    desiredCapacity: 2
+    availabilityZones:
+      - ${AWS_DEFAULT_REGION}a
+    tags:
+      <<: *tags
+    volumeEncrypted: true
+    volumeKmsKeyID: ${AWS_KMS_KEY_ID}
+secretsEncryption:
+  keyARN: ${AWS_KMS_KEY_ARN}
+cloudWatch:
+  clusterLogging:
+    logRetentionInDays: 1
+    enableTypes:
+      - all
 EOF
 ```
 
@@ -335,15 +486,72 @@ if [[ ! -s "${KUBECONFIG}" ]]; then
 fi
 
 aws eks update-kubeconfig --name="${CLUSTER_NAME}"
-echo -e "***************\n export KUBECONFIG=${KUBECONFIG} \n***************"
 ```
 
-Enable the parameter to assign prefixes to network interfaces for the
-Amazon VPC CNI:
+## Clilium
+
+Install [Cilium](https://cilium.io/) and remove Nodegroup used for
+"eksctl karpenter" installation (It is no longer needed because Cilium will be
+installed and taints will be removed):
+
+![Cilium](https://raw.githubusercontent.com/cilium/cilium/eb3662e6f72d8fa1d2c884967e8de6bf063cb108/Documentation/images/logo.svg
+"cilium"){: width="500" }
 
 ```bash
-kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true
+CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN=$(eksctl get iamserviceaccount --cluster "${CLUSTER_NAME}" --output json | jq -r ".[] | select(.metadata.name==\"cilium-operator\") .status.roleARN")
+cat > "/tmp/helm_values-cilium.yml" << EOF
+cluster:
+  name: ${CLUSTER_NAME}
+  id: 0
+serviceAccounts:
+  operator:
+    name: cilium-operator
+    annotations:
+      eks.amazonaws.com/role-arn: ${CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN}
+bandwidthManager:
+  enabled: true
+egressMasqueradeInterfaces: eth0
+encryption:
+  enabled: true
+  type: wireguard
+  nodeEncryption: true
+eni:
+  enabled: true
+  # awsEnablePrefixDelegation: true
+  eniTags:
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
+  iamRole: ${CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN}
+hubble:
+  metrics:
+    enabled:
+      - dns
+      - drop
+      - tcp
+      - flow
+      - port-distribution
+      - icmp
+      - http
+  relay:
+    enabled: true
+ipam:
+  mode: eni
+kubeProxyReplacement: disabled
+operator:
+  replicas: 1
+tunnel: disabled
+EOF
+
+# renovate: datasource=helm depName=cilium registryUrl=https://helm.cilium.io/
+CILIUM_HELM_CHART_VERSION="1.14.0"
+
+if ! kubectl get namespace cilium; then
+  kubectl create ns cilium
+  cilium install --namespace cilium --version "${CILIUM_HELM_CHART_VERSION}" --wait --helm-values /tmp/helm_values-cilium.yml
+  eksctl delete nodegroup mng02 --cluster "${CLUSTER_NAME}"
+fi
 ```
+
+## Karpenter
 
 Configure [Karpenter](https://karpenter.sh/):
 
@@ -358,9 +566,6 @@ metadata:
   namespace: karpenter
   name: default
 spec:
-  # Enables consolidation which attempts to reduce cluster cost by both removing
-  # un-needed nodes and down-sizing those that can't be removed.
-  # https://youtu.be/OB7IZolZk78?t=2629
   consolidation:
     enabled: true
   requirements:
@@ -403,9 +608,73 @@ spec:
   tags:
     KarpenerProvisionerName: "default"
     Name: "${CLUSTER_NAME}-karpenter"
-$(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 EOF
 ```
+
+## external-snapshotter
+
+Details about EKS and external-snapshotter can be found here: [https://aws.amazon.com/blogs/containers/using-ebs-snapshots-for-persistent-storage-with-your-eks-cluster](https://aws.amazon.com/blogs/containers/using-ebs-snapshots-for-persistent-storage-with-your-eks-cluster)
+
+Install Volume Snapshot Custom Resource Definitions (CRDs):
+
+```bash
+kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
+```
+
+## aws-ebs-csi-driver
+
+Install Amazon EBS CSI Driver `aws-ebs-csi-driver`
+[helm chart](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/charts/aws-ebs-csi-driver)
+and modify the
+[default values](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/charts/aws-ebs-csi-driver/values.yaml):
+The ServiceAccount `ebs-csi-controller-sa` was created by `eksctl`.
+
+![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg
+"csi"){: width="500" }
+
+```bash
+# renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.21.0"
+
+helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" << EOF
+controller:
+  enableMetrics: false
+  serviceMonitor:
+    forceEnable: true
+  extraVolumeTags:
+    Cluster: ${CLUSTER_FQDN}
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
+  serviceAccount:
+    create: false
+    name: ebs-csi-controller-sa
+  region: ${AWS_DEFAULT_REGION}
+storageClasses:
+  - name: gp3
+    annotations:
+      storageclass.kubernetes.io/is-default-class: "true"
+    parameters:
+      encrypted: "true"
+      # kmskeyid: ${AWS_KMS_KEY_ARN}
+volumeSnapshotClasses:
+  - name: ebs-vsc
+    annotations:
+      snapshot.storage.kubernetes.io/is-default-class: "true"
+    deletionPolicy: Delete
+    parameters:
+      encrypted: "true"
+EOF
+helm upgrade --install --version "${AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION}" --namespace aws-ebs-csi-driver --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver
+```
+
+Delete `gp2` StorageClass:
+
+```bash
+kubectl delete storageclass gp2
+```
+
+## aws-node-termination-handler
 
 Install `aws-node-termination-handler`
 [helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
@@ -416,7 +685,7 @@ and modify the
 # renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
 AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
-helm repo add eks https://aws.github.io/eks-charts/ && helm repo update > /dev/null
+helm repo add eks https://aws.github.io/eks-charts/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
 awsRegion: ${AWS_DEFAULT_REGION}
 EOF
@@ -712,7 +981,7 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName: gp2
+          storageClassName: gp3
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
@@ -741,6 +1010,59 @@ serviceMonitor:
   enabled: true
 EOF
 helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" karpenter oci://public.ecr.aws/karpenter/karpenter
+```
+
+## Cilium - extended
+
+Add hubble to Cilium, Prometheus, Metrics, ...
+
+```bash
+helm repo add cilium https://helm.cilium.io/
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cilium.yml" << EOF
+hubble:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  relay:
+    prometheus:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+  ui:
+    enabled: true
+    ingress:
+      enabled: true
+      annotations:
+        forecastle.stakater.com/expose: "true"
+        forecastle.stakater.com/icon: https://raw.githubusercontent.com/cilium/hubble/83a6345a7100531d4e8c54ba0a92352051b8c861/Documentation/images/hubble_logo.png
+        forecastle.stakater.com/appName: Hubble UI
+        nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+        nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+      className: nginx
+      hosts:
+        - hubble.${CLUSTER_FQDN}
+      # paths: ["/"]
+      # pathType: ImplementationSpecific
+      tls:
+        - hosts:
+            - hubble.${CLUSTER_FQDN}
+prometheus:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+envoy:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+operator:
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+EOF
+helm upgrade --install --version "${CILIUM_HELM_CHART_VERSION}" --namespace cilium --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cilium.yml" cilium cilium/cilium
 ```
 
 ### cert-manager
@@ -772,6 +1094,9 @@ securityContext:
 prometheus:
   servicemonitor:
     enabled: true
+webhook:
+  securePort: 10251
+  hostNetwork: true
 EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
@@ -844,6 +1169,9 @@ METRICS_SERVER_HELM_CHART_VERSION="3.11.0"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
+ontainerPort: 10252
+hostNetwork:
+  menabled: true
 metrics:
   enabled: true
 serviceMonitor:
@@ -899,6 +1227,7 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
+  hostNetwork: true
   ingressClassResource:
     default: true
   extraArgs:
@@ -1070,6 +1399,7 @@ Remove CloudFormation stack:
 
 ```sh
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53"
+aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-kms"
 ```
 
 Remove orphan EC2s created by Karpenter:
@@ -1085,6 +1415,7 @@ Wait for all CloudFormation stacks to be deleted:
 
 ```sh
 aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-route53"
+aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-kms"
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
 ```
 
