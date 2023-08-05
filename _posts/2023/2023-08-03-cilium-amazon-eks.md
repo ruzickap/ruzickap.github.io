@@ -74,7 +74,7 @@ export MY_EMAIL="petr.ruzicka@gmail.com"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
 # Tags used to tag the AWS resources
-export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev}"
+export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 ```
 
 You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
@@ -263,7 +263,7 @@ Resources:
   KMSKey:
     Type: AWS::KMS::Key
     Properties:
-      Description: !Sub "KMS key related to ${ClusterName}"
+      Description: !Sub "KMS key for ${ClusterName} Amazon EKS"
       EnableKeyRotation: true
       PendingWindowInDays: 7
       KeyPolicy:
@@ -282,8 +282,9 @@ Resources:
             Principal:
               AWS:
                 - !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+                # The following roles needs to be enabled after the EKS cluster is created
                 # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-irsa-aws-ebs-csi-driver"
-                - !Sub "arn:aws:iam::${AWS::AccountId}:role/admin"
+                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-iamservice-role"
             Action:
               - kms:Encrypt
               - kms:Decrypt
@@ -296,8 +297,9 @@ Resources:
             Principal:
               AWS:
                 - !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+                # The following roles needs to be enabled after the EKS cluster is created
                 # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-irsa-aws-ebs-csi-driver"
-                - !Sub "arn:aws:iam::${AWS::AccountId}:role/admin"
+                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-iamservice-role"
             Action:
               - kms:CreateGrant
             Resource: "*"
@@ -445,6 +447,11 @@ if [[ ! -s "${KUBECONFIG}" ]]; then
     eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
     # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
     eksctl create iamidentitymapping --cluster="${CLUSTER_NAME}" --region="${AWS_DEFAULT_REGION}" --arn="${AWS_ROLE_TO_ASSUME}" --group system:masters --username admin
+    # Add roles created by eksctl to the KMS policy to allow aws-ebs-csi-driver work with encrypted EBS volumes
+    sed -i 's@# \(- !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}.*\)@\1@' "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml"
+    eval aws cloudformation update-stack \
+      --parameters "ParameterKey=BaseDomain,ParameterValue=${BASE_DOMAIN} ParameterKey=ClusterFQDN,ParameterValue=${CLUSTER_FQDN} ParameterKey=ClusterName,ParameterValue=${CLUSTER_NAME}" \
+      --stack-name "${CLUSTER_NAME}-route53-kms" --template-body "file://${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml"
   else
     eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
   fi
@@ -479,7 +486,6 @@ egressMasqueradeInterfaces: eth0
 encryption:
   enabled: true
   type: wireguard
-  # nodeEncryption: true
 eni:
   enabled: true
   awsEnablePrefixDelegation: true
@@ -574,6 +580,17 @@ spec:
     karpenter.sh/discovery: ${CLUSTER_NAME}
   securityGroupSelector:
     karpenter.sh/discovery: ${CLUSTER_NAME}
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 2Gi
+        encrypted: true
+        kmsKeyID: ${AWS_KMS_KEY_ARN}
+    - deviceName: /dev/xvdb
+      ebs:
+        volumeSize: 21Gi
+        encrypted: true
+        kmsKeyID: ${AWS_KMS_KEY_ARN}
   tags:
     KarpenerProvisionerName: "default"
     Name: "${CLUSTER_NAME}-karpenter"
@@ -581,7 +598,7 @@ spec:
 EOF
 ```
 
-## aws-ebs-csi-driver
+## snapshot-controller
 
 Install Volume Snapshot Custom Resource Definitions (CRDs):
 
@@ -589,14 +606,29 @@ Install Volume Snapshot Custom Resource Definitions (CRDs):
 kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
 ```
 
+Install volume snapshot controller `snapshot-controller`
+[helm chart](https://github.com/piraeusdatastore/helm-charts/tree/main/charts/snapshot-controller)
+and modify the
+[default values](https://github.com/piraeusdatastore/helm-charts/blob/main/charts/snapshot-controller/values.yaml):
+
+![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg
+"csi"){: width="500" }
+
+```bash
+# renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
+SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="1.8.3"
+
+helm repo add piraeus-charts https://piraeus.io/helm-charts/
+helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
+```
+
+## aws-ebs-csi-driver
+
 Install Amazon EBS CSI Driver `aws-ebs-csi-driver`
 [helm chart](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/charts/aws-ebs-csi-driver)
 and modify the
 [default values](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/charts/aws-ebs-csi-driver/values.yaml):
 The ServiceAccount `ebs-csi-controller-sa` was created by `eksctl`.
-
-![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg
-"csi"){: width="500" }
 
 ```bash
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
@@ -610,7 +642,7 @@ controller:
     forceEnable: true
   k8sTagClusterId: ${CLUSTER_NAME}
   extraVolumeTags:
-    Cluster: ${CLUSTER_FQDN}
+    "eks:cluster-name": ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   serviceAccount:
     create: false
@@ -630,6 +662,7 @@ volumeSnapshotClasses:
     deletionPolicy: Delete
     parameters:
       encrypted: "true"
+      kmskeyid: ${AWS_KMS_KEY_ARN}
 EOF
 helm upgrade --install --version "${AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION}" --namespace aws-ebs-csi-driver --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver
 ```
@@ -637,7 +670,7 @@ helm upgrade --install --version "${AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION}" --na
 Delete `gp2` StorageClass:
 
 ```bash
-kubectl delete storageclass gp2
+kubectl delete storageclass gp2 || true
 ```
 
 ## aws-node-termination-handler
@@ -809,81 +842,129 @@ grafana:
             path: /var/lib/grafana/dashboards/default
   dashboards:
     default:
-      k8s-cluster-summary:
+      # 2018-10-29
+      8685-k8s-cluster-summary:
         gnetId: 8685
         revision: 1
         datasource: Prometheus
-      node-exporter-full:
+      # 2023-03-30
+      1860-node-exporter-full:
         gnetId: 1860
-        revision: 30
+        revision: 31
         datasource: Prometheus
-      prometheus-2-0-overview:
+      # 2017-11-24
+      3662-prometheus-2-0-overview:
         gnetId: 3662
         revision: 2
         datasource: Prometheus
-      stians-disk-graphs:
+      # 2019-02-27
+      9852-stians-disk-graphs:
         gnetId: 9852
         revision: 1
         datasource: Prometheus
-      kubernetes-apiserver:
+      # 2020-03-31
+      12006-kubernetes-apiserver:
         gnetId: 12006
         revision: 1
         datasource: Prometheus
-      ingress-nginx:
+      # 2018-10-29
+      9614-nginx-ingress-controller:
         gnetId: 9614
         revision: 1
         datasource: Prometheus
-      ingress-nginx2:
+      # 2020-03-09
+      11875-kubernetes-ingress-nginx-eks:
         gnetId: 11875
         revision: 1
         datasource: Prometheus
-      external-dns:
+      # 2021-09-22
+      15038-external-dns:
         gnetId: 15038
         revision: 1
         datasource: Prometheus
-      kubernetes-monitor:
+      # 2022-05-18
+      15398-kubernetes-monitor:
         gnetId: 15398
         revision: 6
         datasource: Prometheus
-      kubernetes-nginx-ingress-prometheus-nextgen:
+      # 2021-04-27
+      14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
         gnetId: 14314
         revision: 2
         datasource: Prometheus
-      portefaix-kubernetes-cluster-overview:
+      # 2022-07-06
+      13473-portefaix-kubernetes-cluster-overview:
         gnetId: 13473
         revision: 2
         datasource: Prometheus
       # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
-      kubernetes-views-pods:
+      # 2023-07-10
+      15760-kubernetes-views-pods:
         gnetId: 15760
-        revision: 22
+        revision: 20
         datasource: Prometheus
-      kubernetes-views-global:
+      # 2023-08-04
+      15757-kubernetes-views-global:
         gnetId: 15757
-        revision: 14
+        revision: 31
         datasource: Prometheus
-      kubernetes-views-namespaces:
+      # 2023-08-04
+      15758-kubernetes-views-namespaces:
         gnetId: 15758
-        revision: 15
+        revision: 26
         datasource: Prometheus
-      kubernetes-views-nodes:
+      # 2023-05-10
+      15759-kubernetes-views-nodes:
         gnetId: 15759
-        revision: 14
+        revision: 19
         datasource: Prometheus
-      kubernetes-system-api-server:
+      # 2023-07-04
+      15761-kubernetes-system-api-server:
         gnetId: 15761
-        revision: 11
+        revision: 13
         datasource: Prometheus
-      kubernetes-system-coredns:
+      # 2023-07-04
+      15762-kubernetes-system-coredns:
         gnetId: 15762
-        revision: 11
+        revision: 13
         datasource: Prometheus
-      cluster-capacity-karpenter:
+      # 2023-07-04
+      19105-prometheus:
+        gnetId: 19105
+        revision: 1
+        datasource: Prometheus
+      # 2022-05-06
+      16237-cluster-capacity:
         gnetId: 16237
         revision: 1
         datasource: Prometheus
-      pod-statistic-karpenter:
+      # 2022-05-06
+      16236-pod-statistic:
         gnetId: 16236
+        revision: 1
+        datasource: Prometheus
+      # 2022-07-20
+      16611-cilium-metrics:
+        gnetId: 16611
+        revision: 1
+        datasource: Prometheus
+      # 2022-07-20
+      16612-cilium-operator:
+        gnetId: 16612
+        revision: 1
+        datasource: Prometheus
+      # 2022-07-20
+      16613-hubble:
+        gnetId: 16613
+        revision: 1
+        datasource: Prometheus
+      # 2023-04-18
+      18015-cilium-policy-verdicts:
+        gnetId: 18015
+        revision: 4
+        datasource: Prometheus
+      19268-prometheus:
+        gnetId: 19268
         revision: 1
         datasource: Prometheus
   grafana.ini:
@@ -986,6 +1067,9 @@ Add hubble to Cilium, Prometheus, Metrics, ...
 helm repo add cilium https://helm.cilium.io/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cilium.yml" << EOF
 hubble:
+  metrics:
+    serviceMonitor:
+      enabled: true
   prometheus:
     enabled: true
     serviceMonitor:
@@ -1008,8 +1092,6 @@ hubble:
       className: nginx
       hosts:
         - hubble.${CLUSTER_FQDN}
-      # paths: ["/"]
-      # pathType: ImplementationSpecific
       tls:
         - hosts:
             - hubble.${CLUSTER_FQDN}
@@ -1386,7 +1468,7 @@ aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAM
 Remove Volumes and Snapshots related to the cluster (just in case):
 
 ```sh
-for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
+for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:eks:cluster-name,Values=${CLUSTER_NAME}" --query 'Volumes[].VolumeId' --output text) ; do
   echo "*** Removing Volume: ${VOLUME}"
   aws ec2 delete-volume --volume-id "${VOLUME}"
 done
