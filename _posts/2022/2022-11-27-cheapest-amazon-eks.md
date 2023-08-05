@@ -35,18 +35,16 @@ Requirements:
 ### Requirements
 
 If you would like to follow this documents and it's task you will need to set up
-few environment variables.
-
-`BASE_DOMAIN` (`k8s.mylabs.dev`) contains DNS records for all your Kubernetes
-clusters. The cluster names will look like `CLUSTER_NAME`.`BASE_DOMAIN`
-(`k01.k8s.mylabs.dev`).
+few environment variables like.
 
 ```bash
 # AWS Region
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+# Base Domain: k8s.mylabs.dev
 export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
+# Cluster Name: k01
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export MY_EMAIL="petr.ruzicka@gmail.com"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
@@ -92,7 +90,7 @@ Required:
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
-- [helm](https://helm.sh/)
+- [helm](https://github.com/helm/helm)
 
 ## Configure AWS Route 53 Domain delegation
 
@@ -268,7 +266,7 @@ metadata:
   region: ${AWS_DEFAULT_REGION}
   tags: &tags
     karpenter.sh/discovery: "${CLUSTER_NAME}"
-$(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
@@ -345,6 +343,8 @@ Amazon VPC CNI:
 kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true
 ```
 
+## Karpenter
+
 Configure [Karpenter](https://karpenter.sh/):
 
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
@@ -403,9 +403,11 @@ spec:
   tags:
     KarpenerProvisionerName: "default"
     Name: "${CLUSTER_NAME}-karpenter"
-$(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 EOF
 ```
+
+## aws-node-termination-handler
 
 Install `aws-node-termination-handler`
 [helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
@@ -416,7 +418,7 @@ and modify the
 # renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
 AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
-helm repo add eks https://aws.github.io/eks-charts/ && helm repo update > /dev/null
+helm repo add eks https://aws.github.io/eks-charts/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
 awsRegion: ${AWS_DEFAULT_REGION}
 EOF

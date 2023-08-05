@@ -215,9 +215,9 @@ localhost | CHANGED => {
 ```
 <!-- markdownlint-enable blanks-around-fences -->
 
-### Create Route53
+### Create Route53 zone and KMS key
 
-Create CloudFormation template containing policies for Route53 and Domain.
+Create CloudFormation template containing Route53 Zone and KMS key.
 
 Put new domain `CLUSTER_FQDN` to the Route 53 and configure the DNS delegation
 from the `BASE_DOMAIN`.
@@ -227,32 +227,26 @@ and it's components:
 
 ```bash
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-```
 
-Create Route53 zone:
-
-```bash
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/cf-route53.yml" << \EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" << \EOF
 AWSTemplateFormatVersion: 2010-09-09
-Description: Route53 entries
+Description: Route53 entries and KMS key
 
 Parameters:
-
   BaseDomain:
     Description: "Base domain where cluster domains + their subdomains will live. Ex: k8s.mylabs.dev"
     Type: String
-
   ClusterFQDN:
     Description: "Cluster FQDN. (domain for all applications) Ex: kube1.k8s.mylabs.dev"
     Type: String
-
+  ClusterName:
+    Description: "Cluster Name Ex: k01"
+    Type: String
 Resources:
-
   HostedZone:
     Type: AWS::Route53::HostedZone
     Properties:
       Name: !Ref ClusterFQDN
-
   RecordSet:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -261,31 +255,6 @@ Resources:
       Type: NS
       TTL: 60
       ResourceRecords: !GetAtt HostedZone.NameServers
-EOF
-
-if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --query "StackSummaries[?starts_with(StackName, \`${CLUSTER_NAME}-route53\`) == \`true\`].StackName" --output text) == "" ]]; then
-  # shellcheck disable=SC2001
-  eval aws cloudformation create-stack \
-    --parameters "ParameterKey=BaseDomain,ParameterValue=${BASE_DOMAIN} ParameterKey=ClusterFQDN,ParameterValue=${CLUSTER_FQDN}" \
-    --stack-name "${CLUSTER_NAME}-route53" \
-    --template-body "file://${TMP_DIR}/${CLUSTER_FQDN}/cf-route53.yml" \
-    --tags "$(echo "${TAGS}" | sed -e 's/\([^=]*\)=\([^,]*\),*/Key=\1,Value=\2 /g')" || true
-fi
-```
-
-### Create KMS key
-
-Create CloudFormation template for KMS and save KMS key details to environment
-variables:
-
-```bash
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-kms.yml" << \EOF
-Description: "KMS key"
-Parameters:
-  ClusterName:
-    Description: "Cluster Name Ex: k01"
-    Type: String
-Resources:
   KMSAlias:
     Type: AWS::KMS::Alias
     Properties:
@@ -301,48 +270,40 @@ Resources:
         Version: "2012-10-17"
         Id: !Sub "eks-key-policy-${ClusterName}"
         Statement:
-        - Sid: Enable IAM User Permissions
-          Effect: Allow
-          Principal:
-            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
-          Action: kms:*
-          Resource: "*"
-        - Sid: Allow use of the key
-          Effect: Allow
-          Principal:
-            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-          Action:
-          - kms:Encrypt
-          - kms:Decrypt
-          - kms:ReEncrypt*
-          - kms:GenerateDataKey*
-          - kms:DescribeKey
-          Resource: "*"
-        - Sid: Allow attachment of persistent resources
-          Effect: Allow
-          Principal:
-            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-          Action:
-          - kms:CreateGrant
-          Resource: "*"
-          Condition:
-            Bool:
-              kms:GrantIsForAWSResource: true
-        - Sid: Alow CloudWatch to use the KMS key
-          Effect: Allow
-          Principal:
-            Service:
-              - !Sub logs.${AWS::Region}.amazonaws.com
-          Action:
-          - "kms:Encrypt*"
-          - "kms:Decrypt*"
-          - "kms:ReEncrypt*"
-          - "kms:GenerateDataKey*"
-          - "kms:Describe*"
-          Resource: "*"
-          Condition:
-            ArnEquals:
-              kms:EncryptionContext:aws:logs:arn: !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/eks/${ClusterName}/cluster"
+          - Sid: Enable IAM User Permissions
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: kms:*
+            Resource: "*"
+          - Sid: Allow use of the key
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-irsa-aws-ebs-csi-driver"
+                - !Sub "arn:aws:iam::${AWS::AccountId}:role/admin"
+            Action:
+              - kms:Encrypt
+              - kms:Decrypt
+              - kms:ReEncrypt*
+              - kms:GenerateDataKey*
+              - kms:DescribeKey
+            Resource: "*"
+          - Sid: Allow attachment of persistent resources
+            Effect: Allow
+            Principal:
+              AWS:
+                - !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-irsa-aws-ebs-csi-driver"
+                - !Sub "arn:aws:iam::${AWS::AccountId}:role/admin"
+            Action:
+              - kms:CreateGrant
+            Resource: "*"
+            Condition:
+              Bool:
+                kms:GrantIsForAWSResource: true
 Outputs:
   KMSKeyArn:
     Description: The ARN of the created KMS Key to encrypt EKS related services
@@ -358,11 +319,14 @@ Outputs:
         Fn::Sub: "${AWS::StackName}-KMSKeyId"
 EOF
 
-eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides "ClusterName=${CLUSTER_NAME}" \
-  --stack-name "${CLUSTER_NAME}-kms" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-kms.yml" --tags "${TAGS//,/ }"
+if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --query "StackSummaries[?starts_with(StackName, \`${CLUSTER_NAME}-route53-kms\`) == \`true\`].StackName" --output text) == "" ]]; then
+  # shellcheck disable=SC2001
+  eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
+    --parameter-overrides "BaseDomain=${BASE_DOMAIN} ClusterFQDN=${CLUSTER_FQDN} ClusterName=${CLUSTER_NAME}" \
+    --stack-name "${CLUSTER_NAME}-route53-kms" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" --tags "${TAGS//,/ }"
+fi
 
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-kms")
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms")
 AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 ```
@@ -428,11 +392,12 @@ addons:
   - name: kube-proxy
   - name: coredns
 managedNodeGroups:
-  - name: mng01
+  - name: mng01-ng
     amiFamily: Bottlerocket
     # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     instanceType: t4g.medium
+    # Due to karpenter we need 2 instances
     desiredCapacity: 2
     availabilityZones:
       - ${AWS_DEFAULT_REGION}a
@@ -447,13 +412,13 @@ managedNodeGroups:
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
     # For instances with less than 30 vCPUs the maximum number is 110 and for all other instances the maximum number is 250
     # https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
-    maxPodsPerNode: 110
+    # maxPodsPerNode: 110
     taints:
      - key: "node.cilium.io/agent-not-ready"
        value: "true"
        effect: "NoExecute"
   # Second node group is needed to allow karpenter to start
-  - name: mng02
+  - name: mng02-ng
     instanceType: t4g.medium
     desiredCapacity: 2
     availabilityZones:
@@ -514,10 +479,10 @@ egressMasqueradeInterfaces: eth0
 encryption:
   enabled: true
   type: wireguard
-  nodeEncryption: true
+  # nodeEncryption: true
 eni:
   enabled: true
-  # awsEnablePrefixDelegation: true
+  awsEnablePrefixDelegation: true
   eniTags:
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   iamRole: ${CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN}
@@ -528,7 +493,6 @@ hubble:
       - drop
       - tcp
       - flow
-      - port-distribution
       - icmp
       - http
   relay:
@@ -547,7 +511,7 @@ CILIUM_HELM_CHART_VERSION="1.14.0"
 if ! kubectl get namespace cilium; then
   kubectl create ns cilium
   cilium install --namespace cilium --version "${CILIUM_HELM_CHART_VERSION}" --wait --helm-values /tmp/helm_values-cilium.yml
-  eksctl delete nodegroup mng02 --cluster "${CLUSTER_NAME}"
+  eksctl delete nodegroup mng02-ng --cluster "${CLUSTER_NAME}"
 fi
 ```
 
@@ -568,6 +532,11 @@ metadata:
 spec:
   consolidation:
     enabled: true
+  # https://karpenter.sh/preview/concepts/provisioners/#cilium-startup-taint
+  startupTaints:
+    - key: node.cilium.io/agent-not-ready
+      value: "true"
+      effect: NoExecute
   requirements:
     - key: karpenter.sh/capacity-type
       operator: In
@@ -612,17 +581,13 @@ spec:
 EOF
 ```
 
-## external-snapshotter
-
-Details about EKS and external-snapshotter can be found here: [https://aws.amazon.com/blogs/containers/using-ebs-snapshots-for-persistent-storage-with-your-eks-cluster](https://aws.amazon.com/blogs/containers/using-ebs-snapshots-for-persistent-storage-with-your-eks-cluster)
+## aws-ebs-csi-driver
 
 Install Volume Snapshot Custom Resource Definitions (CRDs):
 
 ```bash
 kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
 ```
-
-## aws-ebs-csi-driver
 
 Install Amazon EBS CSI Driver `aws-ebs-csi-driver`
 [helm chart](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/charts/aws-ebs-csi-driver)
@@ -643,6 +608,7 @@ controller:
   enableMetrics: false
   serviceMonitor:
     forceEnable: true
+  k8sTagClusterId: ${CLUSTER_NAME}
   extraVolumeTags:
     Cluster: ${CLUSTER_FQDN}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
@@ -656,7 +622,7 @@ storageClasses:
       storageclass.kubernetes.io/is-default-class: "true"
     parameters:
       encrypted: "true"
-      # kmskeyid: ${AWS_KMS_KEY_ARN}
+      kmskeyid: ${AWS_KMS_KEY_ARN}
 volumeSnapshotClasses:
   - name: ebs-vsc
     annotations:
@@ -1398,8 +1364,7 @@ fi
 Remove CloudFormation stack:
 
 ```sh
-aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53"
-aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-kms"
+aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
 ```
 
 Remove orphan EC2s created by Karpenter:
@@ -1414,8 +1379,7 @@ done
 Wait for all CloudFormation stacks to be deleted:
 
 ```sh
-aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-route53"
-aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-kms"
+aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-route53-kms"
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
 ```
 
