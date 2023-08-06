@@ -50,7 +50,7 @@ export MY_EMAIL="petr.ruzicka@gmail.com"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
 # Tags used to tag the AWS resources
-export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev}"
+export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 ```
 
 You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
@@ -212,22 +212,17 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Route53 entries
 
 Parameters:
-
   BaseDomain:
     Description: "Base domain where cluster domains + their subdomains will live. Ex: k8s.mylabs.dev"
     Type: String
-
   ClusterFQDN:
     Description: "Cluster FQDN. (domain for all applications) Ex: kube1.k8s.mylabs.dev"
     Type: String
-
 Resources:
-
   HostedZone:
     Type: AWS::Route53::HostedZone
     Properties:
       Name: !Ref ClusterFQDN
-
   RecordSet:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -296,7 +291,7 @@ addons:
   - name: coredns
   - name: aws-ebs-csi-driver
 managedNodeGroups:
-  - name: mng01
+  - name: mng01-ng
     amiFamily: Bottlerocket
     # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
@@ -333,7 +328,6 @@ if [[ ! -s "${KUBECONFIG}" ]]; then
 fi
 
 aws eks update-kubeconfig --name="${CLUSTER_NAME}"
-echo -e "***************\n export KUBECONFIG=${KUBECONFIG} \n***************"
 ```
 
 Enable the parameter to assign prefixes to network interfaces for the
@@ -576,81 +570,100 @@ grafana:
             path: /var/lib/grafana/dashboards/default
   dashboards:
     default:
-      k8s-cluster-summary:
-        gnetId: 8685
-        revision: 1
-        datasource: Prometheus
-      node-exporter-full:
+      # 2023-03-30
+      1860-node-exporter-full:
         gnetId: 1860
-        revision: 30
+        revision: 31
         datasource: Prometheus
-      prometheus-2-0-overview:
+      # 2017-11-24
+      3662-prometheus-2-0-overview:
         gnetId: 3662
         revision: 2
         datasource: Prometheus
-      stians-disk-graphs:
+      # 2019-02-27
+      9852-stians-disk-graphs:
         gnetId: 9852
         revision: 1
         datasource: Prometheus
-      kubernetes-apiserver:
+      # 2020-03-31
+      12006-kubernetes-apiserver:
         gnetId: 12006
         revision: 1
         datasource: Prometheus
-      ingress-nginx:
+      # 2018-10-29
+      9614-nginx-ingress-controller:
         gnetId: 9614
         revision: 1
         datasource: Prometheus
-      ingress-nginx2:
+      # 2020-03-09
+      11875-kubernetes-ingress-nginx-eks:
         gnetId: 11875
         revision: 1
         datasource: Prometheus
-      external-dns:
+      # 2021-09-22
+      15038-external-dns:
         gnetId: 15038
         revision: 1
         datasource: Prometheus
-      kubernetes-monitor:
-        gnetId: 15398
-        revision: 6
-        datasource: Prometheus
-      kubernetes-nginx-ingress-prometheus-nextgen:
+      # 2021-04-27
+      14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
         gnetId: 14314
         revision: 2
         datasource: Prometheus
-      portefaix-kubernetes-cluster-overview:
+      # 2022-07-06
+      13473-portefaix-kubernetes-cluster-overview:
         gnetId: 13473
         revision: 2
         datasource: Prometheus
       # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
-      kubernetes-views-pods:
+      # 2023-07-10
+      15760-kubernetes-views-pods:
         gnetId: 15760
-        revision: 22
+        revision: 20
         datasource: Prometheus
-      kubernetes-views-global:
+      # 2023-08-04
+      15757-kubernetes-views-global:
         gnetId: 15757
-        revision: 14
+        revision: 31
         datasource: Prometheus
-      kubernetes-views-namespaces:
+      # 2023-08-04
+      15758-kubernetes-views-namespaces:
         gnetId: 15758
-        revision: 15
+        revision: 26
         datasource: Prometheus
-      kubernetes-views-nodes:
+      # 2023-05-10
+      15759-kubernetes-views-nodes:
         gnetId: 15759
-        revision: 14
+        revision: 19
         datasource: Prometheus
-      kubernetes-system-api-server:
+      # 2023-07-04
+      15761-kubernetes-system-api-server:
         gnetId: 15761
-        revision: 11
+        revision: 13
         datasource: Prometheus
-      kubernetes-system-coredns:
+      # 2023-07-04
+      15762-kubernetes-system-coredns:
         gnetId: 15762
-        revision: 11
+        revision: 13
         datasource: Prometheus
-      cluster-capacity-karpenter:
+      # 2023-07-04
+      19105-prometheus:
+        gnetId: 19105
+        revision: 1
+        datasource: Prometheus
+      # 2022-05-06
+      16237-cluster-capacity:
         gnetId: 16237
         revision: 1
         datasource: Prometheus
-      pod-statistic-karpenter:
+      # 2022-05-06
+      16236-pod-statistic:
         gnetId: 16236
+        revision: 1
+        datasource: Prometheus
+      # 2023-08-01
+      19268-prometheus:
+        gnetId: 19268
         revision: 1
         datasource: Prometheus
   grafana.ini:

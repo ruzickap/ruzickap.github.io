@@ -8,6 +8,10 @@ on:
         description: Cluster FQDN
         default: "k01.k8s.mylabs.dev"
         type: string
+      tags:
+        description: Common tags
+        default: "product_id='12345',used_for=dev,Owner=petr.ruzicka@gmail.com,Environment=dev,Cluster=k01.k8s.mylabs.dev"
+        type: string
       posts:
         type: choice
         description: Select post
@@ -35,6 +39,7 @@ env:
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
+  TAGS: ${{ inputs.tags }}
 
 permissions: read-all
 
