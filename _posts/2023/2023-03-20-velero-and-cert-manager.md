@@ -609,7 +609,7 @@ Backup certificate before deleting the cluster (in case it was renewed):
 
 ```sh
 if ! kubectl get certificaterequests.cert-manager.io -n cert-manager --selector letsencrypt=production -o go-template='{{.items | len}}' | grep -qxF 0; then
-  velero backup create --labels letsencrypt=production --from-schedule velero-weekly-backup-cert-manager
+  velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
 fi
 ```
 

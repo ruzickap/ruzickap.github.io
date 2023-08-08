@@ -52,7 +52,7 @@ The Cilium installation should meet these requirements:
 ### Requirements
 
 If you would like to follow this documents and it's task you will need to set up
-few environment variables like.
+few environment variables like:
 
 ```bash
 # AWS Region
@@ -339,8 +339,8 @@ kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
   region: ${AWS_DEFAULT_REGION}
-  tags: &tags
-    karpenter.sh/discovery: "${CLUSTER_NAME}"
+  tags:
+    karpenter.sh/discovery: ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
@@ -381,11 +381,13 @@ karpenter:
   withSpotInterruptionQueue: true
 addons:
   - name: vpc-cni
+    configurationValues: "{\"env\":{\"ENABLE_PREFIX_DELEGATION\":\"true\", \"ENABLE_POD_ENI\":\"true\", \"POD_SECURITY_GROUP_ENFORCING_MODE\":\"standard\"}}"
   - name: kube-proxy
   - name: coredns
 managedNodeGroups:
   - name: mng01-ng
-    amiFamily: Bottlerocket
+    # amiFamily: Bottlerocket
+    amiFamily: AmazonLinux2
     # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     instanceType: t4g.medium
@@ -398,8 +400,6 @@ managedNodeGroups:
     volumeSize: 20
     volumeType: gp3
     disablePodIMDS: true
-    tags:
-      <<: *tags
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
     taints:
@@ -407,14 +407,13 @@ managedNodeGroups:
        value: "true"
        effect: "NoExecute"
     maxPodsPerNode: 110
+    # privateNetworking: true
   # Second node group is needed for karpenter to start (will be removed later)
   - name: mng02-ng
     instanceType: t4g.medium
     desiredCapacity: 2
     availabilityZones:
       - ${AWS_DEFAULT_REGION}a
-    tags:
-      <<: *tags
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
 secretsEncryption:
@@ -454,15 +453,14 @@ Get the necessary details about VPC, NACLs, SGs:
 
 ```bash
 AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:alpha.eksctl.io/cluster-name,Values=${CLUSTER_NAME}" --query 'Vpcs[*].VpcId' --output text)
-AWS_NETWORK_ACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_VPC_ID}" --query 'NetworkAcls[*].NetworkAclId' --output text)
 AWS_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=${AWS_VPC_ID}" "Name=group-name,Values=default" --query 'SecurityGroups[*].GroupId' --output text)
 ```
 
 Fix "HIGH" Default security group should have no rules configured:
 
 ```bash
-aws ec2 revoke-security-group-egress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --cidr 0.0.0.0/0 | jq
-aws ec2 revoke-security-group-ingress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --source-group "${AWS_SECURITY_GROUP_ID}" | jq
+aws ec2 revoke-security-group-egress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --cidr 0.0.0.0/0 | jq || true
+aws ec2 revoke-security-group-ingress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --source-group "${AWS_SECURITY_GROUP_ID}" | jq || true
 ```
 
 ## Clilium
@@ -494,6 +492,7 @@ encryption:
 eni:
   enabled: true
   awsEnablePrefixDelegation: true
+  awsReleaseExcessIPs: true
   eniTags:
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   iamRole: ${CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN}
@@ -580,7 +579,8 @@ metadata:
   namespace: karpenter
   name: default
 spec:
-  amiFamily: Bottlerocket
+  # amiFamily: Bottlerocket
+  amiFamily: AL2
   subnetSelector:
     karpenter.sh/discovery: ${CLUSTER_NAME}
   securityGroupSelector:
@@ -588,7 +588,8 @@ spec:
   blockDeviceMappings:
     - deviceName: /dev/xvda
       ebs:
-        volumeSize: 2Gi
+        # volumeSize: 2Gi
+        volumeSize: 4Gi
         volumeType: gp3
         encrypted: true
         kmsKeyID: ${AWS_KMS_KEY_ARN}
@@ -603,10 +604,6 @@ spec:
     Name: "${CLUSTER_NAME}-karpenter"
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 EOF
-
-
-
-exit 1
 ```
 
 ## snapshot-controller
@@ -683,6 +680,13 @@ Delete `gp2` StorageClass, because the `gp3` will be used instead:
 
 ```bash
 kubectl delete storageclass gp2 || true
+```
+
+```bash
+echo "Map the HostNetwork ports !!!"
+echo "Remove the maxPods value from your kubeletConfiguration if you no longer need it and instead rely on the defaulted values from Karpenter and EKS AMIs."
+# https://karpenter.sh/v0.26/troubleshooting/#solutions
+exit 0
 ```
 
 ## aws-node-termination-handler
@@ -1062,6 +1066,10 @@ replicas: 1
 serviceMonitor:
   enabled: true
 hostNetwork: true
+settings:
+  aws:
+    enablePodENI: true
+    reservedENIs: "1"
 EOF
 helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" karpenter oci://public.ecr.aws/karpenter/karpenter
 ```
@@ -1234,9 +1242,9 @@ METRICS_SERVER_HELM_CHART_VERSION="3.11.0"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
-ontainerPort: 10252
+containerPort: 10252
 hostNetwork:
-  menabled: true
+  enabled: true
 metrics:
   enabled: true
 serviceMonitor:
@@ -1292,7 +1300,12 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
+  # Needed for Cilium + show ports
   hostNetwork: true
+  hostPort:
+    ports:
+      http: 80
+      https: 443
   ingressClassResource:
     default: true
   admissionWebhooks:
@@ -1436,16 +1449,21 @@ EOF
 helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" oauth2-proxy oauth2-proxy/oauth2-proxy
 ```
 
+## Cilium details
+
+```console
+kubectl exec -ti ds/cilium -n cilium -- cilium service list
+kubectl describe ciliumnodes.cilium.io
+kubectl describe ciliumidentities.cilium.io -A
+kubectl describe ciliumendpoints.cilium.io -A
+
+for URL in $(sed -n -e 's/github.com/raw.githubusercontent.com/' -e 's@/blob@@' -e 's@.*\(https://.*values.yaml\).*@\1@p' 2023-08-03-cilium-amazon-eks.md); do echo "*** $URL"; curl -ss $URL | grep -i hostnetw; done
+```
+
 ## Clean-up
 
 ![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg
 "Clean-up"){: width="400" }
-
-Remove CloudFormation stack:
-
-```sh
-aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
-```
 
 Remove EKS cluster and created components:
 
@@ -1477,6 +1495,12 @@ for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluste
   echo "Removing EC2: ${EC2}"
   aws ec2 terminate-instances --instance-ids "${EC2}"
 done
+```
+
+Remove CloudFormation stack:
+
+```sh
+aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
 ```
 
 Wait for all CloudFormation stacks to be deleted:
