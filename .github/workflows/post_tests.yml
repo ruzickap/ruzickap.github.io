@@ -10,7 +10,7 @@ on:
         type: string
       tags:
         description: Common tags
-        default: "product_id='12345',used_for=dev,Owner=petr.ruzicka@gmail.com,Environment=dev,Cluster=k01.k8s.mylabs.dev"
+        default: "product_id='12345',used_for=dev,owner=petr.ruzicka@gmail.com,cluster=k01.k8s.mylabs.dev"
         type: string
       posts:
         type: choice

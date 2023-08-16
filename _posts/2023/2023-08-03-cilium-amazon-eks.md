@@ -10,7 +10,7 @@ image:
 ---
 
 I'm going to describe how to install [Amazon EKS](https://aws.amazon.com/eks/)
-with Karpenter and Cilium as CNI.
+with Karpenter and Cilium (+ standard apps).
 
 Amazon EKS should meet these "cheap" requirements:
 
@@ -97,13 +97,11 @@ Verify if all the necessary variables were set:
 echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
 ```
 
-### Prepare the local working environment
+Install necessary tools:
 
 > You can skip these steps if you have all the required software already
 > installed.
 {: .prompt-tip }
-
-Required:
 
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
@@ -113,7 +111,7 @@ Required:
 
 ## Configure AWS Route 53 Domain delegation
 
-> DNS delegation should be done only once.
+> DNS delegation steps should be done only once
 {: .prompt-info }
 
 Create DNS zone for EKS clusters:
@@ -386,8 +384,7 @@ addons:
   - name: coredns
 managedNodeGroups:
   - name: mng01-ng
-    # amiFamily: Bottlerocket
-    amiFamily: AmazonLinux2
+    amiFamily: Bottlerocket
     # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     instanceType: t4g.medium
@@ -407,7 +404,6 @@ managedNodeGroups:
        value: "true"
        effect: "NoExecute"
     maxPodsPerNode: 110
-    # privateNetworking: true
   # Second node group is needed for karpenter to start (will be removed later)
   - name: mng02-ng
     instanceType: t4g.medium
@@ -447,7 +443,7 @@ fi
 aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 ```
 
-## Harden the Amazon EKS cluster
+### Harden the Amazon EKS cluster
 
 Get the necessary details about VPC, NACLs, SGs:
 
@@ -463,7 +459,7 @@ aws ec2 revoke-security-group-egress --group-id "${AWS_SECURITY_GROUP_ID}" --pro
 aws ec2 revoke-security-group-ingress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --source-group "${AWS_SECURITY_GROUP_ID}" | jq || true
 ```
 
-## Clilium
+### Clilium
 
 Install [Cilium](https://cilium.io/) and remove nodegroup `mng02-ng` used for
 "eksctl karpenter" installation (It is no longer needed because Cilium will be
@@ -471,6 +467,8 @@ installed and taints will be removed):
 
 ![Cilium](https://raw.githubusercontent.com/cilium/cilium/eb3662e6f72d8fa1d2c884967e8de6bf063cb108/Documentation/images/logo.svg
 "cilium"){: width="500" }
+
+- Endpoint ports: 9965, 4244, 9963, 9962, 9964
 
 ```bash
 CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN=$(eksctl get iamserviceaccount --cluster "${CLUSTER_NAME}" --output json | jq -r ".[] | select(.metadata.name==\"cilium-operator\") .status.roleARN")
@@ -510,8 +508,6 @@ hubble:
 ipam:
   mode: eni
 kubeProxyReplacement: disabled
-operator:
-  replicas: 1
 tunnel: disabled
 EOF
 
@@ -525,7 +521,7 @@ if ! kubectl get namespace cilium &> /dev/null; then
 fi
 ```
 
-## Karpenter
+### Karpenter
 
 Configure [Karpenter](https://karpenter.sh/):
 
@@ -537,7 +533,6 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-provisioner.yml" << EOF | kubectl 
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
-  namespace: karpenter
   name: default
 spec:
   consolidation:
@@ -560,6 +555,8 @@ spec:
     - key: karpenter.k8s.aws/instance-family
       operator: In
       values: ["t3a", "t4g"]
+  kubeletConfiguration:
+    maxPods: 110
   # Resource limits constrain the total size of the cluster.
   # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
@@ -576,11 +573,9 @@ spec:
 apiVersion: karpenter.k8s.aws/v1alpha1
 kind: AWSNodeTemplate
 metadata:
-  namespace: karpenter
   name: default
 spec:
-  # amiFamily: Bottlerocket
-  amiFamily: AL2
+  amiFamily: Bottlerocket
   subnetSelector:
     karpenter.sh/discovery: ${CLUSTER_NAME}
   securityGroupSelector:
@@ -588,8 +583,7 @@ spec:
   blockDeviceMappings:
     - deviceName: /dev/xvda
       ebs:
-        # volumeSize: 2Gi
-        volumeSize: 4Gi
+        volumeSize: 2Gi
         volumeType: gp3
         encrypted: true
         kmsKeyID: ${AWS_KMS_KEY_ARN}
@@ -606,7 +600,7 @@ spec:
 EOF
 ```
 
-## snapshot-controller
+### snapshot-controller
 
 Install Volume Snapshot Custom Resource Definitions (CRDs):
 
@@ -630,7 +624,7 @@ helm repo add piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
 ```
 
-## aws-ebs-csi-driver
+### aws-ebs-csi-driver
 
 Install Amazon EBS CSI Driver `aws-ebs-csi-driver`
 [helm chart](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/charts/aws-ebs-csi-driver)
@@ -682,14 +676,7 @@ Delete `gp2` StorageClass, because the `gp3` will be used instead:
 kubectl delete storageclass gp2 || true
 ```
 
-```bash
-echo "Map the HostNetwork ports !!!"
-echo "Remove the maxPods value from your kubeletConfiguration if you no longer need it and instead rely on the defaulted values from Karpenter and EKS AMIs."
-# https://karpenter.sh/v0.26/troubleshooting/#solutions
-exit 0
-```
-
-## aws-node-termination-handler
+### aws-node-termination-handler
 
 Install `aws-node-termination-handler`
 [helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
@@ -769,6 +756,8 @@ and modify the
 
 ![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg
 "prometheus"){: width="500" }
+
+- Endpoint ports: 8080, 9090, 9100, 10250, 10260, 10255, 4194
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -1000,9 +989,8 @@ kubeProxy:
   enabled: false
 prometheusOperator:
   tls:
-    enabled: false
-  admissionWebhooks:
-    enabled: false
+    # https://github.com/prometheus-community/helm-charts/issues/2248
+    internalPort: 10260
   networkPolicy:
     enabled: true
   hostNetwork: true
@@ -1057,6 +1045,8 @@ and modify the
 ![karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 "karpenter"){: width="400" }
 
+- Endpoint ports: 8000, 8443
+
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
 KARPENTER_HELM_CHART_VERSION="v0.29.2"
@@ -1074,7 +1064,7 @@ EOF
 helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" karpenter oci://public.ecr.aws/karpenter/karpenter
 ```
 
-## Cilium - extended
+### Cilium - monitoring
 
 Add hubble to Cilium, Prometheus, Metrics, ...
 
@@ -1146,6 +1136,8 @@ Service account `cert-manager` was created by `eksctl`.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg
 "cert-manager"){: width="200" }
+
+- Endpoint ports: 10251
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
@@ -1236,6 +1228,8 @@ Install `metrics-server`
 and modify the
 [default values](https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/values.yaml):
 
+- Endpoint ports: 10252
+
 ```bash
 # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
 METRICS_SERVER_HELM_CHART_VERSION="3.11.0"
@@ -1291,6 +1285,8 @@ Install `ingress-nginx`
 and modify the
 [default values](https://github.com/kubernetes/ingress-nginx/blob/master/charts/ingress-nginx/values.yaml).
 
+- Endpoint ports: 443, 80, 8443, 10254
+
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
 INGRESS_NGINX_HELM_CHART_VERSION="4.7.1"
@@ -1302,10 +1298,6 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   # Needed for Cilium + show ports
   hostNetwork: true
-  hostPort:
-    ports:
-      http: 80
-      https: 443
   ingressClassResource:
     default: true
   admissionWebhooks:
@@ -1449,15 +1441,660 @@ EOF
 helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" oauth2-proxy oauth2-proxy/oauth2-proxy
 ```
 
-## Cilium details
+### Cilium details
+
+Let's check the Cilium status using the [cilium command](https://github.com/cilium/cilium-cli):
+
+```bash
+cilium status -n cilium
+```
 
 ```console
-kubectl exec -ti ds/cilium -n cilium -- cilium service list
-kubectl describe ciliumnodes.cilium.io
-kubectl describe ciliumidentities.cilium.io -A
-kubectl describe ciliumendpoints.cilium.io -A
+    /¯¯\
+ /¯¯\__/¯¯\    Cilium:             OK
+ \__/¯¯\__/    Operator:           OK
+ /¯¯\__/¯¯\    Envoy DaemonSet:    disabled (using embedded mode)
+ \__/¯¯\__/    Hubble Relay:       OK
+    \__/       ClusterMesh:        disabled
 
-for URL in $(sed -n -e 's/github.com/raw.githubusercontent.com/' -e 's@/blob@@' -e 's@.*\(https://.*values.yaml\).*@\1@p' 2023-08-03-cilium-amazon-eks.md); do echo "*** $URL"; curl -ss $URL | grep -i hostnetw; done
+Deployment             hubble-ui          Desired: 1, Ready: 1/1, Available: 1/1
+Deployment             hubble-relay       Desired: 1, Ready: 1/1, Available: 1/1
+Deployment             cilium-operator    Desired: 1, Ready: 1/1, Available: 1/1
+DaemonSet              cilium             Desired: 2, Ready: 2/2, Available: 2/2
+Containers:            hubble-relay       Running: 1
+                       cilium-operator    Running: 1
+                       cilium             Running: 2
+                       hubble-ui          Running: 1
+Cluster Pods:          18/18 managed by Cilium
+Helm chart version:    1.14.0
+Image versions         hubble-relay       quay.io/cilium/hubble-relay:v1.14.0@sha256:bfe6ef86a1c0f1c3e8b105735aa31db64bcea97dd4732db6d0448c55a3c8e70c: 1
+                       cilium-operator    quay.io/cilium/operator-aws:v1.14.0@sha256:396953225ca4b356a22e526a9e1e04e65d33f84a0447bc6374c14da12f5756cd: 1
+                       cilium             quay.io/cilium/cilium:v1.14.0@sha256:5a94b561f4651fcfd85970a50bc78b201cfbd6e2ab1a03848eab25a82832653a: 2
+                       hubble-ui          quay.io/cilium/hubble-ui:v0.12.0@sha256:1c876cfa1d5e35bc91e1025c9314f922041592a88b03313c22c1f97a5d2ba88f: 1
+                       hubble-ui          quay.io/cilium/hubble-ui-backend:v0.12.0@sha256:8a79a1aad4fc9c2aa2b3e4379af0af872a89fcec9d99e117188190671c66fc2e: 1
+```
+
+Cilium configuration can be found in the `cilium-config` ConfigMap:
+
+```bash
+kubectl -n cilium get configmap cilium-config -o yaml
+```
+
+```console
+apiVersion: v1
+data:
+  agent-not-ready-taint-key: node.cilium.io/agent-not-ready
+  arping-refresh-period: 30s
+  auto-create-cilium-node-resource: "true"
+  auto-direct-node-routes: "false"
+  aws-enable-prefix-delegation: "true"
+  aws-release-excess-ips: "true"
+  bpf-lb-external-clusterip: "false"
+  bpf-lb-map-max: "65536"
+  bpf-lb-sock: "false"
+  bpf-map-dynamic-size-ratio: "0.0025"
+  bpf-policy-map-max: "16384"
+  bpf-root: /sys/fs/bpf
+  cgroup-root: /run/cilium/cgroupv2
+  cilium-endpoint-gc-interval: 5m0s
+  cluster-id: "0"
+  cluster-name: k01
+  cni-exclusive: "true"
+  cni-log-file: /var/run/cilium/cilium-cni.log
+  cnp-node-status-gc-interval: 0s
+  custom-cni-conf: "false"
+  debug: "false"
+  debug-verbose: ""
+  disable-cnp-status-updates: "true"
+  ec2-api-endpoint: ""
+  egress-gateway-reconciliation-trigger-interval: 1s
+  egress-masquerade-interfaces: eth0
+  enable-auto-protect-node-port-range: "true"
+  enable-bandwidth-manager: "true"
+  enable-bbr: "false"
+  enable-bgp-control-plane: "false"
+  enable-bpf-clock-probe: "false"
+  enable-endpoint-health-checking: "true"
+  enable-endpoint-routes: "true"
+  enable-health-check-nodeport: "true"
+  enable-health-checking: "true"
+  enable-hubble: "true"
+  enable-hubble-open-metrics: "false"
+  enable-ipv4: "true"
+  enable-ipv4-big-tcp: "false"
+  enable-ipv4-masquerade: "true"
+  enable-ipv6: "false"
+  enable-ipv6-big-tcp: "false"
+  enable-ipv6-masquerade: "true"
+  enable-k8s-networkpolicy: "true"
+  enable-k8s-terminating-endpoint: "true"
+  enable-l2-neigh-discovery: "true"
+  enable-l7-proxy: "true"
+  enable-local-redirect-policy: "false"
+  enable-metrics: "true"
+  enable-policy: default
+  enable-remote-node-identity: "true"
+  enable-sctp: "false"
+  enable-svc-source-range-check: "true"
+  enable-vtep: "false"
+  enable-well-known-identities: "false"
+  enable-wireguard: "true"
+  enable-xt-socket-fallback: "true"
+  eni-tags: '{"cluster":"k01.k8s.mylabs.dev","owner":"petr.ruzicka@gmail.com","product_id":"12345","used_for":"dev"}'
+  external-envoy-proxy: "false"
+  hubble-disable-tls: "false"
+  hubble-listen-address: :4244
+  hubble-metrics: dns drop tcp flow icmp http
+  hubble-metrics-server: :9965
+  hubble-socket-path: /var/run/cilium/hubble.sock
+  hubble-tls-cert-file: /var/lib/cilium/tls/hubble/server.crt
+  hubble-tls-client-ca-files: /var/lib/cilium/tls/hubble/client-ca.crt
+  hubble-tls-key-file: /var/lib/cilium/tls/hubble/server.key
+  identity-allocation-mode: crd
+  identity-gc-interval: 15m0s
+  identity-heartbeat-timeout: 30m0s
+  install-no-conntrack-iptables-rules: "false"
+  ipam: eni
+  ipam-cilium-node-update-rate: 15s
+  k8s-client-burst: "10"
+  k8s-client-qps: "5"
+  kube-proxy-replacement: disabled
+  mesh-auth-enabled: "true"
+  mesh-auth-gc-interval: 5m0s
+  mesh-auth-queue-size: "1024"
+  mesh-auth-rotated-identities-queue-size: "1024"
+  monitor-aggregation: medium
+  monitor-aggregation-flags: all
+  monitor-aggregation-interval: 5s
+  node-port-bind-protection: "true"
+  nodes-gc-interval: 5m0s
+  operator-api-serve-addr: 127.0.0.1:9234
+  operator-prometheus-serve-addr: :9963
+  preallocate-bpf-maps: "false"
+  procfs: /host/proc
+  prometheus-serve-addr: :9962
+  proxy-connect-timeout: "2"
+  proxy-max-connection-duration-seconds: "0"
+  proxy-max-requests-per-connection: "0"
+  proxy-prometheus-port: "9964"
+  remove-cilium-node-taints: "true"
+  routing-mode: native
+  set-cilium-is-up-condition: "true"
+  set-cilium-node-taints: "true"
+  sidecar-istio-proxy-image: cilium/istio_proxy
+  skip-cnp-status-startup-clean: "false"
+  synchronize-k8s-nodes: "true"
+  tofqdns-dns-reject-response-code: refused
+  tofqdns-enable-dns-compression: "true"
+  tofqdns-endpoint-max-ip-per-hostname: "50"
+  tofqdns-idle-connection-grace-period: 0s
+  tofqdns-max-deferred-connection-deletes: "10000"
+  tofqdns-proxy-response-max-delay: 100ms
+  unmanaged-pod-watcher-interval: "15"
+  update-ec2-adapter-limit-via-api: "true"
+  vtep-cidr: ""
+  vtep-endpoint: ""
+  vtep-mac: ""
+  vtep-mask: ""
+  write-cni-conf-when-ready: /host/etc/cni/net.d/05-cilium.conflist
+kind: ConfigMap
+metadata:
+  annotations:
+    meta.helm.sh/release-name: cilium
+    meta.helm.sh/release-namespace: cilium
+  creationTimestamp: "2023-08-18T17:02:55Z"
+  labels:
+    app.kubernetes.io/managed-by: Helm
+  name: cilium-config
+  namespace: cilium
+  resourceVersion: "5229"
+  uid: 9d1392b8-6a3b-403c-81ce-500393eeb3e3
+```
+
+Differnet way of running cilium status on k8s worker node:
+
+```bash
+kubectl exec -n cilium ds/cilium -- cilium status
+```
+
+```console
+Defaulted container "cilium-agent" out of: cilium-agent, config (init), mount-cgroup (init), apply-sysctl-overwrites (init), mount-bpf-fs (init), clean-cilium-state (init), install-cni-binaries (init)
+KVStore:                 Ok   Disabled
+Kubernetes:              Ok   1.25+ (v1.25.12-eks-2d98532) [linux/amd64]
+Kubernetes APIs:         ["EndpointSliceOrEndpoint", "cilium/v2::CiliumClusterwideNetworkPolicy", "cilium/v2::CiliumEndpoint", "cilium/v2::CiliumNetworkPolicy", "cilium/v2::CiliumNode", "cilium/v2alpha1::CiliumCIDRGroup", "core/v1::Namespace", "core/v1::Pods", "core/v1::Service", "networking.k8s.io/v1::NetworkPolicy"]
+KubeProxyReplacement:    Disabled
+Host firewall:           Disabled
+CNI Chaining:            none
+Cilium:                  Ok   1.14.0 (v1.14.0-b5013e15)
+NodeMonitor:             Listening for events on 2 CPUs with 64x4096 of shared memory
+Cilium health daemon:    Ok
+IPAM:                    IPv4: 9/32 allocated,
+IPv4 BIG TCP:            Disabled
+IPv6 BIG TCP:            Disabled
+BandwidthManager:        EDT with BPF [CUBIC] [eth0]
+Host Routing:            Legacy
+Masquerading:            IPTables [IPv4: Enabled, IPv6: Disabled]
+Controller Status:       55/55 healthy
+Proxy Status:            OK, ip 192.168.8.67, 0 redirects active on ports 10000-20000, Envoy: embedded
+Global Identity Range:   min 256, max 65535
+Hubble:                  Ok              Current/Max Flows: 4095/4095 (100.00%), Flows/s: 8.21   Metrics: Ok
+Encryption:              Wireguard       [NodeEncryption: Disabled, cilium_wg0 (Pubkey: AxE7xXNN/Izr5ajkE48eSWtOH2WeQBTwhjS3Rma1tDo=, Port: 51871, Peers: 1)]
+Cluster health:          2/2 reachable   (2023-08-18T17:53:44Z)
+```
+
+Handy details abou Cilium networking can be found by listing `ciliumnodes` CRD:
+
+```shell
+kubectl describe ciliumnodes.cilium.io
+```
+
+```console
+Name:         ip-192-168-19-152.ec2.internal
+Namespace:
+Labels:       alpha.eksctl.io/cluster-name=k01
+              alpha.eksctl.io/nodegroup-name=mng01-ng
+              beta.kubernetes.io/arch=arm64
+              beta.kubernetes.io/instance-type=t4g.medium
+              beta.kubernetes.io/os=linux
+              eks.amazonaws.com/capacityType=ON_DEMAND
+              eks.amazonaws.com/nodegroup=mng01-ng
+              eks.amazonaws.com/nodegroup-image=ami-05d67a5609bec1651
+              eks.amazonaws.com/sourceLaunchTemplateId=lt-077e09aaa2d4af922
+              eks.amazonaws.com/sourceLaunchTemplateVersion=1
+              failure-domain.beta.kubernetes.io/region=us-east-1
+              failure-domain.beta.kubernetes.io/zone=us-east-1a
+              k8s.io/cloud-provider-aws=4484beb1485b6869a3e7e4b77bb31f1f
+              kubernetes.io/arch=arm64
+              kubernetes.io/hostname=ip-192-168-19-152.ec2.internal
+              kubernetes.io/os=linux
+              node.kubernetes.io/instance-type=t4g.medium
+              topology.ebs.csi.aws.com/zone=us-east-1a
+              topology.kubernetes.io/region=us-east-1
+              topology.kubernetes.io/zone=us-east-1a
+              vpc.amazonaws.com/has-trunk-attached=false
+Annotations:  network.cilium.io/wg-pub-key: lxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx=
+API Version:  cilium.io/v2
+Kind:         CiliumNode
+Metadata:
+  Creation Timestamp:  2023-08-18T17:03:10Z
+  Generation:          6
+  Owner References:
+    API Version:     v1
+    Kind:            Node
+    Name:            ip-192-168-19-152.ec2.internal
+    UID:             b956ae10-e866-4167-9ff1-7d6c889fed44
+  Resource Version:  7677
+  UID:               36fbc130-b9e7-46a8-a62b-b723c6dbb5a3
+Spec:
+  Addresses:
+    Ip:    192.168.19.152
+    Type:  InternalIP
+    Ip:    54.147.78.10
+    Type:  ExternalIP
+    Ip:    192.168.13.220
+    Type:  CiliumInternalIP
+  Alibaba - Cloud:
+  Azure:
+  Encryption:
+  Eni:
+    Availability - Zone:            us-east-1a
+    Disable - Prefix - Delegation:  false
+    First - Interface - Index:      0
+    Instance - Type:                t4g.medium
+    Node - Subnet - Id:             subnet-0ac4e4f9d12641825
+    Use - Primary - Address:        false
+    Vpc - Id:                       vpc-0aaac805cdcd49be5
+  Health:
+    ipv4:  192.168.0.71
+  Ingress:
+  Instance - Id:  i-042bf8f0cee76e7f0
+  Ipam:
+    Pod CID Rs:
+      10.152.0.0/16
+    Pool:
+      192.168.0.64:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.65:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.66:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.67:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.68:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.69:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.70:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.71:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.72:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.73:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.74:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.75:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.76:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.77:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.78:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.79:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.208:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.209:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.210:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.211:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.212:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.213:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.214:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.215:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.216:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.217:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.218:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.219:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.220:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.221:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.222:
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.223:
+        Resource:  eni-01d99349e4f322bf6
+    Pools:
+    Pre - Allocate:  8
+Status:
+  Alibaba - Cloud:
+  Azure:
+  Eni:
+    Enis:
+      eni-01d99349e4f322bf6:
+        Addresses:
+          192.168.13.208
+          192.168.13.209
+          192.168.13.210
+          192.168.13.211
+          192.168.13.212
+          192.168.13.213
+          192.168.13.214
+          192.168.13.215
+          192.168.13.216
+          192.168.13.217
+          192.168.13.218
+          192.168.13.219
+          192.168.13.220
+          192.168.13.221
+          192.168.13.222
+          192.168.13.223
+          192.168.0.64
+          192.168.0.65
+          192.168.0.66
+          192.168.0.67
+          192.168.0.68
+          192.168.0.69
+          192.168.0.70
+          192.168.0.71
+          192.168.0.72
+          192.168.0.73
+          192.168.0.74
+          192.168.0.75
+          192.168.0.76
+          192.168.0.77
+          192.168.0.78
+          192.168.0.79
+        Id:   eni-01d99349e4f322bf6
+        Ip:   192.168.19.152
+        Mac:  12:6d:a9:a9:74:f1
+        Prefixes:
+          192.168.13.208/28
+          192.168.0.64/28
+        Security - Groups:
+          sg-0e72cf267ee2c8aa2
+        Subnet:
+          Cidr:  192.168.0.0/19
+          Id:    subnet-0ac4e4f9d12641825
+        Tags:
+          cluster.k8s.amazonaws.com/name:      k01
+          node.k8s.amazonaws.com/instance_id:  i-042bf8f0cee76e7f0
+        Vpc:
+          Id:              vpc-0aaac805cdcd49be5
+          Primary - Cidr:  192.168.0.0/16
+  Ipam:
+    Operator - Status:
+    Used:
+      192.168.0.69:
+        Owner:     oauth2-proxy/oauth2-proxy-7d5fd7948f-qvnhr
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.71:
+        Owner:     health
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.73:
+        Owner:     kube-prometheus-stack/kube-prometheus-stack-grafana-54dbcd857d-2hh4x [restored]
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.75:
+        Owner:     cilium/hubble-relay-d44b99d7b-tllkk
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.76:
+        Owner:     cilium/hubble-ui-869b75b895-cjs2w
+        Resource:  eni-01d99349e4f322bf6
+      192.168.0.77:
+        Owner:     external-dns/external-dns-7fdb8769ff-srj48
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.211:
+        Owner:     kube-prometheus-stack/kube-prometheus-stack-kube-state-metrics-78c9594f8f-22lgc [restored]
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.213:
+        Owner:     aws-ebs-csi-driver/ebs-csi-node-svjd8 [restored]
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.215:
+        Owner:     kube-system/coredns-7975d6fb9b-jzqv7 [restored]
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.217:
+        Owner:     kube-system/coredns-7975d6fb9b-c5rfb [restored]
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.220:
+        Owner:     router
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.222:
+        Owner:     aws-ebs-csi-driver/ebs-csi-controller-7847774b66-b4lsl [restored]
+        Resource:  eni-01d99349e4f322bf6
+      192.168.13.223:
+        Owner:     forecastle/forecastle-58d7ccb8f8-vw5ct
+        Resource:  eni-01d99349e4f322bf6
+Events:            <none>
+
+
+Name:         ip-192-168-3-237.ec2.internal
+Namespace:
+Labels:       alpha.eksctl.io/cluster-name=k01
+              alpha.eksctl.io/nodegroup-name=mng01-ng
+              beta.kubernetes.io/arch=arm64
+              beta.kubernetes.io/instance-type=t4g.medium
+              beta.kubernetes.io/os=linux
+              eks.amazonaws.com/capacityType=ON_DEMAND
+              eks.amazonaws.com/nodegroup=mng01-ng
+              eks.amazonaws.com/nodegroup-image=ami-05d67a5609bec1651
+              eks.amazonaws.com/sourceLaunchTemplateId=lt-077e09aaa2d4af922
+              eks.amazonaws.com/sourceLaunchTemplateVersion=1
+              failure-domain.beta.kubernetes.io/region=us-east-1
+              failure-domain.beta.kubernetes.io/zone=us-east-1a
+              k8s.io/cloud-provider-aws=4484beb1485b6869a3e7e4b77bb31f1f
+              kubernetes.io/arch=arm64
+              kubernetes.io/hostname=ip-192-168-3-237.ec2.internal
+              kubernetes.io/os=linux
+              node.kubernetes.io/instance-type=t4g.medium
+              topology.ebs.csi.aws.com/zone=us-east-1a
+              topology.kubernetes.io/region=us-east-1
+              topology.kubernetes.io/zone=us-east-1a
+              vpc.amazonaws.com/has-trunk-attached=false
+Annotations:  network.cilium.io/wg-pub-key: AxE7xXNN/Izr5ajkE48eSWtOH2WeQBTwhjS3Rma1tDo=
+API Version:  cilium.io/v2
+Kind:         CiliumNode
+Metadata:
+  Creation Timestamp:  2023-08-18T17:03:11Z
+  Generation:          6
+  Owner References:
+    API Version:     v1
+    Kind:            Node
+    Name:            ip-192-168-3-237.ec2.internal
+    UID:             d088d0dd-e531-4652-9a2b-fe6f80516f00
+  Resource Version:  6220
+  UID:               2e961861-ea2b-412b-820f-962a9db28b60
+Spec:
+  Addresses:
+    Ip:    192.168.3.237
+    Type:  InternalIP
+    Ip:    18.208.178.29
+    Type:  ExternalIP
+    Ip:    192.168.8.67
+    Type:  CiliumInternalIP
+  Alibaba - Cloud:
+  Azure:
+  Encryption:
+  Eni:
+    Availability - Zone:            us-east-1a
+    Disable - Prefix - Delegation:  false
+    First - Interface - Index:      0
+    Instance - Type:                t4g.medium
+    Node - Subnet - Id:             subnet-0ac4e4f9d12641825
+    Use - Primary - Address:        false
+    Vpc - Id:                       vpc-0aaac805cdcd49be5
+  Health:
+    ipv4:  192.168.8.66
+  Ingress:
+  Instance - Id:  i-086acad17bd2d676b
+  Ipam:
+    Pod CID Rs:
+      10.237.0.0/16
+    Pool:
+      192.168.30.32:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.33:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.34:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.35:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.36:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.37:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.38:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.39:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.40:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.41:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.42:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.43:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.44:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.45:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.46:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.30.47:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.64:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.65:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.66:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.67:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.68:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.69:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.70:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.71:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.72:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.73:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.74:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.75:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.76:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.77:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.78:
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.79:
+        Resource:  eni-0f47ee6b88bd0143b
+    Pools:
+    Pre - Allocate:  8
+Status:
+  Alibaba - Cloud:
+  Azure:
+  Eni:
+    Enis:
+      eni-0f47ee6b88bd0143b:
+        Addresses:
+          192.168.8.64
+          192.168.8.65
+          192.168.8.66
+          192.168.8.67
+          192.168.8.68
+          192.168.8.69
+          192.168.8.70
+          192.168.8.71
+          192.168.8.72
+          192.168.8.73
+          192.168.8.74
+          192.168.8.75
+          192.168.8.76
+          192.168.8.77
+          192.168.8.78
+          192.168.8.79
+          192.168.30.32
+          192.168.30.33
+          192.168.30.34
+          192.168.30.35
+          192.168.30.36
+          192.168.30.37
+          192.168.30.38
+          192.168.30.39
+          192.168.30.40
+          192.168.30.41
+          192.168.30.42
+          192.168.30.43
+          192.168.30.44
+          192.168.30.45
+          192.168.30.46
+          192.168.30.47
+        Id:   eni-0f47ee6b88bd0143b
+        Ip:   192.168.3.237
+        Mac:  12:e1:d7:9d:e6:59
+        Prefixes:
+          192.168.8.64/28
+          192.168.30.32/28
+        Security - Groups:
+          sg-0e72cf267ee2c8aa2
+        Subnet:
+          Cidr:  192.168.0.0/19
+          Id:    subnet-0ac4e4f9d12641825
+        Tags:
+          cluster.k8s.amazonaws.com/name:      k01
+          node.k8s.amazonaws.com/instance_id:  i-086acad17bd2d676b
+        Vpc:
+          Id:              vpc-0aaac805cdcd49be5
+          Primary - Cidr:  192.168.0.0/16
+  Ipam:
+    Operator - Status:
+    Used:
+      192.168.8.64:
+        Owner:     aws-ebs-csi-driver/ebs-csi-controller-7847774b66-nrlf4 [restored]
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.66:
+        Owner:     health
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.67:
+        Owner:     router
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.68:
+        Owner:     snapshot-controller/snapshot-controller-8658dd5c86-z2z6q [restored]
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.69:
+        Owner:     cert-manager/cert-manager-859997c796-j9hh8
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.70:
+        Owner:     cert-manager/cert-manager-cainjector-7bb8cb69c5-2q6fk
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.72:
+        Owner:     mailhog/mailhog-6f54fccf85-pdb9k [restored]
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.73:
+        Owner:     aws-ebs-csi-driver/ebs-csi-node-n8vrn [restored]
+        Resource:  eni-0f47ee6b88bd0143b
+      192.168.8.78:
+        Owner:     kube-prometheus-stack/alertmanager-kube-prometheus-stack-alertmanager-0 [restored]
+        Resource:  eni-0f47ee6b88bd0143b
+Events:            <none>
 ```
 
 ## Clean-up

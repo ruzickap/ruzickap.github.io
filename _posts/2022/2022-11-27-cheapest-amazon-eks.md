@@ -18,7 +18,7 @@ with lowest price.
 Requirements:
 
 - Single AZ only - no payments for cross availability zones traffic
-- Spot instances "everywhere"
+- Spot instances
 - Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
   [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
@@ -80,13 +80,11 @@ Verify if all the necessary variables were set:
 echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
 ```
 
-### Prepare the local working environment
+Install necessary tools:
 
 > You can skip these steps if you have all the required software already
 > installed.
 {: .prompt-tip }
-
-Required:
 
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
@@ -95,7 +93,7 @@ Required:
 
 ## Configure AWS Route 53 Domain delegation
 
-> DNS delegation should be done only once.
+> DNS delegation steps should be done only once
 {: .prompt-info }
 
 Create DNS zone for EKS clusters:
@@ -343,7 +341,6 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-provisioner.yml" << EOF | kubectl 
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
-  namespace: karpenter
   name: default
 spec:
   # Enables consolidation which attempts to reduce cluster cost by both removing
@@ -364,6 +361,8 @@ spec:
     - key: karpenter.k8s.aws/instance-family
       operator: In
       values: ["t3a", "t4g"]
+  kubeletConfiguration:
+    maxPods: 110
   # Resource limits constrain the total size of the cluster.
   # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
@@ -380,7 +379,6 @@ spec:
 apiVersion: karpenter.k8s.aws/v1alpha1
 kind: AWSNodeTemplate
 metadata:
-  namespace: karpenter
   name: default
 spec:
   amiFamily: Bottlerocket
@@ -1092,12 +1090,6 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
 fi
 ```
 
-Remove CloudFormation stack:
-
-```sh
-aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53"
-```
-
 Remove orphan EC2s created by Karpenter:
 
 ```sh
@@ -1105,6 +1097,12 @@ for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluste
   echo "Removing EC2: ${EC2}"
   aws ec2 terminate-instances --instance-ids "${EC2}"
 done
+```
+
+Remove CloudFormation stack:
+
+```sh
+aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
 ```
 
 Wait for all CloudFormation stacks to be deleted:
