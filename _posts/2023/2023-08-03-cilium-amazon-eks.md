@@ -512,7 +512,7 @@ tunnel: disabled
 EOF
 
 # renovate: datasource=helm depName=cilium registryUrl=https://helm.cilium.io/
-CILIUM_HELM_CHART_VERSION="1.14.0"
+CILIUM_HELM_CHART_VERSION="1.14.1"
 
 if ! kubectl get namespace cilium &> /dev/null; then
   kubectl create ns cilium
