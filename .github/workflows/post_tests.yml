@@ -8,6 +8,10 @@ on:
         description: Cluster FQDN
         default: "k01.k8s.mylabs.dev"
         type: string
+      tags:
+        description: Common tags
+        default: "product_id='12345',used_for=dev,owner=petr.ruzicka@gmail.com,cluster=k01.k8s.mylabs.dev"
+        type: string
       posts:
         type: choice
         description: Select post
@@ -19,6 +23,7 @@ on:
           - velero-and-cert-manager cheapest-amazon-eks
           - secrets-store-csi-driver-reloader velero-and-cert-manager cheapest-amazon-eks
           - my-favourite-krew-plugins-kubectl cheapest-amazon-eks
+          - cilium-amazon-eks
       action:
         type: choice
         description: Select action
@@ -34,6 +39,7 @@ env:
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
+  TAGS: ${{ inputs.tags }}
 
 permissions: read-all
 
@@ -62,6 +68,8 @@ jobs:
       - name: "${{ inputs.action }} | ${{ inputs.posts }} | ${{ inputs.cluster_fqdn }}"
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_ACTION: ${{ inputs.action }}
+          GH_INPUTS: ${{ inputs.posts }}
         run: |
           set -euxo pipefail
 
@@ -69,7 +77,7 @@ jobs:
 
           POST_FILES_ARRAY=()
           # shellcheck disable=SC2043
-          for POST_FILE in ${{ inputs.posts }}; do
+          for POST_FILE in ${GH_INPUTS}; do
             POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POST_FILE}*.md")")
           done
 
@@ -78,12 +86,17 @@ jobs:
             gh release download --repo weaveworks/eksctl --pattern eksctl_Linux_amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
           fi
 
+          if grep -q cilium "${POST_FILES_ARRAY[@]}" && ! command -v cilium &> /dev/null ; then
+            echo "*** Installing cilium"
+            gh release download --repo cilium/cilium-cli --pattern cilium-linux-amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
+          fi
+
           if grep -q velero "${POST_FILES_ARRAY[@]}" && ! command -v velero &> /dev/null ; then
             echo "*** Installing velero"
             gh release download --repo vmware-tanzu/velero --pattern "velero-*-linux-amd64.tar.gz" --output - | sudo tar xz -C /usr/local/bin/ --strip-components 1 --wildcards "*/velero"
           fi
 
-          if [[ "${{ inputs.action }}" =~ 'build' ]]; then
+          if [[ "${GH_ACTION}" =~ 'build' ]]; then
             echo -e "********************\n*** Create\n********************"
             for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
               echo "*** ${POST_FILES_ARRAY[idx]} | build"
@@ -103,7 +116,7 @@ jobs:
             done
           fi
 
-          if [[ "${{ inputs.action }}" =~ 'destroy' ]]; then
+          if [[ "${GH_ACTION}" =~ 'destroy' ]]; then
             echo -e "********************\n*** Destroy\n********************"
             export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
             export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"

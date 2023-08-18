@@ -18,13 +18,14 @@ with lowest price.
 Requirements:
 
 - Single AZ only - no payments for cross availability zones traffic
-- Spot instances "everywhere"
+- Spot instances
 - Less expensive region - `us-east-1`
-- Most price efficient EC2 instance type - ARM Graviton based `t4g.medium`
-  (2 x CPU, 4GB RAM)
-- Use ARM based EC2 instances
-- Use Bottlerocket - small operation system / CPU / Memory footprint
-- Use Network Load Balancer (NLB) as a most cost efficient + cost optimized LB
+- Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
+  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
+- Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) - small
+  operation system / CPU / Memory footprint
+- Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
+  as a most cost efficient + cost optimized LB
 - Run as many pods as possible on worker nodes `max-pods-per-node`
   - <https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks>
   - <https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/>
@@ -34,24 +35,23 @@ Requirements:
 ### Requirements
 
 If you would like to follow this documents and it's task you will need to set up
-few environment variables.
-
-`BASE_DOMAIN` (`k8s.mylabs.dev`) contains DNS records for all your Kubernetes
-clusters. The cluster names will look like `CLUSTER_NAME`.`BASE_DOMAIN`
-(`k01.k8s.mylabs.dev`).
+few environment variables like:
 
 ```bash
 # AWS Region
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+# Base Domain: k8s.mylabs.dev
 export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
+# Cluster Name: k01
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export MY_EMAIL="petr.ruzicka@gmail.com"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
-export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 # Tags used to tag the AWS resources
-export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev}"
+export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
+mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
 You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
@@ -80,21 +80,20 @@ Verify if all the necessary variables were set:
 echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
 ```
 
-### Prepare the local working environment
+Install necessary tools:
 
 > You can skip these steps if you have all the required software already
 > installed.
 {: .prompt-tip }
 
-Required:
-
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
+- [helm](https://github.com/helm/helm)
 
 ## Configure AWS Route 53 Domain delegation
 
-> DNS delegation should be done only once.
+> DNS delegation steps should be done only once
 {: .prompt-info }
 
 Create DNS zone for EKS clusters:
@@ -192,42 +191,31 @@ localhost | CHANGED => {
 
 ### Create Route53
 
-Create CloudFormation template containing policies for Route53 and Domain.
+Create CloudFormation template containing [Route53](https://aws.amazon.com/route53/)
+zone.
 
 Put new domain `CLUSTER_FQDN` to the Route 53 and configure the DNS delegation
 from the `BASE_DOMAIN`.
 
-Create temporary directory for files used for creating/configuring EKS Cluster
-and it's components:
-
-```bash
-mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-```
-
 Create Route53 zone:
 
 ```bash
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/cf-route53.yml" << \EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53.yml" << \EOF
 AWSTemplateFormatVersion: 2010-09-09
 Description: Route53 entries
 
 Parameters:
-
   BaseDomain:
     Description: "Base domain where cluster domains + their subdomains will live. Ex: k8s.mylabs.dev"
     Type: String
-
   ClusterFQDN:
-    Description: "Cluster FQDN. (domain for all applications) Ex: kube1.k8s.mylabs.dev"
+    Description: "Cluster FQDN. (domain for all applications) Ex: k01.k8s.mylabs.dev"
     Type: String
-
 Resources:
-
   HostedZone:
     Type: AWS::Route53::HostedZone
     Properties:
       Name: !Ref ClusterFQDN
-
   RecordSet:
     Type: AWS::Route53::RecordSet
     Properties:
@@ -240,10 +228,10 @@ EOF
 
 if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --query "StackSummaries[?starts_with(StackName, \`${CLUSTER_NAME}-route53\`) == \`true\`].StackName" --output text) == "" ]]; then
   # shellcheck disable=SC2001
-  eval aws cloudformation "create-stack" \
+  eval aws cloudformation create-stack \
     --parameters "ParameterKey=BaseDomain,ParameterValue=${BASE_DOMAIN} ParameterKey=ClusterFQDN,ParameterValue=${CLUSTER_FQDN}" \
     --stack-name "${CLUSTER_NAME}-route53" \
-    --template-body "file://${TMP_DIR}/${CLUSTER_FQDN}/cf-route53.yml" \
+    --template-body "file://${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53.yml" \
     --tags "$(echo "${TAGS}" | sed -e 's/\([^=]*\)=\([^,]*\),*/Key=\1,Value=\2 /g')" || true
 fi
 ```
@@ -258,15 +246,15 @@ I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
 
 ```bash
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
   region: ${AWS_DEFAULT_REGION}
-  tags: &tags
-    karpenter.sh/discovery: "${CLUSTER_NAME}"
-$(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
+  tags:
+    karpenter.sh/discovery: ${CLUSTER_NAME}
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
@@ -292,11 +280,12 @@ karpenter:
   withSpotInterruptionQueue: true
 addons:
   - name: vpc-cni
+    configurationValues: "{\"env\":{\"ENABLE_PREFIX_DELEGATION\":\"true\", \"ENABLE_POD_ENI\":\"true\", \"POD_SECURITY_GROUP_ENFORCING_MODE\":\"standard\"}}"
   - name: kube-proxy
   - name: coredns
   - name: aws-ebs-csi-driver
 managedNodeGroups:
-  - name: mng01
+  - name: mng01-ng
     amiFamily: Bottlerocket
     # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
@@ -310,8 +299,6 @@ managedNodeGroups:
     volumeSize: 20
     volumeType: gp3
     disablePodIMDS: true
-    tags:
-      <<: *tags
     volumeEncrypted: true
     # For instances with less than 30 vCPUs the maximum number is 110 and for all other instances the maximum number is 250
     # https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
@@ -333,7 +320,6 @@ if [[ ! -s "${KUBECONFIG}" ]]; then
 fi
 
 aws eks update-kubeconfig --name="${CLUSTER_NAME}"
-echo -e "***************\n export KUBECONFIG=${KUBECONFIG} \n***************"
 ```
 
 Enable the parameter to assign prefixes to network interfaces for the
@@ -342,6 +328,8 @@ Amazon VPC CNI:
 ```bash
 kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true
 ```
+
+## Karpenter
 
 Configure [Karpenter](https://karpenter.sh/):
 
@@ -353,7 +341,6 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-provisioner.yml" << EOF | kubectl 
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
-  namespace: karpenter
   name: default
 spec:
   # Enables consolidation which attempts to reduce cluster cost by both removing
@@ -374,6 +361,8 @@ spec:
     - key: karpenter.k8s.aws/instance-family
       operator: In
       values: ["t3a", "t4g"]
+  kubeletConfiguration:
+    maxPods: 110
   # Resource limits constrain the total size of the cluster.
   # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
@@ -390,7 +379,6 @@ spec:
 apiVersion: karpenter.k8s.aws/v1alpha1
 kind: AWSNodeTemplate
 metadata:
-  namespace: karpenter
   name: default
 spec:
   amiFamily: Bottlerocket
@@ -398,12 +386,25 @@ spec:
     karpenter.sh/discovery: ${CLUSTER_NAME}
   securityGroupSelector:
     karpenter.sh/discovery: ${CLUSTER_NAME}
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 2Gi
+        volumeType: gp3
+        encrypted: true
+    - deviceName: /dev/xvdb
+      ebs:
+        volumeSize: 20Gi
+        volumeType: gp3
+        encrypted: true
   tags:
     KarpenerProvisionerName: "default"
     Name: "${CLUSTER_NAME}-karpenter"
-$(echo "${TAGS}" | sed 's/^/    /g ; s/=\([^,]*\),*/: "\1"\n    /g')
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 EOF
 ```
+
+## aws-node-termination-handler
 
 Install `aws-node-termination-handler`
 [helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
@@ -414,8 +415,8 @@ and modify the
 # renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
 AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
-helm repo add eks https://aws.github.io/eks-charts/ && helm repo update > /dev/null
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
+helm repo add eks https://aws.github.io/eks-charts/
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
 awsRegion: ${AWS_DEFAULT_REGION}
 EOF
 helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
@@ -434,6 +435,8 @@ Then you will need some basic tools / integrations, like [external-dns](https://
 
 ### mailhog
 
+Mailhog will be used to receive email alerts form the Prometheus.
+
 Install `mailhog`
 [helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
 and modify the
@@ -447,7 +450,7 @@ and modify the
 MAILHOG_HELM_CHART_VERSION="5.2.3"
 
 helm repo add codecentric https://codecentric.github.io/helm-charts
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
 image:
   repository: docker.io/cd2team/mailhog
   tag: "1663459324"
@@ -487,7 +490,7 @@ and modify the
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="48.3.1"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
 defaultRules:
   rules:
     etcd: false
@@ -572,81 +575,100 @@ grafana:
             path: /var/lib/grafana/dashboards/default
   dashboards:
     default:
-      k8s-cluster-summary:
-        gnetId: 8685
-        revision: 1
-        datasource: Prometheus
-      node-exporter-full:
+      # 2023-03-30
+      1860-node-exporter-full:
         gnetId: 1860
-        revision: 30
+        revision: 31
         datasource: Prometheus
-      prometheus-2-0-overview:
+      # 2017-11-24
+      3662-prometheus-2-0-overview:
         gnetId: 3662
         revision: 2
         datasource: Prometheus
-      stians-disk-graphs:
+      # 2019-02-27
+      9852-stians-disk-graphs:
         gnetId: 9852
         revision: 1
         datasource: Prometheus
-      kubernetes-apiserver:
+      # 2020-03-31
+      12006-kubernetes-apiserver:
         gnetId: 12006
         revision: 1
         datasource: Prometheus
-      ingress-nginx:
+      # 2018-10-29
+      9614-nginx-ingress-controller:
         gnetId: 9614
         revision: 1
         datasource: Prometheus
-      ingress-nginx2:
+      # 2020-03-09
+      11875-kubernetes-ingress-nginx-eks:
         gnetId: 11875
         revision: 1
         datasource: Prometheus
-      external-dns:
+      # 2021-09-22
+      15038-external-dns:
         gnetId: 15038
         revision: 1
         datasource: Prometheus
-      kubernetes-monitor:
-        gnetId: 15398
-        revision: 6
-        datasource: Prometheus
-      kubernetes-nginx-ingress-prometheus-nextgen:
+      # 2021-04-27
+      14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
         gnetId: 14314
         revision: 2
         datasource: Prometheus
-      portefaix-kubernetes-cluster-overview:
+      # 2022-07-06
+      13473-portefaix-kubernetes-cluster-overview:
         gnetId: 13473
         revision: 2
         datasource: Prometheus
       # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
-      kubernetes-views-pods:
+      # 2023-07-10
+      15760-kubernetes-views-pods:
         gnetId: 15760
-        revision: 22
+        revision: 20
         datasource: Prometheus
-      kubernetes-views-global:
+      # 2023-08-04
+      15757-kubernetes-views-global:
         gnetId: 15757
-        revision: 14
+        revision: 31
         datasource: Prometheus
-      kubernetes-views-namespaces:
+      # 2023-08-04
+      15758-kubernetes-views-namespaces:
         gnetId: 15758
-        revision: 15
+        revision: 26
         datasource: Prometheus
-      kubernetes-views-nodes:
+      # 2023-05-10
+      15759-kubernetes-views-nodes:
         gnetId: 15759
-        revision: 14
+        revision: 19
         datasource: Prometheus
-      kubernetes-system-api-server:
+      # 2023-07-04
+      15761-kubernetes-system-api-server:
         gnetId: 15761
-        revision: 11
+        revision: 13
         datasource: Prometheus
-      kubernetes-system-coredns:
+      # 2023-07-04
+      15762-kubernetes-system-coredns:
         gnetId: 15762
-        revision: 11
+        revision: 13
         datasource: Prometheus
-      cluster-capacity-karpenter:
+      # 2023-07-04
+      19105-prometheus:
+        gnetId: 19105
+        revision: 1
+        datasource: Prometheus
+      # 2022-05-06
+      16237-cluster-capacity:
         gnetId: 16237
         revision: 1
         datasource: Prometheus
-      pod-statistic-karpenter:
+      # 2022-05-06
+      16236-pod-statistic:
         gnetId: 16236
+        revision: 1
+        datasource: Prometheus
+      # 2023-08-01
+      19268-prometheus:
+        gnetId: 19268
         revision: 1
         datasource: Prometheus
   grafana.ini:
@@ -733,10 +755,14 @@ and modify the
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
 KARPENTER_HELM_CHART_VERSION="v0.29.2"
 
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
 serviceMonitor:
   enabled: true
+settings:
+  aws:
+    enablePodENI: true
+    reservedENIs: "1"
 EOF
 helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" karpenter oci://public.ecr.aws/karpenter/karpenter
 ```
@@ -757,7 +783,7 @@ Service account `cert-manager` was created by `eksctl`.
 CERT_MANAGER_HELM_CHART_VERSION="1.12.3"
 
 helm repo add jetstack https://charts.jetstack.io
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
   create: false
@@ -841,7 +867,7 @@ and modify the
 METRICS_SERVER_HELM_CHART_VERSION="3.11.0"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
 metrics:
   enabled: true
 serviceMonitor:
@@ -867,7 +893,7 @@ Service account `external-dns` was created by `eksctl`.
 EXTERNAL_DNS_HELM_CHART_VERSION="1.13.0"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
 domainFilters:
   - ${CLUSTER_FQDN}
 interval: 20s
@@ -895,7 +921,7 @@ INGRESS_NGINX_HELM_CHART_VERSION="4.7.1"
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
 
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   ingressClassResource:
     default: true
@@ -905,7 +931,7 @@ controller:
     annotations:
       service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
-      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "${TAGS}"
+      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
   metrics:
     enabled: true
     serviceMonitor:
@@ -964,7 +990,7 @@ and modify the
 FORECASTLE_HELM_CHART_VERSION="1.0.128"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
 forecastle:
   config:
     namespaceSelector:
@@ -1064,12 +1090,6 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
 fi
 ```
 
-Remove CloudFormation stack:
-
-```sh
-aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53"
-```
-
 Remove orphan EC2s created by Karpenter:
 
 ```sh
@@ -1077,6 +1097,12 @@ for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluste
   echo "Removing EC2: ${EC2}"
   aws ec2 terminate-instances --instance-ids "${EC2}"
 done
+```
+
+Remove CloudFormation stack:
+
+```sh
+aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
 ```
 
 Wait for all CloudFormation stacks to be deleted:
@@ -1089,7 +1115,7 @@ aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAM
 Remove Volumes and Snapshots related to the cluster (just in case):
 
 ```sh
-for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
+for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:eks:cluster-name,Values=${CLUSTER_NAME}" --query 'Volumes[].VolumeId' --output text) ; do
   echo "*** Removing Volume: ${VOLUME}"
   aws ec2 delete-volume --volume-id "${VOLUME}"
 done
