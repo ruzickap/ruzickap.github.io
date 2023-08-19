@@ -326,7 +326,8 @@ cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-
 grafana:
   dashboards:
     default:
-      velero-exporter-overview:
+      15469-kubernetes-addons-velero-stats:
+        # renovate: depName="Velero Exporter Overview"
         gnetId: 15469
         revision: 1
         datasource: Prometheus

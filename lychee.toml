@@ -30,7 +30,9 @@ exclude = [
   'https://twitter\.com/Ruzicka_Petr',
   'https://.*k01\.k8s\.mylabs\.dev/.*',
   # Ignore all URLS with ${.*} - BASH variable in URL
-  '.*\$%7B.*%7D.*'
+  '.*\$%7B.*%7D.*',
+  # Ignore all URLS with ${{ }} - used in renovate configuration: "https://grafana.com/api/dashboards/{{packageName}}"
+  '.*%7B%7B.*%7D%7D.*',
 ]
 
 # Exclude these filesystem paths from getting checked

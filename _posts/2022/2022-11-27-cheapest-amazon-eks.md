@@ -575,99 +575,99 @@ grafana:
             path: /var/lib/grafana/dashboards/default
   dashboards:
     default:
-      # 2023-03-30
       1860-node-exporter-full:
+        # renovate: depName="Node Exporter Full"
         gnetId: 1860
         revision: 31
         datasource: Prometheus
-      # 2017-11-24
       3662-prometheus-2-0-overview:
+        # renovate: depName="Prometheus 2.0 Overview"
         gnetId: 3662
         revision: 2
         datasource: Prometheus
-      # 2019-02-27
       9852-stians-disk-graphs:
+        # renovate: depName="node-exporter disk graphs"
         gnetId: 9852
         revision: 1
         datasource: Prometheus
-      # 2020-03-31
       12006-kubernetes-apiserver:
+        # renovate: depName="Kubernetes apiserver"
         gnetId: 12006
         revision: 1
         datasource: Prometheus
-      # 2018-10-29
       9614-nginx-ingress-controller:
+        # renovate: depName="NGINX Ingress controller"
         gnetId: 9614
         revision: 1
         datasource: Prometheus
-      # 2020-03-09
       11875-kubernetes-ingress-nginx-eks:
+        # renovate: depName="Kubernetes Ingress Nginx - EKS"
         gnetId: 11875
         revision: 1
         datasource: Prometheus
-      # 2021-09-22
       15038-external-dns:
+        # renovate: depName="External-dns"
         gnetId: 15038
         revision: 1
         datasource: Prometheus
-      # 2021-04-27
       14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
+        # renovate: depName="Kubernetes Nginx Ingress Prometheus NextGen"
         gnetId: 14314
         revision: 2
         datasource: Prometheus
-      # 2022-07-06
       13473-portefaix-kubernetes-cluster-overview:
+        # renovate: depName="Portefaix / Kubernetes cluster Overview"
         gnetId: 13473
         revision: 2
         datasource: Prometheus
       # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
-      # 2023-07-10
       15760-kubernetes-views-pods:
+        # renovate: depName="Kubernetes / Views / Pods"
         gnetId: 15760
         revision: 20
         datasource: Prometheus
-      # 2023-08-04
       15757-kubernetes-views-global:
+        # renovate: depName="Kubernetes / Views / Global"
         gnetId: 15757
         revision: 31
         datasource: Prometheus
-      # 2023-08-04
       15758-kubernetes-views-namespaces:
+        # renovate: depName="Kubernetes / Views / Namespaces"
         gnetId: 15758
         revision: 26
         datasource: Prometheus
-      # 2023-05-10
       15759-kubernetes-views-nodes:
+        # renovate: depName="Kubernetes / Views / Nodes"
         gnetId: 15759
         revision: 19
         datasource: Prometheus
-      # 2023-07-04
       15761-kubernetes-system-api-server:
+        # renovate: depName="Kubernetes / System / API Server"
         gnetId: 15761
         revision: 13
         datasource: Prometheus
-      # 2023-07-04
       15762-kubernetes-system-coredns:
+        # renovate: depName="Kubernetes / System / CoreDNS"
         gnetId: 15762
         revision: 13
         datasource: Prometheus
-      # 2023-07-04
       19105-prometheus:
+        # renovate: depName="Prometheus"
         gnetId: 19105
         revision: 1
         datasource: Prometheus
-      # 2022-05-06
       16237-cluster-capacity:
+        # renovate: depName="Cluster Capacity (Karpenter)"
         gnetId: 16237
         revision: 1
         datasource: Prometheus
-      # 2022-05-06
       16236-pod-statistic:
+        # renovate: depName="Pod Statistic (Karpenter)"
         gnetId: 16236
         revision: 1
         datasource: Prometheus
-      # 2023-08-01
       19268-prometheus:
+        # renovate: depName="Prometheus All Metrics"
         gnetId: 19268
         revision: 1
         datasource: Prometheus
