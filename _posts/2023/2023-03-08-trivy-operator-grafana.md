@@ -1101,7 +1101,8 @@ cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-trivy-operat
 grafana:
   dashboards:
     default:
-      trivy-operator-dashboard:
+      17813-trivy-operator-dashboard:
+        # renovate: depName="Trivy Operator Dashboard"
         gnetId: 17813
         revision: 2
         datasource: Prometheus
