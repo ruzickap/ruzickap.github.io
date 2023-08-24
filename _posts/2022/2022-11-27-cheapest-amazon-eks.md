@@ -1102,7 +1102,7 @@ done
 Remove CloudFormation stack:
 
 ```sh
-aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
+aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53"
 ```
 
 Wait for all CloudFormation stacks to be deleted:
