@@ -58,9 +58,10 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 6000
+          role-duration-seconds: 7000
           role-session-name: GitHubOidcFederatedRole
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          mask-aws-account-id: true
 
       - name: Check out repository code
         uses: actions/checkout@v3
