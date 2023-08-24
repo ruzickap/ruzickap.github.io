@@ -1,6 +1,5 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "branchPrefix": "renovate/",
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
   "ignoreDeps": [
@@ -73,8 +72,8 @@
   "regexManagers": [
     {
       "fileMatch": [
-        ".*\\.ya?ml$",
-        ".*\\.md$",
+        "\\.ya?ml$",
+        "\\.md$",
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?( extractVersion=(?<extractVersion>.+?))?( registryUrl=(?<registryUrl>.+?))?\\s.*[=:]\\s*\"?(?<currentValue>.+?)\"?\\s",
@@ -84,7 +83,7 @@
     },
     {
       "fileMatch": [
-        ".*\\.md$",
+        "\\.md$",
       ],
       "matchStrings": [
         "#\\s+renovate:\\s+depName=\"(?<depName>.*)\"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)"
