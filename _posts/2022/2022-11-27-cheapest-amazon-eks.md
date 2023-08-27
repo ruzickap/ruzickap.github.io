@@ -51,6 +51,7 @@ export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 # Tags used to tag the AWS resources
 export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
@@ -273,6 +274,12 @@ iam:
       wellKnownPolicies:
         externalDNS: true
       roleName: eksctl-${CLUSTER_NAME}-irsa-external-dns
+# Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
+iamIdentityMappings:
+  - arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin
+    groups:
+      - system:masters
+    username: admin
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
   version: v0.29.2
@@ -297,7 +304,6 @@ managedNodeGroups:
     minSize: 2
     maxSize: 5
     volumeSize: 20
-    volumeType: gp3
     disablePodIMDS: true
     volumeEncrypted: true
     # For instances with less than 30 vCPUs the maximum number is 110 and for all other instances the maximum number is 250
@@ -312,8 +318,6 @@ Get the kubeconfig to access the cluster:
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
     eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
-    # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
-    eksctl create iamidentitymapping --cluster="${CLUSTER_NAME}" --region="${AWS_DEFAULT_REGION}" --arn="${AWS_ROLE_TO_ASSUME}" --group system:masters --username admin
   else
     eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
   fi

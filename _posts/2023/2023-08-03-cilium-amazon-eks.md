@@ -68,6 +68,7 @@ export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 # Tags used to tag the AWS resources
 export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
@@ -372,6 +373,12 @@ iam:
       wellKnownPolicies:
         externalDNS: true
       roleName: eksctl-${CLUSTER_NAME}-irsa-external-dns
+# Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
+iamIdentityMappings:
+  - arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin
+    groups:
+      - system:masters
+    username: admin
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
   version: v0.29.2
@@ -395,7 +402,6 @@ managedNodeGroups:
     minSize: 2
     maxSize: 5
     volumeSize: 20
-    volumeType: gp3
     disablePodIMDS: true
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
@@ -404,14 +410,19 @@ managedNodeGroups:
        value: "true"
        effect: "NoExecute"
     maxPodsPerNode: 110
-  # Second node group is needed for karpenter to start (will be removed later)
+    privateNetworking: true
+  # Second node group is needed for karpenter to start (will be removed later) (Issue: https://github.com/eksctl-io/eksctl/issues/7003)
   - name: mng02-ng
-    instanceType: t4g.medium
+    amiFamily: Bottlerocket
+    instanceType: t4g.micro
     desiredCapacity: 2
     availabilityZones:
       - ${AWS_DEFAULT_REGION}a
+    volumeSize: 5
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
+    spot: true
+    privateNetworking: true
 secretsEncryption:
   keyARN: ${AWS_KMS_KEY_ARN}
 cloudWatch:
@@ -428,8 +439,6 @@ Get the kubeconfig to access the cluster:
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
     eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
-    # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
-    eksctl create iamidentitymapping --cluster="${CLUSTER_NAME}" --region="${AWS_DEFAULT_REGION}" --arn="${AWS_ROLE_TO_ASSUME}" --group system:masters --username admin
     # Add roles created by eksctl to the KMS policy to allow aws-ebs-csi-driver work with encrypted EBS volumes
     sed -i "s@# \(- \!Sub \"arn:aws:iam::\${AWS::AccountId}:role/eksctl-\${ClusterName}.*\)@\1@" "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml"
     eval aws cloudformation update-stack \
