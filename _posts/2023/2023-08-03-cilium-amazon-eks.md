@@ -414,7 +414,7 @@ managedNodeGroups:
   # Second node group is needed for karpenter to start (will be removed later) (Issue: https://github.com/eksctl-io/eksctl/issues/7003)
   - name: mng02-ng
     amiFamily: Bottlerocket
-    instanceType: t4g.micro
+    instanceType: t4g.small
     desiredCapacity: 2
     availabilityZones:
       - ${AWS_DEFAULT_REGION}a
@@ -1314,7 +1314,6 @@ controller:
     default-ssl-certificate: "cert-manager/ingress-cert-staging"
   service:
     annotations:
-      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
       service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
   metrics:

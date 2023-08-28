@@ -933,7 +933,6 @@ controller:
     default-ssl-certificate: "cert-manager/ingress-cert-staging"
   service:
     annotations:
-      service.beta.kubernetes.io/aws-load-balancer-backend-protocol: tcp
       service.beta.kubernetes.io/aws-load-balancer-type: nlb
       service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
   metrics:
