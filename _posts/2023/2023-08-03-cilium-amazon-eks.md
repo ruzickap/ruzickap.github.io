@@ -468,7 +468,7 @@ aws ec2 revoke-security-group-egress --group-id "${AWS_SECURITY_GROUP_ID}" --pro
 aws ec2 revoke-security-group-ingress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --source-group "${AWS_SECURITY_GROUP_ID}" | jq || true
 ```
 
-### Clilium
+### Cilium
 
 Install [Cilium](https://cilium.io/) and remove nodegroup `mng02-ng` used for
 "eksctl karpenter" installation (It is no longer needed because Cilium will be
@@ -1618,7 +1618,7 @@ metadata:
   uid: 9d1392b8-6a3b-403c-81ce-500393eeb3e3
 ```
 
-Differnet way of running cilium status on k8s worker node:
+Different way of running cilium status on k8s worker node:
 
 ```bash
 kubectl exec -n cilium ds/cilium -- cilium status
@@ -1649,7 +1649,7 @@ Encryption:              Wireguard       [NodeEncryption: Disabled, cilium_wg0 (
 Cluster health:          2/2 reachable   (2023-08-18T17:53:44Z)
 ```
 
-Handy details abou Cilium networking can be found by listing `ciliumnodes` CRD:
+Handy details about Cilium networking can be found by listing `ciliumnodes` CRD:
 
 ```shell
 kubectl describe ciliumnodes.cilium.io
