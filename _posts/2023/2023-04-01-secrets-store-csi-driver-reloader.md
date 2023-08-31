@@ -151,7 +151,7 @@ which can be used to display various pod details created for the
 book.
 
 Install [kuard](https://github.com/kubernetes-up-and-running/kuard) which will
-use the secretes from [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
+use the secrets from [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
 as mountpoint and also as K8s `Secret`.
 
 ```bash
@@ -359,7 +359,7 @@ Go to these URLs and check the credentials synced from AWS Secrets Manager:
   {"password":"rxxxxxxxxxxxxxxH","username":"admin123"}
   ```
 
-After the commands executed above the secret from from the AWS secret manager
+After the commands executed above the secret from the AWS secret manager
 are copied to Kubernetes Secret (`kuard-secret`) and it is also present as file
 (`/mnt/secrets-store/KuardSecret`) and environment variable (`KUARDSECRET`)
 inside the pod.
@@ -422,7 +422,7 @@ is to restart the pod...
 ## Install Reloader to do rolling upgrades when Secrets get changed
 
 In case of changes in the Secret (`kuard-secret`) the rolling upgrade should be
-performed on Deployment (`kuard`) to "regresh" the environment variables.
+performed on Deployment (`kuard`) to "refresh" the environment variables.
 
 It is time to use [Reloader](https://github.com/stakater/Reloader) which can do
 it automatically.
