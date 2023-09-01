@@ -385,8 +385,6 @@ karpenter:
   createServiceAccount: true
   withSpotInterruptionQueue: true
 addons:
-  - name: vpc-cni
-    configurationValues: "{\"env\":{\"ENABLE_PREFIX_DELEGATION\":\"true\", \"ENABLE_POD_ENI\":\"true\", \"POD_SECURITY_GROUP_ENFORCING_MODE\":\"standard\"}}"
   - name: kube-proxy
   - name: coredns
 managedNodeGroups:
@@ -935,6 +933,7 @@ grafana:
         revision: 13
         datasource: Prometheus
       19105-prometheus:
+        # renovate: depName="Prometheus"
         gnetId: 19105
         revision: 1
         datasource: Prometheus
@@ -987,6 +986,8 @@ grafana:
     enabled: true
     host: "mailhog.mailhog.svc.cluster.local:1025"
     from_address: grafana@${CLUSTER_FQDN}
+  networkPolicy:
+    enabled: true
 kubeControllerManager:
   enabled: false
 kubeEtcd:
@@ -995,6 +996,14 @@ kubeScheduler:
   enabled: false
 kubeProxy:
   enabled: false
+kube-state-metrics:
+  hostNetwork: true
+  networkPolicy:
+    enabled: true
+prometheus-node-exporter:
+  networkPolicy:
+    enabled: true
+  hostNetwork: true
 prometheusOperator:
   tls:
     # https://github.com/prometheus-community/helm-charts/issues/2248

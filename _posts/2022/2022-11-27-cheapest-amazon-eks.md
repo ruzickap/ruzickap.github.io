@@ -287,7 +287,12 @@ karpenter:
   withSpotInterruptionQueue: true
 addons:
   - name: vpc-cni
-    configurationValues: "{\"env\":{\"ENABLE_PREFIX_DELEGATION\":\"true\", \"ENABLE_POD_ENI\":\"true\", \"POD_SECURITY_GROUP_ENFORCING_MODE\":\"standard\"}}"
+    # min version 1.14.0
+    version: latest
+    configurationValues: |-
+      enableNetworkPolicy: "true"
+      env:
+        ENABLE_PREFIX_DELEGATION: "true"
   - name: kube-proxy
   - name: coredns
   - name: aws-ebs-csi-driver
@@ -324,13 +329,6 @@ if [[ ! -s "${KUBECONFIG}" ]]; then
 fi
 
 aws eks update-kubeconfig --name="${CLUSTER_NAME}"
-```
-
-Enable the parameter to assign prefixes to network interfaces for the
-Amazon VPC CNI:
-
-```bash
-kubectl set env daemonset aws-node -n kube-system ENABLE_PREFIX_DELEGATION=true
 ```
 
 ## Karpenter
@@ -694,6 +692,8 @@ grafana:
     enabled: true
     host: "mailhog.mailhog.svc.cluster.local:1025"
     from_address: grafana@${CLUSTER_FQDN}
+  networkPolicy:
+    enabled: true
 kubeControllerManager:
   enabled: false
 kubeEtcd:
@@ -702,12 +702,22 @@ kubeScheduler:
   enabled: false
 kubeProxy:
   enabled: false
+kube-state-metrics:
+  networkPolicy:
+    enabled: true
+prometheus-node-exporter:
+  networkPolicy:
+    enabled: true
 prometheusOperator:
   tls:
     enabled: false
   admissionWebhooks:
     enabled: false
+  networkPolicy:
+    enabled: true
 prometheus:
+  networkPolicy:
+    enabled: true
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -799,6 +809,9 @@ securityContext:
   fsGroup: 1001
 prometheus:
   servicemonitor:
+    enabled: true
+webhook:
+  networkPolicy:
     enabled: true
 EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
@@ -929,6 +942,8 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   ingressClassResource:
     default: true
+  admissionWebhooks:
+    networkPolicyEnabled: true
   extraArgs:
     default-ssl-certificate: "cert-manager/ingress-cert-staging"
   service:
@@ -999,6 +1014,8 @@ forecastle:
     namespaceSelector:
       any: true
     title: Launch Pad
+  networkPolicy:
+    enabled: true
   ingress:
     enabled: true
     annotations:
