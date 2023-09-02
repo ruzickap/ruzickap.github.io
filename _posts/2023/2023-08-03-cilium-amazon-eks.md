@@ -474,14 +474,22 @@ aws ec2 revoke-security-group-ingress --group-id "${AWS_SECURITY_GROUP_ID}" --pr
 
 ### Cilium
 
-Install [Cilium](https://cilium.io/) and remove nodegroup `mng02-ng` used for
-"eksctl karpenter" installation (It is no longer needed because Cilium will be
-installed and taints will be removed):
+[Cilium](https://cilium.io/) is a networking, observability, and security
+solution with an eBPF-based dataplane.
+
+Endpoint ports:
+
+- 4244 (peer-service)
+- 9962 (metrics)
+- 9963 (cilium-operator/metrics)
+- 9964 (envoy-metrics), 9965 (hubble-metrics)
 
 ![Cilium](https://raw.githubusercontent.com/cilium/cilium/eb3662e6f72d8fa1d2c884967e8de6bf063cb108/Documentation/images/logo.svg
 "cilium"){: width="500" }
 
-- Endpoint ports: 9965, 4244, 9963, 9962, 9964, 8081
+Install [Cilium](https://cilium.io/) and remove nodegroup `mng02-ng` used for
+"eksctl karpenter" installation (It is no longer needed because Cilium will be
+installed and taints will be removed):
 
 ```bash
 CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN=$(eksctl get iamserviceaccount --cluster "${CLUSTER_NAME}" --output json | jq -r ".[] | select(.metadata.name==\"cilium-operator\") .status.roleARN")
@@ -536,10 +544,13 @@ fi
 
 ### Karpenter
 
-Configure [Karpenter](https://karpenter.sh/):
+[Karpenter](https://karpenter.sh/) is a Kubernetes Node Autoscaler built
+for flexibility, performance, and simplicity.
 
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 "Karpenter"){: width="500" }
+
+Configure [Karpenter](https://karpenter.sh/):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-provisioner.yml" << EOF | kubectl apply -f -
@@ -621,13 +632,13 @@ Install Volume Snapshot Custom Resource Definitions (CRDs):
 kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
 ```
 
+![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg
+"csi"){: width="500" }
+
 Install volume snapshot controller `snapshot-controller`
 [helm chart](https://github.com/piraeusdatastore/helm-charts/tree/main/charts/snapshot-controller)
 and modify the
 [default values](https://github.com/piraeusdatastore/helm-charts/blob/main/charts/snapshot-controller/values.yaml):
-
-![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg
-"csi"){: width="500" }
 
 ```bash
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
@@ -638,6 +649,11 @@ helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --n
 ```
 
 ### aws-ebs-csi-driver
+
+The [Amazon Elastic Block Store](https://aws.amazon.com/ebs/) Container Storage
+Interface (CSI) Driver provides a [CSI](https://github.com/container-storage-interface/spec/blob/master/spec.md)
+interface used by Container Orchestrators to manage the lifecycle of Amazon EBS
+volumes.
 
 Install Amazon EBS CSI Driver `aws-ebs-csi-driver`
 [helm chart](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/charts/aws-ebs-csi-driver)
@@ -691,6 +707,9 @@ kubectl delete storageclass gp2 || true
 
 ### aws-node-termination-handler
 
+[AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
+gracefully handle EC2 instance shutdown within Kubernetes.
+
 Install `aws-node-termination-handler`
 [helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
 and modify the
@@ -722,13 +741,13 @@ Then you will need some basic tools / integrations, like [external-dns](https://
 
 Mailhog will be used to receive email alerts form the Prometheus.
 
+![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
+"mailhog"){: width="200" }
+
 Install `mailhog`
 [helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
 and modify the
 [default values](https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml).
-
-![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
-"mailhog"){: width="200" }
 
 ```bash
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
@@ -762,15 +781,34 @@ helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mai
 
 ### kube-prometheus-stack
 
-Install `kube-prometheus-stack`
-[helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-and modify the
-[default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml):
+[kube-prometheus stack](https://github.com/prometheus-operator/kube-prometheus)
+is a collection of Kubernetes manifests, [Grafana](http://grafana.com/)
+dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
+combined with documentation and scripts to provide easy to operate end-to-end
+Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using
+the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
+
+Endpoint ports:
+
+- 10260 (kube-prometheus-stack-operator/https)
+- 8080 (kube-prometheus-stack-prometheus/reloader-web)
+- 9090 (kube-prometheus-stack-prometheus/http-web)
+- 8080 (kube-prometheus-stack-kube-state-metrics/http)
+- 9100 (kube-prometheus-stack-prometheus-node-exporter/http-metrics)
+- 10250 (kube-prometheus-stack-kubelet/https-metrics) -> 10253 (conflicts with
+  kubelet, cert-manager, ...)
+- 10255 (kube-prometheus-stack-kubelet/http-metrics)
+- 4194 (kube-prometheus-stack-kubelet/cadvisor)
+- 8081 (kube-prometheus-stack-kube-state-metrics/telemetry-port) -> 8082
+  (conflicts with karpenter)
 
 ![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg
 "prometheus"){: width="500" }
 
-- Endpoint ports: 8080, 9090, 9100, 10250, 10260, 10255, 4194
+Install `kube-prometheus-stack`
+[helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+and modify the
+[default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -973,6 +1011,11 @@ grafana:
         gnetId: 19268
         revision: 1
         datasource: Prometheus
+      18855-fluent-bit:
+        # renovate: depName="Fluent Bit"
+        gnetId: 18855
+        revision: 1
+        datasource: Prometheus
   grafana.ini:
     server:
       root_url: https://grafana.${CLUSTER_FQDN}
@@ -1006,6 +1049,9 @@ kube-state-metrics:
   hostNetwork: true
   networkPolicy:
     enabled: true
+  selfMonitor:
+    enabled: true
+    telemetryPort: 8082
 prometheus-node-exporter:
   networkPolicy:
     enabled: true
@@ -1013,7 +1059,7 @@ prometheus-node-exporter:
 prometheusOperator:
   tls:
     # https://github.com/prometheus-community/helm-charts/issues/2248
-    internalPort: 10260
+    internalPort: 10253
   networkPolicy:
     enabled: true
   hostNetwork: true
@@ -1060,15 +1106,16 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 
 ### karpenter
 
+Endpoint ports:
+
+- 8000 (http-metrics)
+- 8081
+- 8443 (https-webhook) -> 8444 (conflicts with ingress-nginx)
+
 Change [karpenter](https://karpenter.sh/) default installation by upgrading:
 [helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
 and modify the
 [default values](https://github.com/aws/karpenter/blob/main/charts/karpenter/values.yaml).
-
-![karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
-"karpenter"){: width="400" }
-
-- Endpoint ports: 8000, 8443, 8081(cilium)->8082
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
@@ -1079,9 +1126,8 @@ replicas: 1
 serviceMonitor:
   enabled: true
 hostNetwork: true
-controller:
-  healthProbe:
-    port: 8082
+webhook:
+  port: 8444
 settings:
   aws:
     enablePodENI: true
@@ -1154,6 +1200,14 @@ helm upgrade --install --version "${CILIUM_HELM_CHART_VERSION}" --namespace cili
 
 ### aws-for-fluent-bit
 
+Fluent Bit is an open source Log Processor and Forwarder which allows you
+to collect any data like metrics and logs from different sources, enrich them
+with filters and send them to multiple destinations.
+
+Endpoint ports:
+
+- 2020 (monitor-agent)
+
 Install `aws-for-fluent-bit`
 [helm chart](https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit)
 and modify the
@@ -1175,22 +1229,34 @@ hostNetwork: true
 dnsPolicy: ClusterFirstWithHostNet
 serviceMonitor:
   enabled: true
+  extraEndpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+      scheme: http
 EOF
 helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --namespace aws-for-fluent-bit --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" aws-for-fluent-bit eks/aws-for-fluent-bit
 ```
 
 ### cert-manager
 
+[cert-manager](https://cert-manager.io/) adds certificates and certificate
+issuers as resource types in Kubernetes clusters, and simplifies the process
+of obtaining, renewing and using those certificates.
+
+Endpoint ports:
+
+- 10250 (cert-manager-webhook/https) -> 10251 (conflicts with kube-prometheus-stack-kubelet/https-metrics)
+
+![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg
+"cert-manager"){: width="200" }
+
 Install `cert-manager`
 [helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 and modify the
 [default values](https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml).
 Service account `cert-manager` was created by `eksctl`.
-
-![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg
-"cert-manager"){: width="200" }
-
-- Endpoint ports: 10251
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
@@ -1276,12 +1342,20 @@ EOF
 
 ### metrics-server
 
+[Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is
+a scalable, efficient source of container resource metrics for Kubernetes
+built-in autoscaling pipelines.
+
+Endpoint ports:
+
+- 10250 (https) -> 10252
+  (conflicts with kube-prometheus-stack-kubelet/https-metrics,
+  cert-manager-webhook/https)
+
 Install `metrics-server`
 [helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
 and modify the
 [default values](https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/values.yaml):
-
-- Endpoint ports: 10252
 
 ```bash
 # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
@@ -1302,15 +1376,18 @@ helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namesp
 
 ### external-dns
 
+[ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
+exposed Kubernetes Services and Ingresses with DNS providers.
+
+![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png
+"external-dns"){: width="300" }
+
 Install `external-dns`
 [helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
 and modify the
 [default values](https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/values.yaml).
 `external-dns` will take care about DNS records.
 Service account `external-dns` was created by `eksctl`.
-
-![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png
-"external-dns"){: width="300" }
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
@@ -1333,12 +1410,21 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 
 ### ingress-nginx
 
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+controller for Kubernetes using [NGINX](https://www.nginx.org/) as a reverse
+proxy and load balancer.
+
+Endpoint ports:
+
+- 80 (http)
+- 443 (https)
+- 8443 (https-webhook)
+- 10254 (metrics)
+
 Install `ingress-nginx`
 [helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
 and modify the
 [default values](https://github.com/kubernetes/ingress-nginx/blob/master/charts/ingress-nginx/values.yaml).
-
-- Endpoint ports: 443, 80, 8443, 10254
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -1349,7 +1435,6 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
-  # Needed for Cilium + show ports
   hostNetwork: true
   ingressClassResource:
     default: true
@@ -1406,13 +1491,17 @@ helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespa
 
 ### forecastle
 
+[Forecastle](https://github.com/stakater/Forecastle) is a control panel which
+dynamically discovers and provides a launchpad to access applications deployed
+on Kubernetes.
+
+![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png
+"forecastle"){: width="200" }
+
 Install `forecastle`
 [helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
 and modify the
 [default values](https://github.com/stakater/Forecastle/blob/master/deployments/kubernetes/chart/forecastle/values.yaml).
-
-![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png
-"forecastle"){: width="200" }
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
@@ -2147,6 +2236,14 @@ Status:
         Owner:     kube-prometheus-stack/alertmanager-kube-prometheus-stack-alertmanager-0 [restored]
         Resource:  eni-0f47ee6b88bd0143b
 Events:            <none>
+```
+
+Handy command to find the exposed ports (HostNetwork) to look for the port
+colisions:
+
+```shell
+kubectl get endpoints -A -o json | jq '.items[] | (.metadata.name , .subsets[].addresses[].ip, .subsets[].addresses[].nodeName, .subsets[].addresses[].targetRef.name, .subsets[].ports[])'
+kubectl get pods -A -o json | jq ".items[] | select (.spec.hostNetwork==true) .spec.containers[].name, .metadata.name, .spec.containers[].ports[0]"
 ```
 
 ## Clean-up
