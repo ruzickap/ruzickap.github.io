@@ -348,6 +348,12 @@ iam:
   withOIDC: true
   serviceAccounts:
     - metadata:
+        name: aws-for-fluent-bit
+        namespace: aws-for-fluent-bit
+      attachPolicyARNs:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+      roleName: eksctl-${CLUSTER_NAME}-irsa-aws-for-fluent-bit
+    - metadata:
         name: ebs-csi-controller-sa
         namespace: aws-ebs-csi-driver
       wellKnownPolicies:
@@ -475,7 +481,7 @@ installed and taints will be removed):
 ![Cilium](https://raw.githubusercontent.com/cilium/cilium/eb3662e6f72d8fa1d2c884967e8de6bf063cb108/Documentation/images/logo.svg
 "cilium"){: width="500" }
 
-- Endpoint ports: 9965, 4244, 9963, 9962, 9964
+- Endpoint ports: 9965, 4244, 9963, 9962, 9964, 8081
 
 ```bash
 CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN=$(eksctl get iamserviceaccount --cluster "${CLUSTER_NAME}" --output json | jq -r ".[] | select(.metadata.name==\"cilium-operator\") .status.roleARN")
@@ -1062,7 +1068,7 @@ and modify the
 ![karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 "karpenter"){: width="400" }
 
-- Endpoint ports: 8000, 8443
+- Endpoint ports: 8000, 8443, 8081(cilium)->8082
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
@@ -1073,6 +1079,9 @@ replicas: 1
 serviceMonitor:
   enabled: true
 hostNetwork: true
+controller:
+  healthProbe:
+    port: 8082
 settings:
   aws:
     enablePodENI: true
@@ -1141,6 +1150,33 @@ operator:
       enabled: true
 EOF
 helm upgrade --install --version "${CILIUM_HELM_CHART_VERSION}" --namespace cilium --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cilium.yml" cilium cilium/cilium
+```
+
+### aws-for-fluent-bit
+
+Install `aws-for-fluent-bit`
+[helm chart](https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit)
+and modify the
+[default values](https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml):
+
+```bash
+# renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
+AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.29"
+
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" << EOF
+cloudWatchLogs:
+  region: ${AWS_DEFAULT_REGION}
+  logGroupTemplate: "/aws/eks/${CLUSTER_NAME}/cluster"
+  logStreamTemplate: "\$kubernetes['namespace_name'].\$kubernetes['pod_name']"
+serviceAccount:
+  create: false
+  name: aws-for-fluent-bit
+hostNetwork: true
+dnsPolicy: ClusterFirstWithHostNet
+serviceMonitor:
+  enabled: true
+EOF
+helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --namespace aws-for-fluent-bit --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" aws-for-fluent-bit eks/aws-for-fluent-bit
 ```
 
 ### cert-manager
@@ -2148,6 +2184,12 @@ for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluste
   echo "Removing EC2: ${EC2}"
   aws ec2 terminate-instances --instance-ids "${EC2}"
 done
+```
+
+Remove CloudWatch log group:
+
+```sh
+aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
 ```
 
 Remove CloudFormation stack:

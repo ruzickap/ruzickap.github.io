@@ -1119,6 +1119,12 @@ for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluste
 done
 ```
 
+Remove CloudWatch log group:
+
+```sh
+aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+```
+
 Remove CloudFormation stack:
 
 ```sh
