@@ -331,12 +331,15 @@ fi
 aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 ```
 
-## Karpenter
+### Karpenter
 
-Configure [Karpenter](https://karpenter.sh/):
+[Karpenter](https://karpenter.sh/) is a Kubernetes Node Autoscaler built
+for flexibility, performance, and simplicity.
 
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 "Karpenter"){: width="500" }
+
+Configure [Karpenter](https://karpenter.sh/):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-provisioner.yml" << EOF | kubectl apply -f -
@@ -406,7 +409,10 @@ spec:
 EOF
 ```
 
-## aws-node-termination-handler
+### aws-node-termination-handler
+
+[AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
+gracefully handle EC2 instance shutdown within Kubernetes.
 
 Install `aws-node-termination-handler`
 [helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
@@ -439,13 +445,13 @@ Then you will need some basic tools / integrations, like [external-dns](https://
 
 Mailhog will be used to receive email alerts form the Prometheus.
 
+![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
+"mailhog"){: width="200" }
+
 Install `mailhog`
 [helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
 and modify the
 [default values](https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml).
-
-![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
-"mailhog"){: width="200" }
 
 ```bash
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
@@ -479,13 +485,20 @@ helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mai
 
 ### kube-prometheus-stack
 
+[kube-prometheus stack](https://github.com/prometheus-operator/kube-prometheus)
+is a collection of Kubernetes manifests, [Grafana](http://grafana.com/)
+dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
+combined with documentation and scripts to provide easy to operate end-to-end
+Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using
+the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
+
+![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg
+"prometheus"){: width="500" }
+
 Install `kube-prometheus-stack`
 [helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 and modify the
 [default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml):
-
-![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg
-"prometheus"){: width="500" }
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -762,9 +775,6 @@ Change [karpenter](https://karpenter.sh/) default installation by upgrading:
 and modify the
 [default values](https://github.com/aws/karpenter/blob/main/charts/karpenter/values.yaml).
 
-![karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
-"karpenter"){: width="400" }
-
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
 KARPENTER_HELM_CHART_VERSION="v0.30.0"
@@ -783,14 +793,18 @@ helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace k
 
 ### cert-manager
 
+[cert-manager](https://cert-manager.io/) adds certificates and certificate
+issuers as resource types in Kubernetes clusters, and simplifies the process
+of obtaining, renewing and using those certificates.
+
+![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg
+"cert-manager"){: width="200" }
+
 Install `cert-manager`
 [helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 and modify the
 [default values](https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml).
 Service account `cert-manager` was created by `eksctl`.
-
-![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg
-"cert-manager"){: width="200" }
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
@@ -874,6 +888,10 @@ EOF
 
 ### metrics-server
 
+[Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is
+a scalable, efficient source of container resource metrics for Kubernetes
+built-in autoscaling pipelines.
+
 Install `metrics-server`
 [helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
 and modify the
@@ -895,15 +913,18 @@ helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namesp
 
 ### external-dns
 
+[ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
+exposed Kubernetes Services and Ingresses with DNS providers.
+
+![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png
+"external-dns"){: width="300" }
+
 Install `external-dns`
 [helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
 and modify the
 [default values](https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/values.yaml).
 `external-dns` will take care about DNS records.
 Service account `external-dns` was created by `eksctl`.
-
-![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png
-"external-dns"){: width="300" }
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
@@ -925,6 +946,10 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 ```
 
 ### ingress-nginx
+
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+controller for Kubernetes using [NGINX](https://www.nginx.org/) as a reverse
+proxy and load balancer.
 
 Install `ingress-nginx`
 [helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
@@ -995,13 +1020,17 @@ helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespa
 
 ### forecastle
 
+[Forecastle](https://github.com/stakater/Forecastle) is a control panel which
+dynamically discovers and provides a launchpad to access applications deployed
+on Kubernetes.
+
+![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png
+"forecastle"){: width="200" }
+
 Install `forecastle`
 [helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
 and modify the
 [default values](https://github.com/stakater/Forecastle/blob/master/deployments/kubernetes/chart/forecastle/values.yaml).
-
-![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png
-"forecastle"){: width="200" }
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
