@@ -9,6 +9,8 @@ on:
         required: false
         default: false
   push:
+    branches-ignore:
+      - renovate/**
 
 permissions: read-all
 
