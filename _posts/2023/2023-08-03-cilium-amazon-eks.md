@@ -1215,7 +1215,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
-AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.29"
+AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.30"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" << EOF
 cloudWatchLogs:
