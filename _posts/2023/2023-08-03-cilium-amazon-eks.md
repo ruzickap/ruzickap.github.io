@@ -390,6 +390,7 @@ karpenter:
   version: v0.30.0
   createServiceAccount: true
   withSpotInterruptionQueue: true
+  wait: false
 addons:
   - name: kube-proxy
   - name: coredns
@@ -414,18 +415,6 @@ managedNodeGroups:
        value: "true"
        effect: "NoExecute"
     maxPodsPerNode: 110
-    privateNetworking: true
-  # Second node group is needed for karpenter to start (will be removed later) (Issue: https://github.com/eksctl-io/eksctl/issues/7003)
-  - name: mng02-ng
-    amiFamily: Bottlerocket
-    instanceType: t4g.small
-    desiredCapacity: 2
-    availabilityZones:
-      - ${AWS_DEFAULT_REGION}a
-    volumeSize: 5
-    volumeEncrypted: true
-    volumeKmsKeyID: ${AWS_KMS_KEY_ID}
-    spot: true
     privateNetworking: true
 secretsEncryption:
   keyARN: ${AWS_KMS_KEY_ARN}
@@ -487,9 +476,7 @@ Endpoint ports:
 ![Cilium](https://raw.githubusercontent.com/cilium/cilium/eb3662e6f72d8fa1d2c884967e8de6bf063cb108/Documentation/images/logo.svg
 "cilium"){: width="500" }
 
-Install [Cilium](https://cilium.io/) and remove nodegroup `mng02-ng` used for
-"eksctl karpenter" installation (It is no longer needed because Cilium will be
-installed and taints will be removed):
+Install [Cilium](https://cilium.io/):
 
 ```bash
 CILIUM_OPERATOR_SERVICE_ACCOUNT_ROLE_ARN=$(eksctl get iamserviceaccount --cluster "${CLUSTER_NAME}" --output json | jq -r ".[] | select(.metadata.name==\"cilium-operator\") .status.roleARN")
@@ -538,7 +525,6 @@ CILIUM_HELM_CHART_VERSION="1.14.1"
 if ! kubectl get namespace cilium &> /dev/null; then
   kubectl create ns cilium
   cilium install --namespace cilium --version "${CILIUM_HELM_CHART_VERSION}" --wait --helm-values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cilium.yml"
-  eksctl delete nodegroup mng02-ng --cluster "${CLUSTER_NAME}"
 fi
 ```
 

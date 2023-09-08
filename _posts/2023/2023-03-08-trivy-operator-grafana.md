@@ -128,7 +128,7 @@ kubectl run nginx --namespace=test-trivy1 --image=nginx:1.22.0
 echo -n "Waiting for trivy-operator to create VulnerabilityReports: "
 until kubectl get vulnerabilityreports -n test-trivy1 -o go-template='{{.items | len}}' | grep -qxF 1; do
   echo -n "."
-  sleep 3
+  sleep 5
 done
 ```
 
@@ -505,7 +505,7 @@ kubectl run ubuntu-sshd-exposed-secrets --namespace=test-trivy3 --image=peru/ubu
 echo -n "Waiting for trivy-operator to create ExposedSecretReports: "
 until kubectl get exposedsecretreports -n test-trivy3 -o go-template='{{.items | len}}' | grep -qxF 1; do
   echo -n "."
-  sleep 3
+  sleep 5
 done
 ```
 
@@ -625,7 +625,7 @@ EOF
 echo -n "Waiting for trivy-operator to create RbacAssessmentReport: "
 until kubectl get rbacassessmentreport -n test-trivy4 -o go-template='{{.items | len}}' | grep -qxF 1; do
   echo -n "."
-  sleep 3
+  sleep 5
 done
 ```
 
@@ -754,7 +754,7 @@ EOF
 echo -n "Waiting for trivy-operator to create ClusterRbacAssessmentReport: "
 until kubectl get clusterrbacassessmentreport clusterrole-wildcard-resource 2> /dev/null; do
   echo -n "."
-  sleep 3
+  sleep 5
 done
 ```
 
