@@ -44,7 +44,7 @@ exclude_path = [
 # Exclude all private IPs from checking.
 # Equivalent to setting `exclude_private`, `exclude_link_local`, and
 # `exclude_loopback` to true
-exclude_all_private = false
+exclude_all_private = true
 
 # Exclude all mail addresses from checking
 exclude_mail = true

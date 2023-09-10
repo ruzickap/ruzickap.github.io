@@ -12,8 +12,8 @@ image:
 
 FTP is protocol which I haven't used for many years. I configured FTP
 servers like [vsftpd](https://security.appspot.com/vsftpd.html) or
-[ProFTPD](http://www.proftpd.org/) in the past, but this time I decided to look
-at the [SFTPGo](https://github.com/drakkan/sftpgo).
+[ProFTPD](https://github.com/proftpd/proftpd) in the past, but this
+time I decided to look at the [SFTPGo](https://github.com/drakkan/sftpgo).
 
 ![SFTPGo](https://raw.githubusercontent.com/drakkan/sftpgo/5d7f6960f30fc4ba9606d5569dddf8bf5b4764bb/static/img/logo.png
 "SFTPGo")

@@ -486,7 +486,7 @@ helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mai
 ### kube-prometheus-stack
 
 [kube-prometheus stack](https://github.com/prometheus-operator/kube-prometheus)
-is a collection of Kubernetes manifests, [Grafana](http://grafana.com/)
+is a collection of Kubernetes manifests, [Grafana](https://grafana.com/)
 dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
 combined with documentation and scripts to provide easy to operate end-to-end
 Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using
