@@ -631,7 +631,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/awsugcz/awsug.cz/workflows/dependabot-auto-merge/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/dependabot-auto-merge.yml)
   [![GitHub Actions status - hugo-build](https://github.com/awsugcz/awsug.cz/workflows/hugo-build/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/hugo-build.yml)
   [![GitHub Actions status - markdown](https://github.com/awsugcz/awsug.cz/workflows/markdown/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/markdown.yml)
   [![GitHub Actions status - periodic-broken-link-checks](https://github.com/awsugcz/awsug.cz/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/periodic-broken-link-checks.yml)
