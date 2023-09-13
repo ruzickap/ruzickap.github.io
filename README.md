@@ -53,6 +53,14 @@ mega-linter-runner --flavor documentation \
   -e YAML_V8R_FILTER_REGEX_EXCLUDE="(^_data/|^_config.yml)"
 ```
 
+## Tests
+
+Run "post_tests" form cli:
+
+```sh
+gh workflow run post_tests.yml -f cluster_fqdn='k01.k8s.mylabs.dev' -f tags="product_id='13585',used_for=dev,owner=petr.ruzicka@gmail.com,cluster=k01.k8s.mylabs.dev" -f posts='argocd-vault-plugin-and-aws-secret-manager velero-and-cert-manager cheapest-amazon-eks' -f action=build --ref="argocd-vault-plugin"
+```
+
 ## Notes
 
 - Use ```` ```bash ```` to run commands during the [post_tests](./.github/workflows/post_tests.yml)

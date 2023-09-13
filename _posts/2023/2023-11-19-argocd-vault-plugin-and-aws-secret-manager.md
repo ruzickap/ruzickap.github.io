@@ -82,7 +82,7 @@ aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
 
 Screenshot from AWS Secrets Manager:
 
-![aws-secrets-manager-01-secrets-PodinfoSecret](/assets/img/posts/2023/2023-05-23-argocd-vault-plugin-and-aws-secret-manager/aws-secrets-manager-01-secrets-podinfosecret.avif
+![aws-secrets-manager-01-secrets-PodinfoSecret](/assets/img/posts/2023/2023-11-19-argocd-vault-plugin-and-aws-secret-manager/aws-secrets-manager-01-secrets-podinfosecret.avif
 "AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-PodinfoSecret")
 _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-PodinfoSecret_
 
@@ -107,14 +107,12 @@ ARGOCD_HELM_CHART_VERSION="5.46.2"
 
 helm repo add argo https://argoproj.github.io/argo-helm
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-argocd.yml" << EOF
-global:
-  logging:
-    level: debug
 configs:
   cm:
     admin.enabled: false
-    users.anonymous.enabled: false
+    users.anonymous.enabled: true
   params:
+    reposerver.plugin.tar.exclusions: ".git/*"
     server.insecure: true
   rbac:
     policy.default: role:admin
@@ -122,51 +120,51 @@ configs:
     create: true
     plugins:
       avp-kustomize:
-        allowConcurrency: true
-        discover:
-          find:
-            command:
-              - find
-              - "."
-              - "-name"
-              - kustomization.yaml
-        generate:
-          command:
-            - sh
-            - "-c"
-            - "kustomize build . | argocd-vault-plugin generate --verbose-sensitive-output -"
-        lockRepo: false
-      avp-helm:
-        allowConcurrency: true
-        discover:
-          find:
-            command:
-              - sh
-              - "-c"
-              - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
-        generate:
-          command:
-            - sh
-            - "-c"
+        init:
+          command: [sh, -c]
+          args:
             - |
-              helm template \$ARGOCD_APP_NAME -n \$ARGOCD_APP_NAMESPACE -f <(echo "\$ARGOCD_ENV_helm_values") . |
-              argocd-vault-plugin generate --verbose-sensitive-output -
-        lockRepo: false
-      avp:
-        allowConcurrency: true
+              echo "*** Initializing avp-kustomize..." | tee /tmp/avp-kustomize-init
         discover:
           find:
-            command:
-              - sh
-              - "-c"
-              - "find . -name '*.yaml' | xargs -I {} grep \\"<path\\\\|avp\\\\.kubernetes\\\\.io\\" {} | grep ."
+            glob: "**/kustomization.yaml"
         generate:
-          command:
-            - argocd-vault-plugin
-            - generate
-            - "--verbose-sensitive-output"
-            - "."
-        lockRepo: false
+          command: [sh, -c]
+          args:
+            - |
+              kustomize build . | argocd-vault-plugin generate - | tee /tmp/avp-kustomize-generate
+      avp-helm:
+        init:
+          command: [sh, -c]
+          args:
+            - |
+              echo "*** Initializing avp-helm..." | tee /tmp/avp-helm-init
+        discover:
+          find:
+            glob: "**/Chart.yaml"
+        generate:
+          command: [sh, -c]
+          args:
+            - |
+              helm template "\${ARGOCD_APP_NAME}" -n "\${ARGOCD_APP_NAMESPACE}" -f <(echo "\${ARGOCD_ENV_HELM_ARGS}") . |
+              argocd-vault-plugin generate - | tee /tmp/avp-helm-generate
+      avp:
+        init:
+          command: [sh, -c]
+          args:
+            - |
+              echo "*** Initializing avp..." | tee /tmp/avp-init
+        discover:
+          find:
+            command: [sh, -c]
+            args:
+              - |
+                find . -name '*.yaml' | xargs -I {} grep '<path|avp.kubernetes.io' {} | grep .
+        generate:
+          command: [sh, -c]
+          args:
+            - |
+              argocd-vault-plugin generate . | tee /tmp/avp-generate
 controller:
   metrics:
     enabled: true
@@ -176,30 +174,30 @@ controller:
       enabled: true
       namespace: kube-prometheus-stack
       spec:
-      - alert: ArgoAppMissing
-        expr: |
-          absent(argocd_app_info) == 1
-        for: 15m
-        labels:
-          severity: critical
-        annotations:
-          summary: "[Argo CD] No reported applications"
-          description: >
-            Argo CD has not reported any applications data for the past 15 minutes which
-            means that it must be down or not functioning properly.  This needs to be
-            resolved for this cloud to continue to maintain state.
-      - alert: ArgoAppNotSynced
-        expr: |
-          argocd_app_info{sync_status!="Synced"} == 1
-        for: 12h
-        labels:
-          severity: warning
-        annotations:
-          summary: "[{{\`{{\$labels.name}}\`}}] Application not synchronized"
-          description: >
-            The application [{{\`{{\$labels.name}}\`}} has not been synchronized for over
-            12 hours which means that the state of this cloud has drifted away from the
-            state inside Git.
+        - alert: ArgoAppMissing
+          expr: |
+            absent(argocd_app_info) == 1
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: "[Argo CD] No reported applications"
+            description: >
+              Argo CD has not reported any applications data for the past 15 minutes which
+              means that it must be down or not functioning properly.  This needs to be
+              resolved for this cloud to continue to maintain state.
+        - alert: ArgoAppNotSynced
+          expr: |
+            argocd_app_info{sync_status!="Synced"} == 1
+          for: 12h
+          labels:
+            severity: warning
+          annotations:
+            summary: "[{{\`{{\$labels.name}}\`}}] Application not synchronized"
+            description: >
+              The application [{{\`{{\$labels.name}}\`}} has not been synchronized for over
+              12 hours which means that the state of this cloud has drifted away from the
+              state inside Git.
 dex:
   enabled: false
 redis:
@@ -238,29 +236,30 @@ repoServer:
     create: false
     name: argocd-repo-server
   initContainers:
-  - name: download-tools
-    image: alpine:latest
-    command: [sh, -c]
-    env:
-    - name: AVP_VERSION
-      # renovate: datasource=github-tags depName=argoproj-labs/argocd-vault-plugin extractVersion=^(?<version>.*)$
-      value: 1.14.0
-    - name: AVP_ARCHITECTURE
-      value: arm64
-    args:
-    - >-
-      wget -O argocd-vault-plugin
-      https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v\${AVP_VERSION}/argocd-vault-plugin_\${AVP_VERSION}_linux_\${AVP_ARCHITECTURE} &&
-      chmod +x argocd-vault-plugin &&
-      mv argocd-vault-plugin /custom-tools/
-    volumeMounts:
-    - mountPath: /custom-tools
-      name: custom-tools
+    - name: download-tools
+      image: alpine:latest
+      command: ["sh", "-c"]
+      env:
+        - name: AVP_VERSION
+          # renovate: datasource=github-tags depName=argoproj-labs/argocd-vault-plugin extractVersion=^(?<version>.*)$
+          value: 1.14.0
+        - name: AVP_ARCHITECTURE
+          value: arm64
+      args:
+        - >-
+          wget -O argocd-vault-plugin
+          https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v\${AVP_VERSION}/argocd-vault-plugin_\${AVP_VERSION}_linux_\${AVP_ARCHITECTURE} &&
+          chmod +x argocd-vault-plugin &&
+          mv argocd-vault-plugin /custom-tools/
+      volumeMounts:
+        - mountPath: /custom-tools
+          name: custom-tools
   extraContainers:
     - name: avp
-      command: [/var/run/argocd/argocd-cmp-server]
+      command: [/var/run/argocd/argocd-cmp-server, --loglevel, debug]
       # renovate: datasource=docker depName=quay.io/argoproj/argocd extractVersion=^(?<version>.+)$
-      image: quay.io/argoproj/argocd:v2.7.14
+      # image: quay.io/argoproj/argocd:v2.7.14
+      image: busybox
       securityContext:
         runAsNonRoot: true
         runAsUser: 999
@@ -278,9 +277,10 @@ repoServer:
           subPath: argocd-vault-plugin
           mountPath: /usr/local/bin/argocd-vault-plugin
     - name: avp-helm
-      command: [/var/run/argocd/argocd-cmp-server]
+      command: [/var/run/argocd/argocd-cmp-server, --loglevel, debug]
       # renovate: datasource=docker depName=quay.io/argoproj/argocd extractVersion=^(?<version>.+)$
-      image: quay.io/argoproj/argocd:v2.7.14
+      # image: quay.io/argoproj/argocd:v2.7.14
+      image: busybox
       securityContext:
         runAsNonRoot: true
         runAsUser: 999
@@ -298,9 +298,10 @@ repoServer:
           subPath: argocd-vault-plugin
           mountPath: /usr/local/bin/argocd-vault-plugin
     - name: avp-kustomize
-      command: [/var/run/argocd/argocd-cmp-server]
+      command: [/var/run/argocd/argocd-cmp-server, --loglevel, debug]
       # renovate: datasource=docker depName=quay.io/argoproj/argocd extractVersion=^(?<version>.+)$
-      image: quay.io/argoproj/argocd:v2.7.14
+      # image: quay.io/argoproj/argocd:v2.7.14
+      image: busybox
       securityContext:
         runAsNonRoot: true
         runAsUser: 999
@@ -482,21 +483,54 @@ ingress:
         - podinfo.${CLUSTER_FQDN}
 EOF
 
-argocd app create podinfo \
-  --repo https://stefanprodan.github.io/podinfo --helm-chart podinfo --revision 6.4.1 \
-  --dest-namespace podinfo --dest-server https://kubernetes.default.svc \
-  --auto-prune \
-  --sync-option CreateNamespace=true \
-  --sync-policy auto \
-  --values-literal-file "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-podinfo.yml"
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-argocd.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: podinfo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: podinfo
+    repoURL: https://stefanprodan.github.io/podinfo
+    targetRevision: 6.4.1
+    helm:
+      valuesObject:
+        ui:
+          message: "<path:${CLUSTER_FQDN}-PodinfoSecret#podinfo_secret_message>"
+        ingress:
+          enabled: true
+          className: nginx
+          annotations:
+            forecastle.stakater.com/expose: "true"
+            forecastle.stakater.com/icon: https://raw.githubusercontent.com/stefanprodan/podinfo/gh-pages/cuddle_bunny.gif
+            forecastle.stakater.com/appName: Podinfo
+          hosts:
+            - host: podinfo.${CLUSTER_FQDN}
+              paths:
+                - path: /
+                  pathType: ImplementationSpecific
+          tls:
+            - hosts:
+                - podinfo.${CLUSTER_FQDN}
+    plugin:
+      name: avp-helm
 
-argocd app create podinfo2 \
-  --repo https://github.com/stefanprodan/podinfo.git --path kustomize \
-  --dest-namespace podinfo2 --dest-server https://kubernetes.default.svc \
-  --kustomize-common-annotation "secret-test=<path:${CLUSTER_FQDN}-PodinfoSecret#podinfo_secret_message>" \
-  --auto-prune \
-  --sync-option CreateNamespace=true \
-  --sync-policy auto
+###########################
+# Not working due to error: Failed to load target state: failed to generate manifest for source 1 of 1: rpc error: code = Unknown desc = multiple application sources defined: Helm,Plugin
+# Looks like it is not possible to use standard helm chart definition with plugin
+###########################
+
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: podinfo
+  syncPolicy:
+    automated:
+      prune: true
+    syncOptions:
+      - CreateNamespace=true
+EOF
 ```
 
 ---
