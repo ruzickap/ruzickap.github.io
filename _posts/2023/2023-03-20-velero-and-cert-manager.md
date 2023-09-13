@@ -602,6 +602,137 @@ Here is the report form [SSL Labs](https://www.ssllabs.com):
 ![ssl-labs-report](/assets/img/posts/2023/2023-03-20-velero-and-cert-manager/ssl-labs-report.avif
 "ssl-labs-report")
 
+## Rotation of the "production" certificate
+
+The Let's Encrypt certificates are valid for 90 days. It is necessary to renew
+them before they expire.
+
+Few commands showing the details after cert-manager renewed the certificate.
+
+Examine the certificate:
+
+```shell
+kubectl describe certificates -n cert-manager ingress-cert-production
+```
+
+```console
+...
+Status:
+  Conditions:
+    Last Transition Time:  2023-09-13T04:50:19Z
+    Message:               Certificate is up to date and has not expired
+    Observed Generation:   1
+    Reason:                Ready
+    Status:                True
+    Type:                  Ready
+  Not After:               2023-12-12T03:53:45Z
+  Not Before:              2023-09-13T03:53:46Z
+  Renewal Time:            2023-11-12T03:53:45Z
+  Revision:                1
+Events:
+  Type    Reason     Age   From                                       Message
+  ----    ------     ----  ----                                       -------
+  Normal  Issuing    58m   cert-manager-certificates-trigger          Renewing certificate as renewal was scheduled at 2023-09-09 13:39:16 +0000 UTC
+  Normal  Reused     58m   cert-manager-certificates-key-manager      Reusing private key stored in existing Secret resource "ingress-cert-production"
+  Normal  Requested  58m   cert-manager-certificates-request-manager  Created new CertificateRequest resource "ingress-cert-production-1"
+  Normal  Issuing    55m   cert-manager-certificates-issuing          The certificate has been successfully issued
+```
+
+Look at the `CertificateRequest`:
+
+```shell
+kubectl describe certificaterequests -n cert-manager ingress-cert-production-1
+```
+
+```console
+Name:         ingress-cert-production-1
+Namespace:    cert-manager
+Labels:       letsencrypt=production
+              velero.io/backup-name=velero-weekly-backup-cert-manager-20230711144135
+              velero.io/restore-name=velero-weekly-backup-cert-manager-20230913045017
+Annotations:  cert-manager.io/certificate-name: ingress-cert-production
+              cert-manager.io/certificate-revision: 1
+              cert-manager.io/private-key-secret-name: ingress-cert-production-kxk5s
+API Version:  cert-manager.io/v1
+Kind:         CertificateRequest
+Metadata:
+  Creation Timestamp:  2023-09-13T04:50:19Z
+  Generation:          1
+  Owner References:
+    API Version:           cert-manager.io/v1
+    Block Owner Deletion:  true
+    Controller:            true
+    Kind:                  Certificate
+    Name:                  ingress-cert-production
+    UID:                   b04e1186-e6c5-42d0-8d61-34810644b386
+  Resource Version:        8653
+  UID:                     b9c209b3-0bac-440d-a62f-91800c6c458b
+Spec:
+  Extra:
+    authentication.kubernetes.io/pod-name:
+      cert-manager-f9f87498d-nvggh
+    authentication.kubernetes.io/pod-uid:
+      3b1a2731-0e75-4cf2-bdbd-7278ac364498
+  Groups:
+    system:serviceaccounts
+    system:serviceaccounts:cert-manager
+    system:authenticated
+  Issuer Ref:
+    Kind:    ClusterIssuer
+    Name:    letsencrypt-production-dns
+  Request:   LS0xxxxxxxS0K
+  UID:       8704d6db-816e-4c93-bcc8-8801060b05d0
+  Username:  system:serviceaccount:cert-manager:cert-manager
+Status:
+  Certificate:  LSxxxxxxCg==
+  Conditions:
+    Last Transition Time:  2023-09-13T04:50:19Z
+    Message:               Certificate request has been approved by cert-manager.io
+    Reason:                cert-manager.io
+    Status:                True
+    Type:                  Approved
+    Last Transition Time:  2023-09-13T04:53:46Z
+    Message:               Certificate fetched from issuer successfully
+    Reason:                Issued
+    Status:                True
+    Type:                  Ready
+Events:
+  Type    Reason              Age   From                                                Message
+  ----    ------              ----  ----                                                -------
+  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-ca          Not signing CertificateRequest until it is Approved
+  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-acme        Not signing CertificateRequest until it is Approved
+  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-vault       Not signing CertificateRequest until it is Approved
+  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-selfsigned  Not signing CertificateRequest until it is Approved
+  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-venafi      Not signing CertificateRequest until it is Approved
+  Normal  cert-manager.io     54m   cert-manager-certificaterequests-approver           Certificate request has been approved by cert-manager.io
+  Normal  OrderCreated        54m   cert-manager-certificaterequests-issuer-acme        Created Order resource cert-manager/ingress-cert-production-1-3932937138
+  Normal  OrderPending        54m   cert-manager-certificaterequests-issuer-acme        Waiting on certificate issuance from order cert-manager/ingress-cert-production-1-3932937138: ""
+  Normal  CertificateIssued   50m   cert-manager-certificaterequests-issuer-acme        Certificate fetched from issuer successfully
+```
+
+Check the `cert-manager` logs:
+
+```shell
+kubectl logs -n cert-manager cert-manager-f9f87498d-nvggh
+```
+
+```console
+...
+I0913 04:50:18.960223       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Ready" to 2023-09-13 04:50:18.960211036 +0000 UTC m=+451.003679107
+I0913 04:50:18.962295       1 trigger_controller.go:194] "cert-manager/certificates-trigger: Certificate must be re-issued" key="cert-manager/ingress-cert-production" reason="Renewing" message="Renewing certificate as renewal was scheduled at <nil>"
+I0913 04:50:18.962464       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Issuing" to 2023-09-13 04:50:18.962457264 +0000 UTC m=+451.005925351
+I0913 04:50:19.011897       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Ready" to 2023-09-13 04:50:19.011889134 +0000 UTC m=+451.055357214
+I0913 04:50:19.020026       1 trigger_controller.go:194] "cert-manager/certificates-trigger: Certificate must be re-issued" key="cert-manager/ingress-cert-production" reason="Renewing" message="Renewing certificate as renewal was scheduled at <nil>"
+I0913 04:50:19.020061       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Issuing" to 2023-09-13 04:50:19.020054522 +0000 UTC m=+451.063522609
+I0913 04:50:19.046907       1 trigger_controller.go:194] "cert-manager/certificates-trigger: Certificate must be re-issued" key="cert-manager/ingress-cert-production" reason="Renewing" message="Renewing certificate as renewal was scheduled at 2023-09-09 13:39:16 +0000 UTC"
+I0913 04:50:19.046942       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Issuing" to 2023-09-13 04:50:19.046937063 +0000 UTC m=+451.090405134
+I0913 04:50:19.134032       1 conditions.go:263] Setting lastTransitionTime for CertificateRequest "ingress-cert-production-1" condition "Approved" to 2023-09-13 04:50:19.134023095 +0000 UTC m=+451.177491158
+I0913 04:50:19.175761       1 conditions.go:263] Setting lastTransitionTime for CertificateRequest "ingress-cert-production-1" condition "Ready" to 2023-09-13 04:50:19.175750564 +0000 UTC m=+451.219218635
+I0913 04:50:19.210564       1 conditions.go:263] Setting lastTransitionTime for CertificateRequest "ingress-cert-production-1" condition "Ready" to 2023-09-13 04:50:19.210549558 +0000 UTC m=+451.254017629
+I0913 04:53:46.526286       1 acme.go:233] "cert-manager/certificaterequests-issuer-acme/sign: certificate issued" resource_name="ingress-cert-production-1" resource_namespace="cert-manager" resource_kind="CertificateRequest" resource_version="v1" related_resource_name="ingress-cert-production-1-3932937138" related_resource_namespace="cert-manager" related_resource_kind="Order" related_resource_version="v1"
+I0913 04:53:46.526563       1 conditions.go:252] Found status change for CertificateRequest "ingress-cert-production-1" condition "Ready": "False" -> "True"; setting lastTransitionTime to 2023-09-13 04:53:46.526554494 +0000 UTC m=+658.570022573
+```
+
 ---
 
 Backup certificate before deleting the cluster (in case it was renewed):
