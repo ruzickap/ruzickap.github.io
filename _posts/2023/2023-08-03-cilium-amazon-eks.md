@@ -969,7 +969,7 @@ grafana:
       15761-kubernetes-system-api-server:
         # renovate: depName="Kubernetes / System / API Server"
         gnetId: 15761
-        revision: 13
+        revision: 14
         datasource: Prometheus
       15762-kubernetes-system-coredns:
         # renovate: depName="Kubernetes / System / CoreDNS"
