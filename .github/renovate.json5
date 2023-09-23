@@ -1,105 +1,82 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  // ignore chirpy dependencies
-  // https://renovatebot.com/docs/configuration-options/#ignoredeps
-  "ignoreDeps": [
-    "jekyll-sass-converter",
-    "http_parser.rb",
-    "html-proofer",
-  ],
-  "labels": ["renovate", "renovate/{{replace '.*/' '' depName}}", "renovate/{{updateType}}"],
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["patch"],
-      "automergeType": "branch",
-      // Do not wait for tests - this will speed up the whole process - updating many branches + running many tests
-      "ignoreTests": true,
-      "automerge": true,
-    },
-    {
-      "description": "Ignore frequent renovate updates",
-      "matchPackageNames": ["renovatebot/github-action"],
-      "matchUpdateTypes": ["patch"],
-      "enabled": false
-    },
-    {
-      "description": "Ignore html-proofer update to latest stable major version - required by chirpy",
-      "datasources": ["rubygems"],
-      "matchPackageNames": ["html-proofer"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
-    },
-    {
-      "matchPackageNames": ["renovatebot/github-action"],
-      "matchUpdateTypes": ["minor"],
-      "automergeType": "branch",
-      "automerge": true,
-      "ignoreTests": true,
-      "schedule": ["* 0,2,4 1-7 * 0"],
-    },
-    {
-      "description": "AutoMerge eksctl",
-      "matchPackageNames": ["weaveworks/eksctl"],
-      "matchUpdateTypes": ["minor", "patch"],
-      "ignoreTests": true,
-      "automergeType": "branch",
-      "automerge": true,
-    },
-    {
-      "description": "AutoMerge kube-prometheus-stack helm chart version",
-      "matchDatasources": ["helm"],
-      "matchPackagePatterns": ["(^|\\/)kube-prometheus-stack$"],
-      "matchUpdateTypes": ["major", "minor"],
-      "automergeType": "branch",
-      "automerge": true,
-    },
-    {
-      "description": "Update all github-actions by default",
-      "matchManagers": ["github-actions"],
-      "automergeType": "branch",
-      "automerge": true,
-    },
-    {
-      "description": "Grafana Dashboards",
-      "matchDatasources": ["custom.grafana-dashboards"],
-      "matchUpdateTypes": ["major"],
-      "automergeType": "branch",
-      "automerge": true,
-    },
-  ],
-  "prBodyTemplate": "{{{table}}}{{{notes}}}{{{changelogs}}}",
-  "rebaseWhen": "behind-base-branch",
-  "regexManagers": [
-    {
-      "fileMatch": [
-        "\\.ya?ml$",
-        "\\.md$",
-      ],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?( extractVersion=(?<extractVersion>.+?))?( registryUrl=(?<registryUrl>.+?))?\\s.*[=:]\\s*\"?(?<currentValue>.+?)\"?\\s",
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
-      "extractVersionTemplate": "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.+)${{/if}}",
-    },
-    {
-      "fileMatch": [
-        "\\.md$",
-      ],
-      "matchStrings": [
-        "#\\s+renovate:\\s+depName=\"(?<depName>.*)\"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)"
-      ],
-      "versioningTemplate": "regex:^(?<major>\\d+)$",
-      "datasourceTemplate": "custom.grafana-dashboards"
-    },
-  ],
-  "customDatasources": {
+  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  automerge: true,
+  automergeType: "branch",
+  customDatasources: {
     "grafana-dashboards": {
-      "defaultRegistryUrlTemplate": "https://grafana.com/api/dashboards/{{packageName}}",
-      "format": "json",
-      "transformTemplates": [
-        "{\"releases\":[{\"version\": $string(revision)}]}"
-      ],
+      defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
+      format: "json",
+      transformTemplates: ['{"releases":[{"version": $string(revision)}]}'],
     },
   },
-  "separateMinorPatch": true,
+  // ignore chirpy dependencies
+  // https://renovatebot.com/docs/configuration-options/#ignoredeps
+  ignoreDeps: ["jekyll-sass-converter", "http_parser.rb", "html-proofer"],
+  ignoreTests: true,
+  labels: [
+    "renovate",
+    "renovate/{{replace '.*/' '' depName}}",
+    "renovate/{{updateType}}",
+  ],
+  packageRules: [
+    {
+      matchUpdateTypes: ["patch"],
+    },
+    {
+      description: "Ignore frequent renovate updates",
+      matchPackageNames: ["renovatebot/github-action"],
+      matchUpdateTypes: ["patch"],
+      enabled: false,
+    },
+    {
+      matchPackageNames: ["renovatebot/github-action"],
+      matchUpdateTypes: ["minor"],
+      schedule: ["* 0,2,4 1-7 * 0"],
+    },
+    {
+      description: "AutoMerge eksctl",
+      matchPackageNames: ["weaveworks/eksctl"],
+      matchUpdateTypes: ["minor", "patch"],
+    },
+    {
+      description: "AutoMerge kube-prometheus-stack helm chart version",
+      matchDatasources: ["helm"],
+      matchPackagePatterns: ["(^|\\/)kube-prometheus-stack$"],
+      matchUpdateTypes: ["major", "minor"],
+    },
+    {
+      description: "Update all github-actions by default",
+      matchManagers: ["github-actions"],
+    },
+    {
+      description: "Grafana Dashboards",
+      matchDatasources: ["custom.grafana-dashboards"],
+      matchUpdateTypes: ["major"],
+    },
+  ],
+  prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}",
+  rebaseWhen: "behind-base-branch",
+  regexManagers: [
+    {
+      fileMatch: ["\\.ya?ml$", "\\.md$"],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?( extractVersion=(?<extractVersion>.+?))?( registryUrl=(?<registryUrl>.+?))?\\s.*[=:]\\s*"?(?<currentValue>.+?)"?\\s',
+      ],
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.+)${{/if}}",
+    },
+    {
+      fileMatch: ["\\.md$"],
+      matchStrings: [
+        '#\\s+renovate:\\s+depName="(?<depName>.*)"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)',
+      ],
+      versioningTemplate: "regex:^(?<major>\\d+)$",
+      datasourceTemplate: "custom.grafana-dashboards",
+    },
+  ],
+  separateMinorPatch: true,
+  vulnerabilityAlerts: {
+    commitMessagePrefix: "chore(renovate): Security update",
+    labels: ["security"],
+  },
 }

@@ -222,7 +222,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
   [![GitHub Actions status - checks](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/checks/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/checks.yml)
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/linter.yml)
   [![GitHub Actions status - markdown](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/markdown/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/markdown.yml)
-  [![GitHub Actions status - periodic-markdown-links-check](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/periodic-markdown-links-check/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/periodic-markdown-links-check.yml)
   [![GitHub Actions status - shellcheck](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/shellcheck.yml)
   [![GitHub Actions status - yamllint](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/yamllint/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/yamllint.yml)
 
@@ -968,7 +967,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - CI/CD status:
 
   [![GitHub Actions status - markdown](https://github.com/ruzickap/k8s-harbor-presentation/workflows/markdown/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/markdown.yml)
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-harbor-presentation/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/periodic-broken-link-checks.yml)
   [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-harbor-presentation/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/yamllint.yml)
 
 - Issue tracking:
