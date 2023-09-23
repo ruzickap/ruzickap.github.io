@@ -248,7 +248,7 @@ cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
 initContainers:
   - name: velero-plugin-for-aws
     # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?<version>.+)$
-    image: velero/velero-plugin-for-aws:v1.7.1
+    image: velero/velero-plugin-for-aws:v1.8.0
     volumeMounts:
       - mountPath: /target
         name: plugins
