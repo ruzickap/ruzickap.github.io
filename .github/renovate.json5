@@ -102,4 +102,8 @@
     },
   },
   "separateMinorPatch": true,
+  "vulnerabilityAlerts": {
+    "commitMessagePrefix": "chore(renovate): Security update",
+    "labels": ["security"]
+  },
 }
