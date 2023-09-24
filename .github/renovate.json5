@@ -46,6 +46,13 @@
       matchUpdateTypes: ["major", "minor"],
     },
     {
+      // Bug: https://github.com/stakater/Forecastle/issues/390
+      description: "Disable Forecastle helm chart version upgrade",
+      matchDatasources: ["helm"],
+      matchPackagePatterns: ["^forecastle"],
+      enabled: false,
+    },
+    {
       description: "Update all github-actions by default",
       matchManagers: ["github-actions"],
       ignoreTests: false,
