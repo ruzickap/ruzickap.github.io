@@ -9,6 +9,7 @@ on:
       logLevel:
         type: choice
         description: "Log-Level"
+        default: debug
         options:
           - info
           - debug
