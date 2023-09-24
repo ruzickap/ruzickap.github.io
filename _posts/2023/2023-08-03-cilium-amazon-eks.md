@@ -1017,19 +1017,18 @@ grafana:
         revision: 1
         datasource: Prometheus
   grafana.ini:
+    analytics:
+      check_for_updates: false
     server:
       root_url: https://grafana.${CLUSTER_FQDN}
     # Use oauth2-proxy instead of default Grafana Oauth
     auth.basic:
       enabled: false
     auth.proxy:
-      auto_sign_up: true
       enabled: true
       header_name: X-Email
       header_property: email
     users:
-      allow_sign_up: false
-      auto_assign_org: true
       auto_assign_org_role: Admin
   smtp:
     enabled: true
@@ -1436,6 +1435,7 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   hostNetwork: true
+  allowSnippetAnnotations: true
   ingressClassResource:
     default: true
   admissionWebhooks:
@@ -1505,7 +1505,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
-FORECASTLE_HELM_CHART_VERSION="1.0.130"
+FORECASTLE_HELM_CHART_VERSION="1.0.129"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
