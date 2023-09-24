@@ -32,6 +32,7 @@
       matchPackageNames: ["renovatebot/github-action"],
       matchUpdateTypes: ["minor"],
       schedule: ["* 0,2,4 1-7 * 0"],
+      ignoreTests: false,
     },
     {
       description: "AutoMerge eksctl",
@@ -47,6 +48,7 @@
     {
       description: "Update all github-actions by default",
       matchManagers: ["github-actions"],
+      ignoreTests: false,
     },
     {
       description: "Grafana Dashboards",
