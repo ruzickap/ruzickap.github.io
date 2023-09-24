@@ -477,6 +477,8 @@ _pod-lens showing details in kube-prometheus-stack namespace_
 kubectl pod-lens -n karpenter karpenter-
 ```
 
+<!-- markdownlint-disable hr-style -->
+
 <!---
  [Namespace]  karpenter
 └─┬ [Namespace]  karpenter                        Replica: 1/1
@@ -523,6 +525,8 @@ MaxAvailable: 1
 Disruptions:  1
 ---           ---
 -->
+
+<!-- markdownlint-enable hr-style -->
 
 ![pod-lens karpenter screenshot](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-pod-lens-karpenter.avif){: width="500" }
 _pod-lens showing details in karpenter namespace_
