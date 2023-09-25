@@ -568,8 +568,8 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - Container build](https://github.com/ruzickap/raw-photo-tools-container/workflows/Container%20build/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/container-build.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/raw-photo-tools-container/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/linter.yml)
+  [![GitHub Actions status - container-build](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/container-build.yml/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/container-build.yml)
+  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/mega-linter.yml/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/mega-linter.yml)
 
 - Issue tracking:
 

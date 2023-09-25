@@ -60,7 +60,7 @@ mega-linter-runner --flavor documentation \
 
   ````md
   ```bash
-  <some create commands>
+  ### <some create commands...>
   ```
   ````
 
@@ -69,7 +69,7 @@ mega-linter-runner --flavor documentation \
 
   ````md
   ```shell
-  some commands
+  ### some commands...
   ```
   ````
 
@@ -78,6 +78,6 @@ mega-linter-runner --flavor documentation \
 
   ````md
   ```sh
-  <some clean-up/destroy commands>
+  ### <some clean-up/destroy commands...>
   ```
   ````

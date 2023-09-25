@@ -24,6 +24,7 @@ on:
           - secrets-store-csi-driver-reloader velero-and-cert-manager cheapest-amazon-eks
           - my-favourite-krew-plugins-kubectl cheapest-amazon-eks
           - cilium-amazon-eks
+          - secure-cheap-amazon-eks
       action:
         type: choice
         description: Select action
@@ -102,7 +103,7 @@ jobs:
             for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
               echo "*** ${POST_FILES_ARRAY[idx]} | build"
               # shellcheck disable=SC1090
-              source <(echo "set -euxo pipefail" ; sed -n "/^\`\`\`bash$/,/^\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed "/^\`\`\`*/d")
+              source <(echo "set -euxo pipefail" ; sed -n "/^\s*\`\`\`bash$/,/^\s*\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed 's/^\s*```*//')
               if [[ "${POST_FILES_ARRAY[*]}" =~ eks && ${idx} -eq ${#POST_FILES_ARRAY[@]}-1 ]]; then
                 (
                   echo "<https://${CLUSTER_FQDN}>"

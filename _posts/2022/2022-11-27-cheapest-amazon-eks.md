@@ -17,7 +17,7 @@ with lowest price.
 
 Requirements:
 
-- Single AZ only - no payments for cross availability zones traffic
+- Two AZ, use one zone if possible (no payments for cross AZ traffic)
 - Spot instances
 - Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
@@ -25,7 +25,7 @@ Requirements:
 - Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) - small
   operation system / CPU / Memory footprint
 - Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
-  as a most cost efficient + cost optimized LB
+  as a most cost efficient + cost optimized load balancer
 - Run as many pods as possible on worker nodes `max-pods-per-node`
   - <https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks>
   - <https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/>
@@ -109,6 +109,9 @@ aws route53 create-hosted-zone --output json \
   --hosted-zone-config="{\"Comment\": \"Created by petr.ruzicka@gmail.com\", \"PrivateZone\": false}" | jq
 ```
 
+![Route53 k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedzones-k8s.mylabs.dev-1.avif)
+_Route53 k8s.mylabs.dev zone_
+
 Use your domain registrar to change the nameservers for your zone (for example
 `mylabs.dev`) to use the Amazon Route 53 nameservers. Here is the way how you
 can find out the the Route 53 nameservers:
@@ -190,6 +193,9 @@ localhost | CHANGED => {
 ```
 <!-- markdownlint-enable blanks-around-fences -->
 
+![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
+_CloudFlare mylabs.dev zone_
+
 ### Create Route53
 
 Create CloudFormation template containing [Route53](https://aws.amazon.com/route53/)
@@ -236,6 +242,14 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
     --tags "$(echo "${TAGS}" | sed -e 's/\([^=]*\)=\([^,]*\),*/Key=\1,Value=\2 /g')" || true
 fi
 ```
+
+After running the CF stack you should see the following Route53 zones:
+
+![Route53 k01.k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedzones-k01.k8s.mylabs.dev.avif)
+_Route53 k01.k8s.mylabs.dev zone_
+
+![Route53 k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedones-k8s.mylabs.dev-2.avif)
+_Route53 k8s.mylabs.dev zone_
 
 ## Create Amazon EKS
 
@@ -429,17 +443,6 @@ awsRegion: ${AWS_DEFAULT_REGION}
 EOF
 helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
 ```
-
-## Prometheus, DNS, Ingress, Certificates and others
-
-There are many K8s services / applications which can export metrics to
-Prometheus. That is the reason why the prometheus should be "first" application
-which should be installed on the K8s cluster.
-
-Then you will need some basic tools / integrations, like [external-dns](https://github.com/kubernetes-sigs/external-dns),
-[ingress-nginx](https://kubernetes.github.io/ingress-nginx/),
-[cert-manager](https://cert-manager.io/), [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/),
-...
 
 ### mailhog
 
@@ -1170,7 +1173,7 @@ aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAM
 Remove Volumes and Snapshots related to the cluster (just in case):
 
 ```sh
-for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:eks:cluster-name,Values=${CLUSTER_NAME}" --query 'Volumes[].VolumeId' --output text) ; do
+for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
   echo "*** Removing Volume: ${VOLUME}"
   aws ec2 delete-volume --volume-id "${VOLUME}"
 done
