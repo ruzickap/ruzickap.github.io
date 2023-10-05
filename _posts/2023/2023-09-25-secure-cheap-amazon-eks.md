@@ -593,6 +593,9 @@ SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="1.9.1"
 
 helm repo add piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
+
+# Fix: Namespace does not have PSS level assigned
+kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=baseline
 ```
 
 ### aws-ebs-csi-driver
@@ -703,6 +706,7 @@ ingress:
   hostname: mailpit.${CLUSTER_FQDN}
 EOF
 helm upgrade --install --version "${MAILPIT_HELM_CHART_VERSION}" --namespace mailpit --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" mailpit jouve/mailpit
+kubectl label namespace mailpit pod-security.kubernetes.io/enforce=baseline
 ```
 
 ### kube-prometheus-stack
@@ -740,16 +744,20 @@ defaultRules:
 alertmanager:
   config:
     global:
-      smtp_smarthost: "mailpit.mailpit.svc.cluster.local:1025"
+      smtp_smarthost: "mailpit-smtp.mailpit.svc.cluster.local:25"
       smtp_from: "alertmanager@${CLUSTER_FQDN}"
     route:
       group_by: ["alertname", "job"]
-      receiver: email-notifications
+      receiver: email
       routes:
-        - receiver: email-notifications
-          matchers: [ '{severity=~"warning|critical"}' ]
+        - receiver: 'null'
+          matchers:
+            - alertname =~ "InfoInhibitor|Watchdog"
+        - receiver: email
+          matchers:
+            - severity =~ "warning|critical"
     receivers:
-      - name: email-notifications
+      - name: email
         email_configs:
           - to: "notification@${CLUSTER_FQDN}"
             require_tls: false
@@ -948,7 +956,7 @@ grafana:
       auto_assign_org_role: Admin
   smtp:
     enabled: true
-    host: "mailpit.mailpit.svc.cluster.local:1025"
+    host: "mailpit-smtp.mailpit.svc.cluster.local:25"
     from_address: grafana@${CLUSTER_FQDN}
   networkPolicy:
     enabled: true
@@ -1035,6 +1043,7 @@ settings:
     reservedENIs: "1"
 EOF
 helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace karpenter --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" karpenter oci://public.ecr.aws/karpenter/karpenter
+kubectl label namespace karpenter pod-security.kubernetes.io/enforce=baseline
 ```
 
 ### aws-for-fluent-bit
@@ -1111,6 +1120,7 @@ webhook:
     enabled: true
 EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
+kubectl label namespace cert-manager pod-security.kubernetes.io/enforce=baseline
 ```
 
 Add ClusterIssuers for Let's Encrypt staging:
@@ -1225,6 +1235,7 @@ serviceMonitor:
   enabled: true
 EOF
 helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
+kubectl label namespace external-dns pod-security.kubernetes.io/enforce=baseline
 ```
 
 ### ingress-nginx
@@ -1299,6 +1310,7 @@ controller:
             summary: More than 5% of all requests returned 4XX, this requires your attention
 EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
+kubectl label namespace ingress-nginx pod-security.kubernetes.io/enforce=baseline
 ```
 
 ### forecastle
@@ -1344,6 +1356,7 @@ forecastle:
           - ${CLUSTER_FQDN}
 EOF
 helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace forecastle --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" forecastle stakater/forecastle
+kubectl label namespace forecastle pod-security.kubernetes.io/enforce=baseline
 ```
 
 ### oauth2-proxy
@@ -1392,6 +1405,7 @@ metrics:
     enabled: true
 EOF
 helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" oauth2-proxy oauth2-proxy/oauth2-proxy
+kubectl label namespace oauth2-proxy pod-security.kubernetes.io/enforce=baseline
 ```
 
 ## Clean-up
