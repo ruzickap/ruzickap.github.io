@@ -14,7 +14,7 @@ with Karpenter and Cilium (+ standard apps).
 
 Amazon EKS should meet these "cheap" requirements:
 
-- Two AZ only - no payments for cross availability zones traffic
+- Two AZ only - less payments for cross availability zones traffic
 - Spot instances
 - Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using

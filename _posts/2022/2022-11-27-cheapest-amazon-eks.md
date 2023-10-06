@@ -17,7 +17,7 @@ with lowest price.
 
 Requirements:
 
-- Two AZ, use one zone if possible (no payments for cross AZ traffic)
+- Two AZ, use one zone if possible (less payments for cross AZ traffic)
 - Spot instances
 - Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using

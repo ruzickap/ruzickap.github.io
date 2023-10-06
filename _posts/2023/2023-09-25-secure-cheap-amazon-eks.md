@@ -15,7 +15,7 @@ standard applications in the configuration.
 
 Amazon EKS should align with these cost-effective criteria:
 
-- Two AZ, use one zone if possible (no payments for cross AZ traffic)
+- Two AZ, use one zone if possible (less payments for cross AZ traffic)
 - Spot instances
 - Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
@@ -394,12 +394,11 @@ iamIdentityMappings:
     username: admin
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.30.0
+  version: v0.31.0
   createServiceAccount: true
   withSpotInterruptionQueue: true
 addons:
   - name: vpc-cni
-    # min version 1.14.0
     version: latest
     configurationValues: |-
       enableNetworkPolicy: "true"
@@ -425,6 +424,10 @@ managedNodeGroups:
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
     maxPodsPerNode: 110
     privateNetworking: true
+    bottlerocket:
+      settings:
+        kubernetes:
+          seccomp-default: true
 secretsEncryption:
   keyARN: ${AWS_KMS_KEY_ARN}
 cloudWatch:
@@ -483,10 +486,10 @@ Enhance the security stance of the EKS cluster by addressing the following conce
   aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 2 --protocol tcp --port-range "From=3389,To=3389" --cidr-block 0.0.0.0/0 --rule-action Deny
   ```
 
-- VPC NACL should be configured to allow only needed traffic:
+- Namespace does not have PSS level assigned:
 
   ```bash
-  # aws ec2 replace-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 100 --protocol tcp --port-range "From=443,To=443" --cidr-block 0.0.0.0/0 --rule-action allow
+  kubectl label namespace default pod-security.kubernetes.io/enforce=baseline
   ```
 
 ### Karpenter
@@ -593,8 +596,6 @@ SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="1.9.1"
 
 helm repo add piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
-
-# Fix: Namespace does not have PSS level assigned
 kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=baseline
 ```
 
@@ -1031,7 +1032,7 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.30.0"
+KARPENTER_HELM_CHART_VERSION="v0.31.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
@@ -1407,6 +1408,16 @@ EOF
 helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" oauth2-proxy oauth2-proxy/oauth2-proxy
 kubectl label namespace oauth2-proxy pod-security.kubernetes.io/enforce=baseline
 ```
+
+### Enforce Pod Security Standards with Namespace Labels
+
+Label all namespaces to warn when going agains the Pod Security Standards:
+
+```bash
+kubectl label namespace --all pod-security.kubernetes.io/warn=baseline
+```
+
+Details can be foung in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
 
 ## Clean-up
 
