@@ -143,7 +143,7 @@ WiFi + Configure FTP Transfer.
 - Find your local IP address on the Mac by running the `ifconfig` command in the
 [terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac):
 
-  ```bash
+  ```console
   ❯ ifconfig en0
   ...
     inet 172.20.10.4 netmask ...
