@@ -679,7 +679,7 @@ helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERS
 
 ### mailpit
 
-Mailpit will be used to receive email alerts form the Prometheus.
+Mailpit will be used to receive email alerts from the Prometheus.
 
 ![mailpit](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
 "mailpit"){: width="200" }
@@ -1411,13 +1411,13 @@ kubectl label namespace oauth2-proxy pod-security.kubernetes.io/enforce=baseline
 
 ### Enforce Pod Security Standards with Namespace Labels
 
-Label all namespaces to warn when going agains the Pod Security Standards:
+Label all namespaces to warn when going against the Pod Security Standards:
 
 ```bash
 kubectl label namespace --all pod-security.kubernetes.io/warn=baseline
 ```
 
-Details can be foung in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
+Details can be found in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
 
 ## Clean-up
 
