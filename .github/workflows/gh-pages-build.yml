@@ -31,6 +31,8 @@ jobs:
           mkdir public
           cp LICENSE README.md public/
           touch public/.nojekyll
+          echo "google-site-verification: googleaa2cf0133141f1f4.html" > public/googleaa2cf0133141f1f4.html
+          echo -e '<?xml version="1.0"?>\n<users>\n\t<user>592AB158E3F9EF887F8DC8E69A2FF754</user>\n</users>' > public/BingSiteAuth.xml
 
       - name: Set Variables
         id: variables
