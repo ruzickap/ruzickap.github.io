@@ -26,14 +26,6 @@ jobs:
           fetch-depth: 0
           submodules: true
 
-      - name: Prepare public directory
-        run: |
-          mkdir public
-          cp LICENSE README.md public/
-          touch public/.nojekyll
-          echo "google-site-verification: googleaa2cf0133141f1f4.html" > public/googleaa2cf0133141f1f4.html
-          echo -e '<?xml version="1.0"?>\n<users>\n\t<user>592AB158E3F9EF887F8DC8E69A2FF754</user>\n</users>' > public/BingSiteAuth.xml
-
       - name: Set Variables
         id: variables
         run: |
@@ -49,6 +41,7 @@ jobs:
           echo "BASE_DOMAIN=${BASE_DOMAIN}" | tee -a "${GITHUB_OUTPUT}"
           echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_OUTPUT}"
           sed -i "s@^url: .*@url: 'https://${BASE_DOMAIN}'@" _config.yml
+          mkdir public
 
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
@@ -66,6 +59,13 @@ jobs:
           bundle exec htmlproofer public \
             --disable-external=true \
             --ignore-urls "/^http://127.0.0.1/,/^http://0.0.0.0/,/^http://localhost/"
+
+      - name: Add files to public directory
+        run: |
+          cp LICENSE README.md public/
+          touch public/.nojekyll
+          echo 'google-site-verification: googleaa2cf0133141f1f4.html' > public/googleaa2cf0133141f1f4.html
+          echo -e '<?xml version="1.0"?>\n<users>\n\t<user>592AB158E3F9EF887F8DC8E69A2FF754</user>\n</users>' > public/BingSiteAuth.xml
 
       - name: Check broken links
         uses: ruzickap/action-my-broken-link-checker@v2
