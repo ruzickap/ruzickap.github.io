@@ -3,10 +3,6 @@
 # Import the theme
 theme: jekyll-theme-chirpy
 
-# Change the following value to '/PROJECT_NAME' ONLY IF your site type is GitHub Pages Project sites
-# and doesn't have a custom domain.
-baseurl: ''
-
 # The language of the webpage › http://www.lingoes.net/en/translator/langcode.htm
 # If it has the same name as one of the files in folder `_data/locales`, the layout language will also be changed,
 # otherwise, the layout language will use the default value of 'en'.
@@ -53,7 +49,7 @@ google_site_verification: y45N8avw0zpYwbPL8ncwcQC79xOBMNZcvD0380LRsBU # fill in 
 # The end of `jekyll-seo-tag` settings
 
 google_analytics:
-  id: # fill in your Google Analytics ID
+  id: G-64WRCWDZM8 # fill in your Google Analytics ID
 
 # Prefer color scheme setting.
 #
@@ -112,6 +108,9 @@ pwa:
   enabled: true # the option for PWA feature
 
 paginate: 10
+
+# The base URL of your site
+baseurl: ''
 
 # ------------ The following options are not recommended to be modified ------------------
 

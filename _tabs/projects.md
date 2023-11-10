@@ -597,7 +597,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - Links](https://github.com/ruzickap/myteam-adr/workflows/Links/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/links.yml)
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/myteam-adr/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/linter.yml)
   [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/myteam-adr/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - Publish ADR](https://github.com/ruzickap/myteam-adr/workflows/Publish%20ADR/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/publish-adr.yml)
