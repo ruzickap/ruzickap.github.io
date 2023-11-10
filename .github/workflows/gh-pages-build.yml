@@ -62,7 +62,8 @@ jobs:
 
       - name: Add files to public directory
         run: |
-          cp LICENSE README.md public/
+          cp LICENSE public/
+          sed -n '1,/Dev Page:/p' README.md > public/README.md
           touch public/.nojekyll
           echo 'google-site-verification: googleaa2cf0133141f1f4.html' > public/googleaa2cf0133141f1f4.html
           echo -e '<?xml version="1.0"?>\n<users>\n\t<user>592AB158E3F9EF887F8DC8E69A2FF754</user>\n</users>' > public/BingSiteAuth.xml
@@ -72,7 +73,7 @@ jobs:
         with:
           url: https://${{ steps.variables.outputs.BASE_DOMAIN }}
           pages_path: public
-          cmd_params: '--exclude=(linkedin.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/|k01.k8s.mylabs.dev) --color=always --header="User-Agent:curl/7.54.0" --buffer-size=8192 --skip-tls-verification'
+          cmd_params: '--exclude=(linkedin.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/|k01.k8s.mylabs.dev|www.googletagmanager.com) --color=always --header="User-Agent:curl/7.54.0" --buffer-size=8192 --skip-tls-verification'
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

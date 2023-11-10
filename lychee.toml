@@ -24,11 +24,12 @@ accept = [999]
 # Exclude URLs and mail addresses from checking (supports regex)
 # https://github.com/cotes2020/jekyll-theme-chirpy/issues/758
 exclude = [
-  'https://fonts\.(googleapis|gstatic)\.com/',
-  'https://ruzickap\.github\.io/projects/',
+  'fonts\.(googleapis|gstatic)\.com',
+  'www.googletagmanager.com',
+  'ruzickap\.github\.io/projects/',
   # Due to: [TIMEOUT] https://twitter.com/Ruzicka_Petr | Timeout
-  'https://twitter\.com/Ruzicka_Petr',
-  'https://.*k01\.k8s\.mylabs\.dev/.*',
+  'twitter\.com/Ruzicka_Petr',
+  'k01\.k8s\.mylabs\.dev',
   # Ignore all URLS with ${.*} - BASH variable in URL
   '.*\$%7B.*%7D.*',
   # Ignore all URLS with ${{ }} - used in renovate configuration: "https://grafana.com/api/dashboards/{{packageName}}"
