@@ -11,7 +11,7 @@
   },
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
-  ignoreDeps: ["jekyll-sass-converter", "http_parser.rb", "html-proofer"],
+  ignoreDeps: ["http_parser.rb", "html-proofer"],
   ignoreTests: true,
   labels: [
     "renovate",
@@ -32,7 +32,7 @@
       ignoreTests: false,
       matchPackageNames: ["renovatebot/github-action"],
       matchUpdateTypes: ["minor"],
-      schedule: ["* 0,2,4 1-7 * 0"],
+      schedule: ["* * * * 0"],
     },
     {
       description: "AutoMerge eksctl",

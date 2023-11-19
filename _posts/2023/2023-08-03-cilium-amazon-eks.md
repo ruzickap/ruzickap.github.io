@@ -38,7 +38,7 @@ The Cilium installation should meet these requirements:
 
 - [Transparent network encryption](https://isovalent.com/videos/wireguard-node-to-node-encryption-on-cilium/)
   (node to node traffic) should be enabled
-- Encryption should use [Wireguard](https://www.wireguard.com/) as a "fastest
+- Encryption should use [Wireguard](https://www.wireguard.com) as a "fastest
   encryption method"
 - Use [Elastic Network Interface (ENI)](https://docs.cilium.io/en/v1.14/network/concepts/ipam/eni/#aws-eni)
   integration
