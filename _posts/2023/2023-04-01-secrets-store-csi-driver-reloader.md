@@ -119,7 +119,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=secrets-store-csi-driver registryUrl=https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
-SECRETS_STORE_CSI_DRIVER_HELM_CHART_VERSION="1.3.4"
+SECRETS_STORE_CSI_DRIVER_HELM_CHART_VERSION="1.4.0"
 
 helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-secrets-store-csi-driver.yml" << EOF
