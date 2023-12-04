@@ -147,7 +147,7 @@ The necessary components are ready...
 
 [kuard](https://github.com/kubernetes-up-and-running/kuard) is a simple app
 which can be used to display various pod details created for the
-[Kubernetes: Up and Running](https://hello-tanzu.vmware.com/kubernetes-up-and-running-3/)
+[Kubernetes: Up and Running](https://books.google.cz/books/about/Kubernetes_Up_and_Running.html?id=fF4KswEACAAJ)
 book.
 
 Install [kuard](https://github.com/kubernetes-up-and-running/kuard) which will

@@ -9,7 +9,7 @@ My personal site and blog...
 
 [**ruzickap.github.io**](https://ruzickap.github.io/)
 
-- Main Page: <https://blog.ruzicka.dev>, <https://ruzickap.github.io>
+- Main Page: <https://ruzickap.github.io>
 - Dev Page: <https://ruzickap-github-io.pages.dev>
 
 ## Theme Source
