@@ -959,8 +959,8 @@ grafana:
         datasource: Prometheus
       15038-external-dns:
         # renovate: depName="External-dns"
-        gnetId: 15038
-        revision: 1
+        gnetId: 35038
+        revision: 3
         datasource: Prometheus
       14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
         # renovate: depName="Kubernetes Nginx Ingress Prometheus NextGen"
