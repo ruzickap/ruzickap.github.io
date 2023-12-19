@@ -884,7 +884,7 @@ grafana:
       15758-kubernetes-views-namespaces:
         # renovate: depName="Kubernetes / Views / Namespaces"
         gnetId: 15758
-        revision: 27
+        revision: 28
         datasource: Prometheus
       15759-kubernetes-views-nodes:
         # renovate: depName="Kubernetes / Views / Nodes"
