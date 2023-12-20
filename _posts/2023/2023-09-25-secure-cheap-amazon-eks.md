@@ -23,6 +23,11 @@ image:
   path: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 
+> The post was updated to use the [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
+> and [EKS Access Entries](https://aws.amazon.com/blogs/containers/a-deep-dive-into-simplified-amazon-eks-access-management-controls/)
+> introduced in Nov 2023.
+{: .prompt-info }
+
 I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)
 environment that is cost-effective while prioritizing security, and include
 standard applications in the configuration.
@@ -288,7 +293,7 @@ Resources:
                 - !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
                 # The following roles needs to be enabled after the EKS cluster is created
                 # aws-ebs-csi-driver + Karpenter should be able to use the KMS key
-                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-irsa-aws-ebs-csi-driver"
+                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-pia-aws-ebs-csi-driver"
                 # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-iamservice-role"
             Action:
               - kms:Encrypt
@@ -302,7 +307,7 @@ Resources:
             Principal:
               AWS:
                 - !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-irsa-aws-ebs-csi-driver"
+                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-pia-aws-ebs-csi-driver"
                 # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-iamservice-role"
             Action:
               - kms:CreateGrant
@@ -370,61 +375,70 @@ metadata:
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
+accessConfig:
+  authenticationMode: API
+  accessEntries:
+    - principalARN: arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin
+      accessPolicies:
+        - policyARN: arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+          accessScope:
+            type: cluster
+    - principalARN: arn:aws:iam::${AWS_ACCOUNT_ID}:user/aws-cli
+      accessPolicies:
+        - policyARN: arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+          accessScope:
+            type: cluster
 iam:
-  withOIDC: true
-  serviceAccounts:
-    - metadata:
-        name: aws-for-fluent-bit
-        namespace: aws-for-fluent-bit
-      attachPolicyARNs:
+  withOIDC: true # needed by Karpenter
+  podIdentityAssociations:
+    - namespace: aws-for-fluent-bit
+      serviceAccountName: aws-for-fluent-bit
+      roleName: eksctl-${CLUSTER_NAME}-pia-aws-for-fluent-bit
+      permissionPolicyARNs:
         - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
-      roleName: eksctl-${CLUSTER_NAME}-irsa-aws-for-fluent-bit
-    - metadata:
-        name: ebs-csi-controller-sa
-        namespace: aws-ebs-csi-driver
+      tags: &pia_tags
+        $(echo "${TAGS}" | sed "s/,/\\n        /g; s/=/: /g")
+    - namespace: aws-ebs-csi-driver
+      serviceAccountName: ebs-csi-controller-sa
+      roleName: eksctl-${CLUSTER_NAME}-pia-aws-ebs-csi-driver
       wellKnownPolicies:
         ebsCSIController: true
-      roleName: eksctl-${CLUSTER_NAME}-irsa-aws-ebs-csi-driver
-    - metadata:
-        name: cert-manager
-        namespace: cert-manager
+      tags: *pia_tags
+    - namespace: cert-manager
+      serviceAccountName: cert-manager
+      roleName: eksctl-${CLUSTER_NAME}-pia-cert-manager
       wellKnownPolicies:
         certManager: true
-      roleName: eksctl-${CLUSTER_NAME}-irsa-cert-manager
-    - metadata:
-        name: cilium-operator
-        namespace: cilium
-      attachPolicyARNs:
+      tags: *pia_tags
+    - namespace: cilium
+      serviceAccountName: cilium-operator
+      roleName: eksctl-${CLUSTER_NAME}-pia-cilium
+      permissionPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
         - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-      roleName: eksctl-${CLUSTER_NAME}-irsa-cilium
-      roleOnly: true
-    - metadata:
-        name: external-dns
-        namespace: external-dns
+      tags: *pia_tags
+    - namespace: external-dns
+      serviceAccountName: external-dns
+      roleName: eksctl-${CLUSTER_NAME}-pia-external-dns
       wellKnownPolicies:
         externalDNS: true
-      roleName: eksctl-${CLUSTER_NAME}-irsa-external-dns
-# Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
-iamIdentityMappings:
-  - arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin
-    groups:
-      - system:masters
-    username: admin
+      tags: *pia_tags
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
   version: v0.34.0
   createServiceAccount: true
   withSpotInterruptionQueue: true
 addons:
+  - name: coredns
+  - name: eks-pod-identity-agent
+  - name: kube-proxy
+  - name: snapshot-controller
   - name: vpc-cni
     version: latest
     configurationValues: |-
       enableNetworkPolicy: "true"
       env:
         ENABLE_PREFIX_DELEGATION: "true"
-  - name: kube-proxy
-  - name: coredns
 managedNodeGroups:
   - name: mng01-ng
     amiFamily: Bottlerocket
@@ -438,10 +452,10 @@ managedNodeGroups:
     minSize: 2
     maxSize: 5
     volumeSize: 20
-    disablePodIMDS: true
+    # Check with PIA
+    # disablePodIMDS: true
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
-    maxPodsPerNode: 110
     privateNetworking: true
     bottlerocket:
       settings:
@@ -477,7 +491,7 @@ aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 ```
 
 The command "sed" used earlier modified the aws-cf-route53-kms.yml file by
-incorporating newly established IAM roles (`eksctl-k01-irsa-aws-ebs-csi-driver`
+incorporating newly established IAM roles (`eksctl-k01-pia-aws-ebs-csi-driver`
 and `eksctl-k01-iamservice-role`), enabling them to utilize the KMS key.
 
 ![KMS key with new IAM roles](/assets/img/posts/2023/2023-08-03-cilium-amazon-eks/kms-key-2.avif)
@@ -547,8 +561,6 @@ spec:
     - key: karpenter.k8s.aws/instance-family
       operator: In
       values: ["t3a", "t4g"]
-  kubeletConfiguration:
-    maxPods: 110
   # Resource limits constrain the total size of the cluster.
   # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
@@ -597,7 +609,7 @@ EOF
 Install Volume Snapshot Custom Resource Definitions (CRDs):
 
 ```bash
-kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
+# kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
 ```
 
 ![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg){:width="500"}
@@ -611,9 +623,9 @@ and modify the
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
 SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.0"
 
-helm repo add piraeus-charts https://piraeus.io/helm-charts/
-helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
-kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=baseline
+# helm repo add piraeus-charts https://piraeus.io/helm-charts/
+# helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
+# kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=baseline
 ```
 
 ### aws-ebs-csi-driver
@@ -644,7 +656,6 @@ controller:
     "eks:cluster-name": ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   serviceAccount:
-    create: false
     name: ebs-csi-controller-sa
   region: ${AWS_DEFAULT_REGION}
 node:
@@ -664,7 +675,7 @@ volumeSnapshotClasses:
       snapshot.storage.kubernetes.io/is-default-class: "true"
     deletionPolicy: Delete
 EOF
-helm upgrade --install --version "${AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION}" --namespace aws-ebs-csi-driver --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver
+helm upgrade --install --version "${AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION}" --namespace aws-ebs-csi-driver --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver
 ```
 
 Delete `gp2` StorageClass, because the `gp3` will be used instead:
@@ -1084,7 +1095,6 @@ cloudWatchLogs:
   logGroupTemplate: "/aws/eks/${CLUSTER_NAME}/cluster"
   logStreamTemplate: "\$kubernetes['namespace_name'].\$kubernetes['pod_name']"
 serviceAccount:
-  create: false
   name: aws-for-fluent-bit
 serviceMonitor:
   enabled: true
@@ -1095,7 +1105,7 @@ serviceMonitor:
       scrapeTimeout: 10s
       scheme: http
 EOF
-helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --namespace aws-for-fluent-bit --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" aws-for-fluent-bit eks/aws-for-fluent-bit
+helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --namespace aws-for-fluent-bit --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" aws-for-fluent-bit eks/aws-for-fluent-bit
 ```
 
 ### cert-manager
@@ -1120,7 +1130,6 @@ helm repo add jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
-  create: false
   name: cert-manager
 extraArgs:
   - --cluster-resource-namespace=cert-manager
@@ -1243,12 +1252,11 @@ domainFilters:
 interval: 20s
 policy: sync
 serviceAccount:
-  create: false
   name: external-dns
 serviceMonitor:
   enabled: true
 EOF
-helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
+helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
 kubectl label namespace external-dns pod-security.kubernetes.io/enforce=baseline
 ```
 
