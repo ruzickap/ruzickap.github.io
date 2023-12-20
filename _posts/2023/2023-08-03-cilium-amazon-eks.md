@@ -991,7 +991,7 @@ grafana:
       15759-kubernetes-views-nodes:
         # renovate: depName="Kubernetes / Views / Nodes"
         gnetId: 15759
-        revision: 22
+        revision: 23
         datasource: Prometheus
       15761-kubernetes-system-api-server:
         # renovate: depName="Kubernetes / System / API Server"
