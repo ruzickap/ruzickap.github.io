@@ -874,7 +874,7 @@ grafana:
       15760-kubernetes-views-pods:
         # renovate: depName="Kubernetes / Views / Pods"
         gnetId: 15760
-        revision: 24
+        revision: 25
         datasource: Prometheus
       15757-kubernetes-views-global:
         # renovate: depName="Kubernetes / Views / Global"
