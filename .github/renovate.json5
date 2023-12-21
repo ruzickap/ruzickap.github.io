@@ -35,11 +35,6 @@
       schedule: ["* * * * 0"],
     },
     {
-      description: "AutoMerge eksctl",
-      matchPackageNames: ["weaveworks/eksctl"],
-      matchUpdateTypes: ["minor", "patch"],
-    },
-    {
       description: "AutoMerge kube-prometheus-stack helm chart version",
       matchDatasources: ["helm"],
       matchPackagePatterns: ["(^|\\/)kube-prometheus-stack$"],
