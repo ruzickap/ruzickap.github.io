@@ -667,7 +667,7 @@ grafana:
       15762-kubernetes-system-coredns:
         # renovate: depName="Kubernetes / System / CoreDNS"
         gnetId: 15762
-        revision: 13
+        revision: 14
         datasource: Prometheus
       19105-prometheus:
         # renovate: depName="Prometheus"
