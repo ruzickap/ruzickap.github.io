@@ -4,6 +4,7 @@ useDefault = true
 [allowlist]
 paths = [
   '''^_posts/2023/2023-03-08-trivy-operator-grafana.md$''',
+  '''^_posts/2023/2023-04-01-secrets-store-csi-driver-reloader.md$''',
   '''^assets/js/data/search.json$''',
   '''^posts/trivy-operator-grafana/index.html$''',
 ]

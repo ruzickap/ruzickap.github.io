@@ -75,7 +75,7 @@ jobs:
         with:
           url: https://${{ steps.variables.outputs.BASE_DOMAIN }}
           pages_path: public
-          cmd_params: '--exclude=(linkedin.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/|k01.k8s.mylabs.dev|www.googletagmanager.com) --color=always --header="User-Agent:curl/7.54.0" --buffer-size=8192 --skip-tls-verification'
+          cmd_params: '--exclude=(linkedin.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/|k01.k8s.mylabs.dev|www.googletagmanager.com|hub.docker.com) --color=always --header="User-Agent:curl/7.54.0" --buffer-size=8192 --skip-tls-verification'
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

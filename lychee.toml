@@ -30,6 +30,8 @@ exclude = [
   # Due to: [TIMEOUT] https://twitter.com/Ruzicka_Petr | Timeout
   'twitter\.com/Ruzicka_Petr',
   'k01\.k8s\.mylabs\.dev',
+  # Ignore Docker Hub
+  'https://hub.docker.com',
   # Ignore all URLS with ${.*} - BASH variable in URL
   '.*\$%7B.*%7D.*',
   # Ignore all URLS with ${{ }} - used in renovate configuration: "https://grafana.com/api/dashboards/{{packageName}}"
