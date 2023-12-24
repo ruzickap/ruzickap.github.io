@@ -55,7 +55,7 @@ mega-linter-runner --flavor documentation \
 
 ## Notes
 
-- Use ```` ```bash ```` to run commands during the [post_tests](./.github/workflows/post_tests.yml)
+- Use ` ```bash ` to run commands during the [post_tests](./.github/workflows/post_tests.yml)
   "create" execution:
 
   ````md
@@ -64,7 +64,7 @@ mega-linter-runner --flavor documentation \
   ```
   ````
 
-- Use ```` ```shell ```` not to run commands during the [post_tests](./.github/workflows/post_tests.yml)
+- Use ` ```shell ` not to run commands during the [post_tests](./.github/workflows/post_tests.yml)
   execution (they will be only displayed on the web pages):
 
   ````md
@@ -73,7 +73,7 @@ mega-linter-runner --flavor documentation \
   ```
   ````
 
-- Use ```` ```sh```` to run commands during the [post_tests](./.github/workflows/post_tests.yml)
+- Use ` ```sh ` to run commands during the [post_tests](./.github/workflows/post_tests.yml)
   "destroy" execution:
 
   ````md
