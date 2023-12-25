@@ -319,6 +319,7 @@ to verify them before upgrading the cluster:
 kubectl deprecations --k8s-version=v1.27.0
 ```
 
+<!-- markdownlint-disable -->
 <!---
 RESULTS:
 Deprecated APIs:
@@ -334,6 +335,7 @@ ComponentStatus found in /v1
 
 Deleted APIs:
 -->
+<!-- markdownlint-restore -->
 
 ![deprecations screenshot](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-deprecations.avif)
 _deprecations screenshot_
@@ -426,7 +428,8 @@ _open-svc screenshot from official GitHub repository_
 
 * Kubectl plugin for show pod-related resources.
 
-![pod-lens screenshot](https://raw.githubusercontent.com/sunny0826/kubectl-pod-lens/c66b6e7c9a0ace381f14daa3ff15ed20fdf3edde/docs/static/logo.png){: width="150" }
+![pod-lens screenshot](https://raw.githubusercontent.com/sunny0826/kubectl-pod-lens/c66b6e7c9a0ace381f14daa3ff15ed20fdf3edde/docs/static/logo.png
+"pod-lens screenshot"){: width="150" }
 _pod-lens logo_
 
 [pod-lens](https://github.com/sunny0826/kubectl-pod-lens) krew plugin
@@ -443,6 +446,7 @@ PVC, HPA and PDB by pod name and display them in a tree:
 kubectl pod-lens -n kube-prometheus-stack prometheus-kube-prometheus-stack-prometheus-0
 ```
 
+<!-- markdownlint-disable -->
 <!---
  [Namespace]  kube-prometheus-stack
 └─┬ [Namespace]  kube-prometheus-stack                                                                          Replica: 1/1
@@ -469,6 +473,7 @@ Size:           2Gi
 PV Name:        pvc-2ab27f7a-b656-4560-808b-3840760ed79c
 ---             ---
 -->
+<!-- markdownlint-restore -->
 
 ![pod-lens kube-prometheus-stack screenshot](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-pod-lens-kube-prometheus-stack.avif)
 _pod-lens showing details in kube-prometheus-stack namespace_
@@ -477,8 +482,7 @@ _pod-lens showing details in kube-prometheus-stack namespace_
 kubectl pod-lens -n karpenter karpenter-
 ```
 
-<!-- markdownlint-disable hr-style -->
-
+<!-- markdownlint-disable -->
 <!---
  [Namespace]  karpenter
 └─┬ [Namespace]  karpenter                        Replica: 1/1
@@ -525,10 +529,10 @@ MaxAvailable: 1
 Disruptions:  1
 ---           ---
 -->
+<!-- markdownlint-restore -->
 
-<!-- markdownlint-enable hr-style -->
-
-![pod-lens karpenter screenshot](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-pod-lens-karpenter.avif){: width="500" }
+![pod-lens karpenter screenshot](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-pod-lens-karpenter.avif
+"pod-lens karpenter screenshot"){: width="500" }
 _pod-lens showing details in karpenter namespace_
 
 ### [rbac-tool](https://github.com/alcideio/rbac-tool)
@@ -576,7 +580,6 @@ kubectl rbac-tool who-can watch deployments.apps
   User           | eks:vpc-resource-controller              |
   User           | system:kube-controller-manager           |
 ```
-
 
 Get details about the current "user":
 
@@ -708,6 +711,7 @@ Show karpenter `ServiceAccount` details:
 kubectl rolesum --namespace karpenter karpenter
 ```
 
+<!-- markdownlint-disable -->
 <!---
 ServiceAccount: karpenter/karpenter
 Secrets:
@@ -753,6 +757,7 @@ Policies:
   storageclasses.storage.k8s.io                                                                    [*]                                       [-]     [-]   ✔ ✔ ✔ ✖ ✖ ✖ ✖ ✖
   validatingwebhookconfigurations.admissionregistration.k8s.io  [validation.webhook.karpenter.sh, validation.webhook.config.karpenter.sh]    [-]     [-]   ✖ ✖ ✖ ✖ ✔ ✖ ✖ ✖
 -->
+<!-- markdownlint-restore -->
 
 ![rolesum screenshot](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-rolesum.avif)
 _rolesum screenshot_
@@ -774,6 +779,7 @@ Check logs for all pods in `cert-manager` namespace in past 1 hour:
 kubectl stern -n cert-manager . --tail 5 --since 1h --no-follow
 ```
 
+<!-- markdownlint-disable -->
 <!---
 + cert-manager-webhook-54f9d96756-8nbqx › cert-manager-webhook
 + cert-manager-777fbdc9f8-qhk2d › cert-manager-controller
@@ -797,6 +803,7 @@ cert-manager-webhook-54f9d96756-8nbqx cert-manager-webhook I0624 11:39:26.294153
 cert-manager-webhook-54f9d96756-8nbqx cert-manager-webhook I0624 11:39:26.318155       1 logs.go:59] http: TLS handshake error from 192.168.113.49:49852: EOF
 - cert-manager-webhook-54f9d96756-8nbqx › cert-manager-webhook
 -->
+<!-- markdownlint-restore -->
 
 ![stern screenshot](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-stern.avif)
 _stern screenshot_
@@ -817,6 +824,7 @@ kubectl krew install view-allocations
 kubectl view-allocations --utilization
 ```
 
+<!-- markdownlint-disable -->
 <!---
  Resource                                                            Utilization      Requested         Limit  Allocatable   Free
   attachable-volumes-aws-ebs                                                  __             __            __         78.0     __
@@ -893,6 +901,7 @@ kubectl view-allocations --utilization
   ├─ ip-192-168-19-143.ec2.internal                                           __     (15%) 16.0    (15%) 16.0        110.0   94.0
   └─ ip-192-168-3-70.ec2.internal                                             __     (12%) 13.0    (12%) 13.0        110.0   97.0
 -->
+<!-- markdownlint-restore -->
 
 ![view-allocations screenshot](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-view-allocations.avif)
 _view-allocations screenshot_

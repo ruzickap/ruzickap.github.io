@@ -35,7 +35,7 @@ jobs:
           chmod a+x README.sh
 
       - name: MegaLinter
-        uses: oxsecurity/megalinter/flavors/documentation@v7.4.0
+        uses: oxsecurity/megalinter/flavors/documentation@v7.7.0
         env:
           BASH_SHFMT_ARGUMENTS: --indent 2 --space-redirects
           DISABLE_LINTERS: REPOSITORY_DEVSKIM,SPELL_CSPELL
@@ -45,10 +45,9 @@ jobs:
           GITHUB_STATUS_REPORTER: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           HTML_HTMLHINT_FILTER_REGEX_EXCLUDE: ^index.html
-          JSON_PRETTIER_FILTER_REGEX_EXCLUDE: ^.markdown-link-check.json
+          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yml
           PRINT_ALPACA: false
           RUBY_RUBOCOP_FILTER_REGEX_EXCLUDE: ^_plugins
-          SPELL_CSPELL_FILTER_REGEX_INCLUDE: (^README.md|^_posts/)
           # Needed for scanning generated README.sh file
           VALIDATE_ALL_CODEBASE: true
           YAML_PRETTIER_FILTER_REGEX_EXCLUDE: (^_data/|^_config.yml)
