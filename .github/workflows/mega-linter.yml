@@ -19,6 +19,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Restore lychee cache
+        uses: actions/cache@v3
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
       - name: Extract commands from markdown files
         run: |
           set -euxo pipefail
@@ -37,18 +44,7 @@ jobs:
       - name: MegaLinter
         uses: oxsecurity/megalinter/flavors/documentation@v7.7.0
         env:
-          BASH_SHFMT_ARGUMENTS: --indent 2 --space-redirects
-          DISABLE_LINTERS: REPOSITORY_DEVSKIM,SPELL_CSPELL
-          FILTER_REGEX_EXCLUDE: CHANGELOG.md
-          FORMATTERS_DISABLE_ERRORS: false
           GITHUB_COMMENT_REPORTER: false
           GITHUB_STATUS_REPORTER: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HTML_HTMLHINT_FILTER_REGEX_EXCLUDE: ^index.html
-          MARKDOWN_MARKDOWNLINT_CONFIG_FILE: .markdownlint.yml
-          PRINT_ALPACA: false
-          RUBY_RUBOCOP_FILTER_REGEX_EXCLUDE: ^_plugins
-          # Needed for scanning generated README.sh file
           VALIDATE_ALL_CODEBASE: true
-          YAML_PRETTIER_FILTER_REGEX_EXCLUDE: (^_data/|^_config.yml)
-          YAML_V8R_FILTER_REGEX_EXCLUDE: (^_data/|^_config.yml)
