@@ -5,3 +5,6 @@
 .jekyll-cache
 _site
 Gemfile.lock
+
+# Lychee cache
+.lycheecache
