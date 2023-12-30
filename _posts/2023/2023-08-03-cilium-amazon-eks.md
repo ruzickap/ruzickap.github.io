@@ -4,7 +4,23 @@ author: Petr Ruzicka
 date: 2023-08-03
 description: Build "cheap and secure" Amazon EKS with Karpenter and Cilium
 categories: [Kubernetes, Amazon EKS, Cilium, Security]
-tags: [Amazon EKS, k8s, kubernetes, security, karpenter, eksctl, cert-manager, external-dns, podinfo, cilium, prometheus, sso, oauth2-proxy, metrics-server]
+tags:
+  [
+    Amazon EKS,
+    k8s,
+    kubernetes,
+    security,
+    karpenter,
+    eksctl,
+    cert-manager,
+    external-dns,
+    podinfo,
+    cilium,
+    prometheus,
+    sso,
+    oauth2-proxy,
+    metrics-server,
+  ]
 image:
   path: https://raw.githubusercontent.com/cncf/artwork/ac38e11ed57f017a06c9dcb19013bcaed92115a9/projects/cilium/icon/color/cilium_icon-color.svg
 ---
@@ -102,7 +118,7 @@ Install necessary tools:
 
 > You can skip these steps if you have all the required software already
 > installed.
-{: .prompt-tip }
+> {: .prompt-tip }
 
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
@@ -113,7 +129,7 @@ Install necessary tools:
 ## Configure AWS Route 53 Domain delegation
 
 > DNS delegation steps should be done only once
-{: .prompt-info }
+> {: .prompt-info }
 
 Create DNS zone for EKS clusters:
 
@@ -151,6 +167,7 @@ ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev
 ```
 
 <!-- markdownlint-disable blanks-around-fences -->
+
 ```console
 localhost | CHANGED => {
     "ansible_facts": {
@@ -209,6 +226,7 @@ localhost | CHANGED => {
     }
 }
 ```
+
 <!-- markdownlint-enable blanks-around-fences -->
 
 ![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
@@ -345,8 +363,7 @@ _KMS key_
 
 I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 
-![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png
-"eksctl"){: width="700" }
+![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png "eksctl"){: width="700" }
 
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
 
@@ -511,8 +528,7 @@ Endpoint ports:
 - 9963 (cilium-operator/metrics)
 - 9964 (envoy-metrics), 9965 (hubble-metrics)
 
-![Cilium](https://raw.githubusercontent.com/cilium/cilium/eb3662e6f72d8fa1d2c884967e8de6bf063cb108/Documentation/images/logo.svg
-"cilium"){: width="500" }
+![Cilium](https://raw.githubusercontent.com/cilium/cilium/eb3662e6f72d8fa1d2c884967e8de6bf063cb108/Documentation/images/logo.svg "cilium"){: width="500" }
 
 Install [Cilium](https://cilium.io/) and remove nodegroup `mng02-ng` used for
 "eksctl karpenter" installation (It is no longer needed because Cilium will be
@@ -574,8 +590,7 @@ fi
 [Karpenter](https://karpenter.sh/) is a Kubernetes Node Autoscaler built
 for flexibility, performance, and simplicity.
 
-![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
-"Karpenter"){: width="500" }
+![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png "Karpenter"){: width="500" }
 
 Configure [Karpenter](https://karpenter.sh/):
 
@@ -659,8 +674,7 @@ Install Volume Snapshot Custom Resource Definitions (CRDs):
 kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
 ```
 
-![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg
-"csi"){: width="500" }
+![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg "csi"){: width="500" }
 
 Install volume snapshot controller `snapshot-controller`
 [helm chart](https://github.com/piraeusdatastore/helm-charts/tree/main/charts/snapshot-controller)
@@ -768,8 +782,7 @@ Then you will need some basic tools / integrations, like [external-dns](https://
 
 Mailhog will be used to receive email alerts form the Prometheus.
 
-![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
-"mailhog"){: width="200" }
+![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png "mailhog"){: width="200" }
 
 Install `mailhog`
 [helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
@@ -829,8 +842,7 @@ Endpoint ports:
 - 8081 (kube-prometheus-stack-kube-state-metrics/telemetry-port) -> 8082
   (conflicts with karpenter)
 
-![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg
-"prometheus"){: width="500" }
+![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg "prometheus"){: width="500" }
 
 Install `kube-prometheus-stack`
 [helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
@@ -1275,8 +1287,7 @@ Endpoint ports:
 
 - 10250 (cert-manager-webhook/https) -> 10251 (conflicts with kube-prometheus-stack-kubelet/https-metrics)
 
-![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg
-"cert-manager"){: width="200" }
+![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg "cert-manager"){: width="200" }
 
 Install `cert-manager`
 [helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
@@ -1405,8 +1416,7 @@ helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namesp
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
 exposed Kubernetes Services and Ingresses with DNS providers.
 
-![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png
-"external-dns"){: width="300" }
+![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png "external-dns"){: width="300" }
 
 Install `external-dns`
 [helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
@@ -1522,8 +1532,7 @@ helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespa
 dynamically discovers and provides a launchpad to access applications deployed
 on Kubernetes.
 
-![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png
-"forecastle"){: width="200" }
+![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png "forecastle"){: width="200" }
 
 Install `forecastle`
 [helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
@@ -1566,8 +1575,7 @@ helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace 
 Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
 the endpoints by Google Authentication.
 
-![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg
-"oauth2-proxy"){: width="400" }
+![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg "oauth2-proxy"){: width="400" }
 
 Install `oauth2-proxy`
 [helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
@@ -2275,8 +2283,7 @@ kubectl get pods -A -o json | jq ".items[] | select (.spec.hostNetwork==true) .s
 
 ## Clean-up
 
-![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg
-"Clean-up"){: width="400" }
+![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg "Clean-up"){: width="400" }
 
 Remove EKS cluster and created components:
 

@@ -24,13 +24,13 @@ for the cert-manager objects.
 
 Links:
 
-* [Backup and Restore Resources](https://cert-manager.io/v1.11-docs/tutorials/backup/#order-of-restore)
+- [Backup and Restore Resources](https://cert-manager.io/v1.11-docs/tutorials/backup/#order-of-restore)
 
 ## Requirements
 
-* Amazon EKS cluster (described in
+- Amazon EKS cluster (described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
-* [Helm](https://helm.sh/)
+- [Helm](https://helm.sh/)
 
 Variables which are being used in the next steps:
 
@@ -48,7 +48,7 @@ mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ### Create Let's Encrypt production certificate
 
 > These steps should be done only once
-{: .prompt-info }
+> {: .prompt-info }
 
 Generating the production ready Let's Encrypt certificates should be done only
 once. The goal is to backup the certificate and then restore it whenever is it
@@ -112,7 +112,7 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 ### Create S3 bucket
 
 > The following step should be done only once
-{: .prompt-info }
+> {: .prompt-info }
 
 Use CloudFormation to create S3 bucket which will be used to store backups from
 Velero.
@@ -234,8 +234,7 @@ Install `velero`
 and modify the
 [default values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml).
 
-![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
-"velero"){: width="600" }
+![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg "velero"){: width="600" }
 
 {% raw %}
 
@@ -338,7 +337,7 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 ## Backup cert-manager objects
 
 > These steps should be done only once
-{: .prompt-info }
+> {: .prompt-info }
 
 Verify if the `backup-location` is set properly to AWS S3 and is available:
 
@@ -599,8 +598,7 @@ issuer=/C=US/O=Let's Encrypt/CN=R3
 
 Here is the report form [SSL Labs](https://www.ssllabs.com):
 
-![ssl-labs-report](/assets/img/posts/2023/2023-03-20-velero-and-cert-manager/ssl-labs-report.avif
-"ssl-labs-report")
+![ssl-labs-report](/assets/img/posts/2023/2023-03-20-velero-and-cert-manager/ssl-labs-report.avif "ssl-labs-report")
 
 ## Rotation of the "production" certificate
 

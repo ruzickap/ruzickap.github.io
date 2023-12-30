@@ -22,7 +22,7 @@ description: >- # used by seo meta and the atom feed
   Blogging about DevOps, Kubernets, RPi, tips, ...
 
 # fill in the protocol & hostname for your site
-url: 'https://ruzickap.github.io'
+url: "https://ruzickap.github.io"
 
 github:
   username: ruzickap # change to your github username
@@ -110,7 +110,7 @@ pwa:
 paginate: 10
 
 # The base URL of your site
-baseurl: ''
+baseurl: ""
 
 # ------------ The following options are not recommended to be modified ------------------
 
@@ -132,7 +132,7 @@ collections:
 
 defaults:
   - scope:
-      path: '' # An empty string here means all files in the project
+      path: "" # An empty string here means all files in the project
       type: posts
     values:
       layout: post
@@ -146,7 +146,7 @@ defaults:
     values:
       comments: false
   - scope:
-      path: ''
+      path: ""
       type: tabs # see `site.collections`
     values:
       layout: page
@@ -173,8 +173,8 @@ compress_html:
     envs: [development]
 
 exclude:
-  - '*.gem'
-  - '*.gemspec'
+  - "*.gem"
+  - "*.gemspec"
   - docs
   - tools
   - README.md

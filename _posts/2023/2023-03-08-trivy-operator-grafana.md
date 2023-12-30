@@ -33,15 +33,15 @@ and some examples to better understand how it works...
 
 Links:
 
-* [Trivy Operator Dashboard in Grafana](https://aquasecurity.github.io/trivy-operator/v0.12.0/tutorials/grafana-dashboard/)
-* [Kubernetes Benchmark Scans with Trivy: CIS and NSA Reports](https://blog.aquasec.com/kubernetes-benchmark-scans-trivy-cis-nsa-reports)
+- [Trivy Operator Dashboard in Grafana](https://aquasecurity.github.io/trivy-operator/v0.12.0/tutorials/grafana-dashboard/)
+- [Kubernetes Benchmark Scans with Trivy: CIS and NSA Reports](https://blog.aquasec.com/kubernetes-benchmark-scans-trivy-cis-nsa-reports)
 
 ## Requirements
 
-* Amazon EKS cluster with [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+- Amazon EKS cluster with [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
   installed (described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
-* [Helm](https://helm.sh/)
+- [Helm](https://helm.sh/)
 
 Variables which are being used in the next steps:
 
@@ -62,8 +62,7 @@ Install `trivy-operator`
 and modify the
 [default values](https://github.com/aquasecurity/trivy-operator/blob/main/deploy/helm/values.yaml).
 
-![trivy-operator](https://raw.githubusercontent.com/aquasecurity/trivy-operator/e5722da903ff16d5fd926ed46fdffacf5d50d9b5/docs/images/trivy-operator-logo.png
-"trivy-operator"){: width="500" }
+![trivy-operator](https://raw.githubusercontent.com/aquasecurity/trivy-operator/e5722da903ff16d5fd926ed46fdffacf5d50d9b5/docs/images/trivy-operator-logo.png "trivy-operator"){: width="500" }
 
 ```bash
 # renovate: datasource=helm depName=trivy-operator registryUrl=https://aquasecurity.github.io/helm-charts/
@@ -110,14 +109,14 @@ can help with identifying the security issues in the K8s cluster.
 
 > The outputs below were created on the 2023-03-12 and will be different in the
 > future...
-{: .prompt-warning }
+> {: .prompt-warning }
 
 ### Vulnerability Reports
 
 Deploy vulnerable (old) version of the [nginx:1.22.0](https://hub.docker.com/layers/library/nginx/1.22.0/images/sha256-b3a676a9145dc005062d5e79b92d90574fb3bf2396f4913dc1732f9065f55c4b?context=explore)
 to the cluster:
 
-[//]: # (https://github.com/kubernetes/kubernetes/issues/83242)
+[//]: # "https://github.com/kubernetes/kubernetes/issues/83242"
 
 {% raw %}
 
@@ -276,8 +275,8 @@ report.
 
 Links:
 
-* [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
-* [Bad Pod #7: HOSTIPC Only](https://bishopfox.com/blog/kubernetes-pod-privilege-escalation#pod7)
+- [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
+- [Bad Pod #7: HOSTIPC Only](https://bishopfox.com/blog/kubernetes-pod-privilege-escalation#pod7)
 
 ![Center for Internet Security](https://upload.wikimedia.org/wikipedia/en/2/2e/Center_for_Internet_Security_Logo.png)
 _Center for Internet Security_
@@ -600,8 +599,8 @@ pod-ubuntu-sshd-exposed-secrets-ubuntu-sshd-exposed-secrets   peru/ubuntu_sshd  
 
 RBAC Assessment Report exists in two "versions" (CRDs):
 
-* [RbacAssessmentReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/rbacassessment-report/)
-* ClusterRbacAssessmentReport
+- [RbacAssessmentReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/rbacassessment-report/)
+- ClusterRbacAssessmentReport
 
 #### RbacAssessmentReport
 
@@ -1113,15 +1112,15 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 Add the following Grafana Dashboards to existng [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 helm chart:
 
-* [16652] - [Trivy Operator Dashboard](https://grafana.com/grafana/dashboards/17813-trivy-operator-dashboard/)
+- [16652] - [Trivy Operator Dashboard](https://grafana.com/grafana/dashboards/17813-trivy-operator-dashboard/)
   ![Trivy Operator Dashboard](/assets/img/posts/2023/2023-03-08-trivy-operator-grafana/grafana-dashboard-17813-trivy-operator-dashboard.avif)
   _Trivy Operator Dashboard_
 
-* [16742] - [Trivy Image Vulnerability Overview](https://grafana.com/grafana/dashboards/16742-trivy-image-vulnerability-overview/)
+- [16742] - [Trivy Image Vulnerability Overview](https://grafana.com/grafana/dashboards/16742-trivy-image-vulnerability-overview/)
   ![Trivy Image Vulnerability Overview](/assets/img/posts/2023/2023-03-08-trivy-operator-grafana/grafana-dashboard-16742-trivy-image-vulnerability-overview.avif)
   _Trivy Image Vulnerability Overview_
 
-* [16652] - [Trivy Operator Reports](https://grafana.com/grafana/dashboards/16652-trivy-operator-reports/)
+- [16652] - [Trivy Operator Reports](https://grafana.com/grafana/dashboards/16652-trivy-operator-reports/)
   ![Trivy Operator Reports](/assets/img/posts/2023/2023-03-08-trivy-operator-grafana/grafana-dashboard-16652-trivy-operator-reports.avif)
   _Trivy Operator Reports_
 

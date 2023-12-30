@@ -35,7 +35,7 @@ flowchart LR
     AO1[Shooting]           --> AO2(File)                    --> AO3(Copyright Info)              --> AO4(Set Copyright)            --> AO5("CC BY-SA")
     AP1[Shooting]           --> AP2(File)                    --> AP3(Write \n Serial Number)      --> AP4(On)
     AQ1[Shooting]           --> AQ2(Drive Mode)              --> AQ3(Drive Mode)                  --> AQ4(Cont. Shooting:)          --> AQ5(Mid)
-    AR1[Shooting]           --> AR2(Drive Mode)              --> AR3(Drive Mode)                  --> AR4("Self-timer(Single):")    --> AR5(2 sec)
+    AR1[Shooting]           --> AR2(Drive Mode)              --> AR3(Bracket Settings)            --> AR4("Selftimer")              --> AR5(2 sec)
     AS1[Shooting]           --> AS2(Drive Mode)              --> AS3(Interval Shoot \n Func.)     --> AS4(Shooting \n start time)   --> AS5(2 sec)
     AT1[Shooting]           --> AT2(Drive Mode)              --> AT3(Interval Shoot \n Func.)     --> AT4(Shooting interval)        --> AT5(5 sec)
     AU1[Shooting]           --> AU2(Drive Mode)              --> AU3(Interval Shoot \n Func.)     --> AU4(Shooting interval)        --> AU5(Number of shots)                    --> AU6(300)

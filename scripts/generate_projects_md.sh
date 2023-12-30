@@ -57,7 +57,7 @@ for GITHUB_REPOSITORY_TITLE_TMP in "${GITHUB_REPOSITORIES_DESCRIPTIONS[@]}"; do
   GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.default_branch' /tmp/generate_projects_md.json)
   # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
   GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
-  GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGE}" ]]; then echo -e "\n- URL: <${GITHUB_REPOSITORY_HOMEPAGE}>"; fi)
+  GITHUB_REPOSITORY_URL_STRING=$(if [[ -n ${GITHUB_REPOSITORY_HOMEPAGE} ]]; then echo -e "\n- URL: <${GITHUB_REPOSITORY_HOMEPAGE}>"; fi)
   cat << EOF
 
 ## [${GITHUB_REPOSITORY_TITLE}](${GITHUB_REPOSITORY_HTML_URL})
