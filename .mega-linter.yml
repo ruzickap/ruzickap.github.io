@@ -34,5 +34,4 @@ YAML_PRETTIER_FILTER_REGEX_EXCLUDE: (^_data/|^_config.yml)
 
 YAML_V8R_FILTER_REGEX_EXCLUDE: (^_data/|^_config.yml)
 
-# Overwritten by .github/workflows/megalinter.yml
-VALIDATE_ALL_CODEBASE: false
+VALIDATE_ALL_CODEBASE: true

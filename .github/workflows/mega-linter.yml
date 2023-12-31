@@ -47,4 +47,3 @@ jobs:
           GITHUB_COMMENT_REPORTER: false
           GITHUB_STATUS_REPORTER: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VALIDATE_ALL_CODEBASE: true
