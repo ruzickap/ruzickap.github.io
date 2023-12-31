@@ -116,8 +116,7 @@ kubectl wait --for=condition=Available=True --timeout=5m --namespace=test-karpen
 Karpenter will start new [t3a.small](https://aws.amazon.com/ec2/instance-types/t3/)
 `ip-192-168-66-142.ec2.internal` spot EC2 instance:
 
-![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-01-replicas-2.avif
-"eks-node-viewer --resources cpu,memory")
+![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-01-replicas-2.avif)
 
 ```bash
 kubectl view-allocations --namespace test-karpenter --utilization --resource-name=memory --resource-name=cpu
@@ -165,8 +164,7 @@ kubectl scale deployment nginx-deployment --namespace test-karpenter --replicas 
 kubectl wait --for=condition=Available=True --timeout=5m --namespace test-karpenter deployment nginx-deployment
 ```
 
-![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-02-replicas-5.avif
-"eks-node-viewer --resources cpu,memory")
+![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-02-replicas-5.avif)
 
 Check the details:
 
@@ -224,8 +222,7 @@ kubectl wait --for=condition=Available=True --timeout=5m --namespace test-karpen
 sleep 20
 ```
 
-![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-03-replicas-3.avif
-"eks-node-viewer --resources cpu,memory")
+![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-03-replicas-3.avif)
 
 Thanks to the [consolidation](https://karpenter.sh/preview/concepts/deprovisioning/#consolidation)
 function (described in [AWS re:Invent 2022 - Kubernetes virtually anywhere, for everyone](https://youtu.be/OB7IZolZk78?t=2629))
@@ -272,8 +269,7 @@ Remove the nginx workload and the `test-karpenter` namespace:
 kubectl delete namespace test-karpenter
 ```
 
-![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-04-delete.avif
-"eks-node-viewer --resources cpu,memory")
+![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-04-delete.avif)
 
 ### Simple autoscaling
 
@@ -285,8 +281,7 @@ Install `podinfo`
 and modify the
 [default values](https://github.com/stefanprodan/podinfo/blob/master/charts/podinfo/values.yaml).
 
-![podinfo](https://raw.githubusercontent.com/stefanprodan/podinfo/a7be119f20369b97f209d220535506af7c49b4ea/screens/podinfo-ui-v3.png
-"podinfo"){: width="500" }
+![podinfo](https://raw.githubusercontent.com/stefanprodan/podinfo/a7be119f20369b97f209d220535506af7c49b4ea/screens/podinfo-ui-v3.png){:width="500"}
 
 ```bash
 # renovate: datasource=helm depName=podinfo registryUrl=https://stefanprodan.github.io/podinfo

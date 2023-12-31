@@ -4,7 +4,17 @@ author: Petr Ruzicka
 date: 2022-11-27
 description: Start cheapest Amazon EKS using eksctl
 categories: [Kubernetes, Amazon EKS]
-tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl, cert-manager, external-dns, podinfo]
+tags:
+  [
+    Amazon EKS,
+    k8s,
+    kubernetes,
+    karpenter,
+    eksctl,
+    cert-manager,
+    external-dns,
+    podinfo,
+  ]
 image:
   path: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
@@ -83,9 +93,11 @@ echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAG
 
 Install necessary tools:
 
+<!-- prettier-ignore-start -->
 > You can skip these steps if you have all the required software already
 > installed.
 {: .prompt-tip }
+<!-- prettier-ignore-end -->
 
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
@@ -94,8 +106,10 @@ Install necessary tools:
 
 ## Configure AWS Route 53 Domain delegation
 
+<!-- prettier-ignore-start -->
 > DNS delegation steps should be done only once
 {: .prompt-info }
+<!-- prettier-ignore-end -->
 
 Create DNS zone for EKS clusters:
 
@@ -133,6 +147,7 @@ ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev
 ```
 
 <!-- markdownlint-disable blanks-around-fences -->
+
 ```console
 localhost | CHANGED => {
     "ansible_facts": {
@@ -191,6 +206,7 @@ localhost | CHANGED => {
     }
 }
 ```
+
 <!-- markdownlint-enable blanks-around-fences -->
 
 ![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
@@ -255,8 +271,7 @@ _Route53 k8s.mylabs.dev zone_
 
 I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 
-![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png
-"eksctl"){: width="700" }
+![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
 
@@ -350,8 +365,7 @@ aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 [Karpenter](https://karpenter.sh/) is a Kubernetes Node Autoscaler built
 for flexibility, performance, and simplicity.
 
-![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
-"Karpenter"){: width="500" }
+![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="500"}
 
 Configure [Karpenter](https://karpenter.sh/):
 
@@ -448,8 +462,7 @@ helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERS
 
 Mailhog will be used to receive email alerts form the Prometheus.
 
-![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
-"mailhog"){: width="200" }
+![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png){:width="200"}
 
 Install `mailhog`
 [helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
@@ -495,8 +508,7 @@ combined with documentation and scripts to provide easy to operate end-to-end
 Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using
 the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
 
-![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg
-"prometheus"){: width="500" }
+![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="500"}
 
 Install `kube-prometheus-stack`
 [helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
@@ -799,8 +811,7 @@ helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace k
 issuers as resource types in Kubernetes clusters, and simplifies the process
 of obtaining, renewing and using those certificates.
 
-![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg
-"cert-manager"){: width="200" }
+![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="200"}
 
 Install `cert-manager`
 [helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
@@ -918,8 +929,7 @@ helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namesp
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
 exposed Kubernetes Services and Ingresses with DNS providers.
 
-![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png
-"external-dns"){: width="300" }
+![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="300"}
 
 Install `external-dns`
 [helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
@@ -1027,8 +1037,7 @@ helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespa
 dynamically discovers and provides a launchpad to access applications deployed
 on Kubernetes.
 
-![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png
-"forecastle"){: width="200" }
+![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png){:width="200"}
 
 Install `forecastle`
 [helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
@@ -1071,8 +1080,7 @@ helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace 
 Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
 the endpoints by Google Authentication.
 
-![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg
-"oauth2-proxy"){: width="400" }
+![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="400"}
 
 Install `oauth2-proxy`
 [helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
@@ -1116,8 +1124,7 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 
 ## Clean-up
 
-![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg
-"Clean-up"){: width="400" }
+![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="400"}
 
 Remove EKS cluster and created components:
 
