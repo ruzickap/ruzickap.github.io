@@ -3,8 +3,23 @@ title: Secrets Store CSI Driver and Reloader
 author: Petr Ruzicka
 date: 2023-04-01
 description: Deploy Trivy Operator and Grafana Dashboard
-categories: [Kubernetes, Amazon EKS, secrets-store-csi-driver, Reloader, AWS Secrets Manager]
-tags: [Amazon EKS, k8s, kubernetes, secrets-store-csi-driver, reloader, AWS Secrets Manager]
+categories:
+  [
+    Kubernetes,
+    Amazon EKS,
+    secrets-store-csi-driver,
+    Reloader,
+    AWS Secrets Manager,
+  ]
+tags:
+  [
+    Amazon EKS,
+    k8s,
+    kubernetes,
+    secrets-store-csi-driver,
+    reloader,
+    AWS Secrets Manager,
+  ]
 image:
   path: https://raw.githubusercontent.com/kubernetes/community/487f994c013ea61d92cf9a341af7620037abbce3/icons/svg/resources/unlabeled/secret.svg
 ---
@@ -29,15 +44,15 @@ _secrets-store-csi-driver architecture_
 
 Links:
 
-* [Use AWS Secrets Manager secrets in Amazon Elastic Kubernetes Service](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html)
-* [How to use AWS Secrets & Configuration Provider with your Kubernetes Secrets Store CSI driver](https://aws.amazon.com/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/)
-* [Stakater Reloader docs](https://github.com/stakater/Reloader/tree/master/docs)
+- [Use AWS Secrets Manager secrets in Amazon Elastic Kubernetes Service](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html)
+- [How to use AWS Secrets & Configuration Provider with your Kubernetes Secrets Store CSI driver](https://aws.amazon.com/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/)
+- [Stakater Reloader docs](https://github.com/stakater/Reloader/tree/master/docs)
 
 ## Requirements
 
-* Amazon EKS cluster (described in
+- Amazon EKS cluster (described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
-* [Helm](https://helm.sh/)
+- [Helm](https://helm.sh/)
 
 Variables which are being used in the next steps:
 
@@ -106,8 +121,7 @@ aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
 
 Screenshot from AWS Secrets Manager:
 
-![aws-secrets-manager-01-secrets-kuardsecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/aws-secrets-manager-01-secrets-kuardsecret.avif
-"AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret")
+![aws-secrets-manager-01-secrets-kuardsecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/aws-secrets-manager-01-secrets-kuardsecret.avif)
 _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret_
 
 ## Install Secrets Store CSI Driver and AWS Provider
@@ -335,29 +349,31 @@ I0416 12:18:56.220255       1 secretproviderclasspodstatus_controller.go:366] "r
 
 Go to these URLs and check the credentials synced from AWS Secrets Manager:
 
-* [https://kuard.k01.k8s.mylabs.dev/fs/mnt/secrets-store/](https://kuard.k01.k8s.mylabs.dev/fs/mnt/secrets-store/)
-  ![kuard-fs-mnt-secrets-store-KuardSecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/kuard-fs-mnt-secrets-store-KuardSecret.avif
-  "kuard-fs-mnt-secrets-store-KuardSecret")
+- [https://kuard.k01.k8s.mylabs.dev/fs/mnt/secrets-store/](https://kuard.k01.k8s.mylabs.dev/fs/mnt/secrets-store/)
+  ![kuard-fs-mnt-secrets-store-KuardSecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/kuard-fs-mnt-secrets-store-KuardSecret.avif)
 
   ```bash
   kubectl exec -i -n kuard deployments/kuard-deployment -- cat /mnt/secrets-store/KuardSecret
   ```
 
+<!-- prettier-ignore-start -->
   ```json
   {"password":"rxxxxxxxxxxxxxxH","username":"admin123"}
   ```
+<!-- prettier-ignore-end -->
 
-* [https://kuard.k01.k8s.mylabs.dev/-/env](https://kuard.k01.k8s.mylabs.dev/-/env)
-  ![kuard-env](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/kuard-env.avif
-  "kuard-env")
+- [https://kuard.k01.k8s.mylabs.dev/-/env](https://kuard.k01.k8s.mylabs.dev/-/env)
+  ![kuard-env](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/kuard-env.avif)
 
   ```bash
   kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSECRET}"
   ```
 
+<!-- prettier-ignore-start -->
   ```json
   {"password":"rxxxxxxxxxxxxxxH","username":"admin123"}
   ```
+<!-- prettier-ignore-end -->
 
 After the commands executed above the secret from the AWS secret manager
 are copied to Kubernetes Secret (`kuard-secret`) and it is also present as file
@@ -394,17 +410,18 @@ kubectl get secrets -n kuard kuard-secret --template="{{.data.username}}" | base
 }
 ```
 
-![aws-secrets-manager-02-secrets-kuardsecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/aws-secrets-manager-02-secrets-kuardsecret.avif
-"AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret"){: width="700" }
+![aws-secrets-manager-02-secrets-kuardsecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/aws-secrets-manager-02-secrets-kuardsecret.avif){:width="700"}
 _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret_
 
 ```bash
 kubectl exec -i -n kuard deployments/kuard-deployment -- cat /mnt/secrets-store/KuardSecret
 ```
 
+<!-- prettier-ignore-start -->
 ```json
 {"user":"admin123","password":"EXAMPLE-PASSWORD"}
 ```
+<!-- prettier-ignore-end -->
 
 Environment variable inside the pod is not going to be changed:
 
@@ -412,9 +429,11 @@ Environment variable inside the pod is not going to be changed:
 kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSECRET}"
 ```
 
+<!-- prettier-ignore-start -->
 ```json
 {"password":"rxxxxxxxxxxxxxxH","username":"admin123"}
 ```
+<!-- prettier-ignore-end -->
 
 The only way how to change the pre-defined environment variable inside the pod
 is to restart the pod...
@@ -462,8 +481,7 @@ sleep 400
 
 Screenshot from AWS Secrets Manager:
 
-![aws-secrets-manager-03-secrets-kuardsecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/aws-secrets-manager-03-secrets-kuardsecret.avif
-"AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret"){: width="500" }
+![aws-secrets-manager-03-secrets-kuardsecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/aws-secrets-manager-03-secrets-kuardsecret.avif){:width="500"}
 _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret_
 
 After some time changes are detected in `kuard-secret` secret and pods are
@@ -491,15 +509,17 @@ proper value:
 kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSECRET}"
 ```
 
+<!-- prettier-ignore-start -->
 ```json
 {"user":"admin123","password":"EXAMPLE-PASSWORD-2"}
 ```
+<!-- prettier-ignore-end -->
 
 It is possible to use/synchronize credentials form the AWS Secret Manager to:
 
-* File inside the pod
-* Kubernetes Secret
-* Environment variable inside the pod
+- File inside the pod
+- Kubernetes Secret
+- Environment variable inside the pod
 
 ---
 

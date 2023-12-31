@@ -15,8 +15,7 @@ servers like [vsftpd](https://security.appspot.com/vsftpd.html) or
 [ProFTPD](https://github.com/proftpd/proftpd) in the past, but this
 time I decided to look at the [SFTPGo](https://github.com/drakkan/sftpgo).
 
-![SFTPGo](https://raw.githubusercontent.com/drakkan/sftpgo/5d7f6960f30fc4ba9606d5569dddf8bf5b4764bb/static/img/logo.png
-"SFTPGo")
+![SFTPGo](https://raw.githubusercontent.com/drakkan/sftpgo/5d7f6960f30fc4ba9606d5569dddf8bf5b4764bb/static/img/logo.png)
 
 The main reason why I wanted to run own FTP server on my laptop is to transfer
 photos from my camera [Sony A7 IV](https://en.wikipedia.org/wiki/Sony_%CE%B17_IV)
@@ -137,11 +136,13 @@ WiFi + Configure FTP Transfer.
   ![Sony A7 IV WiFi AP Configuration](/assets/img/posts/2023/2023-01-15-ftp-and-sony-camera/sony-camera-01-wifi-ap-configuration.avif){:width="550"}
   _Sony A7 IV WiFi AP Configuration_
 
+<!-- prettier-ignore-start -->
 > Make sure your Mac is connected to the same WiFi as your Sony camera
 {: .prompt-warning }
+<!-- prettier-ignore-end -->
 
 - Find your local IP address on the Mac by running the `ifconfig` command in the
-[terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac):
+  [terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac):
 
   ```console
   ❯ ifconfig en0
