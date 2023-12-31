@@ -267,7 +267,7 @@ _Route53 k8s.mylabs.dev zone_
 
 I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 
-![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png "eksctl"){: width="700" }
+![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
 
