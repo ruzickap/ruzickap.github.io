@@ -707,7 +707,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
-MAILPIT_HELM_CHART_VERSION="0.11.0"
+MAILPIT_HELM_CHART_VERSION="0.12.0"
 
 helm repo add jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
