@@ -918,8 +918,8 @@ grafana:
         datasource: Prometheus
       19105-prometheus:
         # renovate: depName="Prometheus"
-        gnetId: 19105
-        revision: 1
+        gnetId: 29205
+        revision: 2
         datasource: Prometheus
       16237-cluster-capacity:
         # renovate: depName="Cluster Capacity (Karpenter)"
