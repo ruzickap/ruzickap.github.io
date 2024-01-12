@@ -1096,7 +1096,7 @@ Add Trivy Grafana Dashboards:
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="55.7.0"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="55.7.1"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-trivy-operator-grafana.yml" << EOF
 grafana:
