@@ -659,7 +659,7 @@ grafana:
       15757-kubernetes-views-global:
         # renovate: depName="Kubernetes / Views / Global"
         gnetId: 15757
-        revision: 35
+        revision: 36
         datasource: Prometheus
       15758-kubernetes-views-namespaces:
         # renovate: depName="Kubernetes / Views / Namespaces"
