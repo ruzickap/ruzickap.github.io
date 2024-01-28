@@ -571,7 +571,7 @@ Use production Let's Encrypt certificate by `ingress-nginx`:
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.9.0"
+INGRESS_NGINX_HELM_CHART_VERSION="4.9.1"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx-production-certs.yml" << EOF
 controller:
