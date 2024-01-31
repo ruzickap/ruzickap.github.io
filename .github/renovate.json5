@@ -1,7 +1,5 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  automerge: true,
-  automergeType: "branch",
   customDatasources: {
     "grafana-dashboards": {
       defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
@@ -9,10 +7,17 @@
       transformTemplates: ['{"releases":[{"version": $string(revision)}]}'],
     },
   },
+  extends: [
+    "config:recommended",
+    ":disableDependencyDashboard",
+    ":disableRateLimiting",
+    ":enableVulnerabilityAlertsWithLabel(security)",
+    "helpers:pinGitHubActionDigestsToSemver",
+    "security:openssf-scorecard",
+  ],
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
   ignoreDeps: ["http_parser.rb", "html-proofer"],
-  ignoreTests: true,
   labels: [
     "renovate",
     "renovate/{{replace '.*/' '' depName}}",
@@ -20,7 +25,8 @@
   ],
   packageRules: [
     {
-      matchUpdateTypes: ["patch"],
+      matchUpdateTypes: ["major"],
+      automerge: false,
     },
     {
       description: "Ignore frequent renovate updates",
@@ -29,7 +35,7 @@
       matchUpdateTypes: ["patch"],
     },
     {
-      ignoreTests: false,
+      description: "Update renovatebot/github-action minor updates on Sundays",
       matchPackageNames: ["renovatebot/github-action"],
       matchUpdateTypes: ["minor"],
       schedule: ["* * * * 0"],
@@ -39,11 +45,6 @@
       matchDatasources: ["helm"],
       matchPackagePatterns: ["(^|\\/)kube-prometheus-stack$"],
       matchUpdateTypes: ["major", "minor"],
-    },
-    {
-      description: "Update all github-actions by default",
-      ignoreTests: false,
-      matchManagers: ["github-actions"],
     },
     {
       description: "Grafana Dashboards",
@@ -56,7 +57,7 @@
   regexManagers: [
     {
       extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.+)${{/if}}",
-      fileMatch: ["\\.ya?ml$", "\\.md$"],
+      fileMatch: ["\\.ya?ml$", "\\.md$", "^Dockerfile$", "^entrypoint\\.sh$"],
       matchStrings: [
         '# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?( extractVersion=(?<extractVersion>.+?))?( registryUrl=(?<registryUrl>.+?))?\\s.*[=:]\\s*"?(?<currentValue>.+?)"?\\s',
       ],
@@ -72,8 +73,4 @@
     },
   ],
   separateMinorPatch: true,
-  vulnerabilityAlerts: {
-    commitMessagePrefix: "chore(renovate): Security update",
-    labels: ["security"],
-  },
 }

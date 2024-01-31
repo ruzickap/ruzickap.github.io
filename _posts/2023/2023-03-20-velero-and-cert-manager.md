@@ -165,7 +165,7 @@ Resources:
             Bool:
               aws:SecureTransport: "false"
         # S3 Bucket policy does not deny TLS version lower than 1.2
-        - Sid: EnforceTLSv12orHigher
+        - Sid: EnforceTLS
           Effect: Deny
           Action: "s3:*"
           Resource:
