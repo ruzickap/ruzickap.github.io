@@ -21,7 +21,7 @@ jobs:
       contents: write
       deployments: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
         with:
           fetch-depth: 0
           submodules: true
@@ -71,14 +71,14 @@ jobs:
           echo -e '<?xml version="1.0"?>\n<users>\n\t<user>592AB158E3F9EF887F8DC8E69A2FF754</user>\n</users>' > public/BingSiteAuth.xml
 
       - name: Check broken links
-        uses: ruzickap/action-my-broken-link-checker@v2
+        uses: ruzickap/action-my-broken-link-checker@a0895a4cda23b5c90999cb9d3c8a8f44d8a8980d # v2
         with:
           url: https://${{ steps.variables.outputs.BASE_DOMAIN }}
           pages_path: public
           cmd_params: '--exclude=(linkedin.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/|k01.k8s.mylabs.dev|www.googletagmanager.com|hub.docker.com) --color=always --header="User-Agent:curl/7.54.0" --buffer-size=8192 --skip-tls-verification'
 
       - name: Publish to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -92,7 +92,7 @@ jobs:
           EOF
 
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@1
+        uses: cloudflare/pages-action@f0a1cd58cd66095dee69bfa18fa5efd1dde93bca # 1
         if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/gh-pages' }}
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -103,14 +103,14 @@ jobs:
           projectName: ${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
 
       - name: Restore lychee cache
-        uses: actions/cache@v4
+        uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4
         with:
           path: .lycheecache
           key: cache-lychee-${{ github.sha }}
           restore-keys: cache-lychee-
 
       - name: Link Checker
-        uses: lycheeverse/lychee-action@v1
+        uses: lycheeverse/lychee-action@c053181aa0c3d17606addfe97a9075a32723548a # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
