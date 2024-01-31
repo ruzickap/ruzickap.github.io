@@ -22,7 +22,7 @@ description: >- # used by seo meta and the atom feed
   Blogging about DevOps, Kubernets, RPi, tips, ...
 
 # fill in the protocol & hostname for your site
-url: 'https://ruzickap.github.io'
+url: "https://ruzickap.github.io"
 
 github:
   username: ruzickap # change to your github username
@@ -72,6 +72,9 @@ img_cdn:
 
 # the avatar on sidebar, support local or CORS resources
 avatar: https://0.gravatar.com/avatar/5484c0fd9f98e2ffd9212b158931bf4b?s=200
+# The URL of the site-wide social preview image used in SEO `og:image` meta tag.
+# It can be overridden by a customized `page.image` in front matter.
+social_preview_image: # string, local or CORS resources
 
 # boolean type, the global switch for TOC in posts.
 toc: true
@@ -102,15 +105,22 @@ assets:
     enabled: # boolean, keep empty means false
     # specify the Jekyll environment, empty means both
     # only works if `assets.self_host.enabled` is 'true'
-    env: # [development|production]
+    env: # [development | production]
 
 pwa:
-  enabled: true # the option for PWA feature
+  enabled: true # the option for PWA feature (installable)
+  cache:
+    enabled: true # the option for PWA offline cache
+    # Paths defined here will be excluded from the PWA cache.
+    # Usually its value is the `baseurl` of another website that
+    # shares the same domain name as the current website.
+    deny_paths:
+      # - "/example"  # URLs match `<SITE_URL>/example/*` will not be cached by the PWA
 
 paginate: 10
 
 # The base URL of your site
-baseurl: ''
+baseurl: ""
 
 # ------------ The following options are not recommended to be modified ------------------
 
@@ -132,7 +142,7 @@ collections:
 
 defaults:
   - scope:
-      path: '' # An empty string here means all files in the project
+      path: "" # An empty string here means all files in the project
       type: posts
     values:
       layout: post
@@ -146,7 +156,7 @@ defaults:
     values:
       comments: false
   - scope:
-      path: ''
+      path: ""
       type: tabs # see `site.collections`
     values:
       layout: page
@@ -173,8 +183,8 @@ compress_html:
     envs: [development]
 
 exclude:
-  - '*.gem'
-  - '*.gemspec'
+  - "*.gem"
+  - "*.gemspec"
   - docs
   - tools
   - README.md

@@ -17,37 +17,31 @@ max_concurrency = 128
 #############################  Requests  ############################
 
 # Comma-separated list of accepted status codes for valid links.
-accept = [999]
+accept = [429, 999]
 
 #############################  Exclusions  ##########################
 
 # Exclude URLs and mail addresses from checking (supports regex)
-# https://github.com/cotes2020/jekyll-theme-chirpy/issues/758
 exclude = [
-  'fonts\.(googleapis|gstatic)\.com',
+  # Ignore all URLs with '$' - BASH variable in URL
+  '\$',
+  # Ignore all URLs with '{ ... }' - BASH / Ansible variable in URL
+  '%7B.*%7D',
+  # Ignore all URLs which starts with 'file://'
+  'file://',
+
+  'fonts.(googleapis|gstatic).com',
+  'https://www.facebook.com/sharer/sharer.php\?title=TITLE&u=URL',
+  'k01.k8s.mylabs.dev',
   'www.googletagmanager.com',
-  'ruzickap\.github\.io/projects/',
-  # Due to: [TIMEOUT] https://twitter.com/Ruzicka_Petr | Timeout
-  'twitter\.com/Ruzicka_Petr',
-  'k01\.k8s\.mylabs\.dev',
-  # Ignore Docker Hub
-  'https://hub.docker.com',
-  # Ignore all URLS with ${.*} - BASH variable in URL
-  '.*\$%7B.*%7D.*',
-  # Ignore all URLS with ${{ }} - used in renovate configuration: "https://grafana.com/api/dashboards/{{packageName}}"
-  '.*%7B%7B.*%7D%7D.*',
 ]
 
 # Exclude these filesystem paths from getting checked
 exclude_path = [
-  "_tabs/projects.md",
-  "_data/share.yml",
+  "CHANGELOG.md",
 ]
 
 # Exclude all private IPs from checking.
 # Equivalent to setting `exclude_private`, `exclude_link_local`, and
 # `exclude_loopback` to true
 exclude_all_private = true
-
-# Exclude all mail addresses from checking
-exclude_mail = true

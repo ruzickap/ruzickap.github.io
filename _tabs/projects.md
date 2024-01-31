@@ -92,7 +92,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-markdown-linter/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/commands.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-linter/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/docker-image.yml)
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-linter/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/linter.yml)
   [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-markdown-linter/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/markdown.yml)
@@ -190,7 +189,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - Container build](https://github.com/ruzickap/container-build/workflows/Container%20build/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/container-build.yml)
   [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/container-build/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - Renovate](https://github.com/ruzickap/container-build/workflows/Renovate/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/renovate.yml)
 
@@ -538,7 +536,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - Container build](https://github.com/ruzickap/malware-cryptominer-container/workflows/Container%20build/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/container-build.yml)
   [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/malware-cryptominer-container/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - Renovate](https://github.com/ruzickap/malware-cryptominer-container/workflows/Renovate/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/renovate.yml)
 
@@ -757,7 +754,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - checkov](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/checkov/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/checkov.yml)
   [![GitHub Actions status - clusters-aws-reusable-workflow](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws-reusable-workflow/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws-reusable-workflow.yml)
   [![GitHub Actions status - clusters-aws-schedule](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws-schedule/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws-schedule.yml)
   [![GitHub Actions status - clusters-aws](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws.yml)
@@ -767,9 +763,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
   [![GitHub Actions status - mdbook-build-check-deploy](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/mdbook-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/mdbook-build-check-deploy.yml)
   [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - Renovate](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/Renovate/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/renovate.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - terrascan](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/terrascan/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/terrascan.yml)
-  [![GitHub Actions status - tflint](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/tflint/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/tflint.yaml)
   [![GitHub Actions status - tfsec](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/tfsec/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/tfsec.yml)
 
 - Issue tracking:
@@ -1220,7 +1213,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
   [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-macos/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/build.yml)
   [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/cheatsheet-macos/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/dependabot-auto-merge.yml)
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-macos/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/linter.yml)
-  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-macos/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/release.yml)
 
 - Issue tracking:
 

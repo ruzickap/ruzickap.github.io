@@ -1,0 +1,8 @@
+Lint/ScriptPermission:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  Enabled: false
+Layout/EmptyLinesAroundBlockBody:
+  Enabled: false
+Layout/SpaceInsideStringInterpolation:
+  Enabled: false
