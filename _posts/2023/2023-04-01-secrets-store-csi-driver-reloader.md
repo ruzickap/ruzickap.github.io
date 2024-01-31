@@ -149,7 +149,7 @@ Install `secrets-store-csi-driver-provider-aws`
 
 ```bash
 # renovate: datasource=helm depName=secrets-store-csi-driver-provider-aws registryUrl=https://aws.github.io/secrets-store-csi-driver-provider-aws
-SECRETS_STORE_CSI_DRIVER_PROVIDER_AWS_HELM_CHART_VERSION="0.3.5"
+SECRETS_STORE_CSI_DRIVER_PROVIDER_AWS_HELM_CHART_VERSION="0.3.6"
 
 helm repo add aws-secrets-manager https://aws.github.io/secrets-store-csi-driver-provider-aws
 helm upgrade --install --version "${SECRETS_STORE_CSI_DRIVER_PROVIDER_AWS_HELM_CHART_VERSION}" --namespace secrets-store-csi-driver --create-namespace --wait secrets-store-csi-driver-provider-aws aws-secrets-manager/secrets-store-csi-driver-provider-aws
