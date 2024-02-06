@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 
-set -eu
+set -euo pipefail
 
-# Check with: lychee --max-concurrency 3 del.md
+DESTINATION_FILE="${1:-projects.md}"
+TMP_FILE="/tmp/generate_projects_md.json"
 
 GITHUB_REPOSITORIES_DESCRIPTIONS=(
   "ruzickap/action-my-broken-link-checker|GitHub Actions: My Broken Link Checker ✔"
@@ -31,7 +32,7 @@ GITHUB_REPOSITORIES_DESCRIPTIONS=(
   "ruzickap/k8s-tf-eks-gitops|k8s-tf-eks-gitops"
   "ruzickap/k8s-eks-rancher|k8s-eks-rancher"
   "ruzickap/k8s-eks-bottlerocket-fargate|k8s-eks-bottlerocket-fargate"
-  # "ruzickap/k8s-flagger-istio-flux|k8s-flagger-istio-flux" - Public Archive...
+  "ruzickap/k8s-flagger-istio-flux|k8s-flagger-istio-flux"
   "ruzickap/k8s-flux-istio-gitlab-harbor|k8s-flux-istio-gitlab-harbor"
   "ruzickap/k8s-harbor|k8s-harbor"
   "ruzickap/k8s-harbor-presentation|k8s-harbor-presentation"
@@ -43,11 +44,11 @@ GITHUB_REPOSITORIES_DESCRIPTIONS=(
   "ruzickap/k8s-postgresql|k8s-postgresql"
   "ruzickap/k8s-sockshop|k8s-sockshop"
   "ruzickap/cheatsheet-macos|cheatsheet-macos"
-  # "ruzickap/cheatsheet-atom|Cheatsheet - Atom" - Public Archive...
-  # "ruzickap/cheatsheet-systemd|Cheatsheet - Systemd" - Public Archive...
+  "ruzickap/cheatsheet-atom|Cheatsheet - Atom"
+  "ruzickap/cheatsheet-systemd|Cheatsheet - Systemd"
 )
 
-cat > projects.md << EOF
+cat > "${DESTINATION_FILE}" << EOF
 ---
 # https://www.w3schools.com/icons/icons_reference.asp
 icon: fas fa-project-diagram
@@ -60,15 +61,15 @@ EOF
 for GITHUB_REPOSITORY_TITLE_TMP in "${GITHUB_REPOSITORIES_DESCRIPTIONS[@]}"; do
   GITHUB_REPOSITORY="${GITHUB_REPOSITORY_TITLE_TMP%|*}"
   GITHUB_REPOSITORY_TITLE="${GITHUB_REPOSITORY_TITLE_TMP##*|}"
-  curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}" > /tmp/generate_projects_md.json
-  GITHUB_REPOSITORY_DESCRIPTION=$(jq -r '.description' /tmp/generate_projects_md.json)
-  GITHUB_REPOSITORY_HTML_URL=$(jq -r '.html_url' /tmp/generate_projects_md.json)
-  GITHUB_REPOSITORY_HOMEPAGE=$(jq -r '.homepage' /tmp/generate_projects_md.json)
-  GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.default_branch' /tmp/generate_projects_md.json)
+  curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}" > "${TMP_FILE}"
+  GITHUB_REPOSITORY_DESCRIPTION=$(jq -r '.description' "${TMP_FILE}")
+  GITHUB_REPOSITORY_HTML_URL=$(jq -r '.html_url' "${TMP_FILE}")
+  GITHUB_REPOSITORY_HOMEPAGE=$(jq -r '.homepage' "${TMP_FILE}")
+  GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.default_branch' "${TMP_FILE}")
   # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
   GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGE}" ]]; then echo -e "\n- URL: <${GITHUB_REPOSITORY_HOMEPAGE}>"; fi)
-  cat << EOF | tee -a projects.md
+  cat << EOF | tee -a "${DESTINATION_FILE}"
 
 ## [${GITHUB_REPOSITORY_TITLE}](${GITHUB_REPOSITORY_HTML_URL})
 
@@ -99,4 +100,4 @@ ${GITHUB_REPOSITORY_CI_CD_STATUS}
 EOF
 done
 
-prettier -w --parser markdown --prose-wrap always --print-width 80 projects.md
+prettier -w --parser markdown --prose-wrap always --print-width 80 "${DESTINATION_FILE}"
