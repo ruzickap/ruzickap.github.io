@@ -60,16 +60,17 @@ EOF
 
 for GITHUB_REPOSITORY_TITLE_TMP in "${GITHUB_REPOSITORIES_DESCRIPTIONS[@]}"; do
   GITHUB_REPOSITORY="${GITHUB_REPOSITORY_TITLE_TMP%|*}"
+  echo "*** ${GITHUB_REPOSITORY}"
   GITHUB_REPOSITORY_TITLE="${GITHUB_REPOSITORY_TITLE_TMP##*|}"
-  curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}" > "${TMP_FILE}"
+  curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY}" > "${TMP_FILE}"
   GITHUB_REPOSITORY_DESCRIPTION=$(jq -r '.description' "${TMP_FILE}")
   GITHUB_REPOSITORY_HTML_URL=$(jq -r '.html_url' "${TMP_FILE}")
   GITHUB_REPOSITORY_HOMEPAGE=$(jq -r '.homepage' "${TMP_FILE}")
   GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.default_branch' "${TMP_FILE}")
   # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
-  GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
+  GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGE}" ]]; then echo -e "\n- URL: <${GITHUB_REPOSITORY_HOMEPAGE}>"; fi)
-  cat << EOF | tee -a "${DESTINATION_FILE}"
+  cat << EOF >> "${DESTINATION_FILE}"
 
 ## [${GITHUB_REPOSITORY_TITLE}](${GITHUB_REPOSITORY_HTML_URL})
 
@@ -100,4 +101,4 @@ ${GITHUB_REPOSITORY_CI_CD_STATUS}
 EOF
 done
 
-prettier -w --parser markdown --prose-wrap always --print-width 80 "${DESTINATION_FILE}"
+npx prettier -w --parser markdown --prose-wrap always --print-width 80 "${DESTINATION_FILE}"
