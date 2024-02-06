@@ -17,8 +17,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
+      - uses: actions/setup-node@v4
+
       - name: Generate _tabs/projects.md
-        run: scripts/generate-projects.sh _tabs/projects.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm install --save-dev --save-exact prettier
+          scripts/generate-projects.sh _tabs/projects.md
 
       - name: Restore lychee cache
         uses: actions/cache@13aacd865c20de90d75de3b17ebe84f7a17d57d2 # v4.0.0
