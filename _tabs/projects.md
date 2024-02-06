@@ -679,6 +679,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - generate-projects](https://github.com/ruzickap/ruzickap.github.io/workflows/generate-projects/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/generate-projects.yml)
   [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/ruzickap.github.io/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)
   [![GitHub Actions status - Links](https://github.com/ruzickap/ruzickap.github.io/workflows/Links/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/links.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ruzickap.github.io/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml)
@@ -883,6 +884,43 @@ List of my GitHub projects:
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-eks-bottlerocket-fargate/latest)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
+
+## [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux)
+
+- Description: Blue Green deployment with Flagger, Flux and Istio
+- URL: <https://ruzickap.github.io/k8s-flagger-istio-flux/>
+
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-flagger-istio-flux.svg?style=social)](https://github.com/ruzickap/k8s-flagger-istio-flux/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-flagger-istio-flux.svg?style=social)](https://github.com/ruzickap/k8s-flagger-istio-flux/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-flagger-istio-flux.svg?style=social)](https://github.com/ruzickap/k8s-flagger-istio-flux)
+
+- CI/CD status:
+
+  [![GitHub Actions status - Close stale issues and PRs](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/Close%20stale%20issues%20and%20PRs/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/stale.yml)
+  [![GitHub Actions status - kube-linter](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/kube-linter/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/kube-linter.yml)
+  [![GitHub Actions status - Links](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/Links/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/links.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/release-please.yml)
+  [![GitHub Actions status - Renovate](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/Renovate/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/renovate.yml)
+  [![GitHub Actions status - Semantic Pull Request](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/Semantic%20Pull%20Request/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/terraform.yml)
+  [![GitHub Actions status - vuepress-build](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/vuepress-build/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/vuepress-build.yml)
+
+- Issue tracking:
+
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/pulls)
+
+- Repository:
+
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-flagger-istio-flux/latest)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux)
 
 ## [k8s-flux-istio-gitlab-harbor](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
 
@@ -1243,3 +1281,61 @@ List of my GitHub projects:
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-macos/latest)](https://github.com/ruzickap/cheatsheet-macos/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos)
+
+## [Cheatsheet - Atom](https://github.com/ruzickap/cheatsheet-atom)
+
+- Description: Atom Keyboard Shortcuts
+
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/cheatsheet-atom.svg?style=social)](https://github.com/ruzickap/cheatsheet-atom/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/cheatsheet-atom.svg?style=social)](https://github.com/ruzickap/cheatsheet-atom/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/cheatsheet-atom.svg?style=social)](https://github.com/ruzickap/cheatsheet-atom)
+
+- CI/CD status:
+
+  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-atom/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/build.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-atom/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/linter.yml)
+  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-atom/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/release.yml)
+
+- Issue tracking:
+
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/pulls)
+
+- Repository:
+
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-atom/latest)](https://github.com/ruzickap/cheatsheet-atom/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom)
+
+## [Cheatsheet - Systemd](https://github.com/ruzickap/cheatsheet-systemd)
+
+- Description: Cheatsheet for systemd
+
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/cheatsheet-systemd.svg?style=social)](https://github.com/ruzickap/cheatsheet-systemd/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/cheatsheet-systemd.svg?style=social)](https://github.com/ruzickap/cheatsheet-systemd/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/cheatsheet-systemd.svg?style=social)](https://github.com/ruzickap/cheatsheet-systemd)
+
+- CI/CD status:
+
+  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-systemd/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/build.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-systemd/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/linter.yml)
+  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-systemd/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/release.yml)
+
+- Issue tracking:
+
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/pulls)
+
+- Repository:
+
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-systemd/latest)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd)
