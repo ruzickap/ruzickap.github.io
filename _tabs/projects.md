@@ -4,13 +4,13 @@ icon: fas fa-project-diagram
 order: 4
 ---
 
-List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ruzickap/)
+List of my GitHub projects:
+[https://github.com/ruzickap/](https://github.com/ruzickap/)
 
 ## [GitHub Actions: My Broken Link Checker ✔](https://github.com/ruzickap/action-my-broken-link-checker)
 
 - Description: A GitHub Action for checking broken links
 
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-My%20Broken%20Link%20Checker-blue.svg?colorA=24292e&colorB=0366d6&style=flat&longCache=true&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAM6wAADOsB5dZE0gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAERSURBVCiRhZG/SsMxFEZPfsVJ61jbxaF0cRQRcRJ9hlYn30IHN/+9iquDCOIsblIrOjqKgy5aKoJQj4O3EEtbPwhJbr6Te28CmdSKeqzeqr0YbfVIrTBKakvtOl5dtTkK+v4HfA9PEyBFCY9AGVgCBLaBp1jPAyfAJ/AAdIEG0dNAiyP7+K1qIfMdonZic6+WJoBJvQlvuwDqcXadUuqPA1NKAlexbRTAIMvMOCjTbMwl1LtI/6KWJ5Q6rT6Ht1MA58AX8Apcqqt5r2qhrgAXQC3CZ6i1+KMd9TRu3MvA3aH/fFPnBodb6oe6HM8+lYHrGdRXW8M9bMZtPXUji69lmf5Cmamq7quNLFZXD9Rq7v0Bpc1o/tp0fisAAAAASUVORK5CYII=)](https://github.com/marketplace/actions/my-broken-link-checker)
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/action-my-broken-link-checker.svg?style=social)](https://github.com/ruzickap/action-my-broken-link-checker/stargazers)
@@ -20,15 +20,15 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - CI/CD status:
 
   [![GitHub Actions status - check-broken-links](https://github.com/ruzickap/action-my-broken-link-checker/workflows/check-broken-links/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/check-broken-links.yml)
-  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-broken-link-checker/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/commands.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-broken-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/docker-image.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-broken-link-checker/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/linter.yml)
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-broken-link-checker/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/markdown.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/action-my-broken-link-checker/workflows/Renovate/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/renovate.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-broken-link-checker/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/action-my-broken-link-checker/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/action-my-broken-link-checker/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-broken-link-checker/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/readme-commands-check.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-broken-link-checker/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-broken-link-checker/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-broken-link-checker/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-broken-link-checker/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/stale.yml)
   [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-broken-link-checker/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/tests.yml)
-  [![GitHub Actions status - update-semver](https://github.com/ruzickap/action-my-broken-link-checker/workflows/update-semver/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/update-semver.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-broken-link-checker/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/yamllint.yml)
 
 - Issue tracking:
 
@@ -47,7 +47,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - Description: A GitHub Action for checking broken links in Markdown files
 
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-My%20Markdown%20Link%20Checker-blue.svg?colorA=24292e&colorB=0366d6&style=flat&longCache=true&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAM6wAADOsB5dZE0gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAERSURBVCiRhZG/SsMxFEZPfsVJ61jbxaF0cRQRcRJ9hlYn30IHN/+9iquDCOIsblIrOjqKgy5aKoJQj4O3EEtbPwhJbr6Te28CmdSKeqzeqr0YbfVIrTBKakvtOl5dtTkK+v4HfA9PEyBFCY9AGVgCBLaBp1jPAyfAJ/AAdIEG0dNAiyP7+K1qIfMdonZic6+WJoBJvQlvuwDqcXadUuqPA1NKAlexbRTAIMvMOCjTbMwl1LtI/6KWJ5Q6rT6Ht1MA58AX8Apcqqt5r2qhrgAXQC3CZ6i1+KMd9TRu3MvA3aH/fFPnBodb6oe6HM8+lYHrGdRXW8M9bMZtPXUji69lmf5Cmamq7quNLFZXD9Rq7v0Bpc1o/tp0fisAAAAASUVORK5CYII=)](https://github.com/marketplace/actions/my-markdown-link-checker)
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/action-my-markdown-link-checker.svg?style=social)](https://github.com/ruzickap/action-my-markdown-link-checker/stargazers)
@@ -56,15 +55,15 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - commands](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/commands/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/commands.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/docker-image.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/linter.yml)
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/markdown.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/Renovate/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/renovate.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/readme-commands-check.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/stale.yml)
   [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/tests.yml)
-  [![GitHub Actions status - update-semver](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/update-semver/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/update-semver.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/yamllint.yml)
 
 - Issue tracking:
 
@@ -83,7 +82,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - Description: Style checking and linting for Markdown files
 
-[![GitHub Marketplace](https://img.shields.io/badge/Marketplace-My%20Markdown%20Linter-blue.svg?colorA=24292e&colorB=0366d6&style=flat&longCache=true&logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAOCAYAAAAfSC3RAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAM6wAADOsB5dZE0gAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAERSURBVCiRhZG/SsMxFEZPfsVJ61jbxaF0cRQRcRJ9hlYn30IHN/+9iquDCOIsblIrOjqKgy5aKoJQj4O3EEtbPwhJbr6Te28CmdSKeqzeqr0YbfVIrTBKakvtOl5dtTkK+v4HfA9PEyBFCY9AGVgCBLaBp1jPAyfAJ/AAdIEG0dNAiyP7+K1qIfMdonZic6+WJoBJvQlvuwDqcXadUuqPA1NKAlexbRTAIMvMOCjTbMwl1LtI/6KWJ5Q6rT6Ht1MA58AX8Apcqqt5r2qhrgAXQC3CZ6i1+KMd9TRu3MvA3aH/fFPnBodb6oe6HM8+lYHrGdRXW8M9bMZtPXUji69lmf5Cmamq7quNLFZXD9Rq7v0Bpc1o/tp0fisAAAAASUVORK5CYII=)](https://github.com/marketplace/actions/my-markdown-linter)
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/action-my-markdown-linter.svg?style=social)](https://github.com/ruzickap/action-my-markdown-linter/stargazers)
@@ -93,13 +91,14 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - CI/CD status:
 
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-linter/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/docker-image.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/action-my-markdown-linter/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/linter.yml)
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/action-my-markdown-linter/workflows/markdown/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/markdown.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/action-my-markdown-linter/workflows/Renovate/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/renovate.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/action-my-markdown-linter/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/action-my-markdown-linter/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/action-my-markdown-linter/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-markdown-linter/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/readme-commands-check.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-markdown-linter/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-markdown-linter/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-markdown-linter/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-markdown-linter/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/stale.yml)
   [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-markdown-linter/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/tests.yml)
-  [![GitHub Actions status - update-semver](https://github.com/ruzickap/action-my-markdown-linter/workflows/update-semver/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/update-semver.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/action-my-markdown-linter/workflows/yamllint/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/yamllint.yml)
 
 - Issue tracking:
 
@@ -129,10 +128,13 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
   [![GitHub Actions status - build](https://github.com/ruzickap/packer-templates/workflows/build/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/build.yml)
   [![GitHub Actions status - Links](https://github.com/ruzickap/packer-templates/workflows/Links/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/links.yml)
   [![GitHub Actions status - markdown-mdspell](https://github.com/ruzickap/packer-templates/workflows/markdown-mdspell/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/markdown-mdspell.yml)
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/packer-templates/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/packer-templates/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - packer-templates](https://github.com/ruzickap/packer-templates/workflows/packer-templates/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/packer-templates.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/packer-templates/workflows/release-please/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/release-please.yml)
   [![GitHub Actions status - remote_build_server](https://github.com/ruzickap/packer-templates/workflows/remote_build_server/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/remote_build_server.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/packer-templates/workflows/Renovate/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/renovate.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/packer-templates/workflows/renovate/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/packer-templates/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/packer-templates/workflows/stale/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -149,7 +151,8 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 ## [Packer-Virt-Sysprep](https://github.com/ruzickap/packer-virt-sysprep)
 
-- Description: Reproduce the functionality of virt-sysprep for use with Packer builds
+- Description: Reproduce the functionality of virt-sysprep for use with Packer
+  builds
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/blob/master/LICENSE)
@@ -160,6 +163,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - CI/CD status:
 
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/packer-virt-sysprep/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/linter.yml)
+  [![GitHub Actions status - Lint PR](https://github.com/ruzickap/packer-virt-sysprep/workflows/Lint%20PR/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/lint-pr-title.yml)
   [![GitHub Actions status - markdown](https://github.com/ruzickap/packer-virt-sysprep/workflows/markdown/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/markdown.yml)
   [![GitHub Actions status - shellcheck](https://github.com/ruzickap/packer-virt-sysprep/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/shellcheck.yml)
   [![GitHub Actions status - yamllint](https://github.com/ruzickap/packer-virt-sysprep/workflows/yamllint/badge.svg)](https://github.com/ruzickap/packer-virt-sysprep/actions/workflows/yamllint.yml)
@@ -189,8 +193,12 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/container-build/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/container-build/workflows/Renovate/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/renovate.yml)
+  [![GitHub Actions status - container-build-reusable-workflow](https://github.com/ruzickap/container-build/workflows/container-build-reusable-workflow/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/container-build-reusable-workflow.yml)
+  [![GitHub Actions status - container-build](https://github.com/ruzickap/container-build/workflows/container-build/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/container-build.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/container-build/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/container-build/workflows/renovate/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/container-build/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/container-build/workflows/stale/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -218,10 +226,12 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - CI/CD status:
 
   [![GitHub Actions status - checks](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/checks/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/checks.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/linter.yml)
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/markdown/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/markdown.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/yamllint/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/release-please/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/renovate/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/stale/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -238,8 +248,8 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 ## [USB Stick for TV testing](https://github.com/ruzickap/test_usb_stick_for_tv)
 
-- Description: This script will store testing videos/music/pictures to your
-  USB Stick which can be used for testing TVs
+- Description: This script will store testing videos/music/pictures to your USB
+  Stick which can be used for testing TVs
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/blob/main/LICENSE)
@@ -249,9 +259,11 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/linter.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/yamllint/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/release-please/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/renovate/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/stale/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -279,6 +291,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
+  [![GitHub Actions status - Close stale issues and PRs](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/Close%20stale%20issues%20and%20PRs/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/stale.yml)
   [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/markdown.yml)
   [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/molecule.yml)
   [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/shellcheck.yml)
@@ -299,7 +312,8 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 ## [Ansible role proxy_settings](https://github.com/ruzickap/ansible-role-proxy_settings)
 
-- Description: Ansible role for configuring proxy settings for Linux based systems
+- Description: Ansible role for configuring proxy settings for Linux based
+  systems
 - URL: <https://galaxy.ansible.com/ruzickap/proxy_settings/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/releases/latest)
@@ -310,6 +324,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
+  [![GitHub Actions status - Close stale issues and PRs](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/Close%20stale%20issues%20and%20PRs/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/stale.yml)
   [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/dependabot-auto-merge.yml)
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/linter.yml)
   [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/markdown.yml)
@@ -344,6 +359,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
+  [![GitHub Actions status - Close stale issues and PRs](https://github.com/ruzickap/ansible-role-virtio-win/workflows/Close%20stale%20issues%20and%20PRs/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/stale.yml)
   [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-role-virtio-win/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/linter.yml)
   [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-role-virtio-win/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/markdown.yml)
   [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-virtio-win/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/molecule.yml)
@@ -399,7 +415,8 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 ## [Ansible - My Workstation](https://github.com/ruzickap/ansible-my_workstation)
 
-- Description: Ansible playbooks to configure my workstation base on Fedora / macOS
+- Description: Ansible playbooks to configure my workstation base on Fedora /
+  macOS
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/blob/main/LICENSE)
@@ -409,14 +426,13 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-my_workstation/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/ansible-lint.yml)
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/ansible-my_workstation/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/dependabot-auto-merge.yml)
   [![GitHub Actions status - fedora](https://github.com/ruzickap/ansible-my_workstation/workflows/fedora/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/fedora.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-my_workstation/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/linter.yml)
   [![GitHub Actions status - macos](https://github.com/ruzickap/ansible-my_workstation/workflows/macos/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/macos.yml)
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/ansible-my_workstation/workflows/markdown/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/markdown.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-my_workstation/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-my_workstation/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-my_workstation/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-my_workstation/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-my_workstation/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-my_workstation/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-my_workstation/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -443,11 +459,11 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-openwrt/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/ansible-lint.yml)
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/ansible-openwrt/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/dependabot-auto-merge.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-openwrt/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/linter.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-openwrt/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-openwrt/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-openwrt/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-openwrt/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-openwrt/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-openwrt/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-openwrt/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -474,11 +490,11 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - ansible-lint](https://github.com/ruzickap/ansible-raspbian/workflows/ansible-lint/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/ansible-lint.yml)
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/ansible-raspbian/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/dependabot-auto-merge.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ansible-raspbian/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/linter.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/ansible-raspbian/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/ansible-raspbian/workflows/yamllint/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-raspbian/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-raspbian/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-raspbian/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-raspbian/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-raspbian/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -505,10 +521,12 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - popular-containers-vulnerability-checks](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/popular-containers-vulnerability-checks/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/popular-containers-vulnerability-checks.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/Renovate/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/renovate.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/release-please/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/renovate/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/stale/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -525,8 +543,8 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 ## [malware-cryptominer-container](https://github.com/ruzickap/malware-cryptominer-container)
 
-- Description: Container image with malware and crypto miner for testing purposes
-- URL: <https://github.com/ruzickap/malware-cryptominer-container>
+- Description: Container image with malware and crypto miner for testing
+  purposes
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/blob/main/LICENSE)
@@ -536,8 +554,11 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/malware-cryptominer-container/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/malware-cryptominer-container/workflows/Renovate/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/renovate.yml)
+  [![GitHub Actions status - container-build](https://github.com/ruzickap/malware-cryptominer-container/workflows/container-build/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/container-build.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/malware-cryptominer-container/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/malware-cryptominer-container/workflows/renovate/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/malware-cryptominer-container/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/malware-cryptominer-container/workflows/stale/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -555,7 +576,6 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [raw-photo-tools-container](https://github.com/ruzickap/raw-photo-tools-container)
 
 - Description: Repository for building container to help manage RAW photos
-- URL: <https://petr.ruzicka.dev>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/blob/main/LICENSE)
@@ -565,8 +585,11 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - container-build](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/container-build.yml/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/container-build.yml)
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/mega-linter.yml/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - container-build](https://github.com/ruzickap/raw-photo-tools-container/workflows/container-build/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/container-build.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/raw-photo-tools-container/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/raw-photo-tools-container/workflows/renovate/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/raw-photo-tools-container/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/raw-photo-tools-container/workflows/stale/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -594,11 +617,9 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/myteam-adr/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/linter.yml)
   [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/myteam-adr/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - Publish ADR](https://github.com/ruzickap/myteam-adr/workflows/Publish%20ADR/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/publish-adr.yml)
   [![GitHub Actions status - Renovate](https://github.com/ruzickap/myteam-adr/workflows/Renovate/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/renovate.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/myteam-adr/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/shellcheck.yml)
 
 - Issue tracking:
 
@@ -629,6 +650,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
   [![GitHub Actions status - hugo-build](https://github.com/awsugcz/awsug.cz/workflows/hugo-build/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/hugo-build.yml)
   [![GitHub Actions status - markdown](https://github.com/awsugcz/awsug.cz/workflows/markdown/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/markdown.yml)
   [![GitHub Actions status - periodic-broken-link-checks](https://github.com/awsugcz/awsug.cz/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/periodic-broken-link-checks.yml)
+  [![GitHub Actions status - release-please](https://github.com/awsugcz/awsug.cz/workflows/release-please/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/release-please.yaml)
   [![GitHub Actions status - yamllint](https://github.com/awsugcz/awsug.cz/workflows/yamllint/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/yamllint.yml)
 
 - Issue tracking:
@@ -646,8 +668,8 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 ## [ruzickap.github.io](https://github.com/ruzickap/ruzickap.github.io)
 
-- Description: ruzickap.github.io - personal blog
-- URL: <https://ruzickap.github.io>
+- Description: blog.ruzicka.dev - personal blog 🏠
+- URL: <https://ruzickap.github.io/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/blob/main/LICENSE)
@@ -659,8 +681,12 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
   [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/ruzickap.github.io/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)
   [![GitHub Actions status - Links](https://github.com/ruzickap/ruzickap.github.io/workflows/Links/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/links.yml)
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/ruzickap.github.io/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/ruzickap.github.io/workflows/Renovate/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ruzickap.github.io/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - post_tests](https://github.com/ruzickap/ruzickap.github.io/workflows/post_tests/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/post_tests.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/ruzickap.github.io/workflows/release-please/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ruzickap.github.io/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/ruzickap.github.io/workflows/stale/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -678,7 +704,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [petr.ruzicka.dev](https://github.com/ruzickap/petr.ruzicka.dev)
 
 - Description: Personal page
-- URL: <https://petr.ruzicka.dev>
+- URL: <https://petr.ruzicka.dev/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/blob/main/LICENSE)
@@ -689,9 +715,13 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - CI/CD status:
 
   [![GitHub Actions status - hugo-build](https://github.com/ruzickap/petr.ruzicka.dev/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/hugo-build.yml)
-  [![GitHub Actions status - Links](https://github.com/ruzickap/petr.ruzicka.dev/workflows/Links/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/links.yml)
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/petr.ruzicka.dev/workflows/markdown/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/markdown.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/petr.ruzicka.dev/workflows/yamllint/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/petr.ruzicka.dev/workflows/links/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/links.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/petr.ruzicka.dev/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/petr.ruzicka.dev/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/petr.ruzicka.dev/workflows/release-please/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/petr.ruzicka.dev/workflows/renovate/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/petr.ruzicka.dev/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/petr.ruzicka.dev/workflows/stale/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -709,7 +739,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [xvx.cz](https://github.com/ruzickap/xvx.cz)
 
 - Description: xvx.cz
-- URL: <https://xvx.cz>
+- URL: <https://xvx.cz/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/blob/main/LICENSE)
@@ -719,13 +749,14 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/xvx.cz/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/dependabot-auto-merge.yml)
   [![GitHub Actions status - hugo-build](https://github.com/ruzickap/xvx.cz/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/hugo-build.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/xvx.cz/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/linter.yml)
-  [![GitHub Actions status - markdown](https://github.com/ruzickap/xvx.cz/workflows/markdown/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/markdown.yml)
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/xvx.cz/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/xvx.cz/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/periodic-broken-link-checks.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/xvx.cz/workflows/yamllint/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/xvx.cz/workflows/links/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/links.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/xvx.cz/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/xvx.cz/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/xvx.cz/workflows/release-please/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/xvx.cz/workflows/renovate/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/xvx.cz/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/xvx.cz/workflows/stale/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -744,7 +775,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - Description: Multitenant+Multicluster Amazon EKS installation using Terraform,
   GitHub Actions and GitOps
-- URL: <https://ruzickap.github.io/k8s-tf-eks-gitops>
+- URL: <https://ruzickap.github.io/k8s-tf-eks-gitops/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/blob/main/LICENSE)
@@ -754,12 +785,15 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
+  [![GitHub Actions status - Close stale issues and PRs](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/Close%20stale%20issues%20and%20PRs/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/stale.yml)
   [![GitHub Actions status - clusters-aws-reusable-workflow](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws-reusable-workflow/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws-reusable-workflow.yml)
   [![GitHub Actions status - clusters-aws-schedule](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws-schedule/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws-schedule.yml)
   [![GitHub Actions status - clusters-aws](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws.yml)
   [![GitHub Actions status - Flux validate](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/Flux%20validate/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/flux-validate.yaml)
   [![GitHub Actions status - kics-security-scan](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/kics-security-scan/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/kics-security-scan.yml)
   [![GitHub Actions status - Links](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/Links/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/links.yml)
+  [![GitHub Actions status - Lint Commit Messages](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/Lint%20Commit%20Messages/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/commitlint.yml)
+  [![GitHub Actions status - Lint PR](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/Lint%20PR/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/lint-pr-title.yml)
   [![GitHub Actions status - mdbook-build-check-deploy](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/mdbook-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/mdbook-build-check-deploy.yml)
   [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - Renovate](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/Renovate/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/renovate.yml)
@@ -793,9 +827,11 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
   [![GitHub Actions status - Links](https://github.com/ruzickap/k8s-eks-rancher/workflows/Links/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/links.yml)
   [![GitHub Actions status - mdbook-build-check-deploy](https://github.com/ruzickap/k8s-eks-rancher/workflows/mdbook-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/mdbook-build-check-deploy.yml)
-  [![GitHub Actions status - MegaLinter](https://github.com/ruzickap/k8s-eks-rancher/workflows/MegaLinter/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - Renovate](https://github.com/ruzickap/k8s-eks-rancher/workflows/Renovate/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/renovate.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-eks-rancher/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/shellcheck.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-eks-rancher/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-eks-rancher/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-eks-rancher/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-eks-rancher/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-eks-rancher/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/stale.yml)
   [![GitHub Actions status - test-k8s-eks-rancher](https://github.com/ruzickap/k8s-eks-rancher/workflows/test-k8s-eks-rancher/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/test-k8s-eks-rancher.yml)
 
 - Issue tracking:
@@ -814,7 +850,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
 - Description: Notes from Amazon EKS Bottlerocket and Fargate testing
-- URL: <https://ruzickap.github.io/k8s-eks-bottlerocket-fargate>
+- URL: <https://ruzickap.github.io/k8s-eks-bottlerocket-fargate/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/blob/main/LICENSE)
@@ -825,12 +861,15 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - CI/CD status:
 
   [![GitHub Actions status - command](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/command/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/command.yml)
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/dependabot-auto-merge.yml)
   [![GitHub Actions status - kube-linter](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/kube-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/kube-linter.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/linter.yml)
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/periodic-broken-link-checks.yml)
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/vuepress-build-check-deploy.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/links.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/stale.yml)
+  [![GitHub Actions status - vuepress-build](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/workflows/vuepress-build/badge.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/actions/workflows/vuepress-build.yml)
 
 - Issue tracking:
 
@@ -845,59 +884,28 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
-## [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux)
-
-- Description: Blue Green deployment with Flagger, Flux and Istio
-- URL: <https://ruzickap.github.io/k8s-flagger-istio-flux>
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/blob/master/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-flagger-istio-flux.svg?style=social)](https://github.com/ruzickap/k8s-flagger-istio-flux/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-flagger-istio-flux.svg?style=social)](https://github.com/ruzickap/k8s-flagger-istio-flux/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-flagger-istio-flux.svg?style=social)](https://github.com/ruzickap/k8s-flagger-istio-flux)
-
-- CI/CD status:
-
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/dependabot-auto-merge.yml)
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/periodic-broken-link-checks.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/terraform.yml)
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/vuepress-build-check-deploy.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/yamllint.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-flagger-istio-flux/latest)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux)
-
 ## [k8s-flux-istio-gitlab-harbor](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
 
-- Description: Install services using Flux + Istio + Gitlab + Harbor inside
-  Kops cluster running on AWS
-- URL: <https://ruzickap.github.io/k8s-flux-istio-gitlab-harbor>
+- Description: Install services using Flux + Istio + Gitlab + Harbor inside Kops
+  cluster running on AWS
+- URL: <https://ruzickap.github.io/k8s-flux-istio-gitlab-harbor/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-flux-istio-gitlab-harbor.svg?style=social)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-flux-istio-gitlab-harbor.svg?style=social)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-flux-istio-gitlab-harbor.svg?style=social)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
 
 - CI/CD status:
 
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/dependabot-auto-merge.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/linter.yml)
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/periodic-broken-link-checks.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/vuepress-build-check-deploy.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/links.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/stale.yml)
+  [![GitHub Actions status - vuepress-build](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/workflows/vuepress-build/badge.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/actions/workflows/vuepress-build.yml)
 
 - Issue tracking:
 
@@ -918,19 +926,21 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - URL: <https://ruzickap.github.io/k8s-harbor/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-harbor.svg?style=social)](https://github.com/ruzickap/k8s-harbor/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-harbor.svg?style=social)](https://github.com/ruzickap/k8s-harbor/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-harbor.svg?style=social)](https://github.com/ruzickap/k8s-harbor)
 
 - CI/CD status:
 
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/k8s-harbor/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/dependabot-auto-merge.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-harbor/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/linter.yml)
-  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-harbor/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/periodic-broken-link-checks.yml)
-  [![GitHub Actions status - shellcheck](https://github.com/ruzickap/k8s-harbor/workflows/shellcheck/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/shellcheck.yml)
-  [![GitHub Actions status - vuepress-build-check-deploy](https://github.com/ruzickap/k8s-harbor/workflows/vuepress-build-check-deploy/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/vuepress-build-check-deploy.yml)
-  [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-harbor/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/yamllint.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-harbor/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/links.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-harbor/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-harbor/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-harbor/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-harbor/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-harbor/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-harbor/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/stale.yml)
+  [![GitHub Actions status - vuepress-build](https://github.com/ruzickap/k8s-harbor/workflows/vuepress-build/badge.svg)](https://github.com/ruzickap/k8s-harbor/actions/workflows/vuepress-build.yml)
 
 - Issue tracking:
 
@@ -959,6 +969,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 - CI/CD status:
 
   [![GitHub Actions status - markdown](https://github.com/ruzickap/k8s-harbor-presentation/workflows/markdown/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/markdown.yml)
+  [![GitHub Actions status - periodic-broken-link-checks](https://github.com/ruzickap/k8s-harbor-presentation/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/periodic-broken-link-checks.yml)
   [![GitHub Actions status - yamllint](https://github.com/ruzickap/k8s-harbor-presentation/workflows/yamllint/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/yamllint.yml)
 
 - Issue tracking:
@@ -977,6 +988,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [k8s-istio-demo](https://github.com/ruzickap/k8s-istio-demo)
 
 - Description: Demo showing the capabilities of Istio
+- URL: <https://ruzickap.gitbook.io/k8s-istio-demo/readme>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/blob/master/LICENSE)
@@ -1039,6 +1051,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [k8s-istio-workshop](https://github.com/ruzickap/k8s-istio-workshop)
 
 - Description: Istio workshop
+- URL: <https://ruzickap.github.io/k8s-istio-workshop/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/blob/master/LICENSE)
@@ -1069,6 +1082,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x)
 
 - Description: Kubernetes + Jenkins X + Sockshop
+- URL: <https://ruzickap.github.io/k8s-jenkins-x/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/blob/master/LICENSE)
@@ -1100,8 +1114,8 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 ## [k8s-knative-gitlab-harbor](https://github.com/ruzickap/k8s-knative-gitlab-harbor)
 
-- Description: Build container images with Knative + Gitlab + Harbor inside
-  Kops cluster running on AWS
+- Description: Build container images with Knative + Gitlab + Harbor inside Kops
+  cluster running on AWS
 - URL: <https://ruzickap.github.io/k8s-knative-gitlab-harbor/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/releases/latest)
@@ -1135,7 +1149,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [k8s-postgresql](https://github.com/ruzickap/k8s-postgresql)
 
 - Description: PostgreSQL on Kubernetes
-- URL: <https://ruzickap.github.io/k8s-postgresql>
+- URL: <https://ruzickap.github.io/k8s-postgresql/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/blob/master/LICENSE)
@@ -1168,7 +1182,7 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 ## [k8s-sockshop](https://github.com/ruzickap/k8s-sockshop)
 
 - Description: Build and deploy Sockshop application using Flagger + Flux
-- URL: <https://ruzickap.github.io/k8s-sockshop>
+- URL: <https://ruzickap.github.io/k8s-sockshop/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/blob/master/LICENSE)
@@ -1210,9 +1224,12 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
 
 - CI/CD status:
 
-  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-macos/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/build.yml)
-  [![GitHub Actions status - dependabot-auto-merge](https://github.com/ruzickap/cheatsheet-macos/workflows/dependabot-auto-merge/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/dependabot-auto-merge.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-macos/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/linter.yml)
+  [![GitHub Actions status - latex-build](https://github.com/ruzickap/cheatsheet-macos/workflows/latex-build/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/latex-build.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/cheatsheet-macos/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/cheatsheet-macos/workflows/release-please/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/cheatsheet-macos/workflows/renovate/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cheatsheet-macos/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/cheatsheet-macos/workflows/stale/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -1226,64 +1243,3 @@ List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ru
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-macos/latest)](https://github.com/ruzickap/cheatsheet-macos/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/cheatsheet-macos/total.svg)](https://github.com/ruzickap/cheatsheet-macos/releases/latest)
-
-## [Cheatsheet - Atom](https://github.com/ruzickap/cheatsheet-atom)
-
-- Description: Atom Keyboard Shortcuts
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/cheatsheet-atom.svg?style=social)](https://github.com/ruzickap/cheatsheet-atom/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/cheatsheet-atom.svg?style=social)](https://github.com/ruzickap/cheatsheet-atom/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/cheatsheet-atom.svg?style=social)](https://github.com/ruzickap/cheatsheet-atom)
-
-- CI/CD status:
-
-  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-atom/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/build.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-atom/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/linter.yml)
-  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-atom/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/release.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-atom/latest)](https://github.com/ruzickap/cheatsheet-atom/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/cheatsheet-atom/total.svg)](https://github.com/ruzickap/cheatsheet-atom/releases/latest)
-
-## [Cheatsheet - Systemd](https://github.com/ruzickap/cheatsheet-systemd)
-
-- Description: Cheatsheet for systemd
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/cheatsheet-systemd.svg?style=social)](https://github.com/ruzickap/cheatsheet-systemd/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/cheatsheet-systemd.svg?style=social)](https://github.com/ruzickap/cheatsheet-systemd/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/cheatsheet-systemd.svg?style=social)](https://github.com/ruzickap/cheatsheet-systemd)
-
-- CI/CD status:
-
-  [![GitHub Actions status - build](https://github.com/ruzickap/cheatsheet-systemd/workflows/build/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/build.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cheatsheet-systemd/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/linter.yml)
-  [![GitHub Actions status - release](https://github.com/ruzickap/cheatsheet-systemd/workflows/release/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/release.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-systemd/latest)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd)
-  [![GitHub download latest release](https://img.shields.io/github/downloads/ruzickap/cheatsheet-systemd/total.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases/latest)

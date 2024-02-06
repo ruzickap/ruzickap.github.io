@@ -31,7 +31,7 @@ GITHUB_REPOSITORIES_DESCRIPTIONS=(
   "ruzickap/k8s-tf-eks-gitops|k8s-tf-eks-gitops"
   "ruzickap/k8s-eks-rancher|k8s-eks-rancher"
   "ruzickap/k8s-eks-bottlerocket-fargate|k8s-eks-bottlerocket-fargate"
-  "ruzickap/k8s-flagger-istio-flux|k8s-flagger-istio-flux"
+  # "ruzickap/k8s-flagger-istio-flux|k8s-flagger-istio-flux" - Public Archive...
   "ruzickap/k8s-flux-istio-gitlab-harbor|k8s-flux-istio-gitlab-harbor"
   "ruzickap/k8s-harbor|k8s-harbor"
   "ruzickap/k8s-harbor-presentation|k8s-harbor-presentation"
@@ -43,9 +43,19 @@ GITHUB_REPOSITORIES_DESCRIPTIONS=(
   "ruzickap/k8s-postgresql|k8s-postgresql"
   "ruzickap/k8s-sockshop|k8s-sockshop"
   "ruzickap/cheatsheet-macos|cheatsheet-macos"
-  "ruzickap/cheatsheet-atom|Cheatsheet - Atom"
-  "ruzickap/cheatsheet-systemd|Cheatsheet - Systemd"
+  # "ruzickap/cheatsheet-atom|Cheatsheet - Atom" - Public Archive...
+  # "ruzickap/cheatsheet-systemd|Cheatsheet - Systemd" - Public Archive...
 )
+
+cat > projects.md << EOF
+---
+# https://www.w3schools.com/icons/icons_reference.asp
+icon: fas fa-project-diagram
+order: 4
+---
+
+List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ruzickap/)
+EOF
 
 for GITHUB_REPOSITORY_TITLE_TMP in "${GITHUB_REPOSITORIES_DESCRIPTIONS[@]}"; do
   GITHUB_REPOSITORY="${GITHUB_REPOSITORY_TITLE_TMP%|*}"
@@ -58,7 +68,7 @@ for GITHUB_REPOSITORY_TITLE_TMP in "${GITHUB_REPOSITORIES_DESCRIPTIONS[@]}"; do
   # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
   GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s -u "${GITHUB_TOKEN}:x-oauth-basic" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGE}" ]]; then echo -e "\n- URL: <${GITHUB_REPOSITORY_HOMEPAGE}>"; fi)
-  cat << EOF
+  cat << EOF | tee -a projects.md
 
 ## [${GITHUB_REPOSITORY_TITLE}](${GITHUB_REPOSITORY_HTML_URL})
 
@@ -88,3 +98,5 @@ ${GITHUB_REPOSITORY_CI_CD_STATUS}
   [![GitHub repo size](https://img.shields.io/github/repo-size/${GITHUB_REPOSITORY}.svg)](https://github.com/${GITHUB_REPOSITORY})
 EOF
 done
+
+prettier -w --parser markdown --prose-wrap always --print-width 80 projects.md
