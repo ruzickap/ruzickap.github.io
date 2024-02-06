@@ -17,7 +17,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4
 
       - name: Generate _tabs/projects.md
         env:
@@ -42,7 +42,7 @@ jobs:
           fail: true
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@b1ddad2c994a25fbc81a28b3ec0e368bb2021c50 # v6
         with:
           add-paths: _tabs/projects.md
           branch: generate-projects
