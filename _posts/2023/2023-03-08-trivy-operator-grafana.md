@@ -66,7 +66,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=trivy-operator registryUrl=https://aquasecurity.github.io/helm-charts/
-TRIVY_OPERATOR_HELM_CHART_VERSION="0.20.5"
+TRIVY_OPERATOR_HELM_CHART_VERSION="0.20.6"
 
 helm repo add --force-update aqua https://aquasecurity.github.io/helm-charts/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-trivy-operator.yml" << EOF
