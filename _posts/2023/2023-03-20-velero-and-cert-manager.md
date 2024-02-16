@@ -243,14 +243,12 @@ and modify the
 {% raw %}
 
 ```bash
-# renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
 VELERO_HELM_CHART_VERSION="5.3.0"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
 initContainers:
   - name: velero-plugin-for-aws
-    # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?<version>.+)$
     image: velero/velero-plugin-for-aws:v1.9.0
     volumeMounts:
       - mountPath: /target
@@ -322,7 +320,6 @@ helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace vele
 Add Velero Grafana Dashboard:
 
 ```bash
-# renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" << EOF
@@ -570,7 +567,6 @@ issuer=/C=US/O=(STAGING) Let's Encrypt/CN=(STAGING) Artificial Apricot R3
 Use production Let's Encrypt certificate by `ingress-nginx`:
 
 ```bash
-# renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
 INGRESS_NGINX_HELM_CHART_VERSION="4.9.1"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx-production-certs.yml" << EOF

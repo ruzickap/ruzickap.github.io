@@ -284,7 +284,6 @@ and modify the
 ![podinfo](https://raw.githubusercontent.com/stefanprodan/podinfo/a7be119f20369b97f209d220535506af7c49b4ea/screens/podinfo-ui-v3.png){:width="500"}
 
 ```bash
-# renovate: datasource=helm depName=podinfo registryUrl=https://stefanprodan.github.io/podinfo
 PODINFO_HELM_CHART_VERSION="6.5.4"
 
 helm repo add --force-update sp https://stefanprodan.github.io/podinfo

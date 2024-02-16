@@ -536,54 +536,57 @@ Configure [Karpenter](https://karpenter.sh/):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-provisioner.yml" << EOF | kubectl apply -f -
-apiVersion: karpenter.sh/v1alpha5
-kind: Provisioner
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
 metadata:
   name: default
 spec:
-  consolidation:
-    enabled: true
-  # https://karpenter.sh/preview/concepts/provisioners/#cilium-startup-taint
-  startupTaints:
-    - key: node.cilium.io/agent-not-ready
-      value: "true"
-      effect: NoExecute
-  requirements:
-    - key: karpenter.sh/capacity-type
-      operator: In
-      values: ["spot", "on-demand"]
-    - key: kubernetes.io/arch
-      operator: In
-      values: ["amd64", "arm64"]
-    - key: "topology.kubernetes.io/zone"
-      operator: In
-      values: ["${AWS_DEFAULT_REGION}a"]
-    - key: karpenter.k8s.aws/instance-family
-      operator: In
-      values: ["t3a", "t4g"]
+  template:
+    metadata:
+      labels:
+        managedBy: karpenter
+        provisioner: default
+    spec:
+      nodeClassRef:
+        apiVersion: karpenter.k8s.aws/v1beta1
+        kind: EC2NodeClass
+        name: default
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64", "arm64"]
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          values: ["${AWS_DEFAULT_REGION}a"]
+        - key: karpenter.k8s.aws/instance-family
+          operator: In
+          values: ["t3a", "t4g"]
+      startupTaints:
+        - key: node.cilium.io/agent-not-ready
+          value: "true"
+          effect: NoExecute
   # Resource limits constrain the total size of the cluster.
   # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
-    resources:
-      cpu: 8
-      memory: 32Gi
-  providerRef:
-    name: default
-  # Labels are arbitrary key-values that are applied to all nodes
-  labels:
-    managedBy: karpenter
-    provisioner: default
+    cpu: 8
+    memory: 32Gi
 ---
-apiVersion: karpenter.k8s.aws/v1alpha1
-kind: AWSNodeTemplate
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
 metadata:
   name: default
 spec:
   amiFamily: Bottlerocket
-  subnetSelector:
-    karpenter.sh/discovery: ${CLUSTER_NAME}
-  securityGroupSelector:
-    karpenter.sh/discovery: ${CLUSTER_NAME}
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: ${CLUSTER_NAME}
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: ${CLUSTER_NAME}
+  role: "KarpenterNodeRole-${CLUSTER_NAME}"
   blockDeviceMappings:
     - deviceName: /dev/xvda
       ebs:

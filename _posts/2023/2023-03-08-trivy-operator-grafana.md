@@ -65,7 +65,6 @@ and modify the
 ![trivy-operator](https://raw.githubusercontent.com/aquasecurity/trivy-operator/e5722da903ff16d5fd926ed46fdffacf5d50d9b5/docs/images/trivy-operator-logo.png){:width="500"}
 
 ```bash
-# renovate: datasource=helm depName=trivy-operator registryUrl=https://aquasecurity.github.io/helm-charts/
 TRIVY_OPERATOR_HELM_CHART_VERSION="0.20.6"
 
 helm repo add --force-update aqua https://aquasecurity.github.io/helm-charts/
@@ -1095,7 +1094,6 @@ Events:              <none>
 Add Trivy Grafana Dashboards:
 
 ```bash
-# renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-trivy-operator-grafana.yml" << EOF

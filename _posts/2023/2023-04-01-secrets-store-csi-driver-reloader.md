@@ -132,7 +132,6 @@ and modify the
 [default values](https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/main/charts/secrets-store-csi-driver/values.yaml).
 
 ```bash
-# renovate: datasource=helm depName=secrets-store-csi-driver registryUrl=https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
 SECRETS_STORE_CSI_DRIVER_HELM_CHART_VERSION="1.4.1"
 
 helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
@@ -148,7 +147,6 @@ Install `secrets-store-csi-driver-provider-aws`
 [helm chart](https://github.com/aws/secrets-store-csi-driver-provider-aws/tree/main/charts/secrets-store-csi-driver-provider-aws).
 
 ```bash
-# renovate: datasource=helm depName=secrets-store-csi-driver-provider-aws registryUrl=https://aws.github.io/secrets-store-csi-driver-provider-aws
 SECRETS_STORE_CSI_DRIVER_PROVIDER_AWS_HELM_CHART_VERSION="0.3.6"
 
 helm repo add aws-secrets-manager https://aws.github.io/secrets-store-csi-driver-provider-aws
@@ -452,7 +450,6 @@ Install `reloader`
 [helm chart](https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml).
 
 ```bash
-# renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts
 RELOADER_HELM_CHART_VERSION="1.0.67"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
