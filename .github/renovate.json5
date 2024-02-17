@@ -29,6 +29,12 @@
       automerge: false,
     },
     {
+      description: "Disable automerge for helm chart minor updates",
+      matchDatasources: ["helm"],
+      matchUpdateTypes: ["minor"],
+      automerge: false,
+    },
+    {
       description: "Ignore frequent renovate updates",
       enabled: false,
       matchPackageNames: ["renovatebot/github-action"],
@@ -41,9 +47,9 @@
       schedule: ["* * * * 0"],
     },
     {
-      description: "AutoMerge kube-prometheus-stack helm chart version",
+      description: "AutoMerge helm chart updates for files",
       matchDatasources: ["helm"],
-      matchPackagePatterns: ["(^|\\/)kube-prometheus-stack$"],
+      matchFileNames: ["_posts/2023/2023-09-25-secure-cheap-amazon-eks.md"],
       matchUpdateTypes: ["major", "minor"],
     },
     {
