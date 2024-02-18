@@ -425,8 +425,7 @@ iamIdentityMappings:
       - system:masters
     username: admin
 karpenter:
-  # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.34.0
+  version: v0.31.4
   createServiceAccount: true
   withSpotInterruptionQueue: true
 addons:
@@ -578,7 +577,6 @@ kubeProxyReplacement: disabled
 tunnel: disabled
 EOF
 
-# renovate: datasource=helm depName=cilium registryUrl=https://helm.cilium.io/
 CILIUM_HELM_CHART_VERSION="1.15.1"
 
 if ! kubectl get namespace cilium &> /dev/null; then
@@ -685,7 +683,6 @@ and modify the
 [default values](https://github.com/piraeusdatastore/helm-charts/blob/main/charts/snapshot-controller/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
 SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.0"
 
 helm repo add piraeus-charts https://piraeus.io/helm-charts/
@@ -706,7 +703,6 @@ and modify the
 (The ServiceAccount `ebs-csi-controller-sa` was created by `eksctl`)
 
 ```bash
-# renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.27.0"
 
 helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
@@ -760,7 +756,6 @@ and modify the
 [default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
 AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
 helm repo add eks https://aws.github.io/eks-charts/
@@ -793,7 +788,6 @@ and modify the
 [default values](https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml).
 
 ```bash
-# renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
 MAILHOG_HELM_CHART_VERSION="5.2.3"
 
 helm repo add codecentric https://codecentric.github.io/helm-charts
@@ -853,7 +847,6 @@ and modify the
 [default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -1159,8 +1152,7 @@ and modify the
 [default values](https://github.com/aws/karpenter/blob/main/charts/karpenter/values.yaml).
 
 ```bash
-# renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.34.0"
+KARPENTER_HELM_CHART_VERSION="v0.31.4"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
@@ -1255,7 +1247,6 @@ and modify the
 [default values](https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
 AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.32"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" << EOF
@@ -1299,7 +1290,6 @@ and modify the
 Service account `cert-manager` was created by `eksctl`.
 
 ```bash
-# renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.14.2"
 
 helm repo add jetstack https://charts.jetstack.io
@@ -1398,7 +1388,6 @@ and modify the
 [default values](https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
 METRICS_SERVER_HELM_CHART_VERSION="3.12.0"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
@@ -1429,7 +1418,6 @@ and modify the
 Service account `external-dns` was created by `eksctl`.
 
 ```bash
-# renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.14.3"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
@@ -1466,7 +1454,6 @@ and modify the
 [default values](https://github.com/kubernetes/ingress-nginx/blob/master/charts/ingress-nginx/values.yaml).
 
 ```bash
-# renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
 INGRESS_NGINX_HELM_CHART_VERSION="4.9.1"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
@@ -1543,7 +1530,6 @@ and modify the
 [default values](https://github.com/stakater/Forecastle/blob/master/deployments/kubernetes/chart/forecastle/values.yaml).
 
 ```bash
-# renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
 FORECASTLE_HELM_CHART_VERSION="1.0.136"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
@@ -1586,7 +1572,6 @@ and modify the
 [default values](https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml).
 
 ```bash
-# renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
 OAUTH2_PROXY_HELM_CHART_VERSION="6.24.1"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
