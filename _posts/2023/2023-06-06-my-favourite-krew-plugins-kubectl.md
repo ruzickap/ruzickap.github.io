@@ -5,8 +5,7 @@ date: 2023-06-06
 description: My favourite krew plugins for kubectl command-line tool
 categories: [Kubernetes, krew, kubectl, plugins, plugin-manager]
 tags: [kubernetes, krew, kubectl, plugins, plugin-manager]
-image:
-  path: https://raw.githubusercontent.com/kubernetes-sigs/krew/4ec386cc021b4a7896de95d91c5d8025d98eaa4f/assets/logo/stacked/color/krew-stacked-color.svg
+image: https://raw.githubusercontent.com/kubernetes-sigs/krew/4ec386cc021b4a7896de95d91c5d8025d98eaa4f/assets/logo/stacked/color/krew-stacked-color.svg
 ---
 
 I would like to share few notes about kubectl plugins installed by [krew](https://krew.sigs.k8s.io/)

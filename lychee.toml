@@ -17,28 +17,33 @@ max_concurrency = 128
 #############################  Requests  ############################
 
 # Comma-separated list of accepted status codes for valid links.
-accept = [429, 999]
+accept = [999]
 
 #############################  Exclusions  ##########################
 
 # Exclude URLs and mail addresses from checking (supports regex)
 exclude = [
+  # returns 403 when accessed from GitHub Action
+  'stackoverflow\.com',
+  'stackexchange\.com',
   # Ignore all URLs with '$' - BASH variable in URL
   '\$',
   # Ignore all URLs with '{ ... }' - BASH / Ansible variable in URL
   '%7B.*%7D',
   # Ignore all URLs which starts with 'file://'
   'file://',
-
-  'fonts.(googleapis|gstatic).com',
-  'https://www.facebook.com/sharer/sharer.php\?title=TITLE&u=URL',
-  'k01.k8s.mylabs.dev',
-  'www.googletagmanager.com',
+  'cdn\.com',
+  'fonts\.(googleapis|gstatic)\.com',
+  'https://www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL',
+  'mylabs\.dev',
+  'username\.github\.io',
+  'www\.googletagmanager\.com',
 ]
 
 # Exclude these filesystem paths from getting checked
 exclude_path = [
   "CHANGELOG.md",
+  "_tabs/projects.md",
 ]
 
 # Exclude all private IPs from checking.

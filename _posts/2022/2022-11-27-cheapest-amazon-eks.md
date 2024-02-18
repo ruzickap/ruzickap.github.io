@@ -15,8 +15,7 @@ tags:
     external-dns,
     podinfo,
   ]
-image:
-  path: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
+image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 
 Sometimes it is necessary to save costs and run the [Amazon EKS](https://aws.amazon.com/eks/)

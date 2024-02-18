@@ -19,8 +19,7 @@ tags:
     oauth2-proxy,
     metrics-server,
   ]
-image:
-  path: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
+image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 
 I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)

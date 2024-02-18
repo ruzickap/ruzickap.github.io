@@ -31,26 +31,14 @@ bundle exec jekyll s
 Using Docker:
 
 ```bash
-docker run --rm -it --volume="${PWD}:/srv/jekyll:Z" --publish 4000:4000 jekyll/jekyll jekyll serve
+docker run --rm -it --volume="${PWD}:/srv/jekyll" -e JEKYLL_UID="${UID}" -e JEKYLL_GID="${GID}" jekyll/jekyll -- bash -c 'chown -R jekyll /usr/gem/ && jekyll build --destination "public"'
+docker run --rm -it --volume="${PWD}:/srv/jekyll" -e JEKYLL_UID="${UID}" -e JEKYLL_GID="${GID}" --publish 4000:4000 jekyll/jekyll -- bash -c 'chown -R jekyll /usr/gem/ && jekyll serve'
 ```
 
 Megalinter:
 
 ```bash
-mega-linter-runner --flavor documentation \
-  -e "'DISABLE_LINTERS=REPOSITORY_DEVSKIM,SPELL_CSPELL'" \
-  -e BASH_SHFMT_ARGUMENTS="--indent 2 --space-redirects" \
-  -e FORMATTERS_DISABLE_ERRORS="false" \
-  -e HTML_HTMLHINT_FILTER_REGEX_EXCLUDE="^index.html" \
-  -e JSON_PRETTIER_FILTER_REGEX_EXCLUDE="^.markdown-link-check.json" \
-  -e MARKDOWN_MARKDOWNLINT_CONFIG_FILE=".markdownlint.yml" \
-  -e PRINT_ALPACA="false" \
-  -e REPORT_OUTPUT_FOLDER="/tmp/" \
-  -e RUBY_RUBOCOP_FILTER_REGEX_EXCLUDE="^_plugins" \
-  -e SPELL_CSPELL_FILTER_REGEX_INCLUDE="(^README.md|^_posts/)" \
-  -e SPELL_MISSPELL_FILTER_REGEX_EXCLUDE="^_data/locales" \
-  -e YAML_PRETTIER_FILTER_REGEX_EXCLUDE="(^_data/|^_config.yml)" \
-  -e YAML_V8R_FILTER_REGEX_EXCLUDE="(^_data/|^_config.yml)"
+mega-linter-runner --remove-container --container-name="mega-linter" --debug --env VALIDATE_ALL_CODEBASE=true
 ```
 
 ## Notes

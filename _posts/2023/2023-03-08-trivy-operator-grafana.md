@@ -5,8 +5,7 @@ date: 2023-03-08
 description: Deploy Trivy Operator and Grafana Dashboard
 categories: [Kubernetes, Amazon EKS, Security]
 tags: [Amazon EKS, k8s, kubernetes, grafana, trivy-operator, dashboard]
-image:
-  path: https://raw.githubusercontent.com/aquasecurity/trivy-vscode-extension/02fa1bf2b5e1333647ebd1bced679f4e94f8bf39/media/trivy.svg
+image: https://raw.githubusercontent.com/aquasecurity/trivy-vscode-extension/02fa1bf2b5e1333647ebd1bced679f4e94f8bf39/media/trivy.svg
 ---
 
 In the previous post related to

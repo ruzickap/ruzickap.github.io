@@ -5,8 +5,7 @@ date: 2022-12-24
 description: Run Amazon EKS and create workloads for Karpenter
 categories: [Kubernetes, Amazon EKS, Karpenter]
 tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl]
-image:
-  path: https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
+image: https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 ---
 
 In the previous post related to
