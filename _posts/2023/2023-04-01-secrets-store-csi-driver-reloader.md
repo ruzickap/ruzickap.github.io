@@ -20,8 +20,7 @@ tags:
     reloader,
     AWS Secrets Manager,
   ]
-image:
-  path: https://raw.githubusercontent.com/kubernetes/community/487f994c013ea61d92cf9a341af7620037abbce3/icons/svg/resources/unlabeled/secret.svg
+image: https://raw.githubusercontent.com/kubernetes/community/487f994c013ea61d92cf9a341af7620037abbce3/icons/svg/resources/unlabeled/secret.svg
 ---
 
 Sometimes it is necessary to store the secrets in the [HashiCorp Vault](https://www.vaultproject.io/),

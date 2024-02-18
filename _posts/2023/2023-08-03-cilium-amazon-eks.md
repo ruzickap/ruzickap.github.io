@@ -21,8 +21,7 @@ tags:
     oauth2-proxy,
     metrics-server,
   ]
-image:
-  path: https://raw.githubusercontent.com/cncf/artwork/ac38e11ed57f017a06c9dcb19013bcaed92115a9/projects/cilium/icon/color/cilium_icon-color.svg
+image: https://raw.githubusercontent.com/cncf/artwork/ac38e11ed57f017a06c9dcb19013bcaed92115a9/projects/cilium/icon/color/cilium_icon-color.svg
 ---
 
 I'm going to describe how to install [Amazon EKS](https://aws.amazon.com/eks/)
@@ -54,8 +53,8 @@ The Cilium installation should meet these requirements:
 
 - [Transparent network encryption](https://isovalent.com/videos/wireguard-node-to-node-encryption-on-cilium/)
   (node to node traffic) should be enabled
-- Encryption should use [Wireguard](https://www.wireguard.com) as a "fastest
-  encryption method"
+- Encryption should use [Wireguard](https://en.wikipedia.org/wiki/WireGuard) as
+  a "fastest encryption method"
 - Use [Elastic Network Interface (ENI)](https://docs.cilium.io/en/v1.14/network/concepts/ipam/eni/#aws-eni)
   integration
 - [Layer 7 network](https://docs.cilium.io/en/v1.14/observability/visibility/)

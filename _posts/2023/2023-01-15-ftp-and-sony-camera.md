@@ -6,8 +6,7 @@ description: Run FTP server for transferring photos from Sony cameras
 categories: [Photography, Cameras]
 tags: [settings, photo, ftp, cameras, wireless]
 mermaid: true
-image:
-  path: /assets/img/posts/2022/2022-09-02-my-sony-a7-iv-settings/Sony_A7_IV_(ILCE-7M4)_-_by_Henry_Söderlund_(51739988735).avif
+image: /assets/img/posts/2022/2022-09-02-my-sony-a7-iv-settings/Sony_A7_IV_(ILCE-7M4)_-_by_Henry_Soderlund_(51739988735).avif
 ---
 
 FTP is protocol which I haven't used for many years. I configured FTP
