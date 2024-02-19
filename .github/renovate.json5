@@ -30,12 +30,12 @@
     },
     {
       description: "Disable automerge for minor updates in all posts except latest",
+      enabled: false,
       matchFileNames: [
         "_posts/**",
         "!_posts/2023/2023-09-25-secure-cheap-amazon-eks.md",
       ],
       matchUpdateTypes: ["minor"],
-      automerge: false,
     },
     {
       description: "Ignore frequent renovate updates",
