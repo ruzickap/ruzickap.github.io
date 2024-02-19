@@ -18,6 +18,7 @@
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
   ignoreDeps: ["http_parser.rb", "html-proofer"],
+  ignorePaths: ["_posts/2022/**", "_posts/2023/2023-0[1-8]*.md"],
   labels: [
     "renovate",
     "renovate/{{replace '.*/' '' depName}}",
@@ -29,13 +30,9 @@
       automerge: false,
     },
     {
-      description: "Disable automerge for minor updates in all posts except latest",
-      enabled: false,
-      matchFileNames: [
-        "_posts/**",
-        "!_posts/2023/2023-09-25-secure-cheap-amazon-eks.md",
-      ],
-      matchUpdateTypes: ["minor"],
+      description: "AutoMerge all for specific post",
+      matchFileNames: ["_posts/2023/2023-09-25-secure-cheap-amazon-eks.md"],
+      matchUpdateTypes: ["major", "minor"],
     },
     {
       description: "Ignore frequent renovate updates",
@@ -48,11 +45,6 @@
       matchPackageNames: ["renovatebot/github-action"],
       matchUpdateTypes: ["minor"],
       schedule: ["* * * * 0"],
-    },
-    {
-      description: "AutoMerge all for latest post",
-      matchFileNames: ["_posts/2023/2023-09-25-secure-cheap-amazon-eks.md"],
-      matchUpdateTypes: ["major", "minor"],
     },
     {
       description: "Grafana Dashboards",
