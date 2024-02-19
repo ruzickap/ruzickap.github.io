@@ -29,8 +29,11 @@
       automerge: false,
     },
     {
-      description: "Disable automerge for helm chart minor updates",
-      matchDatasources: ["helm"],
+      description: "Disable automerge for minor updates in all posts except latest",
+      matchFileNames: [
+        "_posts/**",
+        "!_posts/2023/2023-09-25-secure-cheap-amazon-eks.md",
+      ],
       matchUpdateTypes: ["minor"],
       automerge: false,
     },
@@ -47,8 +50,7 @@
       schedule: ["* * * * 0"],
     },
     {
-      description: "AutoMerge helm chart updates for files",
-      matchDatasources: ["helm"],
+      description: "AutoMerge all for latest post",
       matchFileNames: ["_posts/2023/2023-09-25-secure-cheap-amazon-eks.md"],
       matchUpdateTypes: ["major", "minor"],
     },
