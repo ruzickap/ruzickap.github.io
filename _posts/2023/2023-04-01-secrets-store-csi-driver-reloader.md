@@ -452,7 +452,7 @@ Install `reloader`
 
 ```bash
 # renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts
-RELOADER_HELM_CHART_VERSION="1.0.67"
+RELOADER_HELM_CHART_VERSION="1.0.69"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-reloader.yml" << EOF
