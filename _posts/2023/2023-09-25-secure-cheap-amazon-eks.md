@@ -1341,7 +1341,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
-FORECASTLE_HELM_CHART_VERSION="1.0.136"
+FORECASTLE_HELM_CHART_VERSION="1.0.137"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
