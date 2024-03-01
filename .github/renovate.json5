@@ -30,11 +30,6 @@
       automerge: false,
     },
     {
-      description: "AutoMerge all for specific post",
-      matchFileNames: ["_posts/2023/2023-09-25-secure-cheap-amazon-eks.md"],
-      matchUpdateTypes: ["major", "minor"],
-    },
-    {
       description: "Ignore frequent renovate updates",
       enabled: false,
       matchPackageNames: ["renovatebot/github-action"],
@@ -47,9 +42,20 @@
       schedule: ["* * * * 0"],
     },
     {
+      automerge: true,
+      commitBody: "[skip ci]",
       description: "Grafana Dashboards",
+      ignoreTests: true,
       matchDatasources: ["custom.grafana-dashboards"],
       matchUpdateTypes: ["major"],
+    },
+    {
+      automerge: true,
+      commitBody: "[skip ci]",
+      description: "AutoMerge all for specific post",
+      ignoreTests: true,
+      matchFileNames: ["_posts/2023/2023-09-25-secure-cheap-amazon-eks.md"],
+      matchUpdateTypes: ["major", "minor", "patch"],
     },
   ],
   prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}",
