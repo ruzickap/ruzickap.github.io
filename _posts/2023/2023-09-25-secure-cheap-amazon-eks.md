@@ -747,7 +747,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.20.1"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.21.0"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
