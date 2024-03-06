@@ -1014,7 +1014,6 @@ List of my GitHub projects:
 
 - CI/CD status:
 
-  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-harbor-presentation/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/links.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-harbor-presentation/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-harbor-presentation/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-harbor-presentation/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/release-please.yml)
