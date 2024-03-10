@@ -412,7 +412,7 @@ iamIdentityMappings:
     username: admin
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.35.0
+  version: v0.35.1
   createServiceAccount: true
   withSpotInterruptionQueue: true
 addons:
@@ -1046,7 +1046,7 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.35.0"
+KARPENTER_HELM_CHART_VERSION="v0.35.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
