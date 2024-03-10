@@ -126,7 +126,7 @@ List of my GitHub projects:
 - CI/CD status:
 
   [![GitHub Actions status - build](https://github.com/ruzickap/packer-templates/workflows/build/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/build.yml)
-  [![GitHub Actions status - Links](https://github.com/ruzickap/packer-templates/workflows/Links/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/links.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/packer-templates/workflows/links/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/links.yml)
   [![GitHub Actions status - markdown-mdspell](https://github.com/ruzickap/packer-templates/workflows/markdown-mdspell/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/markdown-mdspell.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/packer-templates/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - packer-templates](https://github.com/ruzickap/packer-templates/workflows/packer-templates/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/packer-templates.yml)
@@ -316,7 +316,7 @@ List of my GitHub projects:
 
 - Description: Ansible role for configuring proxy settings for Linux based
   systems
-- URL: <https://galaxy.ansible.com/ruzickap/proxy_settings/>
+- Website: <https://galaxy.ansible.com/ruzickap/proxy_settings/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/blob/main/LICENSE)
@@ -612,7 +612,7 @@ List of my GitHub projects:
 ## [myteam-adr](https://github.com/ruzickap/myteam-adr)
 
 - Description: Architectural Decision Record (ADR) for MyTeam
-- URL: <https://ruzickap.github.io/myteam-adr/log4brains>
+- Website: <https://ruzickap.github.io/myteam-adr/log4brains>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/blob/main/LICENSE)
@@ -624,7 +624,7 @@ List of my GitHub projects:
 
   [![GitHub Actions status - links](https://github.com/ruzickap/myteam-adr/workflows/links/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/links.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/myteam-adr/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - Publish ADR](https://github.com/ruzickap/myteam-adr/workflows/Publish%20ADR/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/publish-adr.yml)
+  [![GitHub Actions status - publish-adr](https://github.com/ruzickap/myteam-adr/workflows/publish-adr/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/publish-adr.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/myteam-adr/workflows/release-please/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/myteam-adr/workflows/renovate/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/renovate.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/myteam-adr/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/semantic-pull-request.yml)
@@ -646,7 +646,7 @@ List of my GitHub projects:
 ## [Prague AWS User Group Web Pages](https://github.com/awsugcz/awsug.cz)
 
 - Description: Prague AWS User Group Web Pages
-- URL: <https://awsug.cz>
+- Website: <https://awsug.cz>
 
 [![GitHub release](https://img.shields.io/github/v/release/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/blob/main/LICENSE)
@@ -678,7 +678,7 @@ List of my GitHub projects:
 ## [ruzickap.github.io](https://github.com/ruzickap/ruzickap.github.io)
 
 - Description: blog.ruzicka.dev - personal blog 🏠
-- URL: <https://ruzickap.github.io/>
+- Website: <https://ruzickap.github.io/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/blob/main/LICENSE)
@@ -714,7 +714,7 @@ List of my GitHub projects:
 ## [petr.ruzicka.dev](https://github.com/ruzickap/petr.ruzicka.dev)
 
 - Description: Personal page
-- URL: <https://petr.ruzicka.dev/>
+- Website: <https://petr.ruzicka.dev/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/blob/main/LICENSE)
@@ -749,7 +749,7 @@ List of my GitHub projects:
 ## [xvx.cz](https://github.com/ruzickap/xvx.cz)
 
 - Description: xvx.cz
-- URL: <https://xvx.cz/>
+- Website: <https://xvx.cz/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/blob/main/LICENSE)
@@ -785,7 +785,7 @@ List of my GitHub projects:
 
 - Description: Multitenant+Multicluster Amazon EKS installation using Terraform,
   GitHub Actions and GitOps
-- URL: <https://ruzickap.github.io/k8s-tf-eks-gitops/>
+- Website: <https://ruzickap.github.io/k8s-tf-eks-gitops/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/blob/main/LICENSE)
@@ -824,7 +824,7 @@ List of my GitHub projects:
 ## [k8s-eks-rancher](https://github.com/ruzickap/k8s-eks-rancher)
 
 - Description: Build Amazon EKS with Rancher
-- URL: <https://ruzickap.github.io/k8s-eks-rancher/>
+- Website: <https://ruzickap.github.io/k8s-eks-rancher/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/blob/main/LICENSE)
@@ -859,7 +859,7 @@ List of my GitHub projects:
 ## [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
 - Description: Notes from Amazon EKS Bottlerocket and Fargate testing
-- URL: <https://ruzickap.github.io/k8s-eks-bottlerocket-fargate/>
+- Website: <https://ruzickap.github.io/k8s-eks-bottlerocket-fargate/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/blob/main/LICENSE)
@@ -896,7 +896,7 @@ List of my GitHub projects:
 ## [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux)
 
 - Description: Blue Green deployment with Flagger, Flux and Istio
-- URL: <https://ruzickap.github.io/k8s-flagger-istio-flux/>
+- Website: <https://ruzickap.github.io/k8s-flagger-istio-flux/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/blob/main/LICENSE)
@@ -934,7 +934,7 @@ List of my GitHub projects:
 
 - Description: Install services using Flux + Istio + Gitlab + Harbor inside Kops
   cluster running on AWS
-- URL: <https://ruzickap.github.io/k8s-flux-istio-gitlab-harbor/>
+- Website: <https://ruzickap.github.io/k8s-flux-istio-gitlab-harbor/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/blob/main/LICENSE)
@@ -969,7 +969,7 @@ List of my GitHub projects:
 ## [k8s-harbor](https://github.com/ruzickap/k8s-harbor)
 
 - Description: Harbor in Kubernetes
-- URL: <https://ruzickap.github.io/k8s-harbor/>
+- Website: <https://ruzickap.github.io/k8s-harbor/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/blob/main/LICENSE)
@@ -1004,7 +1004,7 @@ List of my GitHub projects:
 ## [k8s-harbor-presentation](https://github.com/ruzickap/k8s-harbor-presentation)
 
 - Description: Presentation about Harbor project
-- URL: <https://ruzickap.github.io/k8s-harbor-presentation/>
+- Website: <https://ruzickap.github.io/k8s-harbor-presentation/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/blob/main/LICENSE)
@@ -1037,7 +1037,7 @@ List of my GitHub projects:
 ## [k8s-istio-demo](https://github.com/ruzickap/k8s-istio-demo)
 
 - Description: Demo showing the capabilities of Istio
-- URL: <https://ruzickap.gitbook.io/k8s-istio-demo/readme>
+- Website: <https://ruzickap.gitbook.io/k8s-istio-demo/readme>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/blob/main/LICENSE)
@@ -1072,7 +1072,7 @@ List of my GitHub projects:
 ## [k8s-istio-webinar](https://github.com/ruzickap/k8s-istio-webinar)
 
 - Description: Istio webinar
-- URL: <https://ruzickap.github.io/k8s-istio-webinar>
+- Website: <https://ruzickap.github.io/k8s-istio-webinar>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/blob/main/LICENSE)
@@ -1107,7 +1107,7 @@ List of my GitHub projects:
 ## [k8s-istio-workshop](https://github.com/ruzickap/k8s-istio-workshop)
 
 - Description: Istio workshop
-- URL: <https://ruzickap.github.io/k8s-istio-workshop/>
+- Website: <https://ruzickap.github.io/k8s-istio-workshop/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/blob/main/LICENSE)
@@ -1142,7 +1142,7 @@ List of my GitHub projects:
 ## [k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x)
 
 - Description: Kubernetes + Jenkins X + Sockshop
-- URL: <https://ruzickap.github.io/k8s-jenkins-x/>
+- Website: <https://ruzickap.github.io/k8s-jenkins-x/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/blob/main/LICENSE)
@@ -1178,7 +1178,7 @@ List of my GitHub projects:
 
 - Description: Build container images with Knative + Gitlab + Harbor inside Kops
   cluster running on AWS
-- URL: <https://ruzickap.github.io/k8s-knative-gitlab-harbor/>
+- Website: <https://ruzickap.github.io/k8s-knative-gitlab-harbor/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/blob/main/LICENSE)
@@ -1213,7 +1213,7 @@ List of my GitHub projects:
 ## [k8s-postgresql](https://github.com/ruzickap/k8s-postgresql)
 
 - Description: PostgreSQL on Kubernetes
-- URL: <https://ruzickap.github.io/k8s-postgresql/>
+- Website: <https://ruzickap.github.io/k8s-postgresql/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/blob/main/LICENSE)
@@ -1249,7 +1249,7 @@ List of my GitHub projects:
 ## [k8s-sockshop](https://github.com/ruzickap/k8s-sockshop)
 
 - Description: Build and deploy Sockshop application using Flagger + Flux
-- URL: <https://ruzickap.github.io/k8s-sockshop/>
+- Website: <https://ruzickap.github.io/k8s-sockshop/>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/blob/main/LICENSE)
