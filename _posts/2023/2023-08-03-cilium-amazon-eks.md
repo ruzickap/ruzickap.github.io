@@ -579,12 +579,12 @@ tunnel: disabled
 EOF
 
 # renovate: datasource=helm depName=cilium registryUrl=https://helm.cilium.io/
-CILIUM_HELM_CHART_VERSION="1.15.1"
+CILIUM_HELM_CHART_VERSION="1.14.0"
 
 if ! kubectl get namespace cilium &> /dev/null; then
   kubectl create ns cilium
   cilium install --namespace cilium --version "${CILIUM_HELM_CHART_VERSION}" --wait --helm-values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cilium.yml"
-  eksctl delete nodegroup mng02-ng --cluster "${CLUSTER_NAME}"
+  eksctl delete nodegroup mng02-ng --cluster "${CLUSTER_NAME}" --wait
 fi
 ```
 
@@ -669,6 +669,27 @@ spec:
 EOF
 ```
 
+### aws-node-termination-handler
+
+[AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
+gracefully handle EC2 instance shutdown within Kubernetes.
+
+Install `aws-node-termination-handler`
+[helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
+and modify the
+[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
+
+```bash
+# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
+AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
+
+helm repo add eks https://aws.github.io/eks-charts/
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
+awsRegion: ${AWS_DEFAULT_REGION}
+EOF
+helm upgrade --wait --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
+```
+
 ### snapshot-controller
 
 Install Volume Snapshot Custom Resource Definitions (CRDs):
@@ -689,7 +710,7 @@ and modify the
 SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.0"
 
 helm repo add piraeus-charts https://piraeus.io/helm-charts/
-helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
+helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
 ```
 
 ### aws-ebs-csi-driver
@@ -747,27 +768,6 @@ Delete `gp2` StorageClass, because the `gp3` will be used instead:
 
 ```bash
 kubectl delete storageclass gp2 || true
-```
-
-### aws-node-termination-handler
-
-[AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
-gracefully handle EC2 instance shutdown within Kubernetes.
-
-Install `aws-node-termination-handler`
-[helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
-and modify the
-[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
-AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
-
-helm repo add eks https://aws.github.io/eks-charts/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
-awsRegion: ${AWS_DEFAULT_REGION}
-EOF
-helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
 ```
 
 ## Prometheus, DNS, Ingress, Certificates and others
