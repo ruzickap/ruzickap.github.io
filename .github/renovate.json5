@@ -54,7 +54,7 @@
       commitBody: "[skip ci]",
       description: "AutoMerge all for specific post",
       ignoreTests: true,
-      matchFileNames: ["_posts/2023/2023-09-25-secure-cheap-amazon-eks.md"],
+      matchFileNames: ["_posts/2024/*.md"],
       matchUpdateTypes: ["major", "minor", "patch"],
     },
   ],

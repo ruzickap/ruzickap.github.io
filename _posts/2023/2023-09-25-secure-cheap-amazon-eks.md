@@ -391,14 +391,6 @@ iam:
         certManager: true
       roleName: eksctl-${CLUSTER_NAME}-irsa-cert-manager
     - metadata:
-        name: cilium-operator
-        namespace: cilium
-      attachPolicyARNs:
-        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
-        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-      roleName: eksctl-${CLUSTER_NAME}-irsa-cilium
-      roleOnly: true
-    - metadata:
         name: external-dns
         namespace: external-dns
       wellKnownPolicies:
@@ -412,7 +404,7 @@ iamIdentityMappings:
     username: admin
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.35.2
+  version: v0.31.4
   createServiceAccount: true
   withSpotInterruptionQueue: true
 addons:
@@ -528,11 +520,6 @@ metadata:
 spec:
   consolidation:
     enabled: true
-  # https://karpenter.sh/preview/concepts/provisioners/#cilium-startup-taint
-  startupTaints:
-    - key: node.cilium.io/agent-not-ready
-      value: "true"
-      effect: NoExecute
   requirements:
     - key: karpenter.sh/capacity-type
       operator: In
@@ -591,6 +578,27 @@ spec:
 EOF
 ```
 
+### aws-node-termination-handler
+
+[AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
+gracefully handle EC2 instance shutdown within Kubernetes.
+
+Install `aws-node-termination-handler`
+[helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
+and modify the
+[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
+
+```bash
+# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
+AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
+
+helm repo add eks https://aws.github.io/eks-charts/
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
+awsRegion: ${AWS_DEFAULT_REGION}
+EOF
+helm upgrade --wait --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
+```
+
 ### snapshot-controller
 
 Install Volume Snapshot Custom Resource Definitions (CRDs):
@@ -611,7 +619,7 @@ and modify the
 SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.0"
 
 helm repo add piraeus-charts https://piraeus.io/helm-charts/
-helm upgrade --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
+helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
 kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=baseline
 ```
 
@@ -670,27 +678,6 @@ Delete `gp2` StorageClass, because the `gp3` will be used instead:
 
 ```bash
 kubectl delete storageclass gp2 || true
-```
-
-### aws-node-termination-handler
-
-[AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
-gracefully handle EC2 instance shutdown within Kubernetes.
-
-Install `aws-node-termination-handler`
-[helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
-and modify the
-[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
-AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
-
-helm repo add eks https://aws.github.io/eks-charts/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
-awsRegion: ${AWS_DEFAULT_REGION}
-EOF
-helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
 ```
 
 ### mailpit
@@ -930,21 +917,6 @@ grafana:
         gnetId: 16236
         revision: 1
         datasource: Prometheus
-      16611-cilium-metrics:
-        # renovate: depName="Cilium v1.12 Agent Metrics"
-        gnetId: 16611
-        revision: 1
-        datasource: Prometheus
-      16612-cilium-operator:
-        # renovate: depName="Cilium v1.12 Operator Metrics"
-        gnetId: 16612
-        revision: 1
-        datasource: Prometheus
-      16613-hubble:
-        # renovate: depName="Cilium v1.12 Hubble Metrics"
-        gnetId: 16613
-        revision: 1
-        datasource: Prometheus
       19268-prometheus:
         # renovate: depName="Prometheus All Metrics"
         gnetId: 19268
@@ -1046,7 +1018,7 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.35.2"
+KARPENTER_HELM_CHART_VERSION="v0.31.4"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
@@ -1385,7 +1357,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="7.1.0"
+OAUTH2_PROXY_HELM_CHART_VERSION="6.24.2"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
