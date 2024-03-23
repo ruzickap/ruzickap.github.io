@@ -54,12 +54,6 @@ jobs:
         env:
           JEKYLL_ENV: "production"
 
-      - name: Test site
-        run: |
-          bundle exec htmlproofer public \
-            --disable-external=true \
-            --ignore-urls "/^http://127.0.0.1/,/^http://0.0.0.0/,/^http://localhost/"
-
       - name: Add files to public directory
         run: |
           cp LICENSE public/
@@ -70,12 +64,18 @@ jobs:
           echo '0771af676e2543c3bd6577f3203aa839' > public/0771af676e2543c3bd6577f3203aa839.txt # DevSkim: ignore DS173237
           echo -e '<?xml version="1.0"?>\n<users>\n\t<user>592AB158E3F9EF887F8DC8E69A2FF754</user>\n</users>' > public/BingSiteAuth.xml
 
+      - name: Test site
+        run: |
+          bundle exec htmlproofer public \
+            --disable-external=true \
+            --ignore-urls "/^http://127.0.0.1/,/^http://0.0.0.0/,/^http://localhost/"
+
       - name: Check broken links
         uses: ruzickap/action-my-broken-link-checker@bec36cf5736d969f1c5191b9fd2052df87675012 # v2.6.0
         with:
           url: https://${{ steps.variables.outputs.BASE_DOMAIN }}
           pages_path: public
-          cmd_params: '--exclude=(linkedin.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/|mylabs.dev|www.googletagmanager.com|hub.docker.com|stackoverflow.com) --color=always --header="User-Agent:curl/7.54.0" --buffer-size=8192 --skip-tls-verification'
+          cmd_params: '--exclude=(linkedin.com|twitter.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/|mylabs.dev|www.googletagmanager.com|hub.docker.com|stackoverflow.com) --buffer-size=8192 --max-connections-per-host=5 --color=always --rate-limit=5 --header="User-Agent:Mozilla" --skip-tls-verification'
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@373f7f263a76c20808c831209c920827a82a2847 # v3.9.3
