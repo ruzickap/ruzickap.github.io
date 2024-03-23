@@ -18,7 +18,7 @@
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
   ignoreDeps: ["http_parser.rb", "html-proofer"],
-  ignorePaths: ["_posts/2022/**", "_posts/2023/2023-0[1-8]*.md"],
+  ignorePaths: ["_posts/202[2-3]/**"],
   labels: [
     "renovate",
     "renovate/{{replace '.*/' '' depName}}",
