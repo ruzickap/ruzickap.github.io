@@ -22,6 +22,11 @@ tags:
     metrics-server,
   ]
 image: https://raw.githubusercontent.com/cncf/artwork/ac38e11ed57f017a06c9dcb19013bcaed92115a9/projects/cilium/icon/color/cilium_icon-color.svg
+# Runme settings
+shell: bash
+cwd: /tmp
+category: 2023-08-03-cilium-amazon-eks
+skipPrompts: true
 ---
 
 I'm going to describe how to install [Amazon EKS](https://aws.amazon.com/eks/)
@@ -69,7 +74,7 @@ The Cilium installation should meet these requirements:
 If you would like to follow this documents and it's task you will need to set up
 few environment variables like:
 
-```bash
+```bash {"category":"2023-08-03-cilium-amazon-eks,2023-08-03-cilium-amazon-eks-destroy"}
 # AWS Region
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 # Hostname / FQDN definitions
@@ -90,7 +95,7 @@ mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
 and other secrets/variables.
 
-```shell
+```bash {"excludeFromRunAll":true}
 # AWS Credentials
 export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
@@ -102,7 +107,7 @@ export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 
 Verify if all the necessary variables were set:
 
-```bash
+```bash {"excludeFromRunAll":true}
 : "${AWS_ACCESS_KEY_ID?}"
 : "${AWS_DEFAULT_REGION?}"
 : "${AWS_SECRET_ACCESS_KEY?}"
@@ -136,7 +141,7 @@ Install necessary tools:
 
 Create DNS zone for EKS clusters:
 
-```shell
+```bash {"excludeFromRunAll":"true"}
 export CLOUDFLARE_EMAIL="petr.ruzicka@gmail.com"
 export CLOUDFLARE_API_KEY="1xxxxxxxxx0"
 
@@ -153,7 +158,7 @@ Use your domain registrar to change the nameservers for your zone (for example
 `mylabs.dev`) to use the Amazon Route 53 nameservers. Here is the way how you
 can find out the the Route 53 nameservers:
 
-```shell
+```bash {"excludeFromRunAll":"true"}
 NEW_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${BASE_DOMAIN}.\`].Id" --output text)
 NEW_ZONE_NS=$(aws route53 get-hosted-zone --output json --id "${NEW_ZONE_ID}" --query "DelegationSet.NameServers")
 NEW_ZONE_NS1=$(echo "${NEW_ZONE_NS}" | jq -r ".[0]")
@@ -164,7 +169,7 @@ Create the NS record in `k8s.mylabs.dev` (`BASE_DOMAIN`) for
 proper zone delegation. This step depends on your domain registrar - I'm using
 CloudFlare and using Ansible to automate it:
 
-```shell
+```bash {"excludeFromRunAll":"true"}
 ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS1} solo=true proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
 ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS2} solo=false proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
 ```
@@ -1823,7 +1828,7 @@ Cluster health:          2/2 reachable   (2023-08-18T17:53:44Z)
 
 Handy details about Cilium networking can be found by listing `ciliumnodes` CRD:
 
-```shell
+```sh { "excludeFromRunAll":"true" }
 kubectl describe ciliumnodes.cilium.io
 ```
 
@@ -2290,7 +2295,7 @@ kubectl get pods -A -o json | jq ".items[] | select (.spec.hostNetwork==true) .s
 
 Remove EKS cluster and created components:
 
-```sh
+```sh { "category":"destroy" }
 if eksctl get cluster --name="${CLUSTER_NAME}"; then
   eksctl delete cluster --name="${CLUSTER_NAME}" --force
 fi
@@ -2298,7 +2303,7 @@ fi
 
 Remove Route 53 DNS records from DNS Zone:
 
-```sh
+```sh { "category":"destroy" }
 CLUSTER_FQDN_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${CLUSTER_FQDN}.\`].Id" --output text)
 if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
   aws route53 list-resource-record-sets --hosted-zone-id "${CLUSTER_FQDN_ZONE_ID}" | jq -c '.ResourceRecordSets[] | select (.Type != "SOA" and .Type != "NS")' |
@@ -2313,7 +2318,7 @@ fi
 
 Remove orphan EC2s created by Karpenter:
 
-```sh
+```sh { "category":"destroy" }
 for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do
   echo "Removing EC2: ${EC2}"
   aws ec2 terminate-instances --instance-ids "${EC2}"
@@ -2328,20 +2333,20 @@ aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
 
 Remove CloudFormation stack:
 
-```sh
+```sh { "category":"destroy" }
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
 ```
 
 Wait for all CloudFormation stacks to be deleted:
 
-```sh
+```sh { "category":"destroy" }
 aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-route53-kms"
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
 ```
 
 Remove Volumes and Snapshots related to the cluster (just in case):
 
-```sh
+```sh { "category":"destroy" }
 for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
   echo "*** Removing Volume: ${VOLUME}"
   aws ec2 delete-volume --volume-id "${VOLUME}"
@@ -2350,7 +2355,7 @@ done
 
 Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
-```sh
+```sh { "category":"destroy" }
 [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]] && rm -rf "${TMP_DIR}/${CLUSTER_FQDN}" && [[ -d "${TMP_DIR}" ]] && rmdir "${TMP_DIR}" || true
 ```
 
