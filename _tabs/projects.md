@@ -688,6 +688,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - dependency-review](https://github.com/ruzickap/ruzickap.github.io/workflows/dependency-review/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/dependency-review.yml)
   [![GitHub Actions status - generate-projects](https://github.com/ruzickap/ruzickap.github.io/workflows/generate-projects/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/generate-projects.yml)
   [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/ruzickap.github.io/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)
   [![GitHub Actions status - Links](https://github.com/ruzickap/ruzickap.github.io/workflows/Links/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/links.yml)
