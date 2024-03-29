@@ -675,21 +675,8 @@ EOF
 [AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
 gracefully handle EC2 instance shutdown within Kubernetes.
 
-Install `aws-node-termination-handler`
-[helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
-and modify the
-[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
-AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
-
-helm repo add eks https://aws.github.io/eks-charts/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
-awsRegion: ${AWS_DEFAULT_REGION}
-EOF
-helm upgrade --wait --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
-```
+It is not needed when using EKS managed node groups:
+[Use with managed node groups](https://github.com/aws/aws-node-termination-handler/issues/186)
 
 ### snapshot-controller
 

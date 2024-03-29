@@ -1,12 +1,12 @@
 ---
-title: Build secure and cheap Amazon EKS
+title: Build secure and cheap Amazon EKS with Pod Identities
 author: Petr Ruzicka
-date: 2023-09-25
-description: Build "cheap and secure" Amazon EKS with network policies, cluster encryption and logging
-categories: [Kubernetes, Amazon EKS, Security]
+date: 2024-03-23
+description: Build "cheap and secure" Amazon EKS with Pod Identities, network policies, cluster encryption and logging
+categories: [Kubernetes, Amazon EKS, Security, EKS Pod Identities]
 tags:
   [
-    Amazon EKS,
+    amazon eks,
     k8s,
     kubernetes,
     security,
@@ -18,6 +18,7 @@ tags:
     sso,
     oauth2-proxy,
     metrics-server,
+    eks pod identities,
   ]
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
@@ -48,6 +49,8 @@ Amazon EKS should meet the following security requirements:
   configured
 - [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
   should be enabled wherever they are supported
+- [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
+  should be used to allow applications / pods to communicate with AWS API
 
 ## Build Amazon EKS cluster
 
@@ -112,6 +115,7 @@ Deploy the required tools:
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
+- [velero](https://velero.io/)
 
 ## Configure AWS Route 53 Domain delegation
 
@@ -287,7 +291,7 @@ Resources:
                 - !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
                 # The following roles needs to be enabled after the EKS cluster is created
                 # aws-ebs-csi-driver + Karpenter should be able to use the KMS key
-                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-irsa-aws-ebs-csi-driver"
+                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-pia-aws-ebs-csi-driver"
                 # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-iamservice-role"
             Action:
               - kms:Encrypt
@@ -301,7 +305,7 @@ Resources:
             Principal:
               AWS:
                 - !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
-                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-irsa-aws-ebs-csi-driver"
+                # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-pia-aws-ebs-csi-driver"
                 # - !Sub "arn:aws:iam::${AWS::AccountId}:role/eksctl-${ClusterName}-iamservice-role"
             Action:
               - kms:CreateGrant
@@ -331,10 +335,9 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
     --stack-name "${CLUSTER_NAME}-route53-kms" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" --tags "${TAGS//,/ }"
 fi
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query 'Stacks[0].Outputs[? OutputKey==`KMSKeyArn` || OutputKey==`KMSKeyId`].{OutputKey:OutputKey,OutputValue:OutputValue}')
-AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
-AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms")
+AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
+AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 ```
 
 After running the CF stack you should see the following Route53 zones:
@@ -370,33 +373,47 @@ metadata:
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
+accessConfig:
+  authenticationMode: API
+  accessEntries:
+    - principalARN: arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin
+      accessPolicies:
+        - policyARN: arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+          accessScope:
+            type: cluster
+    - principalARN: arn:aws:iam::${AWS_ACCOUNT_ID}:user/aws-cli
+      accessPolicies:
+        - policyARN: arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+          accessScope:
+            type: cluster
 iam:
-  withOIDC: true
-  serviceAccounts:
-    - metadata:
-        name: aws-for-fluent-bit
-        namespace: aws-for-fluent-bit
-      attachPolicyARNs:
+  withOIDC: true # needed by Karpenter
+  podIdentityAssociations:
+    - namespace: aws-for-fluent-bit
+      serviceAccountName: aws-for-fluent-bit
+      roleName: eksctl-${CLUSTER_NAME}-pia-aws-for-fluent-bit
+      permissionPolicyARNs:
         - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
-      roleName: eksctl-${CLUSTER_NAME}-irsa-aws-for-fluent-bit
-    - metadata:
-        name: ebs-csi-controller-sa
-        namespace: aws-ebs-csi-driver
+      tags: &pia_tags
+        $(echo "${TAGS}" | sed "s/,/\\n        /g; s/=/: /g")
+    - namespace: aws-ebs-csi-driver
+      serviceAccountName: ebs-csi-controller-sa
+      roleName: eksctl-${CLUSTER_NAME}-pia-aws-ebs-csi-driver
       wellKnownPolicies:
         ebsCSIController: true
-      roleName: eksctl-${CLUSTER_NAME}-irsa-aws-ebs-csi-driver
-    - metadata:
-        name: cert-manager
-        namespace: cert-manager
+      tags: *pia_tags
+    - namespace: cert-manager
+      serviceAccountName: cert-manager
+      roleName: eksctl-${CLUSTER_NAME}-pia-cert-manager
       wellKnownPolicies:
         certManager: true
-      roleName: eksctl-${CLUSTER_NAME}-irsa-cert-manager
-    - metadata:
-        name: external-dns
-        namespace: external-dns
+      tags: *pia_tags
+    - namespace: external-dns
+      serviceAccountName: external-dns
+      roleName: eksctl-${CLUSTER_NAME}-pia-external-dns
       wellKnownPolicies:
         externalDNS: true
-      roleName: eksctl-${CLUSTER_NAME}-irsa-external-dns
+      tags: *pia_tags
 # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
 iamIdentityMappings:
   - arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin
@@ -404,19 +421,21 @@ iamIdentityMappings:
       - system:masters
     username: admin
 karpenter:
-  # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-  version: v0.31.4
+  # renovate: datasource=github-tags depName=aws/karpenter-provider-aws extractVersion=^(?<version>.*)$
+  version: 0.35.2
   createServiceAccount: true
   withSpotInterruptionQueue: true
 addons:
+  - name: coredns
+  - name: eks-pod-identity-agent
+  - name: kube-proxy
+  - name: snapshot-controller
   - name: vpc-cni
     version: latest
     configurationValues: |-
       enableNetworkPolicy: "true"
       env:
         ENABLE_PREFIX_DELEGATION: "true"
-  - name: kube-proxy
-  - name: coredns
 managedNodeGroups:
   - name: mng01-ng
     amiFamily: Bottlerocket
@@ -433,7 +452,6 @@ managedNodeGroups:
     disablePodIMDS: true
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
-    maxPodsPerNode: 110
     privateNetworking: true
     bottlerocket:
       settings:
@@ -469,7 +487,7 @@ aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 ```
 
 The command "sed" used earlier modified the aws-cf-route53-kms.yml file by
-incorporating newly established IAM roles (`eksctl-k01-irsa-aws-ebs-csi-driver`
+incorporating newly established IAM roles (`eksctl-k01-pia-aws-ebs-csi-driver`
 and `eksctl-k01-iamservice-role`), enabling them to utilize the KMS key.
 
 ![KMS key with new IAM roles](/assets/img/posts/2023/2023-08-03-cilium-amazon-eks/kms-key-2.avif)
@@ -503,62 +521,76 @@ Enhance the security stance of the EKS cluster by addressing the following conce
   kubectl label namespace default pod-security.kubernetes.io/enforce=baseline
   ```
 
+### EKS Pod Identities
+
+Here is a screenshot from the AWS Console showing the EKS Pod Identity
+Association:
+
+![EKS Pod Identity associations](/assets/img/posts/2024/2024-03-23-secure-cheap-amazon-eks-with-pod-identities/amazon-eks-clusters-access.avif)
+_EKS Pod Identity associations_
+
 ### Karpenter
 
 [Karpenter](https://karpenter.sh/) is a Kubernetes Node Autoscaler built
 for flexibility, performance, and simplicity.
 
-![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="500"}
+![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="500"}
 
 Configure [Karpenter](https://karpenter.sh/):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-provisioner.yml" << EOF | kubectl apply -f -
-apiVersion: karpenter.sh/v1alpha5
-kind: Provisioner
+apiVersion: karpenter.sh/v1beta1
+kind: NodePool
 metadata:
   name: default
 spec:
-  consolidation:
-    enabled: true
-  requirements:
-    - key: karpenter.sh/capacity-type
-      operator: In
-      values: ["spot", "on-demand"]
-    - key: kubernetes.io/arch
-      operator: In
-      values: ["amd64", "arm64"]
-    - key: "topology.kubernetes.io/zone"
-      operator: In
-      values: ["${AWS_DEFAULT_REGION}a"]
-    - key: karpenter.k8s.aws/instance-family
-      operator: In
-      values: ["t3a", "t4g"]
-  kubeletConfiguration:
-    maxPods: 110
+  template:
+    metadata:
+      labels:
+        managedBy: karpenter
+        provisioner: default
+    spec:
+      nodeClassRef:
+        apiVersion: karpenter.k8s.aws/v1beta1
+        kind: EC2NodeClass
+        name: default
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64", "arm64"]
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          values: ["${AWS_DEFAULT_REGION}a"]
+        - key: karpenter.k8s.aws/instance-family
+          operator: In
+          values: ["t3a", "t4g"]
+      startupTaints:
+        - key: node.cilium.io/agent-not-ready
+          value: "true"
+          effect: NoExecute
   # Resource limits constrain the total size of the cluster.
   # Limits prevent Karpenter from creating new instances once the limit is exceeded.
   limits:
-    resources:
-      cpu: 8
-      memory: 32Gi
-  providerRef:
-    name: default
-  # Labels are arbitrary key-values that are applied to all nodes
-  labels:
-    managedBy: karpenter
-    provisioner: default
+    cpu: 8
+    memory: 32Gi
 ---
-apiVersion: karpenter.k8s.aws/v1alpha1
-kind: AWSNodeTemplate
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
 metadata:
   name: default
 spec:
   amiFamily: Bottlerocket
-  subnetSelector:
-    karpenter.sh/discovery: ${CLUSTER_NAME}
-  securityGroupSelector:
-    karpenter.sh/discovery: ${CLUSTER_NAME}
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: ${CLUSTER_NAME}
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: ${CLUSTER_NAME}
+  role: "KarpenterNodeRole-${CLUSTER_NAME}"
   blockDeviceMappings:
     - deviceName: /dev/xvda
       ebs:
@@ -573,8 +605,6 @@ spec:
         encrypted: true
         kmsKeyID: ${AWS_KMS_KEY_ARN}
   tags:
-    KarpenerProvisionerName: "default"
-    Name: "${CLUSTER_NAME}-karpenter"
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 EOF
 ```
@@ -598,9 +628,9 @@ kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter
 ![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg){:width="500"}
 
 Install volume snapshot controller `snapshot-controller`
-[helm chart](https://github.com/piraeusdatastore/helm-charts/tree/main/charts/snapshot-controller)
+[helm chart](https://github.com/piraeusdatastore/helm-charts/tree/d6a32df38d23986d1df24ab55f8bc3cc9bba2ada/charts/snapshot-controller)
 and modify the
-[default values](https://github.com/piraeusdatastore/helm-charts/blob/main/charts/snapshot-controller/values.yaml):
+[default values](https://github.com/piraeusdatastore/helm-charts/blob/d6a32df38d23986d1df24ab55f8bc3cc9bba2ada/charts/snapshot-controller/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
@@ -639,7 +669,6 @@ controller:
     "eks:cluster-name": ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   serviceAccount:
-    create: false
     name: ebs-csi-controller-sa
   region: ${AWS_DEFAULT_REGION}
 node:
@@ -659,7 +688,7 @@ volumeSnapshotClasses:
       snapshot.storage.kubernetes.io/is-default-class: "true"
     deletionPolicy: Delete
 EOF
-helm upgrade --install --version "${AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION}" --namespace aws-ebs-csi-driver --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver
+helm upgrade --install --version "${AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION}" --namespace aws-ebs-csi-driver --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" aws-ebs-csi-driver aws-ebs-csi-driver/aws-ebs-csi-driver
 ```
 
 Delete `gp2` StorageClass, because the `gp3` will be used instead:
@@ -672,12 +701,12 @@ kubectl delete storageclass gp2 || true
 
 Mailpit will be used to receive email alerts from the Prometheus.
 
-![mailpit](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png){:width="200"}
+![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="200"}
 
 Install `mailpit`
 [helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
 and modify the
-[default values](https://github.com/jouve/charts/blob/main/charts/mailpit/values.yaml).
+[default values](https://github.com/jouve/charts/blob/c6326a2dc06e444018efa602d5b6431632f3de59/charts/mailpit/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
@@ -689,7 +718,7 @@ ingress:
   enabled: true
   annotations:
     forecastle.stakater.com/expose: "true"
-    forecastle.stakater.com/icon: https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
+    forecastle.stakater.com/icon: https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg
     forecastle.stakater.com/appName: Mailpit
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
@@ -718,7 +747,7 @@ the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-oper
 Install `kube-prometheus-stack`
 [helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 and modify the
-[default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml):
+[default values](https://github.com/prometheus-community/helm-charts/blob/8f8bbfcf33a7628dc7c67b29a05299f557d21b2a/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -1002,11 +1031,11 @@ resources to handle your cluster's applications.
 Change [karpenter](https://karpenter.sh/) default installation by upgrading:
 [helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
 and modify the
-[default values](https://github.com/aws/karpenter/blob/main/charts/karpenter/values.yaml).
+[default values](https://github.com/aws/karpenter-provider-aws/blob/69afba126cc561ba8e109b62d0ebfd529378b09e/charts/karpenter/values.yaml).
 
 ```bash
-# renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
-KARPENTER_HELM_CHART_VERSION="v0.31.4"
+# renovate: datasource=github-tags depName=aws/karpenter-provider-aws
+KARPENTER_HELM_CHART_VERSION="0.35.2"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 replicas: 1
@@ -1037,13 +1066,13 @@ and modify the
 # renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
 AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.32"
 
+helm repo add eks https://aws.github.io/eks-charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" << EOF
 cloudWatchLogs:
   region: ${AWS_DEFAULT_REGION}
   logGroupTemplate: "/aws/eks/${CLUSTER_NAME}/cluster"
   logStreamTemplate: "\$kubernetes['namespace_name'].\$kubernetes['pod_name']"
 serviceAccount:
-  create: false
   name: aws-for-fluent-bit
 serviceMonitor:
   enabled: true
@@ -1054,7 +1083,7 @@ serviceMonitor:
       scrapeTimeout: 10s
       scheme: http
 EOF
-helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --namespace aws-for-fluent-bit --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" aws-for-fluent-bit eks/aws-for-fluent-bit
+helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --namespace aws-for-fluent-bit --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" aws-for-fluent-bit eks/aws-for-fluent-bit
 ```
 
 ### cert-manager
@@ -1079,7 +1108,6 @@ helm repo add jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
-  create: false
   name: cert-manager
 extraArgs:
   - --cluster-resource-namespace=cert-manager
@@ -1197,17 +1225,18 @@ EXTERNAL_DNS_HELM_CHART_VERSION="1.14.3"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
+image:
+  tag: v0.14.1
 domainFilters:
   - ${CLUSTER_FQDN}
 interval: 20s
 policy: sync
 serviceAccount:
-  create: false
   name: external-dns
 serviceMonitor:
   enabled: true
 EOF
-helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
+helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
 kubectl label namespace external-dns pod-security.kubernetes.io/enforce=baseline
 ```
 
@@ -1341,11 +1370,11 @@ the endpoints by Google Authentication.
 Install `oauth2-proxy`
 [helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
 and modify the
-[default values](https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml).
+[default values](https://github.com/oauth2-proxy/manifests/blob/7b37bf5c690b83cff0eee0e0be7deb93e983e3df/helm/oauth2-proxy/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="6.24.2"
+OAUTH2_PROXY_HELM_CHART_VERSION="7.1.0"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF

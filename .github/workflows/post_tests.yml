@@ -26,6 +26,7 @@ on:
           - cilium-amazon-eks
           - secure-cheap-amazon-eks
           - exploit-vulnerability-wordpress-plugin-kali-linux
+          - velero-and-cert-manager secure-cheap-amazon-eks-with-pod-identities
       action:
         type: choice
         description: Select action
