@@ -414,12 +414,23 @@ iam:
       wellKnownPolicies:
         externalDNS: true
       tags: *pia_tags
-# Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
+    - namespace: karpenter
+      serviceAccountName: karpenter
+      roleName: eksctl-${CLUSTER_NAME}-pia-karpenter
+      permissionPolicyARNs:
+        - arn:aws:iam::${AWS_ACCOUNT_ID}:policy/eksctl-KarpenterControllerPolicy-${CLUSTER_NAME}
 iamIdentityMappings:
+  # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
   - arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin
+    username: admin
     groups:
       - system:masters
-    username: admin
+#  # Add the Karpenter node role to the aws-auth configmap to allow nodes to connect
+#  - arn: arn:aws:iam::${AWS_ACCOUNT_ID}:policy/eksctl-KarpenterControllerPolicy-${CLUSTER_NAME}
+#    username: system:node:{{EC2PrivateDNSName}}
+#    groups:
+#    - system:bootstrappers
+#    - system:nodes
 karpenter:
   # renovate: datasource=github-tags depName=aws/karpenter-provider-aws extractVersion=^(?<version>.*)$
   version: 0.35.2
@@ -582,6 +593,8 @@ apiVersion: karpenter.k8s.aws/v1beta1
 kind: EC2NodeClass
 metadata:
   name: default
+  annotations:
+    kubernetes.io/description: "EC2NodeClass for running Bottlerocket nodes"
 spec:
   amiFamily: Bottlerocket
   subnetSelectorTerms:
@@ -598,12 +611,14 @@ spec:
         volumeType: gp3
         encrypted: true
         kmsKeyID: ${AWS_KMS_KEY_ARN}
+        # deleteOnTermination: true
     - deviceName: /dev/xvdb
       ebs:
         volumeSize: 20Gi
         volumeType: gp3
         encrypted: true
         kmsKeyID: ${AWS_KMS_KEY_ARN}
+        # deleteOnTermination: true
   tags:
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 EOF
@@ -868,16 +883,12 @@ grafana:
         gnetId: 9614
         revision: 1
         datasource: Prometheus
-      11875-kubernetes-ingress-nginx-eks:
-        # renovate: depName="Kubernetes Ingress Nginx - EKS"
-        gnetId: 11875
-        revision: 1
-        datasource: Prometheus
       15038-external-dns:
         # renovate: depName="External-dns"
         gnetId: 35038
         revision: 3
         datasource: Prometheus
+      # https://github.com/DevOps-Nirvana/Grafana-Dashboards
       14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
         # renovate: depName="Kubernetes Nginx Ingress Prometheus NextGen"
         gnetId: 14314
