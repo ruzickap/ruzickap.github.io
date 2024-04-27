@@ -10,7 +10,7 @@ on:
         type: string
       tags:
         description: Common tags
-        default: "product_id='12345',used_for=dev,owner=petr.ruzicka@gmail.com,cluster=k01.k8s.mylabs.dev"
+        default: "product_id='12345',used_for=dev,owner=petr.ruzicka@gmail.com"
         type: string
       posts:
         type: choice
@@ -25,6 +25,7 @@ on:
           - my-favourite-krew-plugins-kubectl cheapest-amazon-eks
           - cilium-amazon-eks
           - secure-cheap-amazon-eks
+          - exploit-vulnerability-wordpress-plugin-kali-linux
       action:
         type: choice
         description: Select action
@@ -40,7 +41,7 @@ env:
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
-  TAGS: ${{ inputs.tags }}
+  TAGS: ${{ inputs.tags }},cluster=${{ inputs.cluster_fqdn }}
 
 permissions: read-all
 

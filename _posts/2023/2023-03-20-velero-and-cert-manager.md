@@ -210,8 +210,8 @@ Before installing Velero it is necessary to create IRSA with S3 policy. The
 created ServiceAccount `velero` will be specified in velero helm chart later.
 
 ```bash
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-s3")
-S3_POLICY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"S3PolicyArn\") .OutputValue")
+# shellcheck disable=SC2016
+S3_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret" --query 'Stacks[0].Outputs[?OutputKey==`S3PolicyArn`].OutputValue' --output text)
 eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=velero --namespace=velero --attach-policy-arn="${S3_POLICY_ARN}" --role-name="eksctl-${CLUSTER_NAME}-irsa-velero" --approve
 ```
 
