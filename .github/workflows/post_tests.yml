@@ -128,8 +128,10 @@ jobs:
             export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
             export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
             export TMP_DIR="${TMP_DIR:-${PWD}}"
-            export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
-            aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
+            if eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
+              export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
+              aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
+            fi
 
             for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
               echo "*** ${POST_FILE} | destroy"

@@ -211,7 +211,7 @@ created ServiceAccount `velero` will be specified in velero helm chart later.
 
 ```bash
 # shellcheck disable=SC2016
-S3_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret" --query 'Stacks[0].Outputs[?OutputKey==`S3PolicyArn`].OutputValue' --output text)
+S3_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-s3" --query 'Stacks[0].Outputs[?OutputKey==`S3PolicyArn`].OutputValue' --output text)
 eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=velero --namespace=velero --attach-policy-arn="${S3_POLICY_ARN}" --role-name="eksctl-${CLUSTER_NAME}-irsa-velero" --approve
 ```
 
