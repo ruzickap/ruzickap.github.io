@@ -168,8 +168,8 @@ use the secrets from [AWS Secrets Manager](https://aws.amazon.com/secrets-manage
 as mountpoint and also as K8s `Secret`.
 
 ```bash
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret")
-SECRETS_MANAGER_KUARDSECRET_POLICY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"SecretsManagerKuardSecretPolicyArn\") .OutputValue")
+# shellcheck disable=SC2016
+SECRETS_MANAGER_KUARDSECRET_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret" --query 'Stacks[0].Outputs[?OutputKey==`SecretsManagerKuardSecretPolicyArn`].OutputValue' --output text)
 eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard --attach-policy-arn="${SECRETS_MANAGER_KUARDSECRET_POLICY_ARN}" --role-name="eksctl-${CLUSTER_NAME}-irsa-kuard" --approve
 ```
 
