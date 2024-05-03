@@ -7,7 +7,7 @@ paths = [
   '''^_posts/2023/2023-04-01-secrets-store-csi-driver-reloader.md$''',
   '''^assets/js/data/search.json$''',
   '''^posts/trivy-operator-grafana/index.html$''',
-  '''^_posts/2024/2023-04-27-exploit-vulnerability-wordpress-plugin-kali-linux.md$''',
+  '''^_posts/2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux.md$''',
 ]
 regexes = [
   "de727a48df31c3a650df9f8523df57374b5d2e65", # Let's Encrypt Staging "Serial Number"
