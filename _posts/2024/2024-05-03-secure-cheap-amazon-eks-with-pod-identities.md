@@ -749,31 +749,26 @@ metadata:
   region: ${AWS_DEFAULT_REGION}
   tags:
     karpenter.sh/discovery: ${CLUSTER_NAME}
-## availabilityZones:
-##   - ${AWS_DEFAULT_REGION}a
-##   - ${AWS_DEFAULT_REGION}b
-# accessConfig:
-#   authenticationMode: API
-#   accessEntries:
-#     - principalARN: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/admin
-#       accessPolicies:
-#         - policyARN: arn:${AWS_PARTITION}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
-#           accessScope:
-#             type: cluster
-#     - principalARN: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:user/aws-cli
-#       accessPolicies:
-#         - policyARN: arn:${AWS_PARTITION}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
-#           accessScope:
-#             type: cluster
+availabilityZones:
+  - ${AWS_DEFAULT_REGION}a
+  - ${AWS_DEFAULT_REGION}b
+## https://github.com/eksctl-io/eksctl/issues/7446
+accessConfig:
+  authenticationMode: API_AND_CONFIG_MAP
+  accessEntries:
+    - principalARN: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/admin
+      accessPolicies:
+        - policyARN: arn:${AWS_PARTITION}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+          accessScope:
+            type: cluster
+    - principalARN: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:user/aws-cli
+      accessPolicies:
+        - policyARN: arn:${AWS_PARTITION}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+          accessScope:
+            type: cluster
 iam:
   withOIDC: true # needed by Karpenter
   podIdentityAssociations:
-    # Doesn't work: https://github.com/aws/aws-for-fluent-bit/issues/784
-    # - namespace: aws-for-fluent-bit
-    #   serviceAccountName: aws-for-fluent-bit
-    #   roleName: eksctl-${CLUSTER_NAME}-pia-aws-for-fluent-bit
-    #   permissionPolicyARNs:
-    #     - arn:${AWS_PARTITION}:iam::aws:policy/CloudWatchAgentServerPolicy
     - namespace: aws-ebs-csi-driver
       serviceAccountName: ebs-csi-controller-sa
       roleName: eksctl-${CLUSTER_NAME}-pia-aws-ebs-csi-driver
@@ -796,12 +791,6 @@ iam:
       permissionPolicyARNs:
         - ${AWS_KARPENTER_CONTROLLER_POLICY_ARN}
 iamIdentityMappings:
-  # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
-  - arn: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/admin
-    username: admin
-    groups:
-      - system:masters
-  # Add the Karpenter node role to the aws-auth configmap to allow nodes to connect
   - arn: ${AWS_KARPENTER_NODE_ROLE_ARN}
     username: system:node:{{EC2PrivateDNSName}}
     groups:
@@ -826,8 +815,8 @@ managedNodeGroups:
     instanceType: t4g.medium
     # Due to karpenter we need 2 instances
     desiredCapacity: 2
-    # availabilityZones:
-    #   - ${AWS_DEFAULT_REGION}a
+    availabilityZones:
+      - ${AWS_DEFAULT_REGION}a
     minSize: 2
     maxSize: 5
     volumeSize: 20
@@ -855,11 +844,6 @@ Get the kubeconfig to access the cluster:
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
     eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
-    # Add roles created by eksctl to the KMS policy to allow aws-ebs-csi-driver work with encrypted EBS volumes
-    # sed -i "s@# \(- \!Sub \"arn:${AWS_PARTITION}:iam::\${AWS::AccountId}:role/eksctl-\${ClusterName}.*\)@\1@" "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms-karpenter.yml"
-    # eval aws cloudformation update-stack \
-    #   --parameters "ParameterKey=BaseDomain,ParameterValue=${BASE_DOMAIN} ParameterKey=ClusterFQDN,ParameterValue=${CLUSTER_FQDN} ParameterKey=ClusterName,ParameterValue=${CLUSTER_NAME}" \
-    #   --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --template-body "file://${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms-karpenter.yml"
   else
     eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
   fi
@@ -1378,9 +1362,9 @@ spec:
         - key: kubernetes.io/arch
           operator: In
           values: ["amd64", "arm64"]
-        # - key: "topology.kubernetes.io/zone"
-        #   operator: In
-        #   values: ["${AWS_DEFAULT_REGION}a"]
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          values: ["${AWS_DEFAULT_REGION}a"]
         - key: karpenter.k8s.aws/instance-family
           operator: In
           values: ["t3a", "t4g"]
@@ -1404,7 +1388,8 @@ spec:
   subnetSelectorTerms:
     - tags:
         karpenter.sh/discovery: ${CLUSTER_NAME}
-        # Name: "*Private*"
+        ## TEST - Remove
+        Name: "*Private*"
   securityGroupSelectorTerms:
     - tags:
         karpenter.sh/discovery: ${CLUSTER_NAME}
@@ -1426,44 +1411,6 @@ spec:
     Name: "${CLUSTER_NAME}-karpenter"
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 EOF
-```
-
-### aws-for-fluent-bit
-
-[Fluent Bit](https://fluentbit.io/) is an open source Log Processor and
-Forwarder which allows you to collect any data like metrics and logs from
-different sources, enrich them with filters and send them to multiple
-destinations.
-
-Install `aws-for-fluent-bit`
-[helm chart](https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit)
-and modify the
-[default values](https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml):
-
-```bash
-# Doesn't work: https://github.com/aws/aws-for-fluent-bit/issues/784
-
-# renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
-# AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.32"
-
-# helm repo add eks https://aws.github.io/eks-charts/
-# tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" << EOF
-# cloudWatchLogs:
-#   region: ${AWS_DEFAULT_REGION}
-#   logGroupTemplate: "/aws/eks/${CLUSTER_NAME}/cluster"
-#   logStreamTemplate: "\$kubernetes['namespace_name'].\$kubernetes['pod_name']"
-# serviceAccount:
-#   name: aws-for-fluent-bit
-# serviceMonitor:
-#   enabled: true
-#   extraEndpoints:
-#     - port: metrics
-#       path: /metrics
-#       interval: 30s
-#       scrapeTimeout: 10s
-#       scheme: http
-# EOF
-# helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --namespace aws-for-fluent-bit --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" aws-for-fluent-bit eks/aws-for-fluent-bit
 ```
 
 ### cert-manager
@@ -1601,12 +1548,13 @@ Service account `external-dns` was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
-EXTERNAL_DNS_HELM_CHART_VERSION="1.14.3"
+EXTERNAL_DNS_HELM_CHART_VERSION="1.14.4"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
-image:
-  tag: v0.14.1
+# Fixed ??????? https://github.com/kubernetes-sigs/external-dns/pull/4357/files
+# image:
+#   tag: v0.14.1
 domainFilters:
   - ${CLUSTER_FQDN}
 interval: 20s
@@ -1798,59 +1746,9 @@ kubectl label namespace --all pod-security.kubernetes.io/warn=baseline
 
 Details can be found in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
 
-## Karpenter tests
-
-```shell
-cat << EOF | kubectl apply -f -
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: inflate
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: inflate
-  template:
-    metadata:
-      labels:
-        app: inflate
-    spec:
-      terminationGracePeriodSeconds: 0
-      containers:
-        - name: inflate
-          image: public.ecr.aws/eks-distro/kubernetes/pause:3.7
-          resources:
-            requests:
-              cpu: 1
-EOF
-
-kubectl scale deployment inflate --replicas 3
-kubectl logs -f -n karpenter -l app.kubernetes.io/name=karpenter -c controller
-
-kubectl delete deployment inflate
-kubectl logs -f -n karpenter -l app.kubernetes.io/name=karpenter -c controller
-
-# Manually call spot instance deletion using SQS
-# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/initiate-a-spot-instance-interruption.html#initiate-interruption
-
-# Check if the disks are properly removed (no snapshots)
-
-# Check if the volumes are encrypted
-```
-
 ## Clean-up
 
 ![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="400"}
-
-Remove orphan EC2s created by Karpenter:
-
-```sh
-for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do
-  echo "Removing EC2: ${EC2}"
-  aws ec2 terminate-instances --instance-ids "${EC2}"
-done
-```
 
 Remove EKS cluster and created components:
 
@@ -1897,6 +1795,15 @@ Remove CloudWatch log group:
 
 ```sh
 aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+```
+
+Remove orphan EC2s created by Karpenter:
+
+```sh
+for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do
+  echo "Removing EC2: ${EC2}"
+  aws ec2 terminate-instances --instance-ids "${EC2}"
+done
 ```
 
 Remove CloudFormation stack:
