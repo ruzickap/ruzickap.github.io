@@ -796,11 +796,11 @@ iam:
       permissionPolicyARNs:
         - ${AWS_KARPENTER_CONTROLLER_POLICY_ARN}
 iamIdentityMappings:
-  # # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
-  # - arn: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/admin
-  #   username: admin
-  #   groups:
-  #     - system:masters
+  # Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
+  - arn: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/admin
+    username: admin
+    groups:
+      - system:masters
   # Add the Karpenter node role to the aws-auth configmap to allow nodes to connect
   - arn: ${AWS_KARPENTER_NODE_ROLE_ARN}
     username: system:node:{{EC2PrivateDNSName}}
@@ -814,16 +814,16 @@ addons:
   - name: snapshot-controller
   - name: vpc-cni
     version: latest
-    # configurationValues: |-
-    #   enableNetworkPolicy: "true"
-    #   env:
-    #     ENABLE_PREFIX_DELEGATION: "true"
+    configurationValues: |-
+      enableNetworkPolicy: "true"
+      env:
+        ENABLE_PREFIX_DELEGATION: "true"
 managedNodeGroups:
   - name: mng01-ng
     amiFamily: Bottlerocket
     # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
-    instanceType: t3a.medium
+    instanceType: t4g.medium
     # Due to karpenter we need 2 instances
     desiredCapacity: 2
     # availabilityZones:
@@ -847,89 +847,6 @@ cloudWatch:
     enableTypes:
       - all
 EOF
-```
-
-```text
-addons:
-  # - name: coredns
-  - name: eks-pod-identity-agent
-  # - name: kube-proxy
-  # - name: snapshot-controller
-  # - name: vpc-cni
-    # version: latest
-    # configurationValues: |-
-    #   enableNetworkPolicy: "true"
-    #   env:
-    #     ENABLE_PREFIX_DELEGATION: "true"
-
-
-managedNodeGroups:
-  - name: mng01-ng
-    # amiFamily: Bottlerocket
-    amiFamily: AmazonLinux2
-    # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
-    # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
-    instanceType: t3a.medium
-    # Due to karpenter we need 2 instances
-    desiredCapacity: 2
-    # availabilityZones:
-    #   - ${AWS_DEFAULT_REGION}a
-    minSize: 2
-    maxSize: 5
-    volumeSize: 20
-    # disablePodIMDS: true
-    volumeEncrypted: true
-    volumeKmsKeyID: ${AWS_KMS_KEY_ID}
-    # privateNetworking: true
-    # bottlerocket:
-    #   settings:
-    #     kubernetes:
-    #       seccomp-default: true
-secretsEncryption:
-  keyARN: ${AWS_KMS_KEY_ARN}
-# cloudWatch:
-#   clusterLogging:
-#     logRetentionInDays: 1
-#     enableTypes:
-#       - all
-
-
-# tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
-# ---
-# apiVersion: eksctl.io/v1alpha5
-# kind: ClusterConfig
-# metadata:
-#   name: ${CLUSTER_NAME}
-#   region: ${AWS_DEFAULT_REGION}
-#   tags:
-#     karpenter.sh/discovery: ${CLUSTER_NAME}
-# iam:
-#   withOIDC: true
-#   podIdentityAssociations:
-#   - namespace: "karpenter"
-#     serviceAccountName: karpenter
-#     roleName: ${CLUSTER_NAME}-karpenter
-#     permissionPolicyARNs:
-#     - ${AWS_KARPENTER_CONTROLLER_POLICY_ARN}
-
-# iamIdentityMappings:
-# - arn: "${AWS_KARPENTER_NODE_ROLE_ARN}"
-#   username: system:node:{{EC2PrivateDNSName}}
-#   groups:
-#   - system:bootstrappers
-#   - system:nodes
-
-# managedNodeGroups:
-# - instanceType: m5.large
-#   amiFamily: AmazonLinux2
-#   name: ${CLUSTER_NAME}-ng
-#   desiredCapacity: 2
-#   minSize: 1
-#   maxSize: 10
-
-# addons:
-# - name: eks-pod-identity-agent
-# EOF
 ```
 
 Get the kubeconfig to access the cluster:
