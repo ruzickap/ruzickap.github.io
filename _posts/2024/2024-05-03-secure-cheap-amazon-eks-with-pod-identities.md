@@ -707,12 +707,13 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
     --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms-karpenter.yml" --tags "${TAGS//,/ }"
 fi
 
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms-karpenter")
-AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
-AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
-AWS_KARPENTER_NODE_ROLE_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KarpenterNodeRoleArn\") .OutputValue")
-AWS_KARPENTER_NODE_INSTANCE_PROFILE_NAME=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KarpenterNodeInstanceProfileName\") .OutputValue")
-AWS_KARPENTER_CONTROLLER_POLICY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".Stacks[0].Outputs[] | select(.OutputKey==\"KarpenterControllerPolicyArn\") .OutputValue")
+# shellcheck disable=SC2016
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --query 'Stacks[0].Outputs[? OutputKey==`KMSKeyArn` || OutputKey==`KMSKeyId` ||  OutputKey==`KarpenterNodeRoleArn` || OutputKey==`KarpenterNodeInstanceProfileName` || OutputKey==`KarpenterControllerPolicyArn`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
+AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
+AWS_KARPENTER_NODE_ROLE_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KarpenterNodeRoleArn\") .OutputValue")
+AWS_KARPENTER_NODE_INSTANCE_PROFILE_NAME=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KarpenterNodeInstanceProfileName\") .OutputValue")
+AWS_KARPENTER_CONTROLLER_POLICY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KarpenterControllerPolicyArn\") .OutputValue")
 ```
 
 After running the CF stack you should see the following Route53 zones:
@@ -735,10 +736,6 @@ cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
-```text
-$(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
-```
-
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
 ---
@@ -749,13 +746,16 @@ metadata:
   region: ${AWS_DEFAULT_REGION}
   tags:
     karpenter.sh/discovery: ${CLUSTER_NAME}
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
-## https://github.com/eksctl-io/eksctl/issues/7446
 accessConfig:
+  # Needs to be tested !!! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   authenticationMode: API_AND_CONFIG_MAP
   accessEntries:
+    - principalARN: ${AWS_KARPENTER_NODE_ROLE_ARN}
+      type: EC2_LINUX
     - principalARN: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/admin
       accessPolicies:
         - policyARN: arn:${AWS_PARTITION}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
@@ -767,7 +767,7 @@ accessConfig:
           accessScope:
             type: cluster
 iam:
-  withOIDC: true # needed by Karpenter
+  withOIDC: true
   podIdentityAssociations:
     - namespace: aws-ebs-csi-driver
       serviceAccountName: ebs-csi-controller-sa
@@ -790,12 +790,6 @@ iam:
       roleName: ${CLUSTER_NAME}-karpenter
       permissionPolicyARNs:
         - ${AWS_KARPENTER_CONTROLLER_POLICY_ARN}
-iamIdentityMappings:
-  - arn: ${AWS_KARPENTER_NODE_ROLE_ARN}
-    username: system:node:{{EC2PrivateDNSName}}
-    groups:
-      - system:bootstrappers
-      - system:nodes
 addons:
   - name: coredns
   - name: eks-pod-identity-agent
@@ -820,6 +814,7 @@ managedNodeGroups:
     minSize: 2
     maxSize: 5
     volumeSize: 20
+    # Needs to be tested !!!! xxxxxxxxxx
     # disablePodIMDS: true
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
@@ -880,6 +875,14 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
   kubectl label namespace default pod-security.kubernetes.io/enforce=baseline
   ```
 
+- Label namespaces to warn when going against the Pod Security Standards:
+
+  ```bash
+  kubectl label namespace --all pod-security.kubernetes.io/warn=baseline
+  ```
+
+  Details can be found in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
+
 ### EKS Pod Identities
 
 Here is a screenshot from the AWS Console showing the EKS Pod Identity
@@ -888,7 +891,7 @@ Association:
 ![EKS Pod Identity associations](/assets/img/posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities/amazon-eks-clusters-access.avif)
 _EKS Pod Identity associations_
 
-### snapshot-controller
+### Snapshot Controller
 
 Install Volume Snapshot Custom Resource Definitions (CRDs):
 
@@ -896,23 +899,23 @@ Install Volume Snapshot Custom Resource Definitions (CRDs):
 kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
 ```
 
-![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg){:width="500"}
+![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg){:width="400"}
 
 Install volume snapshot controller `snapshot-controller`
 [helm chart](https://github.com/piraeusdatastore/helm-charts/tree/d6a32df38d23986d1df24ab55f8bc3cc9bba2ada/charts/snapshot-controller)
 and modify the
-[default values](https://github.com/piraeusdatastore/helm-charts/blob/d6a32df38d23986d1df24ab55f8bc3cc9bba2ada/charts/snapshot-controller/values.yaml):
+[default values](https://github.com/piraeusdatastore/helm-charts/blob/snapshot-controller-2.2.2/charts/snapshot-controller/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
-SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.0"
+SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.2"
 
 helm repo add piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
 kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=baseline
 ```
 
-### aws-ebs-csi-driver
+### Amazon EBS CSI driver
 
 The [Amazon Elastic Block Store](https://aws.amazon.com/ebs/) Container Storage
 Interface (CSI) Driver provides a [CSI](https://github.com/container-storage-interface/spec/blob/master/spec.md)
@@ -922,12 +925,12 @@ volumes.
 Install Amazon EBS CSI Driver `aws-ebs-csi-driver`
 [helm chart](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/charts/aws-ebs-csi-driver)
 and modify the
-[default values](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/master/charts/aws-ebs-csi-driver/values.yaml).
+[default values](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/helm-chart-aws-ebs-csi-driver-2.30.0/charts/aws-ebs-csi-driver/values.yaml).
 (The ServiceAccount `ebs-csi-controller-sa` was created by `eksctl`)
 
 ```bash
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.28.1"
+AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.30.0"
 
 helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" << EOF
@@ -968,20 +971,20 @@ Delete `gp2` StorageClass, because the `gp3` will be used instead:
 kubectl delete storageclass gp2 || true
 ```
 
-### mailpit
+### Mailpit
 
 Mailpit will be used to receive email alerts from the Prometheus.
 
-![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="200"}
+![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="150"}
 
 Install `mailpit`
 [helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
 and modify the
-[default values](https://github.com/jouve/charts/blob/c6326a2dc06e444018efa602d5b6431632f3de59/charts/mailpit/values.yaml).
+[default values](https://github.com/jouve/charts/blob/mailpit-0.17.1/charts/mailpit/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
-MAILPIT_HELM_CHART_VERSION="0.14.0"
+MAILPIT_HELM_CHART_VERSION="0.17.1"
 
 helm repo add jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
@@ -1000,6 +1003,10 @@ helm upgrade --install --version "${MAILPIT_HELM_CHART_VERSION}" --namespace mai
 kubectl label namespace mailpit pod-security.kubernetes.io/enforce=baseline
 ```
 
+Screenshot:
+
+![Mailpit](/assets/img/posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities/mailpit.avif){:width="700"}
+
 ### kube-prometheus-stack
 
 Prometheus should be the initial application installed on the Kubernetes cluster
@@ -1013,16 +1020,16 @@ combined with documentation and scripts to provide easy to operate end-to-end
 Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using
 the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
 
-![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="500"}
+![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="400"}
 
 Install `kube-prometheus-stack`
 [helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 and modify the
-[default values](https://github.com/prometheus-community/helm-charts/blob/8f8bbfcf33a7628dc7c67b29a05299f557d21b2a/charts/kube-prometheus-stack/values.yaml):
+[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-58.4.0/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="57.0.3"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="58.4.0"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
@@ -1031,6 +1038,7 @@ defaultRules:
     etcd: false
     kubernetesSystem: false
     kubeScheduler: false
+# https://github.com/prometheus-community/helm-charts/blob/main/charts/alertmanager/values.yaml
 alertmanager:
   config:
     global:
@@ -1040,9 +1048,6 @@ alertmanager:
       group_by: ["alertname", "job"]
       receiver: email
       routes:
-        - receiver: 'null'
-          matchers:
-            - alertname =~ "InfoInhibitor|Watchdog"
         - receiver: email
           matchers:
             - severity =~ "warning|critical"
@@ -1141,18 +1146,13 @@ grafana:
         datasource: Prometheus
       15038-external-dns:
         # renovate: depName="External-dns"
-        gnetId: 35038
+        gnetId: 15038
         revision: 3
         datasource: Prometheus
       # https://github.com/DevOps-Nirvana/Grafana-Dashboards
       14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
         # renovate: depName="Kubernetes Nginx Ingress Prometheus NextGen"
         gnetId: 14314
-        revision: 2
-        datasource: Prometheus
-      13473-portefaix-kubernetes-cluster-overview:
-        # renovate: depName="Portefaix / Kubernetes cluster Overview"
-        gnetId: 13473
         revision: 2
         datasource: Prometheus
       # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
@@ -1178,18 +1178,18 @@ grafana:
         datasource: Prometheus
       15761-kubernetes-system-api-server:
         # renovate: depName="Kubernetes / System / API Server"
-        gnetId: 16761
+        gnetId: 15761
         revision: 16
         datasource: Prometheus
       15762-kubernetes-system-coredns:
         # renovate: depName="Kubernetes / System / CoreDNS"
         gnetId: 15762
-        revision: 17
+        revision: 16
         datasource: Prometheus
       19105-prometheus:
         # renovate: depName="Prometheus"
-        gnetId: 29205
-        revision: 2
+        gnetId: 19105
+        revision: 3
         datasource: Prometheus
       16237-cluster-capacity:
         # renovate: depName="Cluster Capacity (Karpenter)"
@@ -1204,11 +1204,6 @@ grafana:
       19268-prometheus:
         # renovate: depName="Prometheus All Metrics"
         gnetId: 19268
-        revision: 1
-        datasource: Prometheus
-      18855-fluent-bit:
-        # renovate: depName="Fluent Bit"
-        gnetId: 18855
         revision: 1
         datasource: Prometheus
       karpenter-capacity-dashboard:
@@ -1319,7 +1314,7 @@ right compute resources to handle your cluster's applications.
 Install Karpenter
 [helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
 and modify the
-[default values](https://github.com/aws/karpenter-provider-aws/blob/main/charts/karpenter/values.yaml).
+[default values](https://github.com/aws/karpenter-provider-aws/blob/v0.36.0/charts/karpenter/values.yaml).
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
@@ -1419,17 +1414,17 @@ EOF
 issuers as resource types in Kubernetes clusters, and simplifies the process
 of obtaining, renewing and using those certificates.
 
-![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="200"}
+![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="150"}
 
 Install `cert-manager`
 [helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 and modify the
-[default values](https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml).
+[default values](https://github.com/cert-manager/cert-manager/blob/v1.14.5/deploy/charts/cert-manager/values.yaml).
 Service account `cert-manager` was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-CERT_MANAGER_HELM_CHART_VERSION="1.14.4"
+CERT_MANAGER_HELM_CHART_VERSION="1.14.5"
 
 helm repo add jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
@@ -1507,7 +1502,7 @@ spec:
 EOF
 ```
 
-### metrics-server
+### Metrics Server
 
 [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is
 a scalable, efficient source of container resource metrics for Kubernetes
@@ -1516,11 +1511,11 @@ built-in autoscaling pipelines.
 Install `metrics-server`
 [helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
 and modify the
-[default values](https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/values.yaml):
+[default values](https://github.com/kubernetes-sigs/metrics-server/blob/metrics-server-helm-chart-3.12.1/charts/metrics-server/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
-METRICS_SERVER_HELM_CHART_VERSION="3.12.0"
+METRICS_SERVER_HELM_CHART_VERSION="3.12.1"
 
 helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
@@ -1532,17 +1527,17 @@ EOF
 helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
 ```
 
-### external-dns
+### ExternalDNS
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
 exposed Kubernetes Services and Ingresses with DNS providers.
 
-![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="300"}
+![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="200"}
 
 Install `external-dns`
 [helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
 and modify the
-[default values](https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/values.yaml).
+[default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.4/charts/external-dns/values.yaml).
 `external-dns` will take care about DNS records.
 Service account `external-dns` was created by `eksctl`.
 
@@ -1552,9 +1547,6 @@ EXTERNAL_DNS_HELM_CHART_VERSION="1.14.4"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
-# Fixed ??????? https://github.com/kubernetes-sigs/external-dns/pull/4357/files
-# image:
-#   tag: v0.14.1
 domainFilters:
   - ${CLUSTER_FQDN}
 interval: 20s
@@ -1568,7 +1560,7 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 kubectl label namespace external-dns pod-security.kubernetes.io/enforce=baseline
 ```
 
-### ingress-nginx
+### Ingress NGINX Controller
 
 [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
 controller for Kubernetes using [NGINX](https://www.nginx.org/) as a reverse
@@ -1577,11 +1569,11 @@ proxy and load balancer.
 Install `ingress-nginx`
 [helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
 and modify the
-[default values](https://github.com/kubernetes/ingress-nginx/blob/master/charts/ingress-nginx/values.yaml).
+[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.10.1/charts/ingress-nginx/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.10.0"
+INGRESS_NGINX_HELM_CHART_VERSION="4.10.1"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
 
@@ -1643,22 +1635,22 @@ helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespa
 kubectl label namespace ingress-nginx pod-security.kubernetes.io/enforce=baseline
 ```
 
-### forecastle
+### Forecastle
 
 [Forecastle](https://github.com/stakater/Forecastle) is a control panel which
 dynamically discovers and provides a launchpad to access applications deployed
 on Kubernetes.
 
-![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png){:width="200"}
+![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png){:width="150"}
 
 Install `forecastle`
 [helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
 and modify the
-[default values](https://github.com/stakater/Forecastle/blob/master/deployments/kubernetes/chart/forecastle/values.yaml).
+[default values](https://github.com/stakater/Forecastle/blob/v1.0.139/deployments/kubernetes/chart/forecastle/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
-FORECASTLE_HELM_CHART_VERSION="1.0.138"
+FORECASTLE_HELM_CHART_VERSION="1.0.139"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
@@ -1688,21 +1680,25 @@ helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace 
 kubectl label namespace forecastle pod-security.kubernetes.io/enforce=baseline
 ```
 
-### oauth2-proxy
+Screenshot:
+
+![Forecastle](/assets/img/posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities/forecastle.avif){:width="800"}
+
+### OAuth2 Proxy
 
 Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
 the endpoints by Google Authentication.
 
-![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="400"}
+![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="300"}
 
 Install `oauth2-proxy`
 [helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
 and modify the
-[default values](https://github.com/oauth2-proxy/manifests/blob/7b37bf5c690b83cff0eee0e0be7deb93e983e3df/helm/oauth2-proxy/values.yaml).
+[default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-7.5.3/helm/oauth2-proxy/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="7.1.0"
+OAUTH2_PROXY_HELM_CHART_VERSION="7.5.3"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
@@ -1736,19 +1732,9 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 kubectl label namespace oauth2-proxy pod-security.kubernetes.io/enforce=baseline
 ```
 
-### Enforce Pod Security Standards with Namespace Labels
-
-Label all namespaces to warn when going against the Pod Security Standards:
-
-```bash
-kubectl label namespace --all pod-security.kubernetes.io/warn=baseline
-```
-
-Details can be found in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
-
 ## Clean-up
 
-![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="400"}
+![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="300"}
 
 Remove EKS cluster and created components:
 

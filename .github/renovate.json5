@@ -54,7 +54,9 @@
       commitBody: "[skip ci]",
       description: "AutoMerge all for specific post",
       ignoreTests: true,
-      matchFileNames: ["_posts/2024/*.md"],
+      matchFileNames: [
+        "_posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities.md",
+      ],
       matchUpdateTypes: ["major", "minor", "patch"],
     },
   ],
