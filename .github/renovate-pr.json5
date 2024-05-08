@@ -1,5 +1,6 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  branchPrefix: "renovate-pr/",
   customDatasources: {
     "grafana-dashboards": {
       defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
@@ -22,36 +23,16 @@
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
   ignoreDeps: ["http_parser.rb", "html-proofer"],
-  ignorePaths: ["_posts/**"],
   labels: [
-    "renovate",
-    "renovate/{{replace '.*/' '' depName}}",
-    "renovate/{{updateType}}",
+    "renovate-pr",
+    "renovate-pr/{{replace '.*/' '' depName}}",
+    "renovate-pr/{{updateType}}",
   ],
   packageRules: [
     {
-      matchUpdateTypes: ["major"],
-      automerge: false,
-    },
-    {
-      description: "Ignore frequent renovate updates",
-      enabled: false,
-      matchPackageNames: ["renovatebot/github-action"],
-      matchUpdateTypes: ["patch"],
-    },
-    {
-      description: "Update renovatebot/github-action minor updates on Sundays",
-      matchPackageNames: ["renovatebot/github-action"],
-      matchUpdateTypes: ["minor"],
-      schedule: ["* * * * 0"],
-    },
-    {
       automerge: true,
-      commitBody: "[skip ci]",
-      description: "Grafana Dashboards",
       ignoreTests: true,
-      matchDatasources: ["custom.grafana-dashboards"],
-      matchUpdateTypes: ["major"],
+      packagePatterns: ["*"],
     },
   ],
   prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}",
@@ -74,5 +55,4 @@
       versioningTemplate: "regex:^(?<major>\\d+)$",
     },
   ],
-  separateMinorPatch: true,
 }
