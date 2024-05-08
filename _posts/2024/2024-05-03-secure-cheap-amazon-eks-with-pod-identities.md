@@ -1318,7 +1318,7 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
-KARPENTER_HELM_CHART_VERSION="0.36.0"
+KARPENTER_HELM_CHART_VERSION="0.36.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 serviceMonitor:
