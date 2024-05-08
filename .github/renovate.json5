@@ -18,7 +18,7 @@
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
   ignoreDeps: ["http_parser.rb", "html-proofer"],
-  ignorePaths: ["_posts/202[2-3]/**"],
+  ignorePaths: ["_posts/**"],
   labels: [
     "renovate",
     "renovate/{{replace '.*/' '' depName}}",
@@ -48,16 +48,6 @@
       ignoreTests: true,
       matchDatasources: ["custom.grafana-dashboards"],
       matchUpdateTypes: ["major"],
-    },
-    {
-      automerge: true,
-      commitBody: "[skip ci]",
-      description: "AutoMerge all for specific post",
-      ignoreTests: true,
-      matchFileNames: [
-        "_posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities.md",
-      ],
-      matchUpdateTypes: ["major", "minor", "patch"],
     },
   ],
   prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}",

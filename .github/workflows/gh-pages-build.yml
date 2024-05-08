@@ -101,6 +101,7 @@ jobs:
           directory: ./public
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
           projectName: ${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
+          wranglerVersion: 3
 
       - name: Restore lychee cache
         uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
