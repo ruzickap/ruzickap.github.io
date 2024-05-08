@@ -675,21 +675,8 @@ EOF
 [AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
 gracefully handle EC2 instance shutdown within Kubernetes.
 
-Install `aws-node-termination-handler`
-[helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
-and modify the
-[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
-AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
-
-helm repo add eks https://aws.github.io/eks-charts/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
-awsRegion: ${AWS_DEFAULT_REGION}
-EOF
-helm upgrade --wait --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" aws-node-termination-handler eks/aws-node-termination-handler
-```
+It is not needed when using EKS managed node groups:
+[Use with managed node groups](https://github.com/aws/aws-node-termination-handler/issues/186)
 
 ### snapshot-controller
 
@@ -975,7 +962,7 @@ grafana:
         datasource: Prometheus
       15038-external-dns:
         # renovate: depName="External-dns"
-        gnetId: 35038
+        gnetId: 15038
         revision: 3
         datasource: Prometheus
       14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
@@ -1011,7 +998,7 @@ grafana:
         datasource: Prometheus
       15761-kubernetes-system-api-server:
         # renovate: depName="Kubernetes / System / API Server"
-        gnetId: 16761
+        gnetId: 15761
         revision: 16
         datasource: Prometheus
       15762-kubernetes-system-coredns:
@@ -1021,8 +1008,8 @@ grafana:
         datasource: Prometheus
       19105-prometheus:
         # renovate: depName="Prometheus"
-        gnetId: 29205
-        revision: 2
+        gnetId: 19105
+        revision: 3
         datasource: Prometheus
       16237-cluster-capacity:
         # renovate: depName="Cluster Capacity (Karpenter)"

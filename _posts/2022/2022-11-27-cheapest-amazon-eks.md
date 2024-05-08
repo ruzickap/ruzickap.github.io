@@ -636,7 +636,7 @@ grafana:
         datasource: Prometheus
       15038-external-dns:
         # renovate: depName="External-dns"
-        gnetId: 35038
+        gnetId: 15038
         revision: 3
         datasource: Prometheus
       14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
@@ -672,7 +672,7 @@ grafana:
         datasource: Prometheus
       15761-kubernetes-system-api-server:
         # renovate: depName="Kubernetes / System / API Server"
-        gnetId: 16761
+        gnetId: 15761
         revision: 16
         datasource: Prometheus
       15762-kubernetes-system-coredns:
@@ -682,8 +682,8 @@ grafana:
         datasource: Prometheus
       19105-prometheus:
         # renovate: depName="Prometheus"
-        gnetId: 29205
-        revision: 2
+        gnetId: 19105
+        revision: 3
         datasource: Prometheus
       16237-cluster-capacity:
         # renovate: depName="Cluster Capacity (Karpenter)"
