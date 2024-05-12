@@ -40,10 +40,7 @@ jobs:
 
           echo "BASE_DOMAIN=${BASE_DOMAIN}" | tee -a "${GITHUB_OUTPUT}"
           echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_OUTPUT}"
-          sed -i \
-            -e "s@^url: \"https://ruzickap.github.io\"@url: \"https://${BASE_DOMAIN}\"@" \
-            -e "s@domain: ruzickap.github.io@domain: ${BASE_DOMAIN}@" \
-            _config.yml
+          sed -i "s@^url: \"https://ruzickap.github.io\"@url: \"https://${BASE_DOMAIN}\"@" _config.yml
           mkdir public
 
       - name: Setup Ruby
@@ -69,10 +66,9 @@ jobs:
 
       - name: Test site
         run: |
-          cat public/tags/vulnerability/index.html
           bundle exec htmlproofer public \
             --disable-external \
-            --ignore-urls "/^http://127.0.0.1/,/^http://0.0.0.0/,/^http://localhost/,/^https://${BASE_DOMAIN}/script.js"
+            --ignore-urls "/^http://127.0.0.1/,/^http://0.0.0.0/,/^http://localhost/"
 
       - name: Check broken links
         uses: ruzickap/action-my-broken-link-checker@bec36cf5736d969f1c5191b9fd2052df87675012 # v2.6.0
