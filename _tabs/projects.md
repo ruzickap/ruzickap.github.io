@@ -495,9 +495,11 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - create-rpi-image](https://github.com/ruzickap/ansible-raspbian/workflows/create-rpi-image/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/create-rpi-image.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-raspbian/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-raspbian/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-raspbian/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/renovate.yml)
+  [![GitHub Actions status - rpi-image-modifier](https://github.com/ruzickap/ansible-raspbian/workflows/rpi-image-modifier/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/rpi-image-modifier.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-raspbian/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-raspbian/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/stale.yml)
 
@@ -691,10 +693,11 @@ List of my GitHub projects:
   [![GitHub Actions status - dependency-review](https://github.com/ruzickap/ruzickap.github.io/workflows/dependency-review/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/dependency-review.yml)
   [![GitHub Actions status - generate-projects](https://github.com/ruzickap/ruzickap.github.io/workflows/generate-projects/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/generate-projects.yml)
   [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/ruzickap.github.io/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)
-  [![GitHub Actions status - Links](https://github.com/ruzickap/ruzickap.github.io/workflows/Links/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/links.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/ruzickap.github.io/workflows/links/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/links.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ruzickap.github.io/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - post_tests](https://github.com/ruzickap/ruzickap.github.io/workflows/post_tests/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/post_tests.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ruzickap.github.io/workflows/release-please/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate-pr](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate-pr/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate-pr.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ruzickap.github.io/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ruzickap.github.io/workflows/stale/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/stale.yml)
