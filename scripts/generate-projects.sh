@@ -20,7 +20,7 @@ GITHUB_REPOSITORIES_DESCRIPTIONS=(
   "ruzickap/ansible-role-vmwaretools|Ansible role vmwaretools"
   "ruzickap/ansible-my_workstation|Ansible - My Workstation"
   "ruzickap/ansible-openwrt|Ansible - OpenWRT"
-  "ruzickap/ansible-raspbian|Ansible - Raspbian"
+  "ruzickap/ansible-raspberry-pi-os|Ansible - Raspberry Pi OS"
   "ruzickap/popular-containers-vulnerability-checks|popular-containers-vulnerability-checks"
   "ruzickap/malware-cryptominer-container|malware-cryptominer-container"
   "ruzickap/raw-photo-tools-container|raw-photo-tools-container"

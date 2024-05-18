@@ -483,38 +483,37 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt)
 
-## [Ansible - Raspbian](https://github.com/ruzickap/ansible-raspbian)
+## [Ansible - Raspberry Pi OS](https://github.com/ruzickap/ansible-raspberry-pi-os)
 
-- Description: Configure Raspbian (RPi) using Ansible
+- Description: Configure Raspberry Pi OS (RPi) using Ansible
 
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-raspbian.svg?style=social)](https://github.com/ruzickap/ansible-raspbian/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-raspbian.svg?style=social)](https://github.com/ruzickap/ansible-raspbian/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/ansible-raspbian.svg?style=social)](https://github.com/ruzickap/ansible-raspbian)
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-raspberry-pi-os.svg?style=social)](https://github.com/ruzickap/ansible-raspberry-pi-os/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-raspberry-pi-os.svg?style=social)](https://github.com/ruzickap/ansible-raspberry-pi-os/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/ansible-raspberry-pi-os.svg?style=social)](https://github.com/ruzickap/ansible-raspberry-pi-os)
 
 - CI/CD status:
 
-  [![GitHub Actions status - create-rpi-image](https://github.com/ruzickap/ansible-raspbian/workflows/create-rpi-image/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/create-rpi-image.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-raspbian/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-raspbian/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-raspbian/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/renovate.yml)
-  [![GitHub Actions status - rpi-image-modifier](https://github.com/ruzickap/ansible-raspbian/workflows/rpi-image-modifier/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/rpi-image-modifier.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-raspbian/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-raspbian/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-raspbian/actions/workflows/stale.yml)
+  [![GitHub Actions status - create-rpi-image](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/create-rpi-image/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/create-rpi-image.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/stale.yml)
 
 - Issue tracking:
 
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian/pulls)
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/pulls)
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-raspbian/latest)](https://github.com/ruzickap/ansible-raspbian/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-raspbian.svg)](https://github.com/ruzickap/ansible-raspbian)
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-raspberry-pi-os/latest)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os)
 
 ## [popular-containers-vulnerability-checks](https://github.com/ruzickap/popular-containers-vulnerability-checks)
 
