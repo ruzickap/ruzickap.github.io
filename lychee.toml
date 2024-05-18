@@ -32,6 +32,7 @@ exclude = [
   '%7B.*%7D',
   # Ignore all URLs which starts with 'file://'
   'file://',
+  'analytics\.eu\.umami\.is/',
   'cdn\.com',
   'fonts\.(googleapis|gstatic)\.com',
   'https://www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL',

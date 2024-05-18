@@ -116,7 +116,6 @@ Deploy the required tools:
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
-- [velero](https://velero.io/)
 
 ## Configure AWS Route 53 Domain delegation
 
@@ -751,7 +750,6 @@ availabilityZones:
   - ${AWS_DEFAULT_REGION}a
   - ${AWS_DEFAULT_REGION}b
 accessConfig:
-  # Needs to be tested !!! xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
   authenticationMode: API_AND_CONFIG_MAP
   accessEntries:
     - principalARN: ${AWS_KARPENTER_NODE_ROLE_ARN}
@@ -814,8 +812,7 @@ managedNodeGroups:
     minSize: 2
     maxSize: 5
     volumeSize: 20
-    # Needs to be tested !!!! xxxxxxxxxx
-    # disablePodIMDS: true
+    disablePodIMDS: true
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
     privateNetworking: true
@@ -943,6 +940,7 @@ controller:
     "eks:cluster-name": ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   serviceAccount:
+    create: false
     name: ebs-csi-controller-sa
   region: ${AWS_DEFAULT_REGION}
 node:
@@ -1321,6 +1319,9 @@ and modify the
 KARPENTER_HELM_CHART_VERSION="0.36.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
+serviceAccount:
+  create: false
+  name: karpenter
 serviceMonitor:
   enabled: true
 logLevel: debug
@@ -1383,7 +1384,6 @@ spec:
   subnetSelectorTerms:
     - tags:
         karpenter.sh/discovery: ${CLUSTER_NAME}
-        ## TEST - Remove
         Name: "*Private*"
   securityGroupSelectorTerms:
     - tags:
@@ -1430,6 +1430,7 @@ helm repo add jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
+  create: false
   name: cert-manager
 extraArgs:
   - --cluster-resource-namespace=cert-manager
@@ -1552,6 +1553,7 @@ domainFilters:
 interval: 20s
 policy: sync
 serviceAccount:
+  create: false
   name: external-dns
 serviceMonitor:
   enabled: true
