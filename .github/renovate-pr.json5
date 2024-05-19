@@ -22,7 +22,6 @@
   ],
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
-  ignoreDeps: ["http_parser.rb", "html-proofer"],
   labels: [
     "renovate-pr",
     "renovate-pr/{{replace '.*/' '' depName}}",
@@ -32,13 +31,14 @@
     {
       automerge: true,
       ignoreTests: true,
-      packagePatterns: ["*"],
+      matchPackagePatterns: ["*"],
     },
   ],
   prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}",
   rebaseWhen: "behind-base-branch",
-  regexManagers: [
+  customManagers: [
     {
+      customType: "regex",
       extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.+)${{/if}}",
       fileMatch: ["\\.ya?ml$", "\\.md$", "^Dockerfile$", "^entrypoint\\.sh$"],
       matchStrings: [
@@ -47,12 +47,23 @@
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
     },
     {
+      customType: "regex",
       datasourceTemplate: "custom.grafana-dashboards",
       fileMatch: ["\\.md$"],
       matchStrings: [
-        '#\\s+renovate:\\s+depName="(?<depName>.*)"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)',
+        '# renovate: depName="(?<depName>.*)"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)',
       ],
       versioningTemplate: "regex:^(?<major>\\d+)$",
+    },
+    {
+      currentValueTemplate: "{{#if currentValue}}{{{currentValue}}}{{else}}main{{/if}}",
+      customType: "regex",
+      datasourceTemplate: "git-refs",
+      packageNameTemplate: "https://github.com/{{depName}}",
+      fileMatch: ["\\.md$"],
+      matchStrings: [
+        "# renovate:( currentValue=(?<currentValue>.+?))?\\n.*https:\\/\\/raw.githubusercontent.com\\/(?<depName>[^\\/]+\\/[^\\/]+)\\/(?<currentDigest>[^\\/]+)\\/",
+      ],
     },
   ],
 }
