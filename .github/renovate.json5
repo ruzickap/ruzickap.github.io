@@ -73,12 +73,14 @@
       versioningTemplate: "regex:^(?<major>\\d+)$",
     },
     {
+      currentValueTemplate: "{{#if currentValue}}{{{currentValue}}}{{else}}main{{/if}}",
+      customType: "regex",
       datasourceTemplate: "git-refs",
+      packageNameTemplate: "https://github.com/{{depName}}",
       fileMatch: ["\\.md$"],
       matchStrings: [
-        "https://raw.githubusercontent.com/(?<depName>[\\w-]+/[\\w-]+)/(?<currentDigest>[\\w]+)/.*",
+        "# renovate:( currentValue=(?<currentValue>.+?))?\\n.*https:\\/\\/raw.githubusercontent.com\\/(?<depName>[^\\/]+\\/[^\\/]+)\\/(?<currentDigest>[^\\/]+)\\/",
       ],
-      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
     },
   ],
   separateMinorPatch: true,
