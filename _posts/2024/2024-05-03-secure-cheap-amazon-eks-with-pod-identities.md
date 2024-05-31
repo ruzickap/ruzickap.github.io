@@ -1290,7 +1290,7 @@ prometheus:
           - role: endpoints
             namespaces:
               names:
-                - karpernter
+                - karpenter
         relabel_configs:
           - source_labels:
             - __meta_kubernetes_endpoints_name
@@ -1762,7 +1762,7 @@ fi
 ```
 
 [Delete launch templates](https://karpenter.sh/docs/getting-started/getting-started-with-karpenter/#9-delete-the-cluster)
-created by Karpernter:
+created by Karpenter:
 
 ```bash
 aws ec2 describe-launch-templates --filters "Name=tag:karpenter.k8s.aws/cluster,Values=${CLUSTER_NAME}" |
