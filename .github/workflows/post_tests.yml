@@ -25,9 +25,10 @@ on:
           - my-favourite-krew-plugins-kubectl cheapest-amazon-eks
           - cilium-amazon-eks
           - secure-cheap-amazon-eks
-          - exploit-vulnerability-wordpress-plugin-kali-linux
+          - exploit-vulnerability-wordpress-plugin-kali-linux-1
           - secure-cheap-amazon-eks-with-pod-identities
           - velero-and-cert-manager secure-cheap-amazon-eks-with-pod-identities
+          - exploit-vulnerability-wordpress-plugin-kali-linux-2
       action:
         type: choice
         description: Select action
@@ -90,6 +91,13 @@ jobs:
             echo "*** Installing eksctl"
             gh release download --repo eksctl-io/eksctl --pattern eksctl_Linux_amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
             eksctl version
+          fi
+
+          if grep -q 'copilot ' "${POST_FILES_ARRAY[@]}" && ! command -v copilot &> /dev/null ; then
+            echo "*** Installing copilot"
+            gh release download --repo aws/copilot-cli --pattern copilot-linux
+            sudo mv copilot-linux /usr/local/bin/copilot
+            chmod a+x /usr/local/bin/copilot
           fi
 
           if grep -q 'cilium ' "${POST_FILES_ARRAY[@]}" && ! command -v cilium &> /dev/null ; then

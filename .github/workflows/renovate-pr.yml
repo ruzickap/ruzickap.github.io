@@ -34,6 +34,8 @@ env:
   RENOVATE_DRY_RUN: "${{ inputs.dryRun }}"
   # Revovate Config File
   RENOVATE_CONFIG_FILE: ".github/renovate-pr.json5"
+  # Ignore default renovate config file in git repository
+  RENOVATE_REQUIRE_CONFIG: "ignored"
   # Set the base branch
   RENOVATE_BASE_BRANCHES: ${{ github.ref_name }}
   # Renovate Automerge
@@ -61,10 +63,12 @@ jobs:
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@03334d095e2739fa9ac4034ec16f66d5d01e9eba # v44.5.1
+        with:
+          json: true
 
       - name: List all changed files
         run: |
-          set -euxo pipefail
+          echo "*** Changed files:"
           echo "RENOVATE_INCLUDE_PATHS=${{ steps.changed-files.outputs.all_changed_files }}" | tee -a "${GITHUB_ENV}"
 
       - name: 💡 Self-hosted Renovate

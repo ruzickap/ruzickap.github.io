@@ -21,7 +21,6 @@
   ],
   // ignore chirpy dependencies
   // https://renovatebot.com/docs/configuration-options/#ignoredeps
-  ignoreDeps: ["http_parser.rb", "html-proofer"],
   ignorePaths: ["_posts/**"],
   labels: [
     "renovate",
@@ -69,9 +68,19 @@
       datasourceTemplate: "custom.grafana-dashboards",
       fileMatch: ["\\.md$"],
       matchStrings: [
-        '#\\s+renovate:\\s+depName="(?<depName>.*)"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)',
+        '# renovate: depName="(?<depName>.*)"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)',
       ],
       versioningTemplate: "regex:^(?<major>\\d+)$",
+    },
+    {
+      currentValueTemplate: "{{#if currentValue}}{{{currentValue}}}{{else}}main{{/if}}",
+      customType: "regex",
+      datasourceTemplate: "git-refs",
+      packageNameTemplate: "https://github.com/{{depName}}",
+      fileMatch: ["\\.md$"],
+      matchStrings: [
+        "# renovate:( currentValue=(?<currentValue>.+?))?\\n.*https:\\/\\/raw.githubusercontent.com\\/(?<depName>[^\\/]+\\/[^\\/]+)\\/(?<currentDigest>[^\\/]+)\\/",
+      ],
     },
   ],
   separateMinorPatch: true,
