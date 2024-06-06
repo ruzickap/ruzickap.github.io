@@ -940,7 +940,6 @@ controller:
     "eks:cluster-name": ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   serviceAccount:
-    create: false
     name: ebs-csi-controller-sa
   region: ${AWS_DEFAULT_REGION}
 node:
@@ -1320,7 +1319,6 @@ KARPENTER_HELM_CHART_VERSION="0.36.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 serviceAccount:
-  create: false
   name: karpenter
 serviceMonitor:
   enabled: true
@@ -1430,7 +1428,6 @@ helm repo add jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
-  create: false
   name: cert-manager
 extraArgs:
   - --cluster-resource-namespace=cert-manager
@@ -1553,7 +1550,6 @@ domainFilters:
 interval: 20s
 policy: sync
 serviceAccount:
-  create: false
   name: external-dns
 serviceMonitor:
   enabled: true
