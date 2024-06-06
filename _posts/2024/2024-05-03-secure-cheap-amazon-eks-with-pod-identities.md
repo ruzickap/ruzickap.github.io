@@ -1119,7 +1119,7 @@ grafana:
       1860-node-exporter-full:
         # renovate: depName="Node Exporter Full"
         gnetId: 1860
-        revision: 36
+        revision: 37
         datasource: Prometheus
       3662-prometheus-2-0-overview:
         # renovate: depName="Prometheus 2.0 Overview"
