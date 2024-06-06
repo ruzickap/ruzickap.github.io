@@ -927,7 +927,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.30.0"
+AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.31.0"
 
 helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" << EOF
@@ -940,7 +940,6 @@ controller:
     "eks:cluster-name": ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   serviceAccount:
-    create: false
     name: ebs-csi-controller-sa
   region: ${AWS_DEFAULT_REGION}
 node:
@@ -982,7 +981,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
-MAILPIT_HELM_CHART_VERSION="0.17.1"
+MAILPIT_HELM_CHART_VERSION="0.17.4"
 
 helm repo add jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
@@ -1027,7 +1026,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="58.4.0"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="59.1.0"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
@@ -1120,7 +1119,7 @@ grafana:
       1860-node-exporter-full:
         # renovate: depName="Node Exporter Full"
         gnetId: 1860
-        revision: 36
+        revision: 37
         datasource: Prometheus
       3662-prometheus-2-0-overview:
         # renovate: depName="Prometheus 2.0 Overview"
@@ -1316,11 +1315,10 @@ and modify the
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
-KARPENTER_HELM_CHART_VERSION="0.36.1"
+KARPENTER_HELM_CHART_VERSION="0.37.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 serviceAccount:
-  create: false
   name: karpenter
 serviceMonitor:
   enabled: true
@@ -1424,13 +1422,12 @@ Service account `cert-manager` was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-CERT_MANAGER_HELM_CHART_VERSION="1.14.5"
+CERT_MANAGER_HELM_CHART_VERSION="1.15.0"
 
 helm repo add jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
-  create: false
   name: cert-manager
 extraArgs:
   - --cluster-resource-namespace=cert-manager
@@ -1553,7 +1550,6 @@ domainFilters:
 interval: 20s
 policy: sync
 serviceAccount:
-  create: false
   name: external-dns
 serviceMonitor:
   enabled: true
@@ -1700,7 +1696,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="7.5.4"
+OAUTH2_PROXY_HELM_CHART_VERSION="7.7.1"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
