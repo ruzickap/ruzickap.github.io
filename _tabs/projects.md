@@ -1319,7 +1319,7 @@ List of my GitHub projects:
 
 ## [Cheatsheet - Atom](https://github.com/ruzickap/cheatsheet-atom)
 
-- Description: Atom Keyboard Shortcuts
+- Description: Atom Keyboard Shortcuts Cheatsheet
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/blob/main/LICENSE)
