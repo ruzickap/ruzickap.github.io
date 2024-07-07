@@ -905,7 +905,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
-SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.2"
+SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="3.0.5"
 
 helm repo add piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
