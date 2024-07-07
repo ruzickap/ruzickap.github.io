@@ -63,7 +63,7 @@ I'm going to cover only the necessary commands (without descriptions):
 ```bash
 # export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 # export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export AWS_DEFAULT_REGION="eu-central-1"
+export AWS_REGION="eu-central-1"
 AWS_EC2_KEY_PAIR_NAME="wordpress-test"
 TMP_DIR="${TMP_DIR:-${PWD}}"
 WORDPRESS_USERNAME="wordpress"
@@ -79,9 +79,9 @@ wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples
 # renovate:
 wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/amazon-ec2-nice-dcv-samples/720bbefbf14a5391d4762edba13120a2e7a35f66/cfn/KaliLinux-NICE-DCV.yaml
 # renovate:
-wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/ec2-lamp-server/c0ec2481d4995771422304b05b7b90bd701052f2/UbuntuLinux-2204-LAMP-server.yaml
+wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/ec2-lamp-server/36aee47fabca19b59c7a35441599264b381d9859/UbuntuLinux-2204-LAMP-server.yaml
 # renovate:
-wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/ec2-lamp-server/c0ec2481d4995771422304b05b7b90bd701052f2/AmazonLinux-2023-LAMP-server.yaml
+wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/ec2-lamp-server/36aee47fabca19b59c7a35441599264b381d9859/AmazonLinux-2023-LAMP-server.yaml
 
 ## Create a new AWS EC2 Key Pair to be used for the EC2 instances
 aws ec2 create-key-pair --key-name "${AWS_EC2_KEY_PAIR_NAME}" --key-type ed25519 --query "KeyMaterial" --output text > "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem"
@@ -343,7 +343,7 @@ copilot svc deploy --resource-tags "Owner=${USER},Environment=dev,Solution=Amazo
 Delete the Amazon EKS cluster, Kali Linux EC2 instance, and EC2 Key Pair:
 
 ```sh
-export AWS_DEFAULT_REGION="eu-central-1"
+export AWS_REGION="eu-central-1"
 export AWS_EC2_KEY_PAIR_NAME="wordpress-test"
 export SOLUTION_KALI="KaliLinux-NICE-DCV"
 export SOLUTION_EC2_CONTAINER="Amazon-EC2-Container"
