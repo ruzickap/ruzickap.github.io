@@ -15,7 +15,7 @@ on:
       posts:
         type: choice
         description: Select post
-        default: cheapest-amazon-eks
+        default: detect-a-hacker-attacks-eks-ecs-vm
         options:
           - cheapest-amazon-eks
           - amazon-eks-karpenter-tests cheapest-amazon-eks
@@ -29,6 +29,7 @@ on:
           - secure-cheap-amazon-eks-with-pod-identities
           - velero-and-cert-manager secure-cheap-amazon-eks-with-pod-identities
           - exploit-vulnerability-wordpress-plugin-kali-linux-2
+          - detect-a-hacker-attacks-eks-ecs-vm
       action:
         type: choice
         description: Select action
