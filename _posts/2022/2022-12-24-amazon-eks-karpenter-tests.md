@@ -23,7 +23,7 @@ examples.
 
 - Amazon EKS cluster with Karpenter configuration described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
-- [Helm](https://helm.sh/)
+- [Helm](https://helm.sh)
 
 Variables which are being used in the next steps:
 

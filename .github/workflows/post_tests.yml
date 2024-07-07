@@ -15,7 +15,7 @@ on:
       posts:
         type: choice
         description: Select post
-        default: cheapest-amazon-eks
+        default: detect-a-hacker-attacks-eks-vm
         options:
           - cheapest-amazon-eks
           - amazon-eks-karpenter-tests cheapest-amazon-eks
@@ -29,6 +29,7 @@ on:
           - secure-cheap-amazon-eks-with-pod-identities
           - velero-and-cert-manager secure-cheap-amazon-eks-with-pod-identities
           - exploit-vulnerability-wordpress-plugin-kali-linux-2
+          - detect-a-hacker-attacks-eks-vm
       action:
         type: choice
         description: Select action
@@ -104,6 +105,15 @@ jobs:
             echo "*** Installing cilium"
             gh release download --repo cilium/cilium-cli --pattern cilium-linux-amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
             cilium version --client
+          fi
+
+          if grep -q 'rain ' "${POST_FILES_ARRAY[@]}" && ! command -v rain &> /dev/null ; then
+            echo "*** Installing rain"
+            gh release download --repo aws-cloudformation/rain --pattern "rain-*_linux-amd64.zip"
+            unzip -q rain-*_linux-amd64.zip
+            chmod a+x rain*/rain
+            sudo mv rain*/rain /usr/local/bin/
+            rain --version
           fi
 
           if grep -q 'velero ' "${POST_FILES_ARRAY[@]}" && ! command -v velero &> /dev/null ; then

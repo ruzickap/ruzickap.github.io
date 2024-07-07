@@ -40,7 +40,7 @@ Links:
 - Amazon EKS cluster with [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
   installed (described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
-- [Helm](https://helm.sh/)
+- [Helm](https://helm.sh)
 
 Variables which are being used in the next steps:
 

@@ -29,7 +29,7 @@ or others and use them in Kubernetes.
 
 In this post I would like to look at the way how to store secrets in
 [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) retrieve them
-using [Kubernetes Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io/)
+using [Kubernetes Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io)
 with [AWS Secrets and Configuration Provider (ASCP)](https://github.com/aws/secrets-store-csi-driver-provider-aws)
 and use them as Kubernetes Secret and also mount them directly into the pod as
 files.
@@ -51,7 +51,7 @@ Links:
 
 - Amazon EKS cluster (described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
-- [Helm](https://helm.sh/)
+- [Helm](https://helm.sh)
 
 Variables which are being used in the next steps:
 
