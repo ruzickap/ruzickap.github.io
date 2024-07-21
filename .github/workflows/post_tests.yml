@@ -15,7 +15,7 @@ on:
       posts:
         type: choice
         description: Select post
-        default: cheapest-amazon-eks
+        default: detect-a-hacker-attacks-eks-ecs-vm
         options:
           - cheapest-amazon-eks
           - amazon-eks-karpenter-tests cheapest-amazon-eks
@@ -29,6 +29,7 @@ on:
           - secure-cheap-amazon-eks-with-pod-identities
           - velero-and-cert-manager secure-cheap-amazon-eks-with-pod-identities
           - exploit-vulnerability-wordpress-plugin-kali-linux-2
+          - detect-a-hacker-attacks-eks-ecs-vm
       action:
         type: choice
         description: Select action
@@ -84,7 +85,7 @@ jobs:
           POST_FILES_ARRAY=()
           # shellcheck disable=SC2043
           for POST_FILE in ${GH_INPUTS}; do
-            POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POST_FILE}*.md")")
+            POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
           done
 
           if grep -q 'eksctl ' "${POST_FILES_ARRAY[@]}" && ! command -v eksctl &> /dev/null ; then

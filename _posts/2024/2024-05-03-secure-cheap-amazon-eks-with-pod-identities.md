@@ -61,7 +61,7 @@ few environment variables like:
 
 ```bash
 # AWS Region
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Base Domain: k8s.mylabs.dev
@@ -95,7 +95,7 @@ Confirm whether all essential variables have been properly configured:
 
 ```bash
 : "${AWS_ACCESS_KEY_ID?}"
-: "${AWS_DEFAULT_REGION?}"
+: "${AWS_REGION?}"
 : "${AWS_SECRET_ACCESS_KEY?}"
 : "${AWS_ROLE_TO_ASSUME?}"
 : "${GOOGLE_CLIENT_ID?}"
@@ -742,13 +742,13 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
-  region: ${AWS_DEFAULT_REGION}
+  region: ${AWS_REGION}
   tags:
     karpenter.sh/discovery: ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
-  - ${AWS_DEFAULT_REGION}a
-  - ${AWS_DEFAULT_REGION}b
+  - ${AWS_REGION}a
+  - ${AWS_REGION}b
 accessConfig:
   authenticationMode: API_AND_CONFIG_MAP
   accessEntries:
@@ -808,7 +808,7 @@ managedNodeGroups:
     # Due to karpenter we need 2 instances
     desiredCapacity: 2
     availabilityZones:
-      - ${AWS_DEFAULT_REGION}a
+      - ${AWS_REGION}a
     minSize: 2
     maxSize: 5
     volumeSize: 20
@@ -905,7 +905,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
-SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.2"
+SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="3.0.5"
 
 helm repo add piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
@@ -927,7 +927,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.31.0"
+AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.32.0"
 
 helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" << EOF
@@ -941,7 +941,7 @@ controller:
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   serviceAccount:
     name: ebs-csi-controller-sa
-  region: ${AWS_DEFAULT_REGION}
+  region: ${AWS_REGION}
 node:
   securityContext:
     # The node pod must be run as root to bind to the registration/driver sockets
@@ -981,7 +981,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
-MAILPIT_HELM_CHART_VERSION="0.17.4"
+MAILPIT_HELM_CHART_VERSION="0.18.1"
 
 helm repo add jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
@@ -1026,7 +1026,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="59.1.0"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="61.2.0"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
@@ -1176,7 +1176,7 @@ grafana:
       15761-kubernetes-system-api-server:
         # renovate: depName="Kubernetes / System / API Server"
         gnetId: 15761
-        revision: 16
+        revision: 17
         datasource: Prometheus
       15762-kubernetes-system-coredns:
         # renovate: depName="Kubernetes / System / CoreDNS"
@@ -1358,7 +1358,7 @@ spec:
           values: ["amd64", "arm64"]
         - key: "topology.kubernetes.io/zone"
           operator: In
-          values: ["${AWS_DEFAULT_REGION}a"]
+          values: ["${AWS_REGION}a"]
         - key: karpenter.k8s.aws/instance-family
           operator: In
           values: ["t3a", "t4g"]
@@ -1422,7 +1422,7 @@ Service account `cert-manager` was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-CERT_MANAGER_HELM_CHART_VERSION="1.15.0"
+CERT_MANAGER_HELM_CHART_VERSION="1.15.1"
 
 helm repo add jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
@@ -1468,7 +1468,7 @@ spec:
             - ${CLUSTER_FQDN}
         dns01:
           route53:
-            region: ${AWS_DEFAULT_REGION}
+            region: ${AWS_REGION}
 EOF
 
 kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
@@ -1541,7 +1541,7 @@ Service account `external-dns` was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
-EXTERNAL_DNS_HELM_CHART_VERSION="1.14.4"
+EXTERNAL_DNS_HELM_CHART_VERSION="1.14.5"
 
 helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
@@ -1648,7 +1648,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
-FORECASTLE_HELM_CHART_VERSION="1.0.139"
+FORECASTLE_HELM_CHART_VERSION="1.0.142"
 
 helm repo add stakater https://stakater.github.io/stakater-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
@@ -1696,7 +1696,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="7.7.1"
+OAUTH2_PROXY_HELM_CHART_VERSION="7.7.8"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
