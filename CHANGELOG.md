@@ -1,5 +1,66 @@
 # Changelog
 
+## 1.0.0 (2024-08-04)
+
+
+### Features
+
+* **chirpy:** upgrade jekyll-theme-chirpy ([#183](https://github.com/ruzickap/ruzickap.github.io/issues/183)) ([d826077](https://github.com/ruzickap/ruzickap.github.io/commit/d8260771c048fe65fb7ca28f8800d8f7178874fb))
+* **chirpy:** upgrade jekyll-theme-chirpy ([#207](https://github.com/ruzickap/ruzickap.github.io/issues/207)) ([58e0673](https://github.com/ruzickap/ruzickap.github.io/commit/58e0673448bfc069e38e515ad581a7d12b678775))
+* **chirpy:** upgrade jekyll-theme-chirpy ([#208](https://github.com/ruzickap/ruzickap.github.io/issues/208)) ([db5bbb9](https://github.com/ruzickap/ruzickap.github.io/commit/db5bbb95c7177f9838faa8fd8fce9036e47d383f))
+* **chirpy:** upgrade jekyll-theme-chirpy ([#276](https://github.com/ruzickap/ruzickap.github.io/issues/276)) ([c1e76f4](https://github.com/ruzickap/ruzickap.github.io/commit/c1e76f4b9c943ffecea3be863fb65d6ef2399490))
+* **gha:** add dependency-review ([#262](https://github.com/ruzickap/ruzickap.github.io/issues/262)) ([ac4c560](https://github.com/ruzickap/ruzickap.github.io/commit/ac4c5606563bbae7d2e54cfe9facdccdd083c21a))
+* **gha:** add generate-projects ([#227](https://github.com/ruzickap/ruzickap.github.io/issues/227)) ([f0d793d](https://github.com/ruzickap/ruzickap.github.io/commit/f0d793da8035ce6ef4690b114fc9d4b88cd80d11))
+* **gha:** Add GitHub Actions workflow files ([#221](https://github.com/ruzickap/ruzickap.github.io/issues/221)) ([3700073](https://github.com/ruzickap/ruzickap.github.io/commit/3700073e21fc4b32bb1df3920a051f32f0da41d9))
+* **gha:** add google-site-verification ([#205](https://github.com/ruzickap/ruzickap.github.io/issues/205)) ([0e7548a](https://github.com/ruzickap/ruzickap.github.io/commit/0e7548a9fd61318c86802d07d4641b00835f2396))
+* **gha:** add ignoreTests=false to github-actions in renovate ([#200](https://github.com/ruzickap/ruzickap.github.io/issues/200)) ([9d85f35](https://github.com/ruzickap/ruzickap.github.io/commit/9d85f35f7aecff91045574f9405a0b23580c27f3))
+* **gha:** add renovate-pr ([#275](https://github.com/ruzickap/ruzickap.github.io/issues/275)) ([06e0dea](https://github.com/ruzickap/ruzickap.github.io/commit/06e0deaa9c867969d0f2555f5b06535b74548e7e))
+* **gh:** add default GitHub repo files ([#225](https://github.com/ruzickap/ruzickap.github.io/issues/225)) ([be0ba5e](https://github.com/ruzickap/ruzickap.github.io/commit/be0ba5e4be63d0ab883f6f18d351b1f9d5a54b94))
+* **gh:** add default GitHub repo files ([#240](https://github.com/ruzickap/ruzickap.github.io/issues/240)) ([c4e8c18](https://github.com/ruzickap/ruzickap.github.io/commit/c4e8c185bc11c63f869787f34727707af844f861))
+* **gha:** disable renovate for gha which doesn't need it ([#178](https://github.com/ruzickap/ruzickap.github.io/issues/178)) ([7b9c164](https://github.com/ruzickap/ruzickap.github.io/commit/7b9c16438015f07fb150d18ab8a97c29e8237da0))
+* **gha:** improve renovate by changing config and action ([#195](https://github.com/ruzickap/ruzickap.github.io/issues/195)) ([31377b0](https://github.com/ruzickap/ruzickap.github.io/commit/31377b08e620f948f89fc260f057df4163533e26))
+* **gha:** unify GHA - renovate, megalinter, markdown, and others ([#222](https://github.com/ruzickap/ruzickap.github.io/issues/222)) ([1e406f7](https://github.com/ruzickap/ruzickap.github.io/commit/1e406f772f28f5e2d7b24e11e24009d0de50a3a2))
+* **posts:** add aws-for-fluent-bit to cilium-amazon-eks ([#176](https://github.com/ruzickap/ruzickap.github.io/issues/176)) ([72d8603](https://github.com/ruzickap/ruzickap.github.io/commit/72d86036f2bb2c3c7ebb6a726f738fd0817db76d))
+* **posts:** add cilium-amazon-eks ([#160](https://github.com/ruzickap/ruzickap.github.io/issues/160)) ([318c9ec](https://github.com/ruzickap/ruzickap.github.io/commit/318c9ecfc4246b31f7e5db6d87713b1a45901efd))
+* **posts:** add exploit-vulnerability-wordpress-plugin-kali-linux ([#271](https://github.com/ruzickap/ruzickap.github.io/issues/271)) ([d3ca1af](https://github.com/ruzickap/ruzickap.github.io/commit/d3ca1affc470a8e5b29d1e33c8b11cf8ca375010))
+* **posts:** add exploit-vulnerability-wordpress-plugin-kali-linux-2 ([#278](https://github.com/ruzickap/ruzickap.github.io/issues/278)) ([c840ea5](https://github.com/ruzickap/ruzickap.github.io/commit/c840ea561481af8c7913bfee6c5268142be7eec4))
+* **posts:** add network policies ([#175](https://github.com/ruzickap/ruzickap.github.io/issues/175)) ([12b1da4](https://github.com/ruzickap/ruzickap.github.io/commit/12b1da4871d19f4652967681cb80daa07923dfe1))
+* **posts:** add private network to the cilium-amazon-eks ([#169](https://github.com/ruzickap/ruzickap.github.io/issues/169)) ([aa2fa11](https://github.com/ruzickap/ruzickap.github.io/commit/aa2fa11e2a48d30b4bb66bcb8d2861127786c84a))
+* **posts:** add secure-cheap-amazon-eks ([#202](https://github.com/ruzickap/ruzickap.github.io/issues/202)) ([bc5040f](https://github.com/ruzickap/ruzickap.github.io/commit/bc5040ffccadeda2c8d661aa78d4811a4fd54250))
+* **posts:** add secure-cheap-amazon-eks-with-pod-identities ([#267](https://github.com/ruzickap/ruzickap.github.io/issues/267)) ([b173e0d](https://github.com/ruzickap/ruzickap.github.io/commit/b173e0d4a8e6ad6c02dc4390f1e9805e6a0d0974))
+* **posts:** disable helm chart upgrades ([#245](https://github.com/ruzickap/ruzickap.github.io/issues/245)) ([9442dde](https://github.com/ruzickap/ruzickap.github.io/commit/9442dde8d2a2f7ffb23ef3f7cb8feba8cea3e4e7))
+* **posts:** eks-with-pod-identities cleanup ([#277](https://github.com/ruzickap/ruzickap.github.io/issues/277)) ([d37b909](https://github.com/ruzickap/ruzickap.github.io/commit/d37b909216b5874b1de4b2a69a08bae027931fec))
+* **posts:** improve hostNetwork port mapping in cilium-amazon-eks ([#177](https://github.com/ruzickap/ruzickap.github.io/issues/177)) ([e2c8efb](https://github.com/ruzickap/ruzickap.github.io/commit/e2c8efb97c71171bcbdc7fa964fd052ac35f95b6))
+* **posts:** remove old ingress-nginx annotations ([#170](https://github.com/ruzickap/ruzickap.github.io/issues/170)) ([d36c8ee](https://github.com/ruzickap/ruzickap.github.io/commit/d36c8eeb260a9f7c16f1df5e6f58288c51081137))
+* **projects:** use Website instead of URL ([#259](https://github.com/ruzickap/ruzickap.github.io/issues/259)) ([9885855](https://github.com/ruzickap/ruzickap.github.io/commit/98858552fbd5f276d73a04097b60b942ab1d245f))
+* **renovate:** add autoupdate of grafana dashboards ([#165](https://github.com/ruzickap/ruzickap.github.io/issues/165)) ([3b855a3](https://github.com/ruzickap/ruzickap.github.io/commit/3b855a328fc362347eabd2bbf89fca081d50df69))
+* **renovate:** allow forecastle upgrades via renovate again ([#203](https://github.com/ruzickap/ruzickap.github.io/issues/203)) ([3af5183](https://github.com/ruzickap/ruzickap.github.io/commit/3af5183cbd315e3c2517ccd6711f0058cbafca71))
+* **renovate:** use proper packageRules with matchFileNames ([#253](https://github.com/ruzickap/ruzickap.github.io/issues/253)) ([0fb9703](https://github.com/ruzickap/ruzickap.github.io/commit/0fb9703390c91cf65ea5adc613c0af85a7c4bfb6))
+
+
+### Bug Fixes
+
+* **gha:** disable gitleaks findings, ignore docker hub links ([#214](https://github.com/ruzickap/ruzickap.github.io/issues/214)) ([37c1f81](https://github.com/ruzickap/ruzickap.github.io/commit/37c1f811e2b858731c9d3377a598c4f490b85aaf))
+* **gha:** fix generate-projects by adding token ([#228](https://github.com/ruzickap/ruzickap.github.io/issues/228)) ([0633078](https://github.com/ruzickap/ruzickap.github.io/commit/0633078b837bc90472e1cad0913035d8e8842463))
+* **gha:** fix gha when adding google-site-verification ([#206](https://github.com/ruzickap/ruzickap.github.io/issues/206)) ([29a5984](https://github.com/ruzickap/ruzickap.github.io/commit/29a5984d3f0ab5a6c134e8fa578ae9b49791a1b6))
+* **links:** add exclude URLs to lychee.toml ([#249](https://github.com/ruzickap/ruzickap.github.io/issues/249)) ([044f194](https://github.com/ruzickap/ruzickap.github.io/commit/044f194e38629058c178fb11adcad0711f411e41))
+* **linter:** use prettier to lint all posts + fix issues ([#220](https://github.com/ruzickap/ruzickap.github.io/issues/220)) ([25dad30](https://github.com/ruzickap/ruzickap.github.io/commit/25dad30196f758d5c030127e9573922d2f59960b))
+* **posts:** disable automerge for all posts except latest ([#250](https://github.com/ruzickap/ruzickap.github.io/issues/250)) ([0cbaca3](https://github.com/ruzickap/ruzickap.github.io/commit/0cbaca3be8bc43a1fee76c5b4680032e5f81171e))
+* **posts:** fix broken URLs, change blog URL, upgrade release-please ([#211](https://github.com/ruzickap/ruzickap.github.io/issues/211)) ([c71f6f4](https://github.com/ruzickap/ruzickap.github.io/commit/c71f6f4c1c00ffe138f1af76a1486ddaa60e43c0))
+* **posts:** fix date in exploit-vulnerability-wordpress-plugin-kali-linux ([#272](https://github.com/ruzickap/ruzickap.github.io/issues/272)) ([43b4215](https://github.com/ruzickap/ruzickap.github.io/commit/43b421571cf989de0d2329d9d378e0cc1562271f))
+* **posts:** fix delete part for cheapest-amazon-eks ([#167](https://github.com/ruzickap/ruzickap.github.io/issues/167)) ([ec2360f](https://github.com/ruzickap/ruzickap.github.io/commit/ec2360fe5c5389c69505367aa3ae70142686a964))
+* **posts:** fix issues with post about cilium ([#261](https://github.com/ruzickap/ruzickap.github.io/issues/261)) ([56f3315](https://github.com/ruzickap/ruzickap.github.io/commit/56f3315576cbe3630c25a50f14c0db4bdeeb17eb))
+* **posts:** fix network policies and improve grafana ([#201](https://github.com/ruzickap/ruzickap.github.io/issues/201)) ([11ef51d](https://github.com/ruzickap/ruzickap.github.io/commit/11ef51d6189b3d76e151b7cb034d00bc015ab15e))
+* **posts:** fix service account issue in pod identities ([#281](https://github.com/ruzickap/ruzickap.github.io/issues/281)) ([253e2a0](https://github.com/ruzickap/ruzickap.github.io/commit/253e2a045249c3557a5ecb53a0f5417de4a358c4))
+* **posts:** fix velero issue + upgrade ([#151](https://github.com/ruzickap/ruzickap.github.io/issues/151)) ([4941fb6](https://github.com/ruzickap/ruzickap.github.io/commit/4941fb6f0894d1cf95f288b970cdd7c88a703401))
+* **posts:** sony menu correction in my-sony-a7-iv-settings ([#219](https://github.com/ruzickap/ruzickap.github.io/issues/219)) ([3b489d8](https://github.com/ruzickap/ruzickap.github.io/commit/3b489d8f2e1a42b5ca4a122950a04bd84804f71c))
+* **posts:** use old karpenter version for secure-cheap-amazon-eks ([#263](https://github.com/ruzickap/ruzickap.github.io/issues/263)) ([e4a1759](https://github.com/ruzickap/ruzickap.github.io/commit/e4a17595fa268f1776310b10bed03d73fc79e625))
+* **renovate:** automerge gha using renovate ([#210](https://github.com/ruzickap/ruzickap.github.io/issues/210)) ([18c0cdf](https://github.com/ruzickap/ruzickap.github.io/commit/18c0cdf550f9c79f8212816c0b471d30516ee709))
+* **renovate:** disable renovate updates for 2023 posts ([#265](https://github.com/ruzickap/ruzickap.github.io/issues/265)) ([3f63a57](https://github.com/ruzickap/ruzickap.github.io/commit/3f63a57da89acb37f15f67bc0f6da317ab234aa1))
+* **renovate:** disable updates for posts ([#252](https://github.com/ruzickap/ruzickap.github.io/issues/252)) ([1c4c36e](https://github.com/ruzickap/ruzickap.github.io/commit/1c4c36e06b9f9ddcba48d2bd9f2650c8ba6ab6c8))
+* **renovate:** disable updates in all posts ([#273](https://github.com/ruzickap/ruzickap.github.io/issues/273)) ([5fd17e6](https://github.com/ruzickap/ruzickap.github.io/commit/5fd17e6c2e2e41d010b576857b73bc625a4988ab))
+* **renovate:** fix automerge + skip ci ([#255](https://github.com/ruzickap/ruzickap.github.io/issues/255)) ([1ac60a4](https://github.com/ruzickap/ruzickap.github.io/commit/1ac60a49f131d45a2d61016b0613dc3e3aaeb998))
+
 ## 1.0.0 (2023-11-16)
 
 ## What's Changed
