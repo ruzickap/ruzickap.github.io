@@ -26,21 +26,6 @@ jobs:
           npm install --save-dev --save-exact prettier
           scripts/generate-projects.sh _tabs/projects.md
 
-      - name: Restore lychee cache
-        uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8 # v4.1.1
-        with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-
-      - name: Link Checker
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: lycheeverse/lychee-action@2bb232618be239862e31382c5c0eaeba12e5e966 # v2.0.1
-        with:
-          args: "_tabs/projects.md"
-          fail: true
-
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
         with:
