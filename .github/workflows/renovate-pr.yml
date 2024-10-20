@@ -72,6 +72,6 @@ jobs:
           echo "RENOVATE_INCLUDE_PATHS=${{ steps.changed-files.outputs.all_changed_files }}" | tee -a "${GITHUB_ENV}"
 
       - name: 💡 Self-hosted Renovate
-        uses: renovatebot/github-action@259200be4d976a76196ec8985b0dddcaf1733b47 # v40.2.0
+        uses: renovatebot/github-action@80eaf969abf68ad62aa94d9ab392421b31621634 # v40.3.4
         with:
           token: ${{ steps.app-token.outputs.token }}
