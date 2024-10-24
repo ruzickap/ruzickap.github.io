@@ -128,7 +128,9 @@ Parameters:
   S3BucketName:
     Description: Name of the S3 bucket
     Type: String
-    Default: s3bucket.myexample.com
+  EmailToSubscribe:
+    Description: Confirm subscription over email to receive a copy of S3 events
+    Type: String
 
 Resources:
   S3Policy:
@@ -177,7 +179,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: Private
-      BucketName: !Sub "${S3BucketName}"
+      BucketName: !Ref S3BucketName
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -190,6 +192,45 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
               KMSMasterKeyID: alias/aws/s3
+      NotificationConfiguration:
+        TopicConfigurations:
+          - Event: s3:ObjectCreated:*
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:ObjectRemoved:*
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:ReducedRedundancyLostObject
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:LifecycleTransition
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:LifecycleExpiration:*
+            Topic: !Ref S3ChangeNotificationTopic
+  S3ChangeNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Ref S3BucketName
+      DisplayName: S3 Change Notification Topic
+      KmsMasterKeyId: alias/aws/sns
+  S3ChangeNotificationSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref S3ChangeNotificationTopic
+      Protocol: email
+      Endpoint: !Ref EmailToSubscribe
+  SNSTopicPolicyResponse:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref S3ChangeNotificationTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: SNS:Publish
+            Resource: "*"
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:s3:${AWS::Region}:${AWS::AccountId}:${S3BucketName}
 Outputs:
   S3PolicyArn:
     Description: The ARN of the created Amazon S3 policy
@@ -200,7 +241,7 @@ Outputs:
 EOF
 
 aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides "S3BucketName=${CLUSTER_FQDN}" \
+  --parameter-overrides "S3BucketName=${CLUSTER_FQDN} EmailToSubscribe=${MY_EMAIL}" \
   --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
 ```
 
@@ -243,14 +284,14 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="5.3.0"
+VELERO_HELM_CHART_VERSION="7.2.1"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
 initContainers:
   - name: velero-plugin-for-aws
     # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?<version>.+)$
-    image: velero/velero-plugin-for-aws:v1.9.0
+    image: velero/velero-plugin-for-aws:v1.10.1
     volumeMounts:
       - mountPath: /target
         name: plugins
@@ -322,7 +363,7 @@ Add Velero Grafana Dashboard:
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="65.4.0"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" << EOF
 grafana:
@@ -570,7 +611,7 @@ Use production Let's Encrypt certificate by `ingress-nginx`:
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.9.1"
+INGRESS_NGINX_HELM_CHART_VERSION="4.11.3"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx-production-certs.yml" << EOF
 controller:
