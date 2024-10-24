@@ -128,7 +128,9 @@ Parameters:
   S3BucketName:
     Description: Name of the S3 bucket
     Type: String
-    Default: s3bucket.myexample.com
+  EmailToSubscribe:
+    Description: Confirm subscription over email to receive a copy of S3 events
+    Type: String
 
 Resources:
   S3Policy:
@@ -177,7 +179,7 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       AccessControl: Private
-      BucketName: !Sub "${S3BucketName}"
+      BucketName: !Ref S3BucketName
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -190,6 +192,45 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
               KMSMasterKeyID: alias/aws/s3
+      NotificationConfiguration:
+        TopicConfigurations:
+          - Event: s3:ObjectCreated:*
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:ObjectRemoved:*
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:ReducedRedundancyLostObject
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:LifecycleTransition
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:LifecycleExpiration:*
+            Topic: !Ref S3ChangeNotificationTopic
+  S3ChangeNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Ref S3BucketName
+      DisplayName: S3 Change Notification Topic
+      KmsMasterKeyId: alias/aws/sns
+  S3ChangeNotificationSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref S3ChangeNotificationTopic
+      Protocol: email
+      Endpoint: !Ref EmailToSubscribe
+  SNSTopicPolicyResponse:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref S3ChangeNotificationTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: SNS:Publish
+            Resource: "*"
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:s3:${AWS::Region}:${AWS::AccountId}:${S3BucketName}
 Outputs:
   S3PolicyArn:
     Description: The ARN of the created Amazon S3 policy
@@ -200,7 +241,7 @@ Outputs:
 EOF
 
 aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides "S3BucketName=${CLUSTER_FQDN}" \
+  --parameter-overrides "S3BucketName=${CLUSTER_FQDN} EmailToSubscribe=${MY_EMAIL}" \
   --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
 ```
 
