@@ -30,6 +30,8 @@
   packageRules: [
     {
       automerge: true,
+      commitBody: "[skip ci]",
+      description: "Automerge all without running any tests",
       ignoreTests: true,
       matchPackagePatterns: ["*"],
     },

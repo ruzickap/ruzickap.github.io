@@ -232,9 +232,9 @@ Resources:
 Outputs:
   S3PolicyArn:
     Description: The ARN of the created Amazon S3 policy
-    Value: !Ref S3Policy
+    Value: !GetAtt S3Policy.Arn
   S3Bucket:
-    Description: The ARN of the created Amazon S3 bucket
+    Description: The name of the created Amazon S3 bucket
     Value: !Ref S3Bucket
   S3ChangeNotificationTopicArn:
     Description: ARN of the SNS Topic for S3 change notifications
@@ -242,7 +242,7 @@ Outputs:
 EOF
 
 aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides "S3BucketName=${CLUSTER_FQDN} EmailToSubscribe=${MY_EMAIL}" \
+  --parameter-overrides S3BucketName=${CLUSTER_FQDN} EmailToSubscribe=${MY_EMAIL} \
   --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
 ```
 
