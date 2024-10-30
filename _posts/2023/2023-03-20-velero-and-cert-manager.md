@@ -213,28 +213,43 @@ Resources:
               ArnEquals:
                 aws:SourceArn: !GetAtt S3Bucket.Arn
   S3Policy:
-    Type: AWS::S3::BucketPolicy
+    Type: AWS::IAM::ManagedPolicy
     Properties:
-      Bucket: !Ref S3Bucket
+      ManagedPolicyName: !Sub "${S3BucketName}-s3"
+      Description: !Sub "Policy required by Velero to write to S3 bucket ${S3BucketName}"
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
-          - Sid: ForceSSLOnlyAccess
-            Effect: Deny
-            Principal: "*"
-            Action: s3:*
-            Resource:
-              - !GetAtt S3Bucket.Arn
-              - !Sub ${S3Bucket.Arn}/*
-            Condition:
-              Bool:
-                aws:SecureTransport: "false"
+        - Effect: Allow
+          Action:
+          - s3:ListBucket
+          - s3:GetBucketLocation
+          - s3:ListBucketMultipartUploads
+          Resource: !GetAtt S3Bucket.Arn
+        - Effect: Allow
+          Action:
+          - s3:PutObject
+          - s3:GetObject
+          - s3:DeleteObject
+          - s3:ListMultipartUploadParts
+          - s3:AbortMultipartUpload
+          Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
+        # S3 Bucket policy does not deny HTTP requests
+        - Sid: ForceSSLOnlyAccess
+          Effect: Deny
+          Action: "s3:*"
+          Resource:
+            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}"
+            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}/*"
+          Condition:
+            Bool:
+              aws:SecureTransport: "false"
 Outputs:
   S3PolicyArn:
     Description: The ARN of the created Amazon S3 policy
     Value: !Ref S3Policy
   S3Bucket:
-    Description: The ARN of the created Amazon S3 bucket
+    Description: The name of the created Amazon S3 bucket
     Value: !Ref S3Bucket
   S3ChangeNotificationTopicArn:
     Description: ARN of the SNS Topic for S3 change notifications
@@ -242,7 +257,7 @@ Outputs:
 EOF
 
 aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides "S3BucketName=${CLUSTER_FQDN} EmailToSubscribe=${MY_EMAIL}" \
+  --parameter-overrides S3BucketName=${CLUSTER_FQDN} EmailToSubscribe=${MY_EMAIL} \
   --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
 ```
 
@@ -364,7 +379,7 @@ Add Velero Grafana Dashboard:
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.21.4"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" << EOF
 grafana:
@@ -612,7 +627,7 @@ Use production Let's Encrypt certificate by `ingress-nginx`:
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.9.1"
+INGRESS_NGINX_HELM_CHART_VERSION="4.11.3"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx-production-certs.yml" << EOF
 controller:
