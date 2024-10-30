@@ -84,7 +84,7 @@ jobs:
           POST_FILES_ARRAY=()
           # shellcheck disable=SC2043
           for POST_FILE in ${GH_INPUTS}; do
-            POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POST_FILE}*.md")")
+            POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
           done
 
           if grep -q 'eksctl ' "${POST_FILES_ARRAY[@]}" && ! command -v eksctl &> /dev/null ; then
