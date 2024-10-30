@@ -128,68 +128,107 @@ Parameters:
   S3BucketName:
     Description: Name of the S3 bucket
     Type: String
-    Default: s3bucket.myexample.com
+  EmailToSubscribe:
+    Description: Confirm subscription over email to receive a copy of S3 events
+    Type: String
 
 Resources:
-  S3Policy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      ManagedPolicyName: !Sub "${S3BucketName}-s3"
-      Description: !Sub "Policy required by Velero to write to S3 bucket ${S3BucketName}"
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-        - Effect: Allow
-          Action:
-          - s3:ListBucket
-          - s3:GetBucketLocation
-          - s3:ListBucketMultipartUploads
-          Resource: !GetAtt S3Bucket.Arn
-        - Effect: Allow
-          Action:
-          - s3:PutObject
-          - s3:GetObject
-          - s3:DeleteObject
-          - s3:ListMultipartUploadParts
-          - s3:AbortMultipartUpload
-          Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
-        # S3 Bucket policy does not deny HTTP requests
-        - Sid: ForceSSLOnlyAccess
-          Effect: Deny
-          Action: "s3:*"
-          Resource:
-            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}"
-            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}/*"
-          Condition:
-            Bool:
-              aws:SecureTransport: "false"
-        # S3 Bucket policy does not deny TLS version lower than 1.2
-        - Sid: EnforceTLS
-          Effect: Deny
-          Action: "s3:*"
-          Resource:
-            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}"
-            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}/*"
-          Condition:
-            NumericLessThan:
-              s3:TlsVersion: 1.2
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      AccessControl: Private
-      BucketName: !Sub "${S3BucketName}"
+      BucketName: !Ref S3BucketName
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
-      VersioningConfiguration:
-        Status: Suspended
+      LifecycleConfiguration:
+        Rules:
+          - Id: TransitionToOneZoneIA
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: ONEZONE_IA
+          - Id: DeleteOldObjects
+            Status: Enabled
+            ExpirationInDays: 90
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
               KMSMasterKeyID: alias/aws/s3
+      NotificationConfiguration:
+        TopicConfigurations:
+          - Event: s3:ObjectCreated:*
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:ObjectRemoved:*
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:ReducedRedundancyLostObject
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:LifecycleTransition
+            Topic: !Ref S3ChangeNotificationTopic
+          - Event: s3:LifecycleExpiration:*
+            Topic: !Ref S3ChangeNotificationTopic
+  S3ChangeNotificationTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Join ["-", !Split [".", !Sub "${S3BucketName}"]]
+      DisplayName: S3 Change Notification Topic
+      KmsMasterKeyId: alias/aws/sns
+  S3ChangeNotificationSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref S3ChangeNotificationTopic
+      Protocol: email
+      Endpoint: !Ref EmailToSubscribe
+  SNSTopicPolicyResponse:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref S3ChangeNotificationTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: SNS:Publish
+            Resource: !Ref S3ChangeNotificationTopic
+            Condition:
+              ArnLike:
+                aws:SourceArn: !Sub arn:${AWS::Partition}:s3:::${S3BucketName}
+  SNSTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics:
+        - !Ref S3ChangeNotificationTopic
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: sns:Publish
+            Resource: !Ref S3ChangeNotificationTopic
+            Condition:
+              ArnEquals:
+                aws:SourceArn: !GetAtt S3Bucket.Arn
+  S3Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ForceSSLOnlyAccess
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub ${S3Bucket.Arn}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
 Outputs:
   S3PolicyArn:
     Description: The ARN of the created Amazon S3 policy
@@ -197,10 +236,13 @@ Outputs:
   S3Bucket:
     Description: The ARN of the created Amazon S3 bucket
     Value: !Ref S3Bucket
+  S3ChangeNotificationTopicArn:
+    Description: ARN of the SNS Topic for S3 change notifications
+    Value: !Ref S3ChangeNotificationTopic
 EOF
 
 aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides "S3BucketName=${CLUSTER_FQDN}" \
+  --parameter-overrides "S3BucketName=${CLUSTER_FQDN} EmailToSubscribe=${MY_EMAIL}" \
   --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
 ```
 

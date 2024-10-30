@@ -61,7 +61,7 @@ few environment variables like:
 
 ```bash
 # AWS Region
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Base Domain: k8s.mylabs.dev
@@ -95,7 +95,7 @@ Confirm whether all essential variables have been properly configured:
 
 ```bash
 : "${AWS_ACCESS_KEY_ID?}"
-: "${AWS_DEFAULT_REGION?}"
+: "${AWS_REGION?}"
 : "${AWS_SECRET_ACCESS_KEY?}"
 : "${AWS_ROLE_TO_ASSUME?}"
 : "${GOOGLE_CLIENT_ID?}"
@@ -742,13 +742,13 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
-  region: ${AWS_DEFAULT_REGION}
+  region: ${AWS_REGION}
   tags:
     karpenter.sh/discovery: ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
-  - ${AWS_DEFAULT_REGION}a
-  - ${AWS_DEFAULT_REGION}b
+  - ${AWS_REGION}a
+  - ${AWS_REGION}b
 accessConfig:
   authenticationMode: API_AND_CONFIG_MAP
   accessEntries:
@@ -808,7 +808,7 @@ managedNodeGroups:
     # Due to karpenter we need 2 instances
     desiredCapacity: 2
     availabilityZones:
-      - ${AWS_DEFAULT_REGION}a
+      - ${AWS_REGION}a
     minSize: 2
     maxSize: 5
     volumeSize: 20
@@ -941,7 +941,7 @@ controller:
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
   serviceAccount:
     name: ebs-csi-controller-sa
-  region: ${AWS_DEFAULT_REGION}
+  region: ${AWS_REGION}
 node:
   securityContext:
     # The node pod must be run as root to bind to the registration/driver sockets
@@ -1358,7 +1358,7 @@ spec:
           values: ["amd64", "arm64"]
         - key: "topology.kubernetes.io/zone"
           operator: In
-          values: ["${AWS_DEFAULT_REGION}a"]
+          values: ["${AWS_REGION}a"]
         - key: karpenter.k8s.aws/instance-family
           operator: In
           values: ["t3a", "t4g"]
@@ -1468,7 +1468,7 @@ spec:
             - ${CLUSTER_FQDN}
         dns01:
           route53:
-            region: ${AWS_DEFAULT_REGION}
+            region: ${AWS_REGION}
 EOF
 
 kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
