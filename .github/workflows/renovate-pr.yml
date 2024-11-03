@@ -20,6 +20,9 @@ on:
       - "*"
       - "!main"
       - "!renovate/*"
+    paths:
+      - "posts/**"
+
 env:
   # https://docs.renovatebot.com/troubleshooting/#log-debug-levels
   LOG_LEVEL: "${{ inputs.logLevel || 'debug' }}"

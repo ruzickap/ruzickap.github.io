@@ -11,6 +11,9 @@ on:
   push:
     branches-ignore:
       - renovate/**
+    paths-ignore:
+      - ".github/**"
+      - "!.github/workflows/gh-pages-build.yml"
 
 permissions: read-all
 
