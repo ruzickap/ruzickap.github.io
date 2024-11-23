@@ -29,7 +29,7 @@ Links:
 
 - Amazon EKS cluster (described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
-- [Helm](https://helm.sh/)
+- [Helm](https://helm.sh)
 
 Variables which are being used in the next steps:
 
@@ -300,14 +300,14 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="5.3.0"
+VELERO_HELM_CHART_VERSION="7.2.1"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
 initContainers:
   - name: velero-plugin-for-aws
     # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?<version>.+)$
-    image: velero/velero-plugin-for-aws:v1.9.0
+    image: velero/velero-plugin-for-aws:v1.10.1
     volumeMounts:
       - mountPath: /target
         name: plugins
@@ -379,7 +379,7 @@ Add Velero Grafana Dashboard:
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.21.4"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="65.5.0"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" << EOF
 grafana:

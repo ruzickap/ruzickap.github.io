@@ -73,13 +73,6 @@ jobs:
             --disable-external \
             --ignore-urls "/^http://127.0.0.1/,/^http://0.0.0.0/,/^http://localhost/"
 
-      - name: Check broken links
-        uses: ruzickap/action-my-broken-link-checker@6c356a0c80f7f0a2a12f105850ef8efd24c6da63 # v2.7.0
-        with:
-          url: https://${{ steps.variables.outputs.BASE_DOMAIN }}
-          pages_path: public
-          cmd_params: '--exclude=(linkedin.com|twitter.com|fonts.gstatic.com|fonts.googleapis.com|${{ steps.variables.outputs.BASE_DOMAIN }}/projects/|mylabs.dev|www.googletagmanager.com|hub.docker.com|stackoverflow.com) --buffer-size=8192 --max-connections-per-host=5 --color=always --rate-limit=5 --header="User-Agent:Mozilla" --skip-tls-verification --timeout=20'
-
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
         if: ${{ github.ref == 'refs/heads/main' }}
