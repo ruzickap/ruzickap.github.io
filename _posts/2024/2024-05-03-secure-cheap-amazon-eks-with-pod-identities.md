@@ -280,7 +280,7 @@ Resources:
       TTL: 60
       ResourceRecords: !GetAtt HostedZone.NameServers
   # https://karpenter.sh/docs/reference/cloudformation/
-  # https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v0.36/getting-started/getting-started-with-karpenter/cloudformation.yaml
+  # https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v0.37/getting-started/getting-started-with-karpenter/cloudformation.yaml
   KarpenterNodeInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -631,7 +631,7 @@ Resources:
     Properties:
       AliasName: !Sub "alias/eks-${ClusterName}"
       TargetKeyId: !Ref KMSKey
-  # https://karpenter.sh/v0.36/troubleshooting/#node-terminates-before-ready-on-failed-encrypted-ebs-volume
+  # https://karpenter.sh/v0.37/troubleshooting/#node-terminates-before-ready-on-failed-encrypted-ebs-volume
   KMSKey:
     Type: AWS::KMS::Key
     Properties:
@@ -893,7 +893,7 @@ _EKS Pod Identity associations_
 Install Volume Snapshot Custom Resource Definitions (CRDs):
 
 ```bash
-kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
+kubectl apply --kustomize 'https://github.com/kubernetes-csi/external-snapshotter//client/config/crd/?ref=v8.1.0'
 ```
 
 ![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg){:width="400"}
@@ -1026,7 +1026,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="59.1.0"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
@@ -1204,9 +1204,9 @@ grafana:
         revision: 1
         datasource: Prometheus
       karpenter-capacity-dashboard:
-        url: https://karpenter.sh/v0.36/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
+        url: https://karpenter.sh/v0.37/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
       karpenter-performance-dashboard:
-        url: https://karpenter.sh/v0.36/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
+        url: https://karpenter.sh/v0.37/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
   grafana.ini:
     analytics:
       check_for_updates: false
@@ -1282,7 +1282,7 @@ prometheus:
           resources:
             requests:
               storage: 2Gi
-    # https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v0.36/getting-started/getting-started-with-karpenter/prometheus-values.yaml
+    # https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v0.37/getting-started/getting-started-with-karpenter/prometheus-values.yaml
     additionalScrapeConfigs:
       - job_name: karpenter
         kubernetes_sd_configs:
@@ -1311,7 +1311,7 @@ right compute resources to handle your cluster's applications.
 Install Karpenter
 [helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
 and modify the
-[default values](https://github.com/aws/karpenter-provider-aws/blob/v0.36.0/charts/karpenter/values.yaml).
+[default values](https://github.com/aws/karpenter-provider-aws/blob/v0.37.0/charts/karpenter/values.yaml).
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws

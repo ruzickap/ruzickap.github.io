@@ -16,10 +16,6 @@ on:
           - debug
           - trace
   push:
-    branches:
-      - "*"
-      - "!main"
-      - "!renovate/*"
     paths:
       - "posts/**"
 
@@ -49,7 +45,7 @@ permissions: read-all
 
 jobs:
   renovate-pr:
-    if: ${{ !contains(github.event.pull_request.labels.*.name, 'no-renovate-pr') }}
+    if: contains(github.event.pull_request.labels.*.name, 'renovate-pr')
     runs-on: ubuntu-latest
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
