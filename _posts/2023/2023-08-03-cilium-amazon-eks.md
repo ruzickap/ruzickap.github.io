@@ -683,7 +683,7 @@ It is not needed when using EKS managed node groups:
 Install Volume Snapshot Custom Resource Definitions (CRDs):
 
 ```bash
-kubectl apply --kustomize https://github.com/kubernetes-csi/external-snapshotter.git/client/config/crd/
+kubectl apply --kustomize 'https://github.com/kubernetes-csi/external-snapshotter//client/config/crd/?ref=v8.1.0'
 ```
 
 ![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg){:width="500"}
@@ -1246,6 +1246,7 @@ and modify the
 # renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
 AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.32"
 
+helm repo add eks https://aws.github.io/eks-charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" << EOF
 cloudWatchLogs:
   region: ${AWS_DEFAULT_REGION}
