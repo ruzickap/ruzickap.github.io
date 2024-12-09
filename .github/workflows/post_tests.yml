@@ -24,7 +24,7 @@ on:
           - secrets-store-csi-driver-reloader velero-and-cert-manager cheapest-amazon-eks
           - my-favourite-krew-plugins-kubectl cheapest-amazon-eks
           - cilium-amazon-eks
-          - secure-cheap-amazon-eks
+          - 2023-09-25-secure-cheap-amazon-eks
           - exploit-vulnerability-wordpress-plugin-kali-linux-1
           - secure-cheap-amazon-eks-with-pod-identities
           - velero-and-cert-manager secure-cheap-amazon-eks-with-pod-identities
@@ -81,6 +81,7 @@ jobs:
           set -euxo pipefail
 
           export TMP_DIR="${PWD}/mytmp"
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
           POST_FILES_ARRAY=()
           # shellcheck disable=SC2043
@@ -90,36 +91,36 @@ jobs:
 
           if grep -q 'eksctl ' "${POST_FILES_ARRAY[@]}" && ! command -v eksctl &> /dev/null ; then
             echo "*** Installing eksctl"
-            gh release download --repo eksctl-io/eksctl --pattern eksctl_Linux_amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
+            brew install eksctl
             eksctl version
           fi
 
           if grep -q 'copilot ' "${POST_FILES_ARRAY[@]}" && ! command -v copilot &> /dev/null ; then
             echo "*** Installing copilot"
-            gh release download --repo aws/copilot-cli --pattern copilot-linux
-            sudo mv copilot-linux /usr/local/bin/copilot
-            chmod a+x /usr/local/bin/copilot
+            brew install copilot
           fi
 
           if grep -q 'cilium ' "${POST_FILES_ARRAY[@]}" && ! command -v cilium &> /dev/null ; then
             echo "*** Installing cilium"
-            gh release download --repo cilium/cilium-cli --pattern cilium-linux-amd64.tar.gz --output - | sudo tar xz -C /usr/local/bin/
-            cilium version --client
+            brew install cilium-cli
+          fi
+
+          if grep -q 'kubectl ' "${POST_FILES_ARRAY[@]}" ; then
+            echo "*** Installing kubecolor"
+            brew install kubecolor
+            export KUBECOLOR_FORCE_COLORS=256
+            kubectl() { kubecolor "$@"; }
+            kubectl version --client=true
           fi
 
           if grep -q 'rain ' "${POST_FILES_ARRAY[@]}" && ! command -v rain &> /dev/null ; then
             echo "*** Installing rain"
-            gh release download --repo aws-cloudformation/rain --pattern "rain-*_linux-amd64.zip"
-            unzip -q rain-*_linux-amd64.zip
-            chmod a+x rain*/rain
-            sudo mv rain*/rain /usr/local/bin/
-            rain --version
+            brew install rain
           fi
 
           if grep -q 'velero ' "${POST_FILES_ARRAY[@]}" && ! command -v velero &> /dev/null ; then
             echo "*** Installing velero"
-            gh release download --repo vmware-tanzu/velero --pattern "velero-*-linux-amd64.tar.gz" --output - | sudo tar xz -C /usr/local/bin/ --strip-components 1 --wildcards "*/velero"
-            velero version --client-only
+            brew install velero
           fi
 
           if [[ "${GH_ACTION}" =~ 'build' ]]; then
