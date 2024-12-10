@@ -2,7 +2,7 @@
 title: Velero and cert-manager
 author: Petr Ruzicka
 date: 2023-03-20
-description: Deploy Trivy Operator and Grafana Dashboard
+description: Velero and cert-manager
 categories: [Kubernetes, Amazon EKS, Velero, cert-manager]
 tags: [Amazon EKS, k8s, kubernetes, velero, cert-manager, certificates]
 image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
@@ -379,7 +379,7 @@ Add Velero Grafana Dashboard:
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="65.5.0"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" << EOF
 grafana:
