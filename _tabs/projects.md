@@ -698,6 +698,7 @@ List of my GitHub projects:
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ruzickap.github.io/workflows/release-please/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate-pr](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate-pr/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate-pr.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/ruzickap.github.io/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ruzickap.github.io/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ruzickap.github.io/workflows/stale/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/stale.yml)
 
