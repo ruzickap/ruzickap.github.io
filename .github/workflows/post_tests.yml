@@ -22,6 +22,7 @@ on:
           - 2023-03-20-velero-and-cert-manager 2024-05-03-secure-cheap-amazon-eks-with-pod-identities
           - 2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2
           - 2024-07-07-detect-a-hacker-attacks-eks-vm
+          - 2024-12-12-terraform-keep-sorted
       action:
         type: choice
         description: Select action
