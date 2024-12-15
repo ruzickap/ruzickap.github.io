@@ -23,6 +23,7 @@ on:
           - 2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2
           - 2024-07-07-detect-a-hacker-attacks-eks-vm
           - 2024-12-12-terraform-keep-sorted
+          - 2024-12-14-secure-cheap-amazon-eks-auto
       action:
         type: choice
         description: Select action
