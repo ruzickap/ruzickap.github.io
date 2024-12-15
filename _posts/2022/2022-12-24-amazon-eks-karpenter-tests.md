@@ -278,7 +278,7 @@ outputs + logs...
 Install `podinfo`
 [helm chart](https://artifacthub.io/packages/helm/podinfo/podinfo)
 and modify the
-[default values](https://github.com/stefanprodan/podinfo/blob/master/charts/podinfo/values.yaml).
+[default values](https://github.com/stefanprodan/podinfo/blob/6.5.4/charts/podinfo/values.yaml).
 
 ![podinfo](https://raw.githubusercontent.com/stefanprodan/podinfo/a7be119f20369b97f209d220535506af7c49b4ea/screens/podinfo-ui-v3.png){:width="500"}
 

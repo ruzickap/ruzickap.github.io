@@ -43,6 +43,19 @@ Requirements:
 
 ### Requirements
 
+You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+and other secrets/variables.
+
+```shell
+# AWS Credentials
+export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
+export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export AWS_SESSION_TOKEN="xxxxxxxx"
+export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
+export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
+export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
+```
+
 If you would like to follow this documents and it's task you will need to set up
 few environment variables like:
 
@@ -62,19 +75,6 @@ export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER
 export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-```
-
-You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
-and other secrets/variables.
-
-```shell
-# AWS Credentials
-export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
-export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export AWS_SESSION_TOKEN="xxxxxxxx"
-export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
-export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
-export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```
 
 Verify if all the necessary variables were set:
@@ -466,7 +466,7 @@ Mailhog will be used to receive email alerts form the Prometheus.
 Install `mailhog`
 [helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
 and modify the
-[default values](https://github.com/codecentric/helm-charts/blob/master/charts/mailhog/values.yaml).
+[default values](https://github.com/codecentric/helm-charts/blob/mailhog-5.2.3/charts/mailhog/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
@@ -512,7 +512,7 @@ the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-oper
 Install `kube-prometheus-stack`
 [helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 and modify the
-[default values](https://github.com/prometheus-community/helm-charts/blob/main/charts/kube-prometheus-stack/values.yaml):
+[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-56.6.2/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -786,7 +786,7 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 Change [karpenter](https://karpenter.sh/) default installation by upgrading:
 [helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
 and modify the
-[default values](https://github.com/aws/karpenter/blob/main/charts/karpenter/values.yaml).
+[default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml).
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
@@ -815,7 +815,7 @@ of obtaining, renewing and using those certificates.
 Install `cert-manager`
 [helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 and modify the
-[default values](https://github.com/cert-manager/cert-manager/blob/master/deploy/charts/cert-manager/values.yaml).
+[default values](https://github.com/cert-manager/cert-manager/blob/v1.14.3/deploy/charts/cert-manager/values.yaml).
 Service account `cert-manager` was created by `eksctl`.
 
 ```bash
@@ -907,7 +907,7 @@ built-in autoscaling pipelines.
 Install `metrics-server`
 [helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
 and modify the
-[default values](https://github.com/kubernetes-sigs/metrics-server/blob/master/charts/metrics-server/values.yaml):
+[default values](https://github.com/kubernetes-sigs/metrics-server/blob/metrics-server-helm-chart-3.12.0/charts/metrics-server/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
@@ -933,7 +933,7 @@ exposed Kubernetes Services and Ingresses with DNS providers.
 Install `external-dns`
 [helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
 and modify the
-[default values](https://github.com/kubernetes-sigs/external-dns/blob/master/charts/external-dns/values.yaml).
+[default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml).
 `external-dns` will take care about DNS records.
 Service account `external-dns` was created by `eksctl`.
 
@@ -965,7 +965,7 @@ proxy and load balancer.
 Install `ingress-nginx`
 [helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
 and modify the
-[default values](https://github.com/kubernetes/ingress-nginx/blob/master/charts/ingress-nginx/values.yaml).
+[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.9.1/charts/ingress-nginx/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -1041,7 +1041,7 @@ on Kubernetes.
 Install `forecastle`
 [helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
 and modify the
-[default values](https://github.com/stakater/Forecastle/blob/master/deployments/kubernetes/chart/forecastle/values.yaml).
+[default values](https://github.com/stakater/Forecastle/blob/v1.0.136/deployments/kubernetes/chart/forecastle/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
@@ -1084,7 +1084,7 @@ the endpoints by Google Authentication.
 Install `oauth2-proxy`
 [helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
 and modify the
-[default values](https://github.com/oauth2-proxy/manifests/blob/main/helm/oauth2-proxy/values.yaml).
+[default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-6.24.1/helm/oauth2-proxy/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
