@@ -8,36 +8,6 @@
       transformTemplates: ['{"releases":[{"version": $string(revision)}]}'],
     },
   },
-  // Keep the extends started with ":" at the end of the list to allow overriding
-  extends: [
-    "config:recommended",
-    "docker:pinDigests",
-    "helpers:pinGitHubActionDigestsToSemver",
-    "security:openssf-scorecard",
-    ":disableDependencyDashboard",
-    ":disableRateLimiting",
-    ":docker",
-    ":enableVulnerabilityAlertsWithLabel(security)",
-    ":pinSkipCi",
-  ],
-  // ignore chirpy dependencies
-  // https://renovatebot.com/docs/configuration-options/#ignoredeps
-  labels: [
-    "renovate-pr",
-    "renovate-pr/{{replace '.*/' '' depName}}",
-    "renovate-pr/{{updateType}}",
-  ],
-  packageRules: [
-    {
-      automerge: true,
-      commitBody: "[skip ci]",
-      description: "Automerge all without running any tests",
-      ignoreTests: true,
-      matchPackagePatterns: ["*"],
-    },
-  ],
-  prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}",
-  rebaseWhen: "behind-base-branch",
   customManagers: [
     {
       customType: "regex",
@@ -68,4 +38,29 @@
       ],
     },
   ],
+  // Keep the extends started with ":" at the end of the list to allow overriding
+  extends: [
+    "config:recommended",
+    "docker:pinDigests",
+    "helpers:pinGitHubActionDigestsToSemver",
+    "security:openssf-scorecard",
+    ":disableDependencyDashboard",
+    ":disableRateLimiting",
+    ":docker",
+    ":enableVulnerabilityAlertsWithLabel(security)",
+    ":pinSkipCi",
+  ],
+  packageRules: [
+    {
+      automerge: true,
+      commitBody: "[skip ci]",
+      description: "Automerge all without running any tests",
+      ignoreTests: true,
+      matchPackagePatterns: ["*"],
+    },
+  ],
+  prConcurrentLimit: 500,
+  prHourlyLimit: 500,
+  prCommitsPerRunLimit: 500,
+  branchConcurrentLimit: 500,
 }
