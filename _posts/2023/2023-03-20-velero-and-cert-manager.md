@@ -292,7 +292,7 @@ eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=velero --name
 Install `velero`
 [helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
 and modify the
-[default values](https://github.com/vmware-tanzu/helm-charts/blob/main/charts/velero/values.yaml).
+[default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-7.2.1/charts/velero/values.yaml).
 
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
 

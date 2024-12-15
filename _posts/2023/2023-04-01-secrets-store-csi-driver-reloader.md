@@ -128,7 +128,7 @@ _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret_
 Install `secrets-store-csi-driver`
 [helm chart](https://github.com/kubernetes-sigs/secrets-store-csi-driver/tree/main/charts/secrets-store-csi-driver)
 and modify the
-[default values](https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/main/charts/secrets-store-csi-driver/values.yaml).
+[default values](https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/v1.4.1/charts/secrets-store-csi-driver/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=secrets-store-csi-driver registryUrl=https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
@@ -448,7 +448,7 @@ it automatically.
 ![Reloader](https://raw.githubusercontent.com/stakater/Reloader/b73f14aef9d0ff24b91e4682223ecce485b8d21c/assets/web/reloader-round-100px.png)
 
 Install `reloader`
-[helm chart](https://github.com/stakater/Reloader/blob/master/deployments/kubernetes/chart/reloader/values.yaml).
+[helm chart](https://github.com/stakater/Reloader/blob/v1.0.69/deployments/kubernetes/chart/reloader/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts

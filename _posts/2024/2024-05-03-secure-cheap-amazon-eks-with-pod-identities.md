@@ -56,6 +56,19 @@ Amazon EKS should meet the following security requirements:
 
 ### Requirements
 
+You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+and other secrets/variables.
+
+```shell
+# AWS Credentials
+export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
+export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export AWS_SESSION_TOKEN="xxxxxxxx"
+export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
+export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
+export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
+```
+
 If you would like to follow this documents and it's task you will need to set up
 few environment variables like:
 
@@ -76,19 +89,6 @@ export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 export AWS_PARTITION="aws"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-```
-
-You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
-and other secrets/variables.
-
-```shell
-# AWS Credentials
-export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
-export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export AWS_SESSION_TOKEN="xxxxxxxx"
-export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
-export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
-export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```
 
 Confirm whether all essential variables have been properly configured:
@@ -707,7 +707,7 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
 fi
 
 # shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --query 'Stacks[0].Outputs[? OutputKey==`KMSKeyArn` || OutputKey==`KMSKeyId` ||  OutputKey==`KarpenterNodeRoleArn` || OutputKey==`KarpenterNodeInstanceProfileName` || OutputKey==`KarpenterControllerPolicyArn`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --query 'Stacks[0].Outputs[? OutputKey==`KMSKeyArn` || OutputKey==`KMSKeyId` || OutputKey==`KarpenterNodeRoleArn` || OutputKey==`KarpenterNodeInstanceProfileName` || OutputKey==`KarpenterControllerPolicyArn`].{OutputKey:OutputKey,OutputValue:OutputValue}')
 AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 AWS_KARPENTER_NODE_ROLE_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KarpenterNodeRoleArn\") .OutputValue")
@@ -737,7 +737,6 @@ cluster.
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
----
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -977,7 +976,7 @@ Mailpit will be used to receive email alerts from the Prometheus.
 Install `mailpit`
 [helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
 and modify the
-[default values](https://github.com/jouve/charts/blob/mailpit-0.17.1/charts/mailpit/values.yaml).
+[default values](https://github.com/jouve/charts/blob/mailpit-0.17.4/charts/mailpit/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
@@ -1022,7 +1021,7 @@ the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-oper
 Install `kube-prometheus-stack`
 [helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 and modify the
-[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-58.4.0/charts/kube-prometheus-stack/values.yaml):
+[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-56.6.2/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -1417,7 +1416,7 @@ of obtaining, renewing and using those certificates.
 Install `cert-manager`
 [helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 and modify the
-[default values](https://github.com/cert-manager/cert-manager/blob/v1.14.5/deploy/charts/cert-manager/values.yaml).
+[default values](https://github.com/cert-manager/cert-manager/blob/v1.15.0/deploy/charts/cert-manager/values.yaml).
 Service account `cert-manager` was created by `eksctl`.
 
 ```bash
