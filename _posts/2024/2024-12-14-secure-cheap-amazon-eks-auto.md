@@ -400,7 +400,7 @@ cloudWatch:
     enableTypes:
       - all
 EOF
-eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
+eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}" || eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
 To use network policies with EKS Auto Mode, you first need to enable the Network
@@ -460,8 +460,8 @@ spec:
       requirements:
         - key: eks.amazonaws.com/instance-category
           operator: In
-          # values: ["t"]
-          values: ["c", "m"]
+          values: ["t"]
+          # values: ["c", "m"]
         - key: karpenter.sh/capacity-type
           operator: In
           values: ["spot", "on-demand"]
@@ -657,11 +657,6 @@ grafana:
         # renovate: depName="Prometheus 2.0 Overview"
         gnetId: 3662
         revision: 2
-        datasource: Prometheus
-      9852-stians-disk-graphs:
-        # renovate: depName="node-exporter disk graphs"
-        gnetId: 9852
-        revision: 1
         datasource: Prometheus
       12006-kubernetes-apiserver:
         # renovate: depName="Kubernetes apiserver"
@@ -999,7 +994,7 @@ controller:
     annotations:
       # https://www.qovery.com/blog/our-migration-from-kubernetes-built-in-nlb-to-alb-controller/
       # https://www.youtube.com/watch?v=xwiRjimKW9c
-      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "${TAGS}"
+      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
       # service.beta.kubernetes.io/aws-load-balancer-alpn-policy: HTTP2Preferred
       service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
       service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
@@ -1109,15 +1104,6 @@ if eksctl get cluster --name="${CLUSTER_NAME}"; then
 fi
 ```
 
-Remove Volumes and Snapshots related to the cluster (just in case):
-
-```sh
-for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
-  echo "*** Removing Volume: ${VOLUME}"
-  aws ec2 delete-volume --volume-id "${VOLUME}"
-done
-```
-
 Remove Route 53 DNS records from DNS Zone:
 
 ```sh
@@ -1139,6 +1125,15 @@ Remove CloudFormation stack:
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
 aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-route53-kms"
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
+```
+
+Remove Volumes and Snapshots related to the cluster (just in case):
+
+```sh
+for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
+  echo "*** Removing Volume: ${VOLUME}"
+  aws ec2 delete-volume --volume-id "${VOLUME}"
+done
 ```
 
 Remove CloudWatch log group:
