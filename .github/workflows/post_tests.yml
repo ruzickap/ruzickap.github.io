@@ -7,7 +7,7 @@ on:
       posts:
         type: choice
         description: Select post
-        default: 2024-05-03-secure-cheap-amazon-eks-with-pod-identities
+        default: 2024-12-14-secure-cheap-amazon-eks-auto
         options:
           - 2022-11-27-cheapest-amazon-eks
           - 2022-12-24-amazon-eks-karpenter-tests 2022-11-27-cheapest-amazon-eks
@@ -38,7 +38,8 @@ env:
   AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-  CLUSTER_FQDN: "k01.k8s.mylabs.dev"
+  CLUSTER_FQDN: k01.k8s.mylabs.dev
+  CLUSTER_NAME: k01
   TAGS: "product_id='12345',used_for=dev,owner=petr.ruzicka@gmail.com,cluster=k01.k8s.mylabs.dev"
 
 permissions: read-all
@@ -74,7 +75,7 @@ jobs:
         run: |
           set -euxo pipefail
 
-          export TMP_DIR="${PWD}/mytmp"
+          export TMP_DIR="${PWD}"
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 
           POST_FILES_ARRAY=()
@@ -86,7 +87,15 @@ jobs:
           if grep -Eq '(^| )eksctl ' "${POST_FILES_ARRAY[@]}" && ! command -v eksctl &> /dev/null ; then
             echo "*** Installing eksctl"
             brew install eksctl
-            eksctl version
+            (
+              echo "<https://${CLUSTER_FQDN}>"
+              echo '```'
+              # shellcheck disable=SC2028
+              echo "eval \"\$(aws sts assume-role --role-arn \"\${AWS_ROLE_TO_ASSUME}\" --role-session-name \"\$USER@\$(hostname -f)-k8s-\$(date +%s)\" --duration-seconds 36000 | jq -r '.Credentials | \"export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\\nexport AWS_SESSION_TOKEN=\(.SessionToken)\\n\"')\""
+              echo "export KUBECONFIG=\"/tmp/kubeconfig-${CLUSTER_NAME}.conf\""
+              echo "aws eks update-kubeconfig --region \"${AWS_DEFAULT_REGION}\" --name \"${CLUSTER_NAME}\" --kubeconfig \"\$KUBECONFIG\""
+              echo '```'
+            ) | tee -a "${GITHUB_STEP_SUMMARY}"
           fi
 
           if grep -Eq '(^| )copilot ' "${POST_FILES_ARRAY[@]}" && ! command -v copilot &> /dev/null ; then
@@ -115,25 +124,11 @@ jobs:
               echo "*** ${POST_FILES_ARRAY[idx]} | build"
               # shellcheck disable=SC1090
               source <(echo "set -euxo pipefail" ; sed -n "/^\s*\`\`\`bash$/,/^\s*\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed 's/^\s*```*//')
-              if [[ "${POST_FILES_ARRAY[*]}" =~ eks && ${idx} -eq ${#POST_FILES_ARRAY[@]}-1 ]]; then
-                (
-                  echo "<https://${CLUSTER_FQDN}>"
-                  echo '```'
-                  # shellcheck disable=SC2028
-                  echo "eval \"\$(aws sts assume-role --role-arn \"\${AWS_ROLE_TO_ASSUME}\" --role-session-name \"\$USER@\$(hostname -f)-k8s-\$(date +%s)\" --duration-seconds 36000 | jq -r '.Credentials | \"export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\\nexport AWS_SESSION_TOKEN=\(.SessionToken)\\n\"')\""
-                  echo "export KUBECONFIG=\"/tmp/kubeconfig-${CLUSTER_NAME}.conf\""
-                  echo "aws eks update-kubeconfig --region \"${AWS_DEFAULT_REGION}\" --name \"${CLUSTER_NAME}\" --kubeconfig \"\$KUBECONFIG\""
-                  echo '```'
-                ) | tee -a "${GITHUB_STEP_SUMMARY}"
-              fi
             done
           fi
 
           if [[ "${GH_ACTION}" =~ 'destroy' ]]; then
             echo -e "********************\n*** Destroy\n********************"
-            export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
-            export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-            export TMP_DIR="${TMP_DIR:-${PWD}}"
             if eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
               export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
               aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
