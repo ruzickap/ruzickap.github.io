@@ -400,7 +400,7 @@ cloudWatch:
     enableTypes:
       - all
 EOF
-eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
+eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}" || eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
 To use network policies with EKS Auto Mode, you first need to enable the Network
@@ -460,17 +460,16 @@ spec:
       requirements:
         - key: eks.amazonaws.com/instance-category
           operator: In
-          # values: ["t"]
-          values: ["c", "m"]
+          values: ["t"]
         - key: karpenter.sh/capacity-type
           operator: In
-          values: ["spot", "on-demand"]
+          values: ["spot"]
         - key: topology.kubernetes.io/zone
           operator: In
           values: ["${AWS_REGION}a"]
         - key: kubernetes.io/arch
           operator: In
-          values: ["arm64", "amd64"]
+          values: ["arm64"]
         - key: kubernetes.io/os
           operator: In
           values: ["linux"]
@@ -519,6 +518,7 @@ helm repo add jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
 ingress:
   enabled: true
+  ingressClassName: nginx
   annotations:
     gethomepage.dev/enabled: "true"
     gethomepage.dev/description: An email and SMTP testing tool with API for developers
@@ -589,6 +589,7 @@ alertmanager:
             require_tls: false
   ingress:
     enabled: true
+    ingressClassName: nginx
     annotations:
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: The Alertmanager handles alerts sent by client applications such as the Prometheus server
@@ -611,6 +612,7 @@ grafana:
   defaultDashboardsEnabled: false
   ingress:
     enabled: true
+    ingressClassName: nginx
     annotations:
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: The open and composable observability and data visualization platform
@@ -633,7 +635,7 @@ grafana:
           - grafana.${CLUSTER_FQDN}
   sidecar:
     datasources:
-      url: http://kube-prometheus-stack-prometheus.kube-prometheus-stack:9090/
+      url: http://kube-prometheus-stack-prometheus.kube-prometheus-stack:9090
   dashboardProviders:
     dashboardproviders.yaml:
       apiVersion: 1
@@ -657,11 +659,6 @@ grafana:
         # renovate: depName="Prometheus 2.0 Overview"
         gnetId: 3662
         revision: 2
-        datasource: Prometheus
-      9852-stians-disk-graphs:
-        # renovate: depName="node-exporter disk graphs"
-        gnetId: 9852
-        revision: 1
         datasource: Prometheus
       12006-kubernetes-apiserver:
         # renovate: depName="Kubernetes apiserver"
@@ -773,14 +770,37 @@ kubeProxy:
 kube-state-metrics:
   selfMonitor:
     enabled: true
+# https://github.com/prometheus-community/helm-charts/issues/3613
+prometheus-node-exporter:
+  prometheus:
+    monitor:
+      attachMetadata:
+        node: true
+      relabelings:
+      - sourceLabels:
+        - __meta_kubernetes_endpoint_node_name
+        targetLabel: node
+        action: replace
+        regex: (.+)
+        replacement: \${1}
 prometheusOperator:
   networkPolicy:
     enabled: true
 prometheus:
   networkPolicy:
     enabled: true
+    ingress:
+      - from:
+        - namespaceSelector:
+            matchLabels:
+              app.kubernetes.io/name: prometheus-adapter
+              kubernetes.io/metadata.name: prometheus-adapter
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: prometheus-adapter
   ingress:
     enabled: true
+    ingressClassName: nginx
     annotations:
       gethomepage.dev/enabled: "true"
       gethomepage.dev/description: Prometheus is a systems and service monitoring system
@@ -908,29 +928,69 @@ spec:
 EOF
 ```
 
-### Metrics Server
+### Prometheus Adapter
 
-[Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is
-a scalable, efficient source of container resource metrics for Kubernetes
-built-in autoscaling pipelines.
+[Prometheus Adapter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-adapter)
+is an implementation of the custom.metrics.k8s.io API using Prometheus. I'm
+using it as [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
+replacement as descibed [here](https://github.com/prometheus-community/helm-charts/issues/3613).
 
-Install `metrics-server`
-[helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
+Install `prometheus-adapter`
+[helm chart](https://artifacthub.io/packages/helm/prometheus-community/prometheus-adapter)
 and modify the
-[default values](https://github.com/kubernetes-sigs/metrics-server/blob/metrics-server-helm-chart-3.12.2/charts/metrics-server/values.yaml):
+[default values](https://github.com/prometheus-community/helm-charts/blob/prometheus-adapter-4.11.0/charts/prometheus-adapter/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
-METRICS_SERVER_HELM_CHART_VERSION="3.12.2"
+# renovate: datasource=helm depName=prometheus-adapter registryUrl=https://prometheus-community.github.io/helm-charts
+PROMETHEUS_ADAPTER_HELM_CHART_VERSION="4.11.0"
 
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
-metrics:
-  enabled: true
-serviceMonitor:
-  enabled: true
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-prometheus-adapter.yml" << \EOF
+prometheus:
+  url: http://kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local
+rules:
+  resource:
+    cpu:
+      containerQuery: |
+        sum by (<<.GroupBy>>) (
+          rate(container_cpu_usage_seconds_total{container!="",<<.LabelMatchers>>}[3m])
+        )
+      nodeQuery: |
+        sum  by (<<.GroupBy>>) (
+          rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal",<<.LabelMatchers>>}[3m])
+        )
+      resources:
+        overrides:
+          node:
+            resource: node
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      containerLabel: container
+    memory:
+      containerQuery: |
+        sum by (<<.GroupBy>>) (
+          avg_over_time(container_memory_working_set_bytes{container!="",<<.LabelMatchers>>}[3m])
+        )
+      nodeQuery: |
+        sum by (<<.GroupBy>>) (
+          avg_over_time(node_memory_MemTotal_bytes{<<.LabelMatchers>>}[3m])
+          -
+          avg_over_time(node_memory_MemAvailable_bytes{<<.LabelMatchers>>}[3m])
+        )
+      resources:
+        overrides:
+          node:
+            resource: node
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      containerLabel: container
+    window: 3m
 EOF
-helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
+helm upgrade --install --version "${PROMETHEUS_ADAPTER_HELM_CHART_VERSION}" --namespace prometheus-adapter --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-prometheus-adapter.yml" prometheus-adapter prometheus-community/prometheus-adapter
 ```
 
 ### ExternalDNS
@@ -999,7 +1059,7 @@ controller:
     annotations:
       # https://www.qovery.com/blog/our-migration-from-kubernetes-built-in-nlb-to-alb-controller/
       # https://www.youtube.com/watch?v=xwiRjimKW9c
-      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "${TAGS}"
+      service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
       # service.beta.kubernetes.io/aws-load-balancer-alpn-policy: HTTP2Preferred
       service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
       service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
@@ -1049,8 +1109,6 @@ EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
 ```
 
----
-
 ### OAuth2 Proxy
 
 Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
@@ -1085,6 +1143,7 @@ authenticatedEmailsFile:
     ${MY_EMAIL}
 ingress:
   enabled: true
+  ingressClassName: nginx
   hosts:
     - oauth2-proxy.${CLUSTER_FQDN}
   tls:
@@ -1109,15 +1168,6 @@ if eksctl get cluster --name="${CLUSTER_NAME}"; then
 fi
 ```
 
-Remove Volumes and Snapshots related to the cluster (just in case):
-
-```sh
-for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
-  echo "*** Removing Volume: ${VOLUME}"
-  aws ec2 delete-volume --volume-id "${VOLUME}"
-done
-```
-
 Remove Route 53 DNS records from DNS Zone:
 
 ```sh
@@ -1139,6 +1189,15 @@ Remove CloudFormation stack:
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
 aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-route53-kms"
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
+```
+
+Remove Volumes and Snapshots related to the cluster (just in case):
+
+```sh
+for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
+  echo "*** Removing Volume: ${VOLUME}"
+  aws ec2 delete-volume --volume-id "${VOLUME}"
+done
 ```
 
 Remove CloudWatch log group:
