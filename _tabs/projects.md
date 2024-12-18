@@ -657,6 +657,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - Dependabot Updates](https://github.com/awsugcz/awsug.cz/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/dependabot/dependabot-updates)
   [![GitHub Actions status - hugo-build](https://github.com/awsugcz/awsug.cz/workflows/hugo-build/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/hugo-build.yml)
   [![GitHub Actions status - markdown](https://github.com/awsugcz/awsug.cz/workflows/markdown/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/markdown.yml)
   [![GitHub Actions status - periodic-broken-link-checks](https://github.com/awsugcz/awsug.cz/workflows/periodic-broken-link-checks/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/periodic-broken-link-checks.yml)
