@@ -45,8 +45,6 @@ Amazon EKS Auto Mode should meet the following security requirements:
 - Worker node [EBS volumes needs to be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
 - Cluster logging ([CloudWatch](https://aws.amazon.com/cloudwatch/)) needs to be
   configured
-- [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-  should be enabled wherever they are supported
 
 ## Build Amazon EKS Auto Mode
 
@@ -403,20 +401,10 @@ EOF
 eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}" || eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
-To use network policies with EKS Auto Mode, you first need to enable the Network
-Policy Controller by applying a ConfigMap to your cluster:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-configmap-amazon-vpc-cni.yml" << EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: amazon-vpc-cni
-  namespace: kube-system
-data:
-  enable-network-policy-controller: "true"
-EOF
-```
+I was not able to make the NetworkPolicy working with `kube-prometheus-stack`
+properly in the EKS Auto Mode. Prometheus is getting the
+`dial tcp 10.100.0.1:443: i/o timeout` error and is not able to get the metric
+data - therefore I will keep the NetworkPolicy turned off.
 
 Create a [Node Class](https://docs.aws.amazon.com/eks/latest/userguide/create-node-class.html)
 for Amazon EKS which  defines infrastructure-level settings that apply to groups
@@ -431,12 +419,10 @@ metadata:
   name: my-default
 spec:
 $(kubectl get nodeclasses default -o yaml | yq '.spec | pick(["role", "securityGroupSelectorTerms", "subnetSelectorTerms"])' | sed 's/\(.*\)/  \1/')
-  networkPolicyEventLogs: Enabled
   ephemeralStorage:
     size: 20Gi
-  # Tags are not working due to bug: https://github.com/aws/containers-roadmap/issues/2487
-  # tags:
-  #   Name: ${CLUSTER_NAME}
+  tags:
+    Name: ${CLUSTER_NAME}
 EOF
 ```
 
@@ -560,7 +546,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="66.7.1"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="67.4.0"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
@@ -685,7 +671,7 @@ grafana:
       15760-kubernetes-views-pods:
         # renovate: depName="Kubernetes / Views / Pods"
         gnetId: 15760
-        revision: 28
+        revision: 34
         datasource: Prometheus
       15757-kubernetes-views-global:
         # renovate: depName="Kubernetes / Views / Global"
@@ -715,7 +701,7 @@ grafana:
       19105-prometheus:
         # renovate: depName="Prometheus"
         gnetId: 19105
-        revision: 3
+        revision: 6
         datasource: Prometheus
       16237-cluster-capacity:
         # renovate: depName="Cluster Capacity (Karpenter)"
@@ -754,8 +740,6 @@ grafana:
     enabled: true
     host: mailpit-smtp.mailpit.svc.cluster.local:25
     from_address: grafana@${CLUSTER_FQDN}
-  networkPolicy:
-    enabled: true
 # EKS this is not available https://github.com/aws/containers-roadmap/issues/1298
 kubeControllerManager:
   enabled: false
@@ -783,21 +767,6 @@ prometheus-node-exporter:
         action: replace
         regex: (.+)
         replacement: \${1}
-prometheusOperator:
-  networkPolicy:
-    enabled: true
-prometheus:
-  networkPolicy:
-    enabled: true
-    ingress:
-      - from:
-        - namespaceSelector:
-            matchLabels:
-              app.kubernetes.io/name: prometheus-adapter
-              kubernetes.io/metadata.name: prometheus-adapter
-        - podSelector:
-            matchLabels:
-              app.kubernetes.io/instance: prometheus-adapter
   ingress:
     enabled: true
     ingressClassName: nginx
@@ -866,9 +835,6 @@ serviceAccount:
 enableCertificateOwnerRef: true
 prometheus:
   servicemonitor:
-    enabled: true
-webhook:
-  networkPolicy:
     enabled: true
 EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
@@ -1046,15 +1012,10 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   allowSnippetAnnotations: true
-  networkPolicy:
-    enabled: true
   ingressClassResource:
     default: true
   extraArgs:
     default-ssl-certificate: "cert-manager/ingress-cert-staging"
-  admissionWebhooks:
-    networkPolicy:
-      enabled: true
   service:
     annotations:
       # https://www.qovery.com/blog/our-migration-from-kubernetes-built-in-nlb-to-alb-controller/
