@@ -551,6 +551,8 @@ List of my GitHub projects:
 
 - Description: Container image with malware and crypto miner for testing
   purposes
+- Website:
+  <https://artifacthub.io/packages/container/malware-cryptominer-container/malware-cryptominer-container>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/blob/main/LICENSE)
