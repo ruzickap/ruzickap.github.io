@@ -14,11 +14,9 @@ tags:
     eksctl,
     cert-manager,
     external-dns,
-    podinfo,
     prometheus,
     sso,
     oauth2-proxy,
-    metrics-server,
   ]
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
@@ -421,8 +419,9 @@ spec:
 $(kubectl get nodeclasses default -o yaml | yq '.spec | pick(["role", "securityGroupSelectorTerms", "subnetSelectorTerms"])' | sed 's/\(.*\)/  \1/')
   ephemeralStorage:
     size: 20Gi
-  tags:
-    Name: ${CLUSTER_NAME}
+  # https://github.com/eksctl-io/eksctl/issues/8136
+  # tags:
+  #   Name: ${CLUSTER_NAME}
 EOF
 ```
 
@@ -508,11 +507,9 @@ ingress:
   annotations:
     gethomepage.dev/enabled: "true"
     gethomepage.dev/description: An email and SMTP testing tool with API for developers
-    gethomepage.dev/group: Media
+    gethomepage.dev/group: Apps
     gethomepage.dev/icon: https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg
     gethomepage.dev/name: Mailpit
-    gethomepage.dev/widget.type: mailpit
-    gethomepage.dev/widget.url: https://mailpit.${CLUSTER_FQDN}
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
   hostname: mailpit.${CLUSTER_FQDN}
@@ -578,12 +575,10 @@ alertmanager:
     ingressClassName: nginx
     annotations:
       gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: The Alertmanager handles alerts sent by client applications such as the Prometheus server
-      gethomepage.dev/group: Media
+      gethomepage.dev/description: Alert Routing System
+      gethomepage.dev/group: Observability
       gethomepage.dev/icon: alertmanager.svg
       gethomepage.dev/name: Alert Manager
-      gethomepage.dev/widget.type: alertmanager
-      gethomepage.dev/widget.url: https://alertmanager.${CLUSTER_FQDN}
       nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
       nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
     hosts:
@@ -600,13 +595,12 @@ grafana:
     enabled: true
     ingressClassName: nginx
     annotations:
+      gethomepage.dev/description: Visualization Platform
       gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: The open and composable observability and data visualization platform
-      gethomepage.dev/group: Media
+      gethomepage.dev/group: Observability
       gethomepage.dev/icon: grafana.svg
       gethomepage.dev/name: Grafana
-      gethomepage.dev/widget.type: grafana
-      gethomepage.dev/widget.url: https://grafana.${CLUSTER_FQDN}
+      gethomepage.dev/siteMonitor: http://grafana-service.grafana.svc:3000/api/health
       nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
       nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
       nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -772,12 +766,10 @@ prometheus-node-exporter:
     ingressClassName: nginx
     annotations:
       gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: Prometheus is a systems and service monitoring system
-      gethomepage.dev/group: Media
+      gethomepage.dev/description: Monitoring System & TSDB
+      gethomepage.dev/group: Observability
       gethomepage.dev/icon: prometheus.svg
       gethomepage.dev/name: Prometheus
-      gethomepage.dev/widget.type: prometheus
-      gethomepage.dev/widget.url: https://prometheus.${CLUSTER_FQDN}
       nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
       nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
     paths: ["/"]
@@ -1084,7 +1076,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="7.8.2"
+OAUTH2_PROXY_HELM_CHART_VERSION="7.9.2"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
@@ -1105,6 +1097,12 @@ authenticatedEmailsFile:
 ingress:
   enabled: true
   ingressClassName: nginx
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: A reverse proxy that provides authentication with Google, Azure, OpenID Connect and many more identity providers
+    gethomepage.dev/group: Cluster Management
+    gethomepage.dev/icon: https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_icon.svg
+    gethomepage.dev/name: OAuth2-Proxy
   hosts:
     - oauth2-proxy.${CLUSTER_FQDN}
   tls:
@@ -1115,6 +1113,86 @@ metrics:
     enabled: true
 EOF
 helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" oauth2-proxy oauth2-proxy/oauth2-proxy
+```
+
+### Homepage
+
+Install [homepage](https://gethomepage.dev/) to have a nice dashboard.
+
+Install `homepage`
+[helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.0.1/charts/homepage)
+and modify the
+[default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.0.1/charts/homepage/values.yaml).
+
+```bash
+# renovate: datasource=helm depName=homepage registryUrl=http://jameswynn.github.io/helm-charts
+HOMEPAGE_HELM_CHART_VERSION="2.0.1"
+
+helm repo add jameswynn http://jameswynn.github.io/helm-charts
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" << EOF
+enableRbac: true
+serviceAccount:
+  create: true
+ingress:
+  main:
+    enabled: true
+    labels:
+      gethomepage.dev/enabled: "true"
+    annotations:
+      gethomepage.dev/name: Homepage
+      gethomepage.dev/description: A modern, secure, highly customizable application dashboard
+      gethomepage.dev/group: Apps
+      gethomepage.dev/icon: homepage.svg
+      # nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+      # nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+    ingressClassName: "nginx"
+    hosts:
+      - host: ${CLUSTER_FQDN}
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - ${CLUSTER_FQDN}
+config:
+  bookmarks:
+  services:
+  widgets:
+    - resources:
+      # change backend to 'kubernetes' to use Kubernetes integration. Requires RBAC.
+      backend: resources
+      expanded: true
+      cpu: true
+      memory: true
+    - logo:
+      icon: kubernetes.svg
+    - kubernetes:
+      cluster:
+        show: true
+        cpu: true
+        memory: true
+        showLabel: true
+        label: ${CLUSTER_NAME}
+      nodes:
+        show: true
+        cpu: true
+        memory: true
+        showLabel: true
+  kubernetes:
+    mode: cluster
+  settings:
+    hideVersion: true
+    title: ${CLUSTER_FQDN}
+    favicon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/38631ad11695467d7a9e432d5fdec7a39a31e75f/svg/kubernetes.svg
+    layout:
+      Apps:
+        icon: mdi-apps
+      Observability:
+        icon: mdi-chart-bell-curve-cumulative
+      Cluster Management:
+        icon: mdi-tools
+EOF
+helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace homepage --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" homepage jameswynn/homepage
 ```
 
 ## Clean-up
