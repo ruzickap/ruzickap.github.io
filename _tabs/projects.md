@@ -551,6 +551,8 @@ List of my GitHub projects:
 
 - Description: Container image with malware and crypto miner for testing
   purposes
+- Website:
+  <https://artifacthub.io/packages/container/malware-cryptominer-container/malware-cryptominer-container>
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/blob/main/LICENSE)
@@ -562,7 +564,9 @@ List of my GitHub projects:
 
   [![GitHub Actions status - container-build](https://github.com/ruzickap/malware-cryptominer-container/workflows/container-build/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/container-build.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/malware-cryptominer-container/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/malware-cryptominer-container/workflows/release-please/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/malware-cryptominer-container/workflows/renovate/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/malware-cryptominer-container/workflows/scorecards/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/malware-cryptominer-container/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/malware-cryptominer-container/workflows/stale/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/stale.yml)
 
