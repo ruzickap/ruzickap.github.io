@@ -14,11 +14,9 @@ tags:
     eksctl,
     cert-manager,
     external-dns,
-    podinfo,
     prometheus,
     sso,
     oauth2-proxy,
-    metrics-server,
   ]
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
@@ -421,8 +419,9 @@ spec:
 $(kubectl get nodeclasses default -o yaml | yq '.spec | pick(["role", "securityGroupSelectorTerms", "subnetSelectorTerms"])' | sed 's/\(.*\)/  \1/')
   ephemeralStorage:
     size: 20Gi
-  tags:
-    Name: ${CLUSTER_NAME}
+  # https://github.com/eksctl-io/eksctl/issues/8136
+  # tags:
+  #   Name: ${CLUSTER_NAME}
 EOF
 ```
 
@@ -1084,7 +1083,7 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="7.8.2"
+OAUTH2_PROXY_HELM_CHART_VERSION="7.9.2"
 
 helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
@@ -1115,6 +1114,44 @@ metrics:
     enabled: true
 EOF
 helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespace oauth2-proxy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" oauth2-proxy oauth2-proxy/oauth2-proxy
+```
+
+### Homepage
+
+Install [homepage](https://gethomepage.dev/) to have a nice dashboard.
+
+Install `homepage`
+[helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.0.1/charts/homepage)
+and modify the
+[default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.0.1/charts/homepage/values.yaml).
+
+```bash
+# renovate: datasource=helm depName=homepage registryUrl=http://jameswynn.github.io/helm-charts
+HOMEPAGE_HELM_CHART_VERSION="2.0.1"
+
+helm repo add jameswynn http://jameswynn.github.io/helm-charts
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" << EOF
+ingress:
+  main:
+    enabled: true
+    labels:
+      gethomepage.dev/enabled: "true"
+    annotations:
+      gethomepage.dev/name: "Homepage"
+      gethomepage.dev/description: "A modern, secure, highly customizable application dashboard."
+      gethomepage.dev/group: "A New Group"
+      gethomepage.dev/icon: "homepage.png"
+    ingressClassName: "nginx"
+    hosts:
+      - host: ${CLUSTER_FQDN}
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts:
+          - ${CLUSTER_FQDN}
+EOF
+helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace homepage --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" homepage jameswynn/homepage
 ```
 
 ## Clean-up
