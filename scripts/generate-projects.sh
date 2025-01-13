@@ -3,39 +3,30 @@
 set -euo pipefail
 
 DESTINATION_FILE="${1:-projects.md}"
-TMP_FILE="/tmp/generate_projects_md.json"
 
 GITHUB_REPOSITORIES_DESCRIPTIONS=(
+  "awsugcz/awsug.cz|Prague AWS User Group Web Pages"
   "ruzickap/action-my-broken-link-checker|GitHub Actions: My Broken Link Checker ✔"
   "ruzickap/action-my-markdown-link-checker|GitHub Actions: My Markdown Link Checker ✔"
   "ruzickap/action-my-markdown-linter|GitHub Actions: My Markdown Linter ✔"
-  "ruzickap/packer-templates|Packer templates"
-  "ruzickap/packer-virt-sysprep|Packer-Virt-Sysprep"
-  "ruzickap/container-build|container-build"
-  "ruzickap/darktable_video_tutorials_list|Darktable Video Tutorials with screenshots"
-  "ruzickap/test_usb_stick_for_tv|USB Stick for TV testing"
+  "ruzickap/ansible-my_workstation|Ansible - My Workstation"
+  "ruzickap/ansible-openwrt|Ansible - OpenWRT"
+  "ruzickap/ansible-raspberry-pi-os|Ansible - Raspberry Pi OS"
   "ruzickap/ansible-role-my_common_defaults|Ansible role my_common_defaults"
   "ruzickap/ansible-role-proxy_settings|Ansible role proxy_settings"
   "ruzickap/ansible-role-virtio-win|Ansible role virtio-win"
   "ruzickap/ansible-role-vmwaretools|Ansible role vmwaretools"
-  "ruzickap/ansible-my_workstation|Ansible - My Workstation"
-  "ruzickap/ansible-openwrt|Ansible - OpenWRT"
-  "ruzickap/ansible-raspberry-pi-os|Ansible - Raspberry Pi OS"
-  "ruzickap/popular-containers-vulnerability-checks|popular-containers-vulnerability-checks"
-  "ruzickap/malware-cryptominer-container|malware-cryptominer-container"
-  "ruzickap/raw-photo-tools-container|raw-photo-tools-container"
-  "ruzickap/myteam-adr|myteam-adr"
-  "awsugcz/awsug.cz|Prague AWS User Group Web Pages"
-  "ruzickap/ruzickap.github.io|ruzickap.github.io"
-  "ruzickap/petr.ruzicka.dev|petr.ruzicka.dev"
-  "ruzickap/xvx.cz|xvx.cz"
-  "ruzickap/k8s-tf-eks-gitops|k8s-tf-eks-gitops"
-  "ruzickap/k8s-eks-rancher|k8s-eks-rancher"
+  "ruzickap/cheatsheet-atom|Cheatsheet - Atom"
+  "ruzickap/cheatsheet-macos|cheatsheet-macos"
+  "ruzickap/cheatsheet-systemd|Cheatsheet - Systemd"
+  "ruzickap/container-build|container-build"
+  "ruzickap/darktable_video_tutorials_list|Darktable Video Tutorials with screenshots"
   "ruzickap/k8s-eks-bottlerocket-fargate|k8s-eks-bottlerocket-fargate"
+  "ruzickap/k8s-eks-rancher|k8s-eks-rancher"
   "ruzickap/k8s-flagger-istio-flux|k8s-flagger-istio-flux"
   "ruzickap/k8s-flux-istio-gitlab-harbor|k8s-flux-istio-gitlab-harbor"
-  "ruzickap/k8s-harbor|k8s-harbor"
   "ruzickap/k8s-harbor-presentation|k8s-harbor-presentation"
+  "ruzickap/k8s-harbor|k8s-harbor"
   "ruzickap/k8s-istio-demo|k8s-istio-demo"
   "ruzickap/k8s-istio-webinar|k8s-istio-webinar"
   "ruzickap/k8s-istio-workshop|k8s-istio-workshop"
@@ -43,9 +34,17 @@ GITHUB_REPOSITORIES_DESCRIPTIONS=(
   "ruzickap/k8s-knative-gitlab-harbor|k8s-knative-gitlab-harbor"
   "ruzickap/k8s-postgresql|k8s-postgresql"
   "ruzickap/k8s-sockshop|k8s-sockshop"
-  "ruzickap/cheatsheet-macos|cheatsheet-macos"
-  "ruzickap/cheatsheet-atom|Cheatsheet - Atom"
-  "ruzickap/cheatsheet-systemd|Cheatsheet - Systemd"
+  "ruzickap/k8s-tf-eks-gitops|k8s-tf-eks-gitops"
+  "ruzickap/malware-cryptominer-container|malware-cryptominer-container"
+  "ruzickap/myteam-adr|myteam-adr"
+  "ruzickap/packer-templates|Packer templates"
+  "ruzickap/packer-virt-sysprep|Packer-Virt-Sysprep"
+  "ruzickap/petr.ruzicka.dev|petr.ruzicka.dev"
+  "ruzickap/popular-containers-vulnerability-checks|popular-containers-vulnerability-checks"
+  "ruzickap/raw-photo-tools-container|raw-photo-tools-container"
+  "ruzickap/ruzickap.github.io|ruzickap.github.io"
+  "ruzickap/test_usb_stick_for_tv|USB Stick for TV testing"
+  "ruzickap/xvx.cz|xvx.cz"
 )
 
 cat > "${DESTINATION_FILE}" << EOF
@@ -62,11 +61,11 @@ for GITHUB_REPOSITORY_TITLE_TMP in "${GITHUB_REPOSITORIES_DESCRIPTIONS[@]}"; do
   GITHUB_REPOSITORY="${GITHUB_REPOSITORY_TITLE_TMP%|*}"
   echo "*** ${GITHUB_REPOSITORY}"
   GITHUB_REPOSITORY_TITLE="${GITHUB_REPOSITORY_TITLE_TMP##*|}"
-  curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY}" > "${TMP_FILE}"
-  GITHUB_REPOSITORY_DESCRIPTION=$(jq -r '.description' "${TMP_FILE}")
-  GITHUB_REPOSITORY_HTML_URL=$(jq -r '.html_url' "${TMP_FILE}")
-  GITHUB_REPOSITORY_HOMEPAGE=$(jq -r '.homepage' "${TMP_FILE}")
-  GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.default_branch' "${TMP_FILE}")
+  GITHUB_REPOSITORY_JSON=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY}")
+  GITHUB_REPOSITORY_DESCRIPTION=$(jq -r '.description' <<< "${GITHUB_REPOSITORY_JSON}")
+  GITHUB_REPOSITORY_HTML_URL=$(jq -r '.html_url' <<< "${GITHUB_REPOSITORY_JSON}")
+  GITHUB_REPOSITORY_HOMEPAGE=$(jq -r '.homepage' <<< "${GITHUB_REPOSITORY_JSON}")
+  GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.default_branch' <<< "${GITHUB_REPOSITORY_JSON}")
   # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
   GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGE}" ]]; then echo -e "\n- Website: <${GITHUB_REPOSITORY_HOMEPAGE}>"; fi)
