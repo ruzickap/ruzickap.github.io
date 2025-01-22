@@ -1061,6 +1061,8 @@ List of my GitHub projects:
 - CI/CD status:
 
   [![GitHub Actions status - container-build](https://github.com/ruzickap/malware-cryptominer-container/workflows/container-build/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/container-build.yml)
+  [![GitHub Actions status - ghcr-cleanup-br](https://github.com/ruzickap/malware-cryptominer-container/workflows/ghcr-cleanup-br/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/ghcr-cleanup-br.yml)
+  [![GitHub Actions status - ghcr-cleanup](https://github.com/ruzickap/malware-cryptominer-container/workflows/ghcr-cleanup/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/ghcr-cleanup.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/malware-cryptominer-container/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/malware-cryptominer-container/workflows/release-please/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/malware-cryptominer-container/workflows/renovate/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/renovate.yml)
