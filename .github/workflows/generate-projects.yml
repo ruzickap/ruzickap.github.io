@@ -31,7 +31,7 @@ jobs:
         with:
           add-paths: _tabs/projects.md
           branch: generate-projects
-          commit-message: "docs(projects): update _tabs/projects.md"
+          commit-message: "docs: update _tabs/projects.md"
           delete-branch: true
           labels: generate-projects
-          title: "docs(projects): update _tabs/projects.md"
+          title: "docs: update _tabs/projects.md"
