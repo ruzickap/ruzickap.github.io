@@ -886,71 +886,6 @@ spec:
 EOF
 ```
 
-### Prometheus Adapter
-
-[Prometheus Adapter](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-adapter)
-is an implementation of the custom.metrics.k8s.io API using Prometheus. I'm
-using it as [metrics-server](https://github.com/kubernetes-sigs/metrics-server)
-replacement as descibed [here](https://github.com/prometheus-community/helm-charts/issues/3613).
-
-Install `prometheus-adapter`
-[helm chart](https://artifacthub.io/packages/helm/prometheus-community/prometheus-adapter)
-and modify the
-[default values](https://github.com/prometheus-community/helm-charts/blob/prometheus-adapter-4.11.0/charts/prometheus-adapter/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=prometheus-adapter registryUrl=https://prometheus-community.github.io/helm-charts
-PROMETHEUS_ADAPTER_HELM_CHART_VERSION="4.11.0"
-
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-prometheus-adapter.yml" << \EOF
-prometheus:
-  url: http://kube-prometheus-stack-prometheus.kube-prometheus-stack.svc.cluster.local
-rules:
-  resource:
-    cpu:
-      containerQuery: |
-        sum by (<<.GroupBy>>) (
-          rate(container_cpu_usage_seconds_total{container!="",<<.LabelMatchers>>}[3m])
-        )
-      nodeQuery: |
-        sum  by (<<.GroupBy>>) (
-          rate(node_cpu_seconds_total{mode!="idle",mode!="iowait",mode!="steal",<<.LabelMatchers>>}[3m])
-        )
-      resources:
-        overrides:
-          node:
-            resource: node
-          namespace:
-            resource: namespace
-          pod:
-            resource: pod
-      containerLabel: container
-    memory:
-      containerQuery: |
-        sum by (<<.GroupBy>>) (
-          avg_over_time(container_memory_working_set_bytes{container!="",<<.LabelMatchers>>}[3m])
-        )
-      nodeQuery: |
-        sum by (<<.GroupBy>>) (
-          avg_over_time(node_memory_MemTotal_bytes{<<.LabelMatchers>>}[3m])
-          -
-          avg_over_time(node_memory_MemAvailable_bytes{<<.LabelMatchers>>}[3m])
-        )
-      resources:
-        overrides:
-          node:
-            resource: node
-          namespace:
-            resource: namespace
-          pod:
-            resource: pod
-      containerLabel: container
-    window: 3m
-EOF
-helm upgrade --install --version "${PROMETHEUS_ADAPTER_HELM_CHART_VERSION}" --namespace prometheus-adapter --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-prometheus-adapter.yml" prometheus-adapter prometheus-community/prometheus-adapter
-```
-
 ### ExternalDNS
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
@@ -1172,12 +1107,18 @@ config:
         cpu: true
         memory: true
         showLabel: true
-        label: ${CLUSTER_NAME}
+        label: "${CLUSTER_NAME}"
       nodes:
         show: true
         cpu: true
         memory: true
         showLabel: true
+    - resources:
+      backend: resources
+      expanded: true
+      cpu: true
+      memory: true
+      network: default
   kubernetes:
     mode: cluster
   settings:
