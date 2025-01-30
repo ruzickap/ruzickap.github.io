@@ -7,10 +7,11 @@ order: 4
 List of my GitHub projects:
 [https://github.com/ruzickap/](https://github.com/ruzickap/)
 
-## [Prague AWS User Group Web Pages](https://github.com/awsugcz/awsug.cz)
+## [awsug.cz](https://github.com/awsugcz/awsug.cz)
 
 - Description: Prague AWS User Group Web Pages
 - Website: <https://awsug.cz>
+- Topics: aws, community, meetup, user-group, aws-user-group
 
 [![GitHub release](https://img.shields.io/github/v/release/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/blob/main/LICENSE)
@@ -40,9 +41,11 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz)
 
-## [GitHub Actions: My Broken Link Checker ✔](https://github.com/ruzickap/action-my-broken-link-checker)
+## [action-my-broken-link-checker](https://github.com/ruzickap/action-my-broken-link-checker)
 
 - Description: A GitHub Action for checking broken links
+- Topics: broken-links, github-actions, github-action, actions, website,
+  checker, links, link-checker, url-checker, link-checking, public, url-checking
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/blob/main/LICENSE)
@@ -76,9 +79,12 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker)
 
-## [GitHub Actions: My Markdown Link Checker ✔](https://github.com/ruzickap/action-my-markdown-link-checker)
+## [action-my-markdown-link-checker](https://github.com/ruzickap/action-my-markdown-link-checker)
 
 - Description: A GitHub Action for checking broken links in Markdown files
+- Topics: broken-links, markdown, github-action, github-actions, actions,
+  website, checker, links, link-checker, link-checking, url-checker, public,
+  url-checking
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/blob/main/LICENSE)
@@ -111,9 +117,11 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker)
 
-## [GitHub Actions: My Markdown Linter ✔](https://github.com/ruzickap/action-my-markdown-linter)
+## [action-my-markdown-linter](https://github.com/ruzickap/action-my-markdown-linter)
 
 - Description: Style checking and linting for Markdown files
+- Topics: markdown, linter, lint, github-actions, github-action, linters,
+  linting, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/blob/main/LICENSE)
@@ -146,10 +154,12 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter)
 
-## [Ansible - My Workstation](https://github.com/ruzickap/ansible-my_workstation)
+## [ansible-my_workstation](https://github.com/ruzickap/ansible-my_workstation)
 
 - Description: Ansible playbooks to configure my workstation base on Fedora /
   macOS
+- Topics: fedora, macos, ansible, configuration, ansible-playbook, public,
+  workstation
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/blob/main/LICENSE)
@@ -180,9 +190,10 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation)
 
-## [Ansible - OpenWRT](https://github.com/ruzickap/ansible-openwrt)
+## [ansible-openwrt](https://github.com/ruzickap/ansible-openwrt)
 
 - Description: Ansible playbooks configuring Openwrt devices (Wi-Fi routers)
+- Topics: ansible, openwrt, wifi, router, ansible-playbook, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/blob/main/LICENSE)
@@ -211,9 +222,11 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt)
 
-## [Ansible - Raspberry Pi OS](https://github.com/ruzickap/ansible-raspberry-pi-os)
+## [ansible-raspberry-pi-os](https://github.com/ruzickap/ansible-raspberry-pi-os)
 
 - Description: Configure Raspberry Pi OS (RPi) using Ansible
+- Topics: rpi, ansible, grafana, prometheus, node-exporter, kodi, public,
+  raspberry-pi, raspberry-pi-os
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/blob/main/LICENSE)
@@ -243,10 +256,11 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os)
 
-## [Ansible role my_common_defaults](https://github.com/ruzickap/ansible-role-my_common_defaults)
+## [ansible-role-my_common_defaults](https://github.com/ruzickap/ansible-role-my_common_defaults)
 
 - Description: My Ansible role which sets some "favorite" defaults on the server
   (CentOS / Ubuntu / Windows)
+- Topics: ansible-role, ubuntu, centos, windows, ansible, debian, public, redhat
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/blob/main/LICENSE)
@@ -277,11 +291,13 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults)
 
-## [Ansible role proxy_settings](https://github.com/ruzickap/ansible-role-proxy_settings)
+## [ansible-role-proxy_settings](https://github.com/ruzickap/ansible-role-proxy_settings)
 
 - Description: Ansible role for configuring proxy settings for Linux based
   systems
 - Website: <https://galaxy.ansible.com/ruzickap/proxy_settings/>
+- Topics: proxy-settings, debian, redhat, ansible, ansible-role, proxy, public,
+  ubuntu
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/blob/main/LICENSE)
@@ -313,10 +329,12 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings)
 
-## [Ansible role virtio-win](https://github.com/ruzickap/ansible-role-virtio-win)
+## [ansible-role-virtio-win](https://github.com/ruzickap/ansible-role-virtio-win)
 
 - Description: Ansible role which installs VirtIO Drivers and SPICE Guest Tools
   for Windows
+- Topics: ansible, spice-guest, virtio, virtio-drivers, ansible-role, public,
+  windows
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/blob/main/LICENSE)
@@ -348,10 +366,12 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win)
 
-## [Ansible role vmwaretools](https://github.com/ruzickap/ansible-role-vmwaretools)
+## [ansible-role-vmwaretools](https://github.com/ruzickap/ansible-role-vmwaretools)
 
 - Description: Ansible role will help you with installing original vmware-tools
   form Vmware or fallback to Open VMware Tools (open-vm-tools)
+- Topics: ansible-role, ansible-playbook, ansible, vmware, vmwaretools, role,
+  public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/blob/main/LICENSE)
@@ -383,9 +403,10 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools)
 
-## [Cheatsheet - Atom](https://github.com/ruzickap/cheatsheet-atom)
+## [cheatsheet-atom](https://github.com/ruzickap/cheatsheet-atom)
 
 - Description: Atom Keyboard Shortcuts Cheatsheet
+- Topics: latex, cheatsheet, atom, public, cheatsheet-atom
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/blob/main/LICENSE)
@@ -418,6 +439,7 @@ List of my GitHub projects:
 ## [cheatsheet-macos](https://github.com/ruzickap/cheatsheet-macos)
 
 - Description: MacOS Keyboard Shortcuts
+- Topics: cheatsheet, latex, macos, public, cheatsheet-mscos
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/blob/main/LICENSE)
@@ -447,9 +469,10 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos)
 
-## [Cheatsheet - Systemd](https://github.com/ruzickap/cheatsheet-systemd)
+## [cheatsheet-systemd](https://github.com/ruzickap/cheatsheet-systemd)
 
 - Description: Cheatsheet for systemd
+- Topics: latex, systemd, cheatsheet-systemd, cheatsheet, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/blob/main/LICENSE)
@@ -479,41 +502,39 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd)
 
-## [container-build](https://github.com/ruzickap/container-build)
+## [cks-notes](https://github.com/ruzickap/cks-notes)
 
-- Description: Container build repository
+- Description: CKS Notes
+- Topics: cks, cks-exam, cks-exam-preparation, k8s, security, k8s-security,
+  kubernetes, public
 
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/container-build.svg)](https://github.com/ruzickap/container-build/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/container-build.svg)](https://github.com/ruzickap/container-build/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/container-build.svg?style=social)](https://github.com/ruzickap/container-build/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/container-build.svg?style=social)](https://github.com/ruzickap/container-build/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/container-build.svg?style=social)](https://github.com/ruzickap/container-build)
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/cks-notes.svg?style=social)](https://github.com/ruzickap/cks-notes/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/cks-notes.svg?style=social)](https://github.com/ruzickap/cks-notes/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/cks-notes.svg?style=social)](https://github.com/ruzickap/cks-notes)
 
 - CI/CD status:
 
-  [![GitHub Actions status - container-build-reusable-workflow](https://github.com/ruzickap/container-build/workflows/container-build-reusable-workflow/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/container-build-reusable-workflow.yml)
-  [![GitHub Actions status - container-build](https://github.com/ruzickap/container-build/workflows/container-build/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/container-build.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/container-build/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/container-build/workflows/renovate/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/container-build/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/container-build/workflows/stale/badge.svg)](https://github.com/ruzickap/container-build/actions/workflows/stale.yml)
+  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cks-notes/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/linter.yml)
 
 - Issue tracking:
 
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/container-build.svg)](https://github.com/ruzickap/container-build/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/container-build.svg)](https://github.com/ruzickap/container-build/pulls)
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/pulls)
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/container-build.svg)](https://github.com/ruzickap/container-build/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/container-build.svg)](https://github.com/ruzickap/container-build/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/container-build/latest)](https://github.com/ruzickap/container-build/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/container-build.svg)](https://github.com/ruzickap/container-build/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/container-build.svg)](https://github.com/ruzickap/container-build)
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cks-notes/latest)](https://github.com/ruzickap/cks-notes/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes)
 
-## [Darktable Video Tutorials with screenshots](https://github.com/ruzickap/darktable_video_tutorials_list)
+## [darktable_video_tutorials_list](https://github.com/ruzickap/darktable_video_tutorials_list)
 
 - Description: Links to Darktable Video Tutorials with screenshots
+- Topics: darktable-tutorial, screenshots, darktable, tutorial, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/blob/main/LICENSE)
@@ -548,6 +569,7 @@ List of my GitHub projects:
 
 - Description: Notes from Amazon EKS Bottlerocket and Fargate testing
 - Website: <https://ruzickap.github.io/k8s-eks-bottlerocket-fargate/>
+- Topics: eks, fargate, bottlerocket, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/blob/main/LICENSE)
@@ -581,45 +603,50 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
-## [k8s-eks-rancher](https://github.com/ruzickap/k8s-eks-rancher)
+## [k8s-eks-flux](https://github.com/ruzickap/k8s-eks-flux)
 
-- Description: Build Amazon EKS with Rancher
-- Website: <https://ruzickap.github.io/k8s-eks-rancher/>
+- Description: Notes from using Amazon EKS and Flux
+- Website: <https://ruzickap.github.io/k8s-eks-flux/>
+- Topics: public
 
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-eks-rancher.svg?style=social)](https://github.com/ruzickap/k8s-eks-rancher/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-eks-rancher.svg?style=social)](https://github.com/ruzickap/k8s-eks-rancher/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-eks-rancher.svg?style=social)](https://github.com/ruzickap/k8s-eks-rancher)
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-eks-flux.svg?style=social)](https://github.com/ruzickap/k8s-eks-flux/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-eks-flux.svg?style=social)](https://github.com/ruzickap/k8s-eks-flux/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-eks-flux.svg?style=social)](https://github.com/ruzickap/k8s-eks-flux)
 
 - CI/CD status:
 
-  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-eks-rancher/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/links.yml)
-  [![GitHub Actions status - mdbook-build](https://github.com/ruzickap/k8s-eks-rancher/workflows/mdbook-build/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/mdbook-build.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-eks-rancher/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-eks-rancher/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-eks-rancher/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-eks-rancher/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-eks-rancher/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/stale.yml)
-  [![GitHub Actions status - test-k8s-eks-rancher](https://github.com/ruzickap/k8s-eks-rancher/workflows/test-k8s-eks-rancher/badge.svg)](https://github.com/ruzickap/k8s-eks-rancher/actions/workflows/test-k8s-eks-rancher.yml)
+  [![GitHub Actions status - kube-linter](https://github.com/ruzickap/k8s-eks-flux/workflows/kube-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/kube-linter.yml)
+  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-eks-flux/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/links.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-eks-flux/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-eks-flux/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-eks-flux/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-eks-flux/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-eks-flux/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-eks-flux/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/stale.yml)
+  [![GitHub Actions status - test-k8s-eks-flux](https://github.com/ruzickap/k8s-eks-flux/workflows/test-k8s-eks-flux/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/test-k8s-eks-flux.yml)
+  [![GitHub Actions status - vuepress-build](https://github.com/ruzickap/k8s-eks-flux/workflows/vuepress-build/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/vuepress-build.yml)
 
 - Issue tracking:
 
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/pulls)
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/pulls)
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-eks-rancher/latest)](https://github.com/ruzickap/k8s-eks-rancher/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-rancher.svg)](https://github.com/ruzickap/k8s-eks-rancher)
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-eks-flux/latest)](https://github.com/ruzickap/k8s-eks-flux/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux)
 
 ## [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux)
 
 - Description: Blue Green deployment with Flagger, Flux and Istio
 - Website: <https://ruzickap.github.io/k8s-flagger-istio-flux/>
+- Topics: flagger, flux, istio, kubernetes, canary-deployment, azure, terraform,
+  aks, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/blob/main/LICENSE)
@@ -658,6 +685,8 @@ List of my GitHub projects:
 - Description: Install services using Flux + Istio + Gitlab + Harbor inside Kops
   cluster running on AWS
 - Website: <https://ruzickap.github.io/k8s-flux-istio-gitlab-harbor/>
+- Topics: kubernetes, terraform, flux, istio, gitlab, harbor, kops,
+  cert-manager, helm, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/blob/main/LICENSE)
@@ -689,43 +718,12 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
 
-## [k8s-harbor-presentation](https://github.com/ruzickap/k8s-harbor-presentation)
-
-- Description: Presentation about Harbor project
-- Website: <https://ruzickap.github.io/k8s-harbor-presentation/>
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-harbor-presentation.svg?style=social)](https://github.com/ruzickap/k8s-harbor-presentation/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-harbor-presentation.svg?style=social)](https://github.com/ruzickap/k8s-harbor-presentation/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-harbor-presentation.svg?style=social)](https://github.com/ruzickap/k8s-harbor-presentation)
-
-- CI/CD status:
-
-  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-harbor-presentation/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/markdown-check.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-harbor-presentation/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-harbor-presentation/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-harbor-presentation/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-harbor-presentation/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-harbor-presentation/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/stale.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-harbor-presentation/latest)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation)
-
 ## [k8s-harbor](https://github.com/ruzickap/k8s-harbor)
 
 - Description: Harbor in Kubernetes
 - Website: <https://ruzickap.github.io/k8s-harbor/>
+- Topics: harbor, kuberntes, demo, presentation, eks, vulnerability-scanners,
+  public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/blob/main/LICENSE)
@@ -757,45 +755,46 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor)
 
-## [k8s-istio-demo](https://github.com/ruzickap/k8s-istio-demo)
+## [k8s-harbor-presentation](https://github.com/ruzickap/k8s-harbor-presentation)
 
-- Description: Demo showing the capabilities of Istio
-- Website: <https://ruzickap.gitbook.io/k8s-istio-demo/readme>
+- Description: Presentation about Harbor project
+- Website: <https://ruzickap.github.io/k8s-harbor-presentation/>
+- Topics: harbor, presentation, demo, public
 
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-istio-demo.svg?style=social)](https://github.com/ruzickap/k8s-istio-demo/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-istio-demo.svg?style=social)](https://github.com/ruzickap/k8s-istio-demo/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-istio-demo.svg?style=social)](https://github.com/ruzickap/k8s-istio-demo)
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-harbor-presentation.svg?style=social)](https://github.com/ruzickap/k8s-harbor-presentation/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-harbor-presentation.svg?style=social)](https://github.com/ruzickap/k8s-harbor-presentation/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-harbor-presentation.svg?style=social)](https://github.com/ruzickap/k8s-harbor-presentation)
 
 - CI/CD status:
 
-  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-istio-demo/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/links.yml)
-  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-istio-demo/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/markdown-check.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-istio-demo/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-istio-demo/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-istio-demo/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-istio-demo/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-istio-demo/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/stale.yml)
-  [![GitHub Actions status - terraform](https://github.com/ruzickap/k8s-istio-demo/workflows/terraform/badge.svg)](https://github.com/ruzickap/k8s-istio-demo/actions/workflows/terraform.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-harbor-presentation/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-harbor-presentation/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-harbor-presentation/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-harbor-presentation/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-harbor-presentation/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-harbor-presentation/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-harbor-presentation/actions/workflows/stale.yml)
 
 - Issue tracking:
 
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/pulls)
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/pulls)
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-istio-demo/latest)](https://github.com/ruzickap/k8s-istio-demo/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-istio-demo.svg)](https://github.com/ruzickap/k8s-istio-demo)
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-harbor-presentation/latest)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation)
 
 ## [k8s-istio-webinar](https://github.com/ruzickap/k8s-istio-webinar)
 
 - Description: Istio webinar
 - Website: <https://ruzickap.github.io/k8s-istio-webinar>
+- Topics: istio, webinar, kubernetes, aws, eks, helm, cert-manager,
+  canary-deployment, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/blob/main/LICENSE)
@@ -827,45 +826,11 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar)
 
-## [k8s-istio-workshop](https://github.com/ruzickap/k8s-istio-workshop)
-
-- Description: Istio workshop
-- Website: <https://ruzickap.github.io/k8s-istio-workshop/>
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-istio-workshop.svg?style=social)](https://github.com/ruzickap/k8s-istio-workshop/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-istio-workshop.svg?style=social)](https://github.com/ruzickap/k8s-istio-workshop/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-istio-workshop.svg?style=social)](https://github.com/ruzickap/k8s-istio-workshop)
-
-- CI/CD status:
-
-  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-istio-workshop/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/links.yml)
-  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-istio-workshop/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/markdown-check.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-istio-workshop/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-istio-workshop/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-istio-workshop/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-istio-workshop/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-istio-workshop/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/stale.yml)
-  [![GitHub Actions status - vuepress-build](https://github.com/ruzickap/k8s-istio-workshop/workflows/vuepress-build/badge.svg)](https://github.com/ruzickap/k8s-istio-workshop/actions/workflows/vuepress-build.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-istio-workshop/latest)](https://github.com/ruzickap/k8s-istio-workshop/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-istio-workshop.svg)](https://github.com/ruzickap/k8s-istio-workshop)
-
 ## [k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x)
 
 - Description: Kubernetes + Jenkins X + Sockshop
 - Website: <https://ruzickap.github.io/k8s-jenkins-x/>
+- Topics: kubernetes, jenkins, sockshop, aws, kops, jenkins-ci, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/blob/main/LICENSE)
@@ -902,6 +867,8 @@ List of my GitHub projects:
 - Description: Build container images with Knative + Gitlab + Harbor inside Kops
   cluster running on AWS
 - Website: <https://ruzickap.github.io/k8s-knative-gitlab-harbor/>
+- Topics: knative, gitlab, harbor, container, kaniko, build, istio,
+  cert-manager, tekton, tekton-pipelines, kops, pipelines, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/blob/main/LICENSE)
@@ -937,6 +904,7 @@ List of my GitHub projects:
 
 - Description: PostgreSQL on Kubernetes
 - Website: <https://ruzickap.github.io/k8s-postgresql/>
+- Topics: kubernetes, patroni, helm, pgadmin, harbor, postgresql, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/blob/main/LICENSE)
@@ -973,6 +941,7 @@ List of my GitHub projects:
 
 - Description: Build and deploy Sockshop application using Flagger + Flux
 - Website: <https://ruzickap.github.io/k8s-sockshop/>
+- Topics: kubernetes, flux, terraform, aks, azure, sockshop, istio, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/blob/main/LICENSE)
@@ -1005,52 +974,14 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop)
 
-## [k8s-tf-eks-gitops](https://github.com/ruzickap/k8s-tf-eks-gitops)
-
-- Description: Multitenant+Multicluster Amazon EKS installation using Terraform,
-  GitHub Actions and GitOps
-- Website: <https://ruzickap.github.io/k8s-tf-eks-gitops/>
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-tf-eks-gitops.svg?style=social)](https://github.com/ruzickap/k8s-tf-eks-gitops/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-tf-eks-gitops.svg?style=social)](https://github.com/ruzickap/k8s-tf-eks-gitops/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/k8s-tf-eks-gitops.svg?style=social)](https://github.com/ruzickap/k8s-tf-eks-gitops)
-
-- CI/CD status:
-
-  [![GitHub Actions status - clusters-aws-reusable-workflow](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws-reusable-workflow/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws-reusable-workflow.yml)
-  [![GitHub Actions status - clusters-aws-schedule](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws-schedule/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws-schedule.yml)
-  [![GitHub Actions status - clusters-aws](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/clusters-aws/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/clusters-aws.yml)
-  [![GitHub Actions status - flux-validate](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/flux-validate/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/flux-validate.yaml)
-  [![GitHub Actions status - links](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/links.yml)
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/linter.yml)
-  [![GitHub Actions status - mdbook-build](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/mdbook-build/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/mdbook-build.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/release-please/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/renovate/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/k8s-tf-eks-gitops/workflows/stale/badge.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/actions/workflows/stale.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-tf-eks-gitops/latest)](https://github.com/ruzickap/k8s-tf-eks-gitops/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-tf-eks-gitops.svg)](https://github.com/ruzickap/k8s-tf-eks-gitops)
-
 ## [malware-cryptominer-container](https://github.com/ruzickap/malware-cryptominer-container)
 
 - Description: Container image with malware and crypto miner for testing
   purposes
 - Website:
   <https://artifacthub.io/packages/container/malware-cryptominer-container/malware-cryptominer-container>
+- Topics: container, crypto, cryptominer, dockerfile, eicar, image, malware,
+  test, xmrig, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/blob/main/LICENSE)
@@ -1064,6 +995,7 @@ List of my GitHub projects:
   [![GitHub Actions status - ghcr-cleanup-br](https://github.com/ruzickap/malware-cryptominer-container/workflows/ghcr-cleanup-br/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/ghcr-cleanup-br.yml)
   [![GitHub Actions status - ghcr-cleanup](https://github.com/ruzickap/malware-cryptominer-container/workflows/ghcr-cleanup/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/ghcr-cleanup.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/malware-cryptominer-container/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/malware-cryptominer-container/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/malware-cryptominer-container/workflows/release-please/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/malware-cryptominer-container/workflows/renovate/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/malware-cryptominer-container/workflows/scorecards/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/scorecards.yml)
@@ -1083,43 +1015,48 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container)
 
-## [myteam-adr](https://github.com/ruzickap/myteam-adr)
+## [my-git-projects](https://github.com/ruzickap/my-git-projects)
 
-- Description: Architectural Decision Record (ADR) for MyTeam
-- Website: <https://ruzickap.github.io/myteam-adr/log4brains>
+- Description: My GitHub projects
+- Topics: github, projects, templates, public
 
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/myteam-adr.svg?style=social)](https://github.com/ruzickap/myteam-adr/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/myteam-adr.svg?style=social)](https://github.com/ruzickap/myteam-adr/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/myteam-adr.svg?style=social)](https://github.com/ruzickap/myteam-adr)
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/my-git-projects.svg?style=social)](https://github.com/ruzickap/my-git-projects/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/my-git-projects.svg?style=social)](https://github.com/ruzickap/my-git-projects/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/my-git-projects.svg?style=social)](https://github.com/ruzickap/my-git-projects)
 
 - CI/CD status:
 
-  [![GitHub Actions status - links](https://github.com/ruzickap/myteam-adr/workflows/links/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/links.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/myteam-adr/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - publish-adr](https://github.com/ruzickap/myteam-adr/workflows/publish-adr/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/publish-adr.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/myteam-adr/workflows/release-please/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/myteam-adr/workflows/renovate/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/myteam-adr/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/myteam-adr/workflows/stale/badge.svg)](https://github.com/ruzickap/myteam-adr/actions/workflows/stale.yml)
+  [![GitHub Actions status - aws-cloudformation-gh-action](https://github.com/ruzickap/my-git-projects/workflows/aws-cloudformation-gh-action/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/aws-cloudformation-gh-action.yml)
+  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/my-git-projects/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/markdown-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/my-git-projects/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pre-commit-config](https://github.com/ruzickap/my-git-projects/workflows/pre-commit-config/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/pre-commit-config.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/my-git-projects/workflows/release-please/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate-working-days](https://github.com/ruzickap/my-git-projects/workflows/renovate-working-days/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/renovate-working-days.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/my-git-projects/workflows/renovate/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/my-git-projects/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/my-git-projects/workflows/stale/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/stale.yml)
 
 - Issue tracking:
 
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/pulls)
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/pulls)
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/myteam-adr/latest)](https://github.com/ruzickap/myteam-adr/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/myteam-adr.svg)](https://github.com/ruzickap/myteam-adr)
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/my-git-projects/latest)](https://github.com/ruzickap/my-git-projects/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects)
 
-## [Packer templates](https://github.com/ruzickap/packer-templates)
+## [packer-templates](https://github.com/ruzickap/packer-templates)
 
 - Description: Scripts and Templates used for generating Vagrant images
+- Topics: packer, templates, vagrant, libvirt, virtualbox, ansible,
+  packer-templates, windows, linux, packer-template, vagrant-plugins, qemu,
+  virtio, driver, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/blob/main/LICENSE)
@@ -1153,10 +1090,11 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates)
 
-## [Packer-Virt-Sysprep](https://github.com/ruzickap/packer-virt-sysprep)
+## [packer-virt-sysprep](https://github.com/ruzickap/packer-virt-sysprep)
 
 - Description: Reproduce the functionality of virt-sysprep for use with Packer
   builds
+- Topics: public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/blob/main/LICENSE)
@@ -1189,6 +1127,7 @@ List of my GitHub projects:
 
 - Description: Personal page
 - Website: <https://petr.ruzicka.dev/>
+- Topics: personal-website, web, personal, public, website
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/blob/main/LICENSE)
@@ -1220,73 +1159,45 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev)
 
-## [popular-containers-vulnerability-checks](https://github.com/ruzickap/popular-containers-vulnerability-checks)
+## [ruzickap](https://github.com/ruzickap/ruzickap)
 
-- Description: Vulnerabilities in popular container images
+- Description: GitHub profile repository
+- Topics: github, profile, public
 
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/popular-containers-vulnerability-checks.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/popular-containers-vulnerability-checks.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/popular-containers-vulnerability-checks.svg?style=social)](https://github.com/ruzickap/popular-containers-vulnerability-checks/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/popular-containers-vulnerability-checks.svg?style=social)](https://github.com/ruzickap/popular-containers-vulnerability-checks/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/popular-containers-vulnerability-checks.svg?style=social)](https://github.com/ruzickap/popular-containers-vulnerability-checks)
-
-- CI/CD status:
-
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - popular-containers-vulnerability-checks](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/popular-containers-vulnerability-checks/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/popular-containers-vulnerability-checks.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/release-please/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/renovate/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/popular-containers-vulnerability-checks/workflows/stale/badge.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/actions/workflows/stale.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/popular-containers-vulnerability-checks.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/popular-containers-vulnerability-checks.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/popular-containers-vulnerability-checks.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/popular-containers-vulnerability-checks.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/popular-containers-vulnerability-checks/latest)](https://github.com/ruzickap/popular-containers-vulnerability-checks/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/popular-containers-vulnerability-checks.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/popular-containers-vulnerability-checks.svg)](https://github.com/ruzickap/popular-containers-vulnerability-checks)
-
-## [raw-photo-tools-container](https://github.com/ruzickap/raw-photo-tools-container)
-
-- Description: Repository for building container to help manage RAW photos
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/raw-photo-tools-container.svg?style=social)](https://github.com/ruzickap/raw-photo-tools-container/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/raw-photo-tools-container.svg?style=social)](https://github.com/ruzickap/raw-photo-tools-container/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/raw-photo-tools-container.svg?style=social)](https://github.com/ruzickap/raw-photo-tools-container)
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/ruzickap.svg?style=social)](https://github.com/ruzickap/ruzickap/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/ruzickap.svg?style=social)](https://github.com/ruzickap/ruzickap/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/ruzickap.svg?style=social)](https://github.com/ruzickap/ruzickap)
 
 - CI/CD status:
 
-  [![GitHub Actions status - container-build](https://github.com/ruzickap/raw-photo-tools-container/workflows/container-build/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/container-build.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/raw-photo-tools-container/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/raw-photo-tools-container/workflows/renovate/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/raw-photo-tools-container/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/raw-photo-tools-container/workflows/stale/badge.svg)](https://github.com/ruzickap/raw-photo-tools-container/actions/workflows/stale.yml)
+  [![GitHub Actions status - Latest blog post workflow](https://github.com/ruzickap/ruzickap/workflows/Latest%20blog%20post%20workflow/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/blog-post-workflow.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ruzickap/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/ruzickap/workflows/release-please/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/ruzickap/workflows/renovate/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/renovate.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ruzickap/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/ruzickap/workflows/stale/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/stale.yml)
 
 - Issue tracking:
 
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/pulls)
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/pulls)
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/raw-photo-tools-container/latest)](https://github.com/ruzickap/raw-photo-tools-container/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/raw-photo-tools-container.svg)](https://github.com/ruzickap/raw-photo-tools-container)
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ruzickap/latest)](https://github.com/ruzickap/ruzickap/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap)
 
 ## [ruzickap.github.io](https://github.com/ruzickap/ruzickap.github.io)
 
 - Description: ruzickap.github.io - personal blog 🏠
 - Website: <https://ruzickap.github.io/>
+- Topics: github-actions, jekyll, markdown, personal-website, website, github,
+  public, blog, web
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/blob/main/LICENSE)
@@ -1322,10 +1233,11 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io)
 
-## [USB Stick for TV testing](https://github.com/ruzickap/test_usb_stick_for_tv)
+## [test_usb_stick_for_tv](https://github.com/ruzickap/test_usb_stick_for_tv)
 
 - Description: This script will store testing videos/music/pictures to your USB
   Stick which can be used for testing TVs
+- Topics: usb, tv, android-tv, testing-tvs, test, testing, testing-tools, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/blob/main/LICENSE)
@@ -1358,6 +1270,7 @@ List of my GitHub projects:
 
 - Description: xvx.cz
 - Website: <https://xvx.cz/>
+- Topics: personal-website, public, website, xvx, xvx-cz, personal, web
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/blob/main/LICENSE)
