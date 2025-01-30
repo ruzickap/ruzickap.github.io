@@ -223,7 +223,7 @@ sleep 20
 
 ![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-03-replicas-3.avif)
 
-Thanks to the [consolidation](https://karpenter.sh/preview/concepts/deprovisioning/#consolidation)
+Thanks to the [consolidation](https://karpenter.sh/v0.32/concepts/disruption/#consolidation)
 function (described in [AWS re:Invent 2022 - Kubernetes virtually anywhere, for everyone](https://youtu.be/OB7IZolZk78?t=2629))
 logs will look like:
 
