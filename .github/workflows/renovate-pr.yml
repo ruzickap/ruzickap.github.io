@@ -18,6 +18,8 @@ on:
   push:
     paths:
       - "_posts/**"
+  pull_request:
+    types: [labeled]
 
 env:
   # https://docs.renovatebot.com/troubleshooting/#log-debug-levels

@@ -539,7 +539,7 @@ the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-oper
 Install `kube-prometheus-stack`
 [helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 and modify the
-[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-66.6.0/charts/kube-prometheus-stack/values.yaml):
+[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-67.9.0/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -579,6 +579,8 @@ alertmanager:
       gethomepage.dev/group: Observability
       gethomepage.dev/icon: alertmanager.svg
       gethomepage.dev/name: Alert Manager
+      gethomepage.dev/app: alertmanager
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=alertmanager"
       nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
       nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
     hosts:
@@ -600,7 +602,8 @@ grafana:
       gethomepage.dev/group: Observability
       gethomepage.dev/icon: grafana.svg
       gethomepage.dev/name: Grafana
-      gethomepage.dev/siteMonitor: http://grafana-service.grafana.svc:3000/api/health
+      gethomepage.dev/app: grafana
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=grafana"
       nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
       nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
       nginx.ingress.kubernetes.io/configuration-snippet: |
@@ -712,16 +715,9 @@ grafana:
         gnetId: 19268
         revision: 1
         datasource: Prometheus
-      karpenter-capacity-dashboard:
-        url: https://karpenter.sh/v0.37/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
-      karpenter-performance-dashboard:
-        url: https://karpenter.sh/v0.37/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
   grafana.ini:
     analytics:
       check_for_updates: false
-    # server:
-    #   root_url: https://grafana.${CLUSTER_FQDN}
-    # Use oauth2-proxy instead of default Grafana Oauth
     auth.basic:
       enabled: false
     auth.proxy:
@@ -761,15 +757,18 @@ prometheus-node-exporter:
         action: replace
         regex: (.+)
         replacement: \${1}
+prometheus:
   ingress:
     enabled: true
     ingressClassName: nginx
     annotations:
       gethomepage.dev/enabled: "true"
-      gethomepage.dev/description: Monitoring System & TSDB
+      gethomepage.dev/description: Monitoring System and TSDB
       gethomepage.dev/group: Observability
       gethomepage.dev/icon: prometheus.svg
       gethomepage.dev/name: Prometheus
+      gethomepage.dev/app: prometheus
+      gethomepage.dev/pod-selector: "app.kubernetes.io/name=prometheus"
       nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
       nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
     paths: ["/"]
@@ -832,7 +831,8 @@ EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
 
-Add ClusterIssuers for Let's Encrypt staging:
+Add ClusterIssuers for Let's Encrypt staging (the Cereated certificates will not
+be valid when using "staging"):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-staging.yml" << EOF | kubectl apply -f -
@@ -927,7 +927,7 @@ proxy and load balancer.
 Install `ingress-nginx`
 [helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
 and modify the
-[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.11.3/charts/ingress-nginx/values.yaml).
+[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.12.0/charts/ingress-nginx/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -938,6 +938,8 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
+  config:
+    annotations-risk-level: Critical
   allowSnippetAnnotations: true
   ingressClassResource:
     default: true
@@ -948,10 +950,11 @@ controller:
       # https://www.qovery.com/blog/our-migration-from-kubernetes-built-in-nlb-to-alb-controller/
       # https://www.youtube.com/watch?v=xwiRjimKW9c
       service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
-      # service.beta.kubernetes.io/aws-load-balancer-alpn-policy: HTTP2Preferred
+      service.beta.kubernetes.io/aws-load-balancer-alpn-policy: HTTP2Preferred
       service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
       service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-      # service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
+      # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.11/guide/service/nlb/#protocols
+      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
       service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
       service.beta.kubernetes.io/aws-load-balancer-type: external
   metrics:
@@ -1054,6 +1057,8 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 
 Install [homepage](https://gethomepage.dev/) to have a nice dashboard.
 
+![Homepage](https://raw.githubusercontent.com/gethomepage/homepage/e56dccc7f17144a53b97a315c2e4f622fa07e58d/images/banner_light%402x.png){:width="300"}
+
 Install `homepage`
 [helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.0.1/charts/homepage)
 and modify the
@@ -1071,15 +1076,14 @@ serviceAccount:
 ingress:
   main:
     enabled: true
-    labels:
-      gethomepage.dev/enabled: "true"
     annotations:
+      gethomepage.dev/enabled: "true"
       gethomepage.dev/name: Homepage
       gethomepage.dev/description: A modern, secure, highly customizable application dashboard
       gethomepage.dev/group: Apps
-      gethomepage.dev/icon: homepage.svg
-      # nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
-      # nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+      gethomepage.dev/icon: homepage.png
+      nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+      nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
     ingressClassName: "nginx"
     hosts:
       - host: ${CLUSTER_FQDN}
@@ -1093,32 +1097,20 @@ config:
   bookmarks:
   services:
   widgets:
-    - resources:
-      # change backend to 'kubernetes' to use Kubernetes integration. Requires RBAC.
-      backend: resources
-      expanded: true
-      cpu: true
-      memory: true
     - logo:
-      icon: kubernetes.svg
+        icon: kubernetes.svg
     - kubernetes:
-      cluster:
-        show: true
-        cpu: true
-        memory: true
-        showLabel: true
-        label: "${CLUSTER_NAME}"
-      nodes:
-        show: true
-        cpu: true
-        memory: true
-        showLabel: true
-    - resources:
-      backend: resources
-      expanded: true
-      cpu: true
-      memory: true
-      network: default
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
+          label: "${CLUSTER_NAME}"
+        nodes:
+          show: true
+          cpu: true
+          memory: true
+          showLabel: true
   kubernetes:
     mode: cluster
   settings:
@@ -1132,6 +1124,8 @@ config:
         icon: mdi-chart-bell-curve-cumulative
       Cluster Management:
         icon: mdi-tools
+env:
+  LOG_TARGETS: "stdout"
 EOF
 helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace homepage --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" homepage jameswynn/homepage
 ```
