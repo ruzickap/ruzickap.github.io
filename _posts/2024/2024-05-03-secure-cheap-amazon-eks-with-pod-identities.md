@@ -1203,9 +1203,9 @@ grafana:
         revision: 1
         datasource: Prometheus
       karpenter-capacity-dashboard:
-        url: https://karpenter.sh/v0.37/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
+        url: https://raw.githubusercontent.com/aws/karpenter-provider-aws/ef0a6924c915c8e75a120b1c5674aba92e222f51/website/content/en/v1.2/getting-started/getting-started-with-karpenter/karpenter-capacity-dashboard.json
       karpenter-performance-dashboard:
-        url: https://karpenter.sh/v0.37/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
+        url: https://raw.githubusercontent.com/aws/karpenter-provider-aws/ef0a6924c915c8e75a120b1c5674aba92e222f51/website/content/en/v1.2/getting-started/getting-started-with-karpenter/karpenter-performance-dashboard.json
   grafana.ini:
     analytics:
       check_for_updates: false
