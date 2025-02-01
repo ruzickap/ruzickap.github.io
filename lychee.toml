@@ -23,22 +23,24 @@ accept = [999]
 
 # Exclude URLs and mail addresses from checking (supports regex)
 exclude = [
-  # returns 403 when accessed from GitHub Action
-  'stackoverflow\.com',
-  'stackexchange\.com',
-  # Ignore all URLs with '$' - BASH variable in URL
-  '\$',
+  # keep-sorted start
   # Ignore all URLs with '{ ... }' - BASH / Ansible variable in URL
   '%7B.*%7D',
-  # Ignore all URLs which starts with 'file://'
-  'file://',
+  # Ignore all URLs with '$' - BASH variable in URL
+  '\$',
   'analytics\.eu\.umami\.is/',
   'cdn\.com',
+  # Ignore all URLs which starts with 'file://'
+  'file://',
   'fonts\.(googleapis|gstatic)\.com',
-  'https://www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL',
   'mylabs\.dev',
+  'stackexchange\.com',
+  'stackoverflow\.com',
   'username\.github\.io',
+  'www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL',
   'www\.googletagmanager\.com',
+  'www\.threads\.net/intent/post',
+  # keep-sorted end
 ]
 
 # Exclude these filesystem paths from getting checked
