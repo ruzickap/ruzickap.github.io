@@ -385,6 +385,8 @@ iam:
       roleName: eksctl-${CLUSTER_NAME}-pia-external-dns
       wellKnownPolicies:
         externalDNS: true
+addons:
+  - name: eks-pod-identity-agent
 autoModeConfig:
   enabled: true
   nodePools: ["system"]

@@ -1,59 +1,75 @@
 ---
-title: Velero and cert-manager
+title: Amazon EKS Auto Mode with cert-manager and Velero
 author: Petr Ruzicka
-date: 2023-03-20
-description: Velero and cert-manager
-categories: [Kubernetes, Amazon EKS, Velero, cert-manager]
-tags: [Amazon EKS, k8s, kubernetes, velero, cert-manager, certificates]
+date: 2025-02-01
+description:
+categories: [Kubernetes, Amazon EKS Auto Mode, Velero, cert-manager]
+tags:
+  [
+    amaozn eks auto mode,
+    amazon eks,
+    cert-manager,
+    certificates,
+    eksctl,
+    k8s,
+    kubernetes,
+    security,
+    velero,
+  ]
 image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
 ---
 
-In the previous post related to
-[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
-I'm using the [cert-manager](https://cert-manager.io/) to get the wildcard
-certificate for the ingress.
+<!-- markdownlint-disable MD013 MD033 -->
+In the previous post, [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})
+I used [cert-manager](https://cert-manager.io/) to obrain a [wildcard certificate](https://en.wikipedia.org/wiki/Public_key_certificate#Wildcard_certificate)
+for the [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
+<!-- markdownlint-enable MD013 MD033 -->
 
-When the Let's Encrypt [production](https://letsencrypt.org/about/) certificates
-are used, it may be handy to backup and restore them when the cluster is
-recreated.
+When using Let's Encrypt [production](https://letsencrypt.org/about/)
+certificates, it's useful to back them up and restore them when recreating the
+cluster.
 
-Here are few steps how to install [Velero](https://velero.io/) and
+Here are a few steps to install [Velero](https://velero.io/) and perform the
 [backup + restore](https://cert-manager.io/docs/tutorials/backup/) procedure
-for the cert-manager objects.
+for cert-manager objects.
 
 Links:
 
-- [Backup and Restore Resources](https://cert-manager.io/v1.11-docs/tutorials/backup/#order-of-restore)
+- [Backup and Restore Resources](https://cert-manager.io/v1.13-docs/tutorials/backup/#order-of-restore)
 
 ## Requirements
 
-- Amazon EKS cluster (described in
-  [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
+<!-- markdownlint-disable MD013 MD033 -->
+- Amazon EKS Auto Mode cluster (described in
+  [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %}))
+- [AWS CLI](https://aws.amazon.com/cli/)
 - [Helm](https://helm.sh)
+<!-- markdownlint-enable MD013 MD033 -->
 
-Variables which are being used in the next steps:
+Variables used in the following steps:
 
 ```bash
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 export CLUSTER_FQDN="k01.k8s.mylabs.dev"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export MY_EMAIL="petr.ruzicka@gmail.com"
 export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+# Tags applied to identify AWS resources
+export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
-### Create Let's Encrypt production certificate
+### Generate a Let's Encrypt production certificate
 
 <!-- prettier-ignore-start -->
-> These steps should be done only once
+> These steps only need to be performed once
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Generating the production ready Let's Encrypt certificates should be done only
-once. The goal is to backup the certificate and then restore it whenever is it
-needed to "new" cluster.
+Production-ready Let's Encrypt certificates should be generated only once.
+The goal is to back up the certificate and restore it whenever needed in a new cluster.
 
 Create Let's Encrypt production `ClusterIssuer`:
 
@@ -83,7 +99,7 @@ EOF
 kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
 ```
 
-Create new certificate and let it sign by Let's Encrypt to validate it:
+Create a new certificate and have it signed by Let's Encrypt for validation:
 
 ```shell
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
@@ -113,12 +129,11 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 ### Create S3 bucket
 
 <!-- prettier-ignore-start -->
-> The following step should be done only once
+> The following step needs to be performed only once
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Use CloudFormation to create S3 bucket which will be used to store backups from
-Velero.
+Use CloudFormation to create an S3 bucket for storing Velero backups.
 
 ```shell
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
@@ -144,14 +159,15 @@ Resources:
         RestrictPublicBuckets: true
       LifecycleConfiguration:
         Rules:
+          # Transitions objects to the ONEZONE_IA storage class after 30 days
           - Id: TransitionToOneZoneIA
             Status: Enabled
             Transitions:
               - TransitionInDays: 30
-                StorageClass: ONEZONE_IA
+                StorageClass: STANDARD_IA
           - Id: DeleteOldObjects
             Status: Enabled
-            ExpirationInDays: 90
+            ExpirationInDays: 60
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
@@ -169,6 +185,24 @@ Resources:
             Topic: !Ref S3ChangeNotificationTopic
           - Event: s3:LifecycleExpiration:*
             Topic: !Ref S3ChangeNotificationTopic
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # S3 Bucket policy force HTTPs requests
+          - Sid: ForceSSLOnlyAccess
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub ${S3Bucket.Arn}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
   S3ChangeNotificationTopic:
     Type: AWS::SNS::Topic
     Properties:
@@ -258,41 +292,79 @@ EOF
 
 aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
   --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
-  --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
+  --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
 ```
 
 ## Install Velero
 
-Before installing Velero it is necessary to create IRSA with S3 policy. The
-created ServiceAccount `velero` will be specified in velero helm chart later.
+Before installing Velero, you must create the Pod Identity Association to grant
+Velero the [necessary permissions](https://github.com/vmware-tanzu/velero-plugin-for-aws/blob/644e43f9ca39dc951b6fafa596311fe5659e8dc6/README.md?plain=1#L89-L141)
+to access S3 and EC2 resources.
+The created ServiceAccount `velero` will be specified in velero helm chart later.
 
 ```bash
-# shellcheck disable=SC2016
-S3_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-s3" --query 'Stacks[0].Outputs[?OutputKey==`S3PolicyArn`].OutputValue' --output text)
-eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=velero --namespace=velero --attach-policy-arn="${S3_POLICY_ARN}" --role-name="eksctl-${CLUSTER_NAME}-irsa-velero" --approve
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yaml" << EOF
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: ${CLUSTER_NAME}
+  region: ${AWS_REGION}
+iam:
+  podIdentityAssociations:
+    - namespace: velero
+      serviceAccountName: velero
+      roleName: eksctl-${CLUSTER_NAME}-pia-velero
+      permissionPolicy:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: [
+              "ec2:DescribeVolumes",
+              "ec2:DescribeSnapshots",
+              "ec2:CreateTags",
+              "ec2:CreateSnapshot",
+              "ec2:DeleteSnapshots"
+            ]
+            Resource:
+              - "*"
+          - Effect: Allow
+            Action: [
+              "s3:GetObject",
+              "s3:DeleteObject",
+              "s3:PutObject",
+              "s3:PutObjectTagging",
+              "s3:AbortMultipartUpload",
+              "s3:ListMultipartUploadParts"
+            ]
+            Resource:
+              - "arn:aws:s3:::${CLUSTER_FQDN}/*"
+          - Effect: Allow
+            Action: [
+              "s3:ListBucket",
+            ]
+            Resource:
+              - "arn:aws:s3:::${CLUSTER_FQDN}"
+EOF
+eksctl create podidentityassociation --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yaml"
 ```
 
 ```console
-2023-03-23 20:13:12 [ℹ]  3 existing iamserviceaccount(s) (cert-manager/cert-manager,external-dns/external-dns,karpenter/karpenter) will be excluded
-2023-03-23 20:13:12 [ℹ]  1 iamserviceaccount (velero/velero) was included (based on the include/exclude rules)
-2023-03-23 20:13:12 [!]  serviceaccounts that exist in Kubernetes will be excluded, use --override-existing-serviceaccounts to override
-2023-03-23 20:13:12 [ℹ]  1 task: {
+2025-02-02 19:44:18 [ℹ]  1 task: {
     2 sequential sub-tasks: {
-        create IAM role for serviceaccount "velero/velero",
-        create serviceaccount "velero/velero",
-    } }2023-03-23 20:13:12 [ℹ]  building iamserviceaccount stack "eksctl-k01-addon-iamserviceaccount-velero-velero"
-2023-03-23 20:13:13 [ℹ]  deploying stack "eksctl-k01-addon-iamserviceaccount-velero-velero"
-2023-03-23 20:13:13 [ℹ]  waiting for CloudFormation stack "eksctl-k01-addon-iamserviceaccount-velero-velero"
-2023-03-23 20:13:43 [ℹ]  waiting for CloudFormation stack "eksctl-k01-addon-iamserviceaccount-velero-velero"
-2023-03-23 20:14:34 [ℹ]  waiting for CloudFormation stack "eksctl-k01-addon-iamserviceaccount-velero-velero"
-2023-03-23 20:14:34 [ℹ]  created namespace "velero"
-2023-03-23 20:14:35 [ℹ]  created serviceaccount "velero/velero"
+        create IAM role for pod identity association for service account "velero/velero",
+        create pod identity association for service account "velero/velero",
+    } }2025-02-02 19:44:19 [ℹ]  deploying stack "eksctl-k01-podidentityrole-velero-velero"
+2025-02-02 19:44:19 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
+2025-02-02 19:44:49 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
+2025-02-02 19:45:35 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
+2025-02-02 19:45:36 [ℹ]  created pod identity association for service account "velero" in namespace "velero"
+2025-02-02 19:45:36 [ℹ]  all tasks were completed successfully
 ```
 
 Install `velero`
 [helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
 and modify the
-[default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-7.2.1/charts/velero/values.yaml).
+[default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-8.3.0/charts/velero/values.yaml).
 
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
 
@@ -300,14 +372,14 @@ and modify the
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="7.2.1"
+VELERO_HELM_CHART_VERSION="8.3.0"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
 initContainers:
   - name: velero-plugin-for-aws
     # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?<version>.+)$
-    image: velero/velero-plugin-for-aws:v1.10.1
+    image: velero/velero-plugin-for-aws:v1.11.1
     volumeMounts:
       - mountPath: /target
         name: plugins
@@ -348,8 +420,6 @@ configuration:
         region: ${AWS_DEFAULT_REGION}
 serviceAccount:
   server:
-    # Use exiting IRSA service account
-    create: false
     name: velero
 credentials:
   useSecret: false
@@ -375,11 +445,11 @@ helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace vele
 
 {% endraw %}
 
-Add Velero Grafana Dashboard:
+Add the Velero Grafana dashboard for enhanced monitoring and visualization:
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
+KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="67.9.0"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-velero-cert-manager.yml" << EOF
 grafana:
@@ -409,10 +479,10 @@ velero get backup-location
 
 ```console
 NAME      PROVIDER   BUCKET/PREFIX               PHASE       LAST VALIDATED                  ACCESS MODE   DEFAULT
-default   aws        k01.k8s.mylabs.dev/velero   Available   2023-03-23 20:16:20 +0100 CET   ReadWrite     true
+default   aws        k01.k8s.mylabs.dev/velero   Available   2025-02-02 21:45:03 +0100 CET   ReadWrite     true
 ```
 
-Initiate backup process and save the necessary cert-manager object to S3:
+Initiate the backup process and store the required cert-manager objects in S3.
 
 ```shell
 velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
@@ -425,19 +495,24 @@ velero backup describe --selector letsencrypt=production --details
 ```
 
 ```console
-Name:         velero-weekly-backup-cert-manager-20230323191755
+Name:         velero-weekly-backup-cert-manager-20250202204626
 Namespace:    velero
-Labels:       letsencrypt=production
+Labels:       app.kubernetes.io/instance=velero
+              app.kubernetes.io/managed-by=Helm
+              app.kubernetes.io/name=velero
+              helm.sh/chart=velero-8.3.0
+              letsencrypt=production
               velero.io/schedule-name=velero-weekly-backup-cert-manager
               velero.io/storage-location=default
-Annotations:  velero.io/source-cluster-k8s-gitversion=v1.25.6-eks-48e63af
+Annotations:  meta.helm.sh/release-name=velero
+              meta.helm.sh/release-namespace=velero
+              velero.io/resource-timeout=10m0s
+              velero.io/source-cluster-k8s-gitversion=v1.30.9-eks-8cce635
               velero.io/source-cluster-k8s-major-version=1
-              velero.io/source-cluster-k8s-minor-version=25+
+              velero.io/source-cluster-k8s-minor-version=30+
 
 Phase:  Completed
 
-Errors:    0
-Warnings:  0
 
 Namespaces:
   Included:  cert-manager
@@ -450,22 +525,27 @@ Resources:
 
 Label selector:  letsencrypt=production
 
+Or label selector:  <none>
+
 Storage Location:  default
 
 Velero-Native Snapshot PVs:  auto
+Snapshot Move Data:          false
+Data Mover:                  velero
 
 TTL:  720h0m0s
 
-CSISnapshotTimeout:  10m0s
+CSISnapshotTimeout:    10m0s
+ItemOperationTimeout:  4h0m0s
 
 Hooks:  <none>
 
 Backup Format Version:  1.1.0
 
-Started:    2023-03-23 20:17:55 +0100 CET
-Completed:  2023-03-23 20:17:56 +0100 CET
+Started:    2025-02-02 21:46:26 +0100 CET
+Completed:  2025-02-02 21:46:27 +0100 CET
 
-Expiration:  2023-04-22 21:17:55 +0200 CEST
+Expiration:  2025-03-04 21:46:26 +0100 CET
 
 Total items to be backed up:  2
 Items backed up:              2
@@ -476,34 +556,46 @@ Resource List:
   v1/Secret:
     - cert-manager/ingress-cert-production
 
-Velero-Native Snapshots: <none included>
+Backup Volumes:
+  Velero-Native Snapshots: <none included>
+
+  CSI Snapshots: <none included>
+
+  Pod Volume Backups: <none included>
+
+HooksAttempted:  0
+HooksFailed:     0
 ```
 
-See the files in S3 bucket:
+List the files in the S3 bucket:
 
 ```bash
 aws s3 ls --recursive "s3://${CLUSTER_FQDN}/velero/backups"
+################################################################################
+exit 0
 ```
 
 ```console
-2023-03-23 20:17:57       3388 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-backup.json
-2023-03-23 20:17:57         29 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755-csi-volumesnapshotclasses.json.gz
-2023-03-23 20:17:57         29 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755-csi-volumesnapshotcontents.json.gz
-2023-03-23 20:17:57         29 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755-csi-volumesnapshots.json.gz
-2023-03-23 20:17:57       2545 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755-logs.gz
-2023-03-23 20:17:57         29 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755-podvolumebackups.json.gz
-2023-03-23 20:17:57         99 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755-resource-list.json.gz
-2023-03-23 20:17:57         49 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755-results.gz
-2023-03-23 20:17:57         29 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755-volumesnapshots.json.gz
-2023-03-23 20:17:57       8369 velero/backups/velero-weekly-backup-cert-manager-20230323191755/velero-weekly-backup-cert-manager-20230323191755.tar.gz
+2025-02-02 21:46:28       4291 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-backup.json
+2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-csi-volumesnapshotclasses.json.gz
+2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-csi-volumesnapshotcontents.json.gz
+2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-csi-volumesnapshots.json.gz
+2025-02-02 21:46:28         27 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-itemoperations.json.gz
+2025-02-02 21:46:28       3011 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-logs.gz
+2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-podvolumebackups.json.gz
+2025-02-02 21:46:28         99 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-resource-list.json.gz
+2025-02-02 21:46:28         49 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-results.gz
+2025-02-02 21:46:28         27 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-volumeinfo.json.gz
+2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-volumesnapshots.json.gz
+2025-02-02 21:46:28       6618 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626.tar.gz
 ```
 
 ## Restore cert-manager objects
 
-The next steps will show the way to restore Let's Encrypt production certificate
-(previously backed up by Veleto to S3) to new cluster.
+The following steps will guide you through restoring the Let's Encrypt
+production certificate, previously backed up by Velero to S3, onto a new cluster.
 
-Start the restore procedure of the cert-manager objects:
+Initiate the restore process for cert-manager objects.
 
 ```bash
 velero restore create --from-schedule velero-weekly-backup-cert-manager --labels letsencrypt=production --wait
@@ -516,38 +608,6 @@ velero restore describe --selector letsencrypt=production --details
 ```
 
 ```console
-Name:         velero-weekly-backup-cert-manager-20230323202248
-Namespace:    velero
-Labels:       letsencrypt=production
-Annotations:  <none>
-
-Phase:                       Completed
-Total items to be restored:  2
-Items restored:              2
-
-Started:    2023-03-23 20:22:51 +0100 CET
-Completed:  2023-03-23 20:22:52 +0100 CET
-
-Backup:  velero-weekly-backup-cert-manager-20230323191755
-
-Namespaces:
-  Included:  all namespaces found in the backup
-  Excluded:  <none>
-
-Resources:
-  Included:        *
-  Excluded:        nodes, events, events.events.k8s.io, backups.velero.io, restores.velero.io, resticrepositories.velero.io, csinodes.storage.k8s.io, volumeattachments.storage.k8s.io, backuprepositories.velero.io
-  Cluster-scoped:  auto
-
-Namespace mappings:  <none>
-
-Label selector:  <none>
-
-Restore PVs:  auto
-
-Existing Resource Policy:   <none>
-
-Preserve Service NodePorts:  auto
 ```
 
 Verify if the certificate was restored properly:
@@ -627,7 +687,7 @@ Use production Let's Encrypt certificate by `ingress-nginx`:
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.11.3"
+INGRESS_NGINX_HELM_CHART_VERSION="4.12.0"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx-production-certs.yml" << EOF
 controller:
