@@ -36,6 +36,8 @@ Pull Requests with status updates using GitHub Actions.
 * Next, create a new GitHub Action workflow file named `.github/workflows/pr-slack-notification.yml`
   with the following content:
 
+{% raw %}
+
 ```yaml
 name: pr-slack-notification
 
@@ -178,6 +180,8 @@ jobs:
                     short: true
                     value: "Merged ✅"
 ```
+
+{% endraw %}
 
 ## Description
 
