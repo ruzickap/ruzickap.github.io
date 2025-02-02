@@ -1,0 +1,65 @@
+{
+  // keep-sorted start block=yes newline_separated=yes
+  // Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // keep-sorted start case=no
+        "bierner.markdown-preview-github-styles",
+        "DavidAnson.vscode-markdownlint",
+        "esbenp.prettier-vscode",
+        "GitHub.copilot",
+        "me-dutour-mathieu.vscode-github-actions",
+        "timonwong.shellcheck",
+        "Tyriar.sort-lines",
+        "yzhang.markdown-all-in-one"
+        // keep-sorted end
+      ],
+      "settings": {
+        // keep-sorted start block=yes
+        "[json][markdown][yaml]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[markdown]": {
+          "editor.wordWrap": "off"
+        },
+        "editor.autoClosingQuotes": "never",
+        "editor.cursorBlinking": "smooth",
+        "editor.dragAndDrop": false,
+        "editor.hover.enabled": false,
+        "editor.parameterHints.enabled": false,
+        "editor.quickSuggestions": {
+          "other": "off"
+        },
+        "editor.rulers": [80],
+        "editor.smoothScrolling": true,
+        "editor.tabSize": 2,
+        "extensions.ignoreRecommendations": true,
+        "files.insertFinalNewline": true,
+        "files.trimFinalNewlines": true,
+        "files.trimTrailingWhitespace": true,
+        "git.autofetch": true,
+        "github.copilot.enable": {
+          "*": true,
+          "plaintext": true,
+          "markdown": true
+        }
+        // keep-sorted end
+      }
+    }
+  },
+
+  "forwardPorts": [4000],
+
+  "image": "mcr.microsoft.com/devcontainers/jekyll:latest",
+
+  "name": "ruzickap.github.io",
+
+  "portsAttributes": {
+    "4000": {
+      "label": "jekyll",
+      "onAutoForward": "openPreview"
+    }
+  }
+  // keep-sorted end
+}
