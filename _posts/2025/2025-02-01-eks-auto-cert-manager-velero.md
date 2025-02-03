@@ -93,10 +93,10 @@ spec:
           dnsZones:
             - ${CLUSTER_FQDN}
         dns01:
-          route53:
-            region: ${AWS_DEFAULT_REGION}
+          route53: {}
 EOF
 kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
+kubectl label secret --namespace cert-manager letsencrypt-production-dns letsencrypt=production
 ```
 
 Create a new certificate and have it signed by Let's Encrypt for validation:
@@ -177,14 +177,42 @@ Resources:
         TopicConfigurations:
           - Event: s3:ObjectCreated:*
             Topic: !Ref S3ChangeNotificationTopic
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: velero/backups/
+                  - Name: suffix
+                    Value: velero-backup.json
           - Event: s3:ObjectRemoved:*
             Topic: !Ref S3ChangeNotificationTopic
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: velero/
+                  - Name: suffix
+                    Value: velero-backup.json
           - Event: s3:ReducedRedundancyLostObject
             Topic: !Ref S3ChangeNotificationTopic
           - Event: s3:LifecycleTransition
             Topic: !Ref S3ChangeNotificationTopic
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: velero/backups/
+                  - Name: suffix
+                    Value: velero-backup.json
           - Event: s3:LifecycleExpiration:*
             Topic: !Ref S3ChangeNotificationTopic
+            Filter:
+              S3Key:
+                 Rules:
+                  - Name: prefix
+                    Value: velero/backups/
+                  - Name: suffix
+                    Value: velero-backup.json
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -208,7 +236,8 @@ Resources:
     Properties:
       TopicName: !Join ["-", !Split [".", !Sub "${S3BucketName}"]]
       DisplayName: S3 Change Notification Topic
-      KmsMasterKeyId: alias/aws/sns
+      # The KmsMasterKeyId doesn't work with S3 bucket notifications
+      # KmsMasterKeyId: alias/aws/sns
   S3ChangeNotificationSubscription:
     Type: AWS::SNS::Subscription
     Properties:
@@ -349,16 +378,16 @@ eksctl create podidentityassociation --config-file "${TMP_DIR}/${CLUSTER_FQDN}/e
 ```
 
 ```console
-2025-02-02 19:44:18 [ℹ]  1 task: {
+2025-02-06 06:13:57 [ℹ]  1 task: {
     2 sequential sub-tasks: {
         create IAM role for pod identity association for service account "velero/velero",
         create pod identity association for service account "velero/velero",
-    } }2025-02-02 19:44:19 [ℹ]  deploying stack "eksctl-k01-podidentityrole-velero-velero"
-2025-02-02 19:44:19 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
-2025-02-02 19:44:49 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
-2025-02-02 19:45:35 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
-2025-02-02 19:45:36 [ℹ]  created pod identity association for service account "velero" in namespace "velero"
-2025-02-02 19:45:36 [ℹ]  all tasks were completed successfully
+    } }2025-02-06 06:13:58 [ℹ]  deploying stack "eksctl-k01-podidentityrole-velero-velero"
+2025-02-06 06:13:58 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
+2025-02-06 06:14:28 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
+2025-02-06 06:15:26 [ℹ]  waiting for CloudFormation stack "eksctl-k01-podidentityrole-velero-velero"
+2025-02-06 06:15:27 [ℹ]  created pod identity association for service account "velero" in namespace "velero"
+2025-02-06 06:15:27 [ℹ]  all tasks were completed successfully
 ```
 
 Install `velero`
@@ -392,16 +421,35 @@ metrics:
       - alert: VeleroBackupPartialFailures
         annotations:
           message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} partially failed backups.
-        expr: |-
-          velero_backup_partial_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
+        expr: velero_backup_partial_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
         for: 15m
         labels:
           severity: warning
       - alert: VeleroBackupFailures
         annotations:
           message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed backups.
-        expr: |-
-          velero_backup_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
+        expr: velero_backup_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
+        for: 15m
+        labels:
+          severity: warning
+      - alert: VeleroBackupSnapshotFailures
+        annotations:
+          message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed snapshot backups.
+        expr: increase(velero_volume_snapshot_failure_total{schedule!=""}[1h]) > 0
+        for: 15m
+        labels:
+          severity: warning
+      - alert: VeleroRestorePartialFailures
+        annotations:
+          message: Velero restore {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} partially failed restores.
+        expr: increase(velero_restore_partial_failure_total{schedule!=""}[1h]) > 0
+        for: 15m
+        labels:
+          severity: warning
+      - alert: VeleroRestoreFailures
+        annotations:
+          message: Velero restore {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed restores.
+        expr: increase(velero_restore_failure_total{schedule!=""}[1h]) > 0
         for: 15m
         labels:
           severity: warning
@@ -423,18 +471,18 @@ serviceAccount:
     name: velero
 credentials:
   useSecret: false
-# Create scheduled backup to periodically backup the "production" certificate in the "cert-manager" namespace every night:
+# Create scheduled backup to periodically backup the let's encrypt production resources in the "cert-manager" namespace:
 schedules:
-  weekly-backup-cert-manager:
+  monthly-backup-cert-manager-production:
     labels:
       letsencrypt: production
-    schedule: "@weekly"
+    schedule: "@monthly"
     template:
+      ttl: 2160h
       includedNamespaces:
         - cert-manager
       includedResources:
         - certificates.cert-manager.io
-        - clusterissuers.cert-manager.io
         - secrets
       labelSelector:
         matchLabels:
@@ -479,13 +527,13 @@ velero get backup-location
 
 ```console
 NAME      PROVIDER   BUCKET/PREFIX               PHASE       LAST VALIDATED                  ACCESS MODE   DEFAULT
-default   aws        k01.k8s.mylabs.dev/velero   Available   2025-02-02 21:45:03 +0100 CET   ReadWrite     true
+default   aws        k01.k8s.mylabs.dev/velero   Available   2025-02-06 06:21:59 +0100 CET   ReadWrite     true
 ```
 
 Initiate the backup process and store the required cert-manager objects in S3.
 
 ```shell
-velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
+velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
 ```
 
 Check the backup details:
@@ -495,14 +543,14 @@ velero backup describe --selector letsencrypt=production --details
 ```
 
 ```console
-Name:         velero-weekly-backup-cert-manager-20250202204626
+Name:         velero-monthly-backup-cert-manager-production-20250206052506
 Namespace:    velero
 Labels:       app.kubernetes.io/instance=velero
               app.kubernetes.io/managed-by=Helm
               app.kubernetes.io/name=velero
               helm.sh/chart=velero-8.3.0
               letsencrypt=production
-              velero.io/schedule-name=velero-weekly-backup-cert-manager
+              velero.io/schedule-name=velero-monthly-backup-cert-manager-production
               velero.io/storage-location=default
 Annotations:  meta.helm.sh/release-name=velero
               meta.helm.sh/release-namespace=velero
@@ -519,7 +567,7 @@ Namespaces:
   Excluded:  <none>
 
 Resources:
-  Included:        certificates.cert-manager.io, clusterissuers.cert-manager.io, secrets
+  Included:        certificates.cert-manager.io, secrets
   Excluded:        <none>
   Cluster-scoped:  auto
 
@@ -533,7 +581,7 @@ Velero-Native Snapshot PVs:  auto
 Snapshot Move Data:          false
 Data Mover:                  velero
 
-TTL:  720h0m0s
+TTL:  2160h0m0s
 
 CSISnapshotTimeout:    10m0s
 ItemOperationTimeout:  4h0m0s
@@ -542,19 +590,20 @@ Hooks:  <none>
 
 Backup Format Version:  1.1.0
 
-Started:    2025-02-02 21:46:26 +0100 CET
-Completed:  2025-02-02 21:46:27 +0100 CET
+Started:    2025-02-06 06:25:06 +0100 CET
+Completed:  2025-02-06 06:25:08 +0100 CET
 
-Expiration:  2025-03-04 21:46:26 +0100 CET
+Expiration:  2025-05-07 07:25:06 +0200 CEST
 
-Total items to be backed up:  2
-Items backed up:              2
+Total items to be backed up:  3
+Items backed up:              3
 
 Resource List:
   cert-manager.io/v1/Certificate:
     - cert-manager/ingress-cert-production
   v1/Secret:
     - cert-manager/ingress-cert-production
+    - cert-manager/letsencrypt-production-dns
 
 Backup Volumes:
   Velero-Native Snapshots: <none included>
@@ -571,23 +620,21 @@ List the files in the S3 bucket:
 
 ```bash
 aws s3 ls --recursive "s3://${CLUSTER_FQDN}/velero/backups"
-################################################################################
-exit 0
 ```
 
 ```console
-2025-02-02 21:46:28       4291 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-backup.json
-2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-csi-volumesnapshotclasses.json.gz
-2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-csi-volumesnapshotcontents.json.gz
-2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-csi-volumesnapshots.json.gz
-2025-02-02 21:46:28         27 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-itemoperations.json.gz
-2025-02-02 21:46:28       3011 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-logs.gz
-2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-podvolumebackups.json.gz
-2025-02-02 21:46:28         99 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-resource-list.json.gz
-2025-02-02 21:46:28         49 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-results.gz
-2025-02-02 21:46:28         27 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-volumeinfo.json.gz
-2025-02-02 21:46:28         29 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626-volumesnapshots.json.gz
-2025-02-02 21:46:28       6618 velero/backups/velero-weekly-backup-cert-manager-20250202204626/velero-weekly-backup-cert-manager-20250202204626.tar.gz
+2025-02-06 06:25:09       4276 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-backup.json
+2025-02-06 06:25:08         29 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-csi-volumesnapshotclasses.json.gz
+2025-02-06 06:25:08         29 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-csi-volumesnapshotcontents.json.gz
+2025-02-06 06:25:08         29 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-csi-volumesnapshots.json.gz
+2025-02-06 06:25:08         27 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-itemoperations.json.gz
+2025-02-06 06:25:08       3049 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-logs.gz
+2025-02-06 06:25:08         29 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-podvolumebackups.json.gz
+2025-02-06 06:25:08        121 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-resource-list.json.gz
+2025-02-06 06:25:08         49 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-results.gz
+2025-02-06 06:25:08         27 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-volumeinfo.json.gz
+2025-02-06 06:25:08         29 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506-volumesnapshots.json.gz
+2025-02-06 06:25:08       8379 velero/backups/velero-monthly-backup-cert-manager-production-20250206052506/velero-monthly-backup-cert-manager-production-20250206052506.tar.gz
 ```
 
 ## Restore cert-manager objects
@@ -598,7 +645,7 @@ production certificate, previously backed up by Velero to S3, onto a new cluster
 Initiate the restore process for cert-manager objects.
 
 ```bash
-velero restore create --from-schedule velero-weekly-backup-cert-manager --labels letsencrypt=production --wait
+velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 ```
 
 Details about the restore process:
@@ -608,6 +655,56 @@ velero restore describe --selector letsencrypt=production --details
 ```
 
 ```console
+Name:         velero-monthly-backup-cert-manager-production-20250206055911
+Namespace:    velero
+Labels:       letsencrypt=production
+Annotations:  <none>
+
+Phase:                       Completed
+Total items to be restored:  3
+Items restored:              3
+
+Started:    2025-02-06 06:59:12 +0100 CET
+Completed:  2025-02-06 06:59:13 +0100 CET
+
+Backup:  velero-monthly-backup-cert-manager-production-20250206052506
+
+Namespaces:
+  Included:  all namespaces found in the backup
+  Excluded:  <none>
+
+Resources:
+  Included:        *
+  Excluded:        nodes, events, events.events.k8s.io, backups.velero.io, restores.velero.io, resticrepositories.velero.io, csinodes.storage.k8s.io, volumeattachments.storage.k8s.io, backuprepositories.velero.io
+  Cluster-scoped:  auto
+
+Namespace mappings:  <none>
+
+Label selector:  <none>
+
+Or label selector:  <none>
+
+Restore PVs:  auto
+
+CSI Snapshot Restores: <none included>
+
+Existing Resource Policy:   update
+ItemOperationTimeout:       4h0m0s
+
+Preserve Service NodePorts:  auto
+
+Uploader config:
+
+
+HooksAttempted:   0
+HooksFailed:      0
+
+Resource List:
+  cert-manager.io/v1/Certificate:
+    - cert-manager/ingress-cert-production(created)
+  v1/Secret:
+    - cert-manager/ingress-cert-production(created)
+    - cert-manager/letsencrypt-production-dns(updated)
 ```
 
 Verify if the certificate was restored properly:
@@ -620,14 +717,16 @@ kubectl describe certificates -n cert-manager ingress-cert-production
 Name:         ingress-cert-production
 Namespace:    cert-manager
 Labels:       letsencrypt=production
-              velero.io/backup-name=velero-weekly-backup-cert-manager-20230323194540
-              velero.io/restore-name=velero-weekly-backup-cert-manager-20230324051646
+              velero.io/backup-name=velero-monthly-backup-cert-manager-production-20250206052506
+              velero.io/restore-name=velero-monthly-backup-cert-manager-production-20250206055911
 Annotations:  <none>
 API Version:  cert-manager.io/v1
 Kind:         Certificate
-...
-...
-...
+Metadata:
+  Creation Timestamp:  2025-02-06T05:59:13Z
+  Generation:          1
+  Resource Version:    7903
+  UID:                 a7adee5e-82b7-4849-aac6-aa33298a9268
 Spec:
   Common Name:  *.k01.k8s.mylabs.dev
   Dns Names:
@@ -642,25 +741,25 @@ Spec:
       Letsencrypt:  production
 Status:
   Conditions:
-    Last Transition Time:  2023-03-24T05:16:48Z
+    Last Transition Time:  2025-02-06T05:59:13Z
     Message:               Certificate is up to date and has not expired
     Observed Generation:   1
     Reason:                Ready
     Status:                True
     Type:                  Ready
-  Not After:               2023-06-21T18:10:31Z
-  Not Before:              2023-03-23T18:10:32Z
-  Renewal Time:            2023-05-22T18:10:31Z
+  Not After:               2025-05-07T04:13:10Z
+  Not Before:              2025-02-06T04:13:11Z
+  Renewal Time:            2025-04-07T04:13:10Z
 Events:                    <none>
 ```
 
 ## Reconfigure ingress-nginx
 
-Previous steps restored the Let's Encrypt production certificate
-`cert-manager/ingress-cert-production`. Let's use this cert by `ingress-nginx`.
+The previous steps restored the Let's Encrypt production certificate (`cert-manager/ingress-cert-production`).
+Now, let's configure `ingress-nginx` to use this certificate.
 
-Check the current "staging" certificate - this will be replaced by the
-"production" one:
+First, check the current "staging" certificate, which will be replaced by the
+production certificate:
 
 ```bash
 while ! curl -sk "https://${CLUSTER_FQDN}" > /dev/null; do
@@ -671,19 +770,53 @@ openssl s_client -connect "${CLUSTER_FQDN}:443" < /dev/null
 ```
 
 ```console
-depth=2 C = US, O = (STAGING) Internet Security Research Group, CN = (STAGING) Pretend Pear X1
+depth=1 C=US, O=(STAGING) Let's Encrypt, CN=(STAGING) Wannabe Watercress R11
 verify error:num=20:unable to get local issuer certificate
-verify return:0
-...
+verify return:1
+depth=0 CN=*.k01.k8s.mylabs.dev
+verify return:1
+---
+Certificate chain
+ 0 s:CN=*.k01.k8s.mylabs.dev
+   i:C=US, O=(STAGING) Let's Encrypt, CN=(STAGING) Wannabe Watercress R11
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Feb  6 04:56:23 2025 GMT; NotAfter: May  7 04:56:22 2025 GMT
+ 1 s:C=US, O=(STAGING) Let's Encrypt, CN=(STAGING) Wannabe Watercress R11
+   i:C=US, O=(STAGING) Internet Security Research Group, CN=(STAGING) Pretend Pear X1
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Mar 13 00:00:00 2024 GMT; NotAfter: Mar 12 23:59:59 2027 GMT
 ---
 Server certificate
-subject=/CN=*.k01.k8s.mylabs.dev
-issuer=/C=US/O=(STAGING) Let's Encrypt/CN=(STAGING) Artificial Apricot R3
----
+-----BEGIN CERTIFICATE-----
 ...
+...
+...
+-----END CERTIFICATE-----
+subject=CN=*.k01.k8s.mylabs.dev
+issuer=C=US, O=(STAGING) Let's Encrypt, CN=(STAGING) Wannabe Watercress R11
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 3270 bytes and written 409 bytes
+Verification error: unable to get local issuer certificate
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Server public key is 2048 bit
+This TLS version forbids renegotiation.
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 20 (unable to get local issuer certificate)
+---
+DONE
 ```
 
-Use production Let's Encrypt certificate by `ingress-nginx`:
+Configure `ingress-nginx` to use the Let's Encrypt production certificate.
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -697,171 +830,125 @@ EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --reuse-values --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx-production-certs.yml" ingress-nginx ingress-nginx/ingress-nginx
 ```
 
-The production certificate should be ready:
+The production certificate is now ready for use.
 
 ```bash
+while ! curl -sk "https://${CLUSTER_FQDN}" > /dev/null; do
+  date
+  sleep 5
+done
 openssl s_client -connect "${CLUSTER_FQDN}:443" < /dev/null
 ```
 
 ```console
-depth=2 C = US, O = Internet Security Research Group, CN = ISRG Root X1
+depth=2 C=US, O=Internet Security Research Group, CN=ISRG Root X1
 verify return:1
-depth=1 C = US, O = Let's Encrypt, CN = R3
+depth=1 C=US, O=Let's Encrypt, CN=R10
 verify return:1
-depth=0 CN = *.k01.k8s.mylabs.dev
-...
+depth=0 CN=*.k01.k8s.mylabs.dev
+verify return:1
+---
+Certificate chain
+ 0 s:CN=*.k01.k8s.mylabs.dev
+   i:C=US, O=Let's Encrypt, CN=R10
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Feb  6 04:13:11 2025 GMT; NotAfter: May  7 04:13:10 2025 GMT
+ 1 s:C=US, O=Let's Encrypt, CN=R10
+   i:C=US, O=Internet Security Research Group, CN=ISRG Root X1
+   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
+   v:NotBefore: Mar 13 00:00:00 2024 GMT; NotAfter: Mar 12 23:59:59 2027 GMT
 ---
 Server certificate
-subject=/CN=*.k01.k8s.mylabs.dev
-issuer=/C=US/O=Let's Encrypt/CN=R3
----
+-----BEGIN CERTIFICATE-----
 ...
+...
+...
+-----END CERTIFICATE-----
+subject=CN=*.k01.k8s.mylabs.dev
+issuer=C=US, O=Let's Encrypt, CN=R10
+---
+No client certificate CA names sent
+Peer signing digest: SHA256
+Peer signature type: RSA-PSS
+Server Temp Key: X25519, 253 bits
+---
+SSL handshake has read 3149 bytes and written 409 bytes
+Verification: OK
+---
+New, TLSv1.3, Cipher is TLS_AES_256_GCM_SHA384
+Protocol: TLSv1.3
+Server public key is 2048 bit
+This TLS version forbids renegotiation.
+Compression: NONE
+Expansion: NONE
+No ALPN negotiated
+Early data was not sent
+Verify return code: 0 (ok)
+---
+DONE
 ```
 
-Here is the report form [SSL Labs](https://www.ssllabs.com):
+Here is the SSL Labs report: [SSL Labs](https://www.ssllabs.com):
 
 ![ssl-labs-report](/assets/img/posts/2023/2023-03-20-velero-and-cert-manager/ssl-labs-report.avif)
 
-## Rotation of the "production" certificate
-
-The Let's Encrypt certificates are valid for 90 days. It is necessary to renew
-them before they expire.
-
-Few commands showing the details after cert-manager renewed the certificate.
-
 Examine the certificate:
 
-```shell
+```bash
 kubectl describe certificates -n cert-manager ingress-cert-production
 ```
 
 ```console
-...
+Name:         ingress-cert-production
+Namespace:    cert-manager
+Labels:       letsencrypt=production
+              velero.io/backup-name=velero-monthly-backup-cert-manager-production-20250206052506
+              velero.io/restore-name=velero-monthly-backup-cert-manager-production-20250206055911
+Annotations:  <none>
+API Version:  cert-manager.io/v1
+Kind:         Certificate
+Metadata:
+  Creation Timestamp:  2025-02-06T05:59:13Z
+  Generation:          1
+  Resource Version:    7903
+  UID:                 a7adee5e-82b7-4849-aac6-aa33298a9268
+Spec:
+  Common Name:  *.k01.k8s.mylabs.dev
+  Dns Names:
+    *.k01.k8s.mylabs.dev
+    k01.k8s.mylabs.dev
+  Issuer Ref:
+    Kind:       ClusterIssuer
+    Name:       letsencrypt-production-dns
+  Secret Name:  ingress-cert-production
+  Secret Template:
+    Labels:
+      Letsencrypt:  production
 Status:
   Conditions:
-    Last Transition Time:  2023-09-13T04:50:19Z
+    Last Transition Time:  2025-02-06T05:59:13Z
     Message:               Certificate is up to date and has not expired
     Observed Generation:   1
     Reason:                Ready
     Status:                True
     Type:                  Ready
-  Not After:               2023-12-12T03:53:45Z
-  Not Before:              2023-09-13T03:53:46Z
-  Renewal Time:            2023-11-12T03:53:45Z
-  Revision:                1
-Events:
-  Type    Reason     Age   From                                       Message
-  ----    ------     ----  ----                                       -------
-  Normal  Issuing    58m   cert-manager-certificates-trigger          Renewing certificate as renewal was scheduled at 2023-09-09 13:39:16 +0000 UTC
-  Normal  Reused     58m   cert-manager-certificates-key-manager      Reusing private key stored in existing Secret resource "ingress-cert-production"
-  Normal  Requested  58m   cert-manager-certificates-request-manager  Created new CertificateRequest resource "ingress-cert-production-1"
-  Normal  Issuing    55m   cert-manager-certificates-issuing          The certificate has been successfully issued
+  Not After:               2025-05-07T04:13:10Z
+  Not Before:              2025-02-06T04:13:11Z
+  Renewal Time:            2025-04-07T04:13:10Z
+Events:                    <none>
 ```
 
-Look at the `CertificateRequest`:
+## Clean-up
 
-```shell
-kubectl describe certificaterequests -n cert-manager ingress-cert-production-1
-```
-
-```console
-Name:         ingress-cert-production-1
-Namespace:    cert-manager
-Labels:       letsencrypt=production
-              velero.io/backup-name=velero-weekly-backup-cert-manager-20230711144135
-              velero.io/restore-name=velero-weekly-backup-cert-manager-20230913045017
-Annotations:  cert-manager.io/certificate-name: ingress-cert-production
-              cert-manager.io/certificate-revision: 1
-              cert-manager.io/private-key-secret-name: ingress-cert-production-kxk5s
-API Version:  cert-manager.io/v1
-Kind:         CertificateRequest
-Metadata:
-  Creation Timestamp:  2023-09-13T04:50:19Z
-  Generation:          1
-  Owner References:
-    API Version:           cert-manager.io/v1
-    Block Owner Deletion:  true
-    Controller:            true
-    Kind:                  Certificate
-    Name:                  ingress-cert-production
-    UID:                   b04e1186-e6c5-42d0-8d61-34810644b386
-  Resource Version:        8653
-  UID:                     b9c209b3-0bac-440d-a62f-91800c6c458b
-Spec:
-  Extra:
-    authentication.kubernetes.io/pod-name:
-      cert-manager-f9f87498d-nvggh
-    authentication.kubernetes.io/pod-uid:
-      3b1a2731-0e75-4cf2-bdbd-7278ac364498
-  Groups:
-    system:serviceaccounts
-    system:serviceaccounts:cert-manager
-    system:authenticated
-  Issuer Ref:
-    Kind:    ClusterIssuer
-    Name:    letsencrypt-production-dns
-  Request:   LS0xxxxxxxS0K
-  UID:       8704d6db-816e-4c93-bcc8-8801060b05d0
-  Username:  system:serviceaccount:cert-manager:cert-manager
-Status:
-  Certificate:  LSxxxxxxCg==
-  Conditions:
-    Last Transition Time:  2023-09-13T04:50:19Z
-    Message:               Certificate request has been approved by cert-manager.io
-    Reason:                cert-manager.io
-    Status:                True
-    Type:                  Approved
-    Last Transition Time:  2023-09-13T04:53:46Z
-    Message:               Certificate fetched from issuer successfully
-    Reason:                Issued
-    Status:                True
-    Type:                  Ready
-Events:
-  Type    Reason              Age   From                                                Message
-  ----    ------              ----  ----                                                -------
-  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-ca          Not signing CertificateRequest until it is Approved
-  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-acme        Not signing CertificateRequest until it is Approved
-  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-vault       Not signing CertificateRequest until it is Approved
-  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-selfsigned  Not signing CertificateRequest until it is Approved
-  Normal  WaitingForApproval  54m   cert-manager-certificaterequests-issuer-venafi      Not signing CertificateRequest until it is Approved
-  Normal  cert-manager.io     54m   cert-manager-certificaterequests-approver           Certificate request has been approved by cert-manager.io
-  Normal  OrderCreated        54m   cert-manager-certificaterequests-issuer-acme        Created Order resource cert-manager/ingress-cert-production-1-3932937138
-  Normal  OrderPending        54m   cert-manager-certificaterequests-issuer-acme        Waiting on certificate issuance from order cert-manager/ingress-cert-production-1-3932937138: ""
-  Normal  CertificateIssued   50m   cert-manager-certificaterequests-issuer-acme        Certificate fetched from issuer successfully
-```
-
-Check the `cert-manager` logs:
-
-```shell
-kubectl logs -n cert-manager cert-manager-f9f87498d-nvggh
-```
-
-```console
-...
-I0913 04:50:18.960223       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Ready" to 2023-09-13 04:50:18.960211036 +0000 UTC m=+451.003679107
-I0913 04:50:18.962295       1 trigger_controller.go:194] "cert-manager/certificates-trigger: Certificate must be re-issued" key="cert-manager/ingress-cert-production" reason="Renewing" message="Renewing certificate as renewal was scheduled at <nil>"
-I0913 04:50:18.962464       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Issuing" to 2023-09-13 04:50:18.962457264 +0000 UTC m=+451.005925351
-I0913 04:50:19.011897       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Ready" to 2023-09-13 04:50:19.011889134 +0000 UTC m=+451.055357214
-I0913 04:50:19.020026       1 trigger_controller.go:194] "cert-manager/certificates-trigger: Certificate must be re-issued" key="cert-manager/ingress-cert-production" reason="Renewing" message="Renewing certificate as renewal was scheduled at <nil>"
-I0913 04:50:19.020061       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Issuing" to 2023-09-13 04:50:19.020054522 +0000 UTC m=+451.063522609
-I0913 04:50:19.046907       1 trigger_controller.go:194] "cert-manager/certificates-trigger: Certificate must be re-issued" key="cert-manager/ingress-cert-production" reason="Renewing" message="Renewing certificate as renewal was scheduled at 2023-09-09 13:39:16 +0000 UTC"
-I0913 04:50:19.046942       1 conditions.go:203] Setting lastTransitionTime for Certificate "ingress-cert-production" condition "Issuing" to 2023-09-13 04:50:19.046937063 +0000 UTC m=+451.090405134
-I0913 04:50:19.134032       1 conditions.go:263] Setting lastTransitionTime for CertificateRequest "ingress-cert-production-1" condition "Approved" to 2023-09-13 04:50:19.134023095 +0000 UTC m=+451.177491158
-I0913 04:50:19.175761       1 conditions.go:263] Setting lastTransitionTime for CertificateRequest "ingress-cert-production-1" condition "Ready" to 2023-09-13 04:50:19.175750564 +0000 UTC m=+451.219218635
-I0913 04:50:19.210564       1 conditions.go:263] Setting lastTransitionTime for CertificateRequest "ingress-cert-production-1" condition "Ready" to 2023-09-13 04:50:19.210549558 +0000 UTC m=+451.254017629
-I0913 04:53:46.526286       1 acme.go:233] "cert-manager/certificaterequests-issuer-acme/sign: certificate issued" resource_name="ingress-cert-production-1" resource_namespace="cert-manager" resource_kind="CertificateRequest" resource_version="v1" related_resource_name="ingress-cert-production-1-3932937138" related_resource_namespace="cert-manager" related_resource_kind="Order" related_resource_version="v1"
-I0913 04:53:46.526563       1 conditions.go:252] Found status change for CertificateRequest "ingress-cert-production-1" condition "Ready": "False" -> "True"; setting lastTransitionTime to 2023-09-13 04:53:46.526554494 +0000 UTC m=+658.570022573
-```
-
----
+![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="300"}
 
 Backup certificate before deleting the cluster (in case it was renewed):
 
 {% raw %}
 
 ```sh
-if ! kubectl get certificaterequests.cert-manager.io -n cert-manager --selector letsencrypt=production -o go-template='{{.items | len}}' | grep -qxF 0; then
-  velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
+if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
+  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
 fi
 ```
 
