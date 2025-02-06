@@ -385,6 +385,8 @@ iam:
       roleName: eksctl-${CLUSTER_NAME}-pia-external-dns
       wellKnownPolicies:
         externalDNS: true
+addons:
+  - name: eks-pod-identity-agent
 autoModeConfig:
   enabled: true
   nodePools: ["system"]
@@ -448,7 +450,7 @@ spec:
           values: ["t"]
         - key: karpenter.sh/capacity-type
           operator: In
-          values: ["spot"]
+          values: ["spot", "on-demand"]
         - key: topology.kubernetes.io/zone
           operator: In
           values: ["${AWS_REGION}a"]
@@ -633,6 +635,7 @@ grafana:
             path: /var/lib/grafana/dashboards/default
   dashboards:
     default:
+      # keep-sorted start numeric=yes
       1860-node-exporter-full:
         # renovate: depName="Node Exporter Full"
         gnetId: 1860
@@ -643,20 +646,15 @@ grafana:
         gnetId: 3662
         revision: 2
         datasource: Prometheus
-      12006-kubernetes-apiserver:
-        # renovate: depName="Kubernetes apiserver"
-        gnetId: 12006
-        revision: 1
-        datasource: Prometheus
       9614-nginx-ingress-controller:
         # renovate: depName="NGINX Ingress controller"
         gnetId: 9614
         revision: 1
         datasource: Prometheus
-      15038-external-dns:
-        # renovate: depName="External-dns"
-        gnetId: 15038
-        revision: 3
+      12006-kubernetes-apiserver:
+        # renovate: depName="Kubernetes apiserver"
+        gnetId: 12006
+        revision: 1
         datasource: Prometheus
       # https://github.com/DevOps-Nirvana/Grafana-Dashboards
       14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
@@ -664,11 +662,10 @@ grafana:
         gnetId: 14314
         revision: 2
         datasource: Prometheus
-      # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
-      15760-kubernetes-views-pods:
-        # renovate: depName="Kubernetes / Views / Pods"
-        gnetId: 15760
-        revision: 34
+      15038-external-dns:
+        # renovate: depName="External-dns"
+        gnetId: 15038
+        revision: 3
         datasource: Prometheus
       15757-kubernetes-views-global:
         # renovate: depName="Kubernetes / Views / Global"
@@ -680,41 +677,38 @@ grafana:
         gnetId: 15758
         revision: 41
         datasource: Prometheus
-      15759-kubernetes-views-nodes:
-        # renovate: depName="Kubernetes / Views / Nodes"
-        gnetId: 15759
-        revision: 32
+      # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
+      15760-kubernetes-views-pods:
+        # renovate: depName="Kubernetes / Views / Pods"
+        gnetId: 15760
+        revision: 34
         datasource: Prometheus
       15761-kubernetes-system-api-server:
         # renovate: depName="Kubernetes / System / API Server"
         gnetId: 15761
         revision: 18
         datasource: Prometheus
-      15762-kubernetes-system-coredns:
-        # renovate: depName="Kubernetes / System / CoreDNS"
-        gnetId: 15762
-        revision: 19
-        datasource: Prometheus
       19105-prometheus:
         # renovate: depName="Prometheus"
         gnetId: 19105
         revision: 6
-        datasource: Prometheus
-      16237-cluster-capacity:
-        # renovate: depName="Cluster Capacity (Karpenter)"
-        gnetId: 16237
-        revision: 1
-        datasource: Prometheus
-      16236-pod-statistic:
-        # renovate: depName="Pod Statistic (Karpenter)"
-        gnetId: 16236
-        revision: 1
         datasource: Prometheus
       19268-prometheus:
         # renovate: depName="Prometheus All Metrics"
         gnetId: 19268
         revision: 1
         datasource: Prometheus
+      20340-cert-manager:
+        # renovate: depName="cert-manager"
+        gnetId: 20340
+        revision: 1
+        datasource: Prometheus
+      20842-cert-manager-kubernetes:
+        # renovate: depName="Cert-manager-Kubernetes"
+        gnetId: 20842
+        revision: 1
+        datasource: Prometheus
+      # keep-sorted end
   grafana.ini:
     analytics:
       check_for_updates: false
@@ -854,10 +848,10 @@ spec:
           dnsZones:
             - ${CLUSTER_FQDN}
         dns01:
-          route53:
-            region: ${AWS_REGION}
+          route53: {}
 EOF
 kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
+kubectl label secret --namespace cert-manager letsencrypt-staging-dns letsencrypt=staging
 ```
 
 Create certificate:
@@ -933,7 +927,7 @@ and modify the
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
 INGRESS_NGINX_HELM_CHART_VERSION="4.12.0"
 
-kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
+kubectl wait --namespace cert-manager --for=condition=Ready --timeout=15m certificate ingress-cert-staging
 
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF

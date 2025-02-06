@@ -55,7 +55,7 @@ Generating the production ready Let's Encrypt certificates should be done only
 once. The goal is to backup the certificate and then restore it whenever is it
 needed to "new" cluster.
 
-Create Let's Encrupt production `ClusterIssuer`:
+Create Let's Encrypt production `ClusterIssuer`:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-production.yml" << EOF | kubectl apply -f -
