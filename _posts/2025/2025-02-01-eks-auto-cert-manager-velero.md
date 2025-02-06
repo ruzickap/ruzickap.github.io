@@ -21,7 +21,7 @@ image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19
 
 <!-- markdownlint-disable MD013 MD033 -->
 In the previous post, [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})
-I used [cert-manager](https://cert-manager.io/) to obrain a [wildcard certificate](https://en.wikipedia.org/wiki/Public_key_certificate#Wildcard_certificate)
+I used [cert-manager](https://cert-manager.io/) to obtain a [wildcard certificate](https://en.wikipedia.org/wiki/Public_key_certificate#Wildcard_certificate)
 for the [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 <!-- markdownlint-enable MD013 MD033 -->
 
@@ -35,7 +35,7 @@ for cert-manager objects.
 
 Links:
 
-- [Backup and Restore Resources](https://cert-manager.io/v1.13-docs/tutorials/backup/#order-of-restore)
+- [Backup and Restore Resources](https://cert-manager.io/v1.16-docs/devops-tips/backup/)
 
 ## Requirements
 
@@ -43,7 +43,9 @@ Links:
 - Amazon EKS Auto Mode cluster (described in
   [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %}))
 - [AWS CLI](https://aws.amazon.com/cli/)
+- [eksctl](https://eksctl.io/)
 - [Helm](https://helm.sh)
+- [kubectl](https://github.com/kubernetes/kubectl)
 <!-- markdownlint-enable MD013 MD033 -->
 
 Variables used in the following steps:
