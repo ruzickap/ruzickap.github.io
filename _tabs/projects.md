@@ -82,8 +82,8 @@ List of my GitHub projects:
 ## [action-my-markdown-link-checker](https://github.com/ruzickap/action-my-markdown-link-checker)
 
 - Description: A GitHub Action for checking broken links in Markdown files
-- Topics: broken-links, markdown, github-action, github-actions, actions,
-  website, checker, links, link-checker, link-checking, url-checker, public,
+- Topics: markdown, github-action, github-actions, actions, website, checker,
+  links, link-checker, url-checker, public, broken-links, link-checking,
   url-checking
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/releases/latest)
@@ -204,8 +204,10 @@ List of my GitHub projects:
 - CI/CD status:
 
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-openwrt/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-openwrt/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-openwrt/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-openwrt/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-openwrt/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-openwrt/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-openwrt/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/stale.yml)
 
@@ -418,8 +420,10 @@ List of my GitHub projects:
 
   [![GitHub Actions status - latex-build](https://github.com/ruzickap/cheatsheet-atom/workflows/latex-build/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/latex-build.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/cheatsheet-atom/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-atom/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/cheatsheet-atom/workflows/release-please/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/cheatsheet-atom/workflows/renovate/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/cheatsheet-atom/workflows/scorecards/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cheatsheet-atom/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/cheatsheet-atom/workflows/stale/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/stale.yml)
 
@@ -451,8 +455,10 @@ List of my GitHub projects:
 
   [![GitHub Actions status - latex-build](https://github.com/ruzickap/cheatsheet-macos/workflows/latex-build/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/latex-build.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/cheatsheet-macos/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-macos/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/cheatsheet-macos/workflows/release-please/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/cheatsheet-macos/workflows/renovate/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/cheatsheet-macos/workflows/scorecards/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cheatsheet-macos/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/cheatsheet-macos/workflows/stale/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/stale.yml)
 
@@ -484,8 +490,10 @@ List of my GitHub projects:
 
   [![GitHub Actions status - latex-build](https://github.com/ruzickap/cheatsheet-systemd/workflows/latex-build/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/latex-build.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/cheatsheet-systemd/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-systemd/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/cheatsheet-systemd/workflows/release-please/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/cheatsheet-systemd/workflows/renovate/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/cheatsheet-systemd/workflows/scorecards/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cheatsheet-systemd/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/cheatsheet-systemd/workflows/stale/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/stale.yml)
 
@@ -1037,6 +1045,7 @@ List of my GitHub projects:
   [![GitHub Actions status - renovate](https://github.com/ruzickap/my-git-projects/workflows/renovate/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/renovate.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/my-git-projects/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/my-git-projects/workflows/stale/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/stale.yml)
+  [![GitHub Actions status - tofu-github-repositories](https://github.com/ruzickap/my-git-projects/workflows/tofu-github-repositories/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/tofu-github-repositories.yaml)
 
 - Issue tracking:
 
@@ -1213,6 +1222,7 @@ List of my GitHub projects:
   [![GitHub Actions status - links](https://github.com/ruzickap/ruzickap.github.io/workflows/links/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/links.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ruzickap.github.io/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - post_tests](https://github.com/ruzickap/ruzickap.github.io/workflows/post_tests/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/post_tests.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ruzickap.github.io/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ruzickap.github.io/workflows/release-please/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate-pr](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate-pr/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate-pr.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate.yml)
