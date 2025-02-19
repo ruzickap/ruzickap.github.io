@@ -24,7 +24,7 @@ defaults:
     shell: bash -euxo pipefail {0}
 
 jobs:
-  debug:
+  github-context:
     runs-on: ubuntu-latest
     steps:
       - name: Debug
