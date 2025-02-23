@@ -358,7 +358,6 @@ graph LR
       plex_configuration_storage --> plex_configuration_storage_host_path[Host Path: /mnt/my-local-disk-pool/plex]
     end
     click apps "https://truenas.local/ui/apps/installed"
-    click claim_token "https://account.plex.tv/en/claim"
 ```
 
 ![Plex](https://raw.githubusercontent.com/plexinc/plex-media-player/3d4859f1b1b7aaa3a1be31699fc9cc9295662848/resources/images/splash.png){:width="200"}
@@ -385,7 +384,7 @@ graph LR
       periodic_smart_tests --> type[Type: SHORT]
       periodic_smart_tests --> schedule[Schedule: Weekly]
     end
-    click datasets "https://truenas.local/ui/datasets"
+    click data_protection "https://truenas.local/ui/data-protection"
 ```
 
 ![TrueNAS](https://raw.githubusercontent.com/truenas/documentation/1bb5fd6adb68b18aad6476bcab61d46bad2f0e2e/static/images/full-rgb.png)
