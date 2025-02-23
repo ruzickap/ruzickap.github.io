@@ -71,3 +71,12 @@ mega-linter-runner --remove-container --container-name="mega-linter" --debug --e
   ### <some clean-up/destroy commands...>
   ```
   ````
+
+## Customizations
+
+(Taken from [kungfux/kungfux.github.io](https://github.com/kungfux/kungfux.github.io))
+
+- Add progress bar to back to top
+  `assets/js/progress.js`, `assets/css/jekyll-theme-chirpy.scss`, `_includes/metadata-hook.html`
+- Trigger PWA update automatically
+  `assets/js/auto-update.js`, `_includes/metadata-hook.html`

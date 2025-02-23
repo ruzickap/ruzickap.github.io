@@ -1,0 +1,71 @@
+---
+---
+
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
+
+/*
+ * Theme styles
+ */
+
+// Use blue accent color
+#access-lastmod a:hover {
+  color: #007bff !important;
+  border-bottom: 1px solid #007bff;
+}
+
+// Use single line post title
+#post-list .card .card-body .card-title {
+  -webkit-line-clamp: 1;
+}
+
+/*
+ * Page styles
+ */
+
+// Back-to-top progress bar
+#progress-circle {
+  margin: -1px -1px;
+  top: -2.75rem;
+  position: relative;
+  transform: rotate(-90deg);
+
+  circle {
+    stroke: var(--toc-highlight);
+    stroke-dasharray: 2 * 3.14 * 20;
+    stroke-dashoffset: 2 * 3.14 * 20;
+    transition: stroke-dashoffset 0.2s;
+  }
+}
+
+/*
+ * Post styles
+ */
+
+@import "github-alerts.css";
+
+// Schemas and code blocks styles
+div.highlighter-rouge {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/*
+ * Bootstrap
+ */
+
+.d-flex {
+  display: flex;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.m-auto {
+  margin: auto;
+}
