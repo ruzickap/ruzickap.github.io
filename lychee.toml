@@ -28,15 +28,18 @@ exclude = [
   '%7B.*%7D',
   # Ignore all URLs with '$' - BASH variable in URL
   '\$',
+  '\.local',
   'analytics\.eu\.umami\.is/',
   'cdn\.com',
   # Ignore all URLs which starts with 'file://'
   'file://',
   'fonts\.(googleapis|gstatic)\.com',
+  'linkedin\.com',
   'mylabs\.dev',
   'stackexchange\.com',
   'stackoverflow\.com',
   'username\.github\.io',
+  'www\.dell\.com',
   'www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL',
   'www\.googletagmanager\.com',
   'www\.threads\.net/intent/post',
