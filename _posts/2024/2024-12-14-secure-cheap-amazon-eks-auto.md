@@ -934,6 +934,7 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   config:
     annotations-risk-level: Critical
+    use-proxy-protocol: true
   allowSnippetAnnotations: true
   ingressClassResource:
     default: true
@@ -944,13 +945,12 @@ controller:
       # https://www.qovery.com/blog/our-migration-from-kubernetes-built-in-nlb-to-alb-controller/
       # https://www.youtube.com/watch?v=xwiRjimKW9c
       service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
-      service.beta.kubernetes.io/aws-load-balancer-alpn-policy: HTTP2Preferred
       service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
       service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-      # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.11/guide/service/nlb/#protocols
-      service.beta.kubernetes.io/aws-load-balancer-proxy-protocol: "*"
       service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+      service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: proxy_protocol_v2.enabled=true
       service.beta.kubernetes.io/aws-load-balancer-type: external
+    loadBalancerClass: eks.amazonaws.com/nlb
   metrics:
     enabled: true
     serviceMonitor:
