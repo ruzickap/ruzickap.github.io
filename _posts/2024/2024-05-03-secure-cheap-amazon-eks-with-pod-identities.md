@@ -787,6 +787,11 @@ iam:
       roleName: ${CLUSTER_NAME}-karpenter
       permissionPolicyARNs:
         - ${AWS_KARPENTER_CONTROLLER_POLICY_ARN}
+    - namespace: aws-load-balancer-controller
+      serviceAccountName: aws-load-balancer-controller
+      roleName: eksctl-${CLUSTER_NAME}-pia-aws-load-balancer-controller
+      wellKnownPolicies:
+        awsLoadBalancerController: true
 addons:
   - name: coredns
   - name: eks-pod-identity-agent
@@ -811,7 +816,7 @@ managedNodeGroups:
     minSize: 2
     maxSize: 5
     volumeSize: 20
-    disablePodIMDS: true
+    # disablePodIMDS: true - keep it disabled due to aws-load-balancer-controller
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
     privateNetworking: true
@@ -1499,31 +1504,6 @@ spec:
 EOF
 ```
 
-### Metrics Server
-
-[Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is
-a scalable, efficient source of container resource metrics for Kubernetes
-built-in autoscaling pipelines.
-
-Install `metrics-server`
-[helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
-and modify the
-[default values](https://github.com/kubernetes-sigs/metrics-server/blob/metrics-server-helm-chart-3.12.1/charts/metrics-server/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
-METRICS_SERVER_HELM_CHART_VERSION="3.12.1"
-
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
-metrics:
-  enabled: true
-serviceMonitor:
-  enabled: true
-EOF
-helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
-```
-
 ### ExternalDNS
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
@@ -1557,6 +1537,31 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 kubectl label namespace external-dns pod-security.kubernetes.io/enforce=baseline
 ```
 
+### AWS Load Balancer Controller
+
+[AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
+is a controller to manage Elastic Load Balancers for a Kubernetes cluster. It is
+being used by `ingress-nginx`.
+
+Install `aws-load-balancer-controller`
+[helm chart](https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller)
+and modify the
+[default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.11.0/helm/aws-load-balancer-controller/values.yaml).
+
+```bash
+# renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
+AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.11.0"
+
+helm repo add eks https://aws.github.io/eks-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" << EOF
+serviceAccount:
+  name: aws-load-balancer-controller
+clusterName: ${CLUSTER_NAME}
+EOF
+helm upgrade --install --version "${AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION}" --namespace aws-load-balancer-controller --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" aws-load-balancer-controller eks/aws-load-balancer-controller
+kubectl label namespace aws-load-balancer-controller pod-security.kubernetes.io/enforce=baseline
+```
+
 ### Ingress NGINX Controller
 
 [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
@@ -1566,17 +1571,19 @@ proxy and load balancer.
 Install `ingress-nginx`
 [helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
 and modify the
-[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.10.1/charts/ingress-nginx/values.yaml).
+[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.12.0/charts/ingress-nginx/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.10.1"
+INGRESS_NGINX_HELM_CHART_VERSION="4.12.0"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
 
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
+  config:
+    use-proxy-protocol: true
   allowSnippetAnnotations: true
   ingressClassResource:
     default: true
@@ -1586,8 +1593,13 @@ controller:
     default-ssl-certificate: "cert-manager/ingress-cert-staging"
   service:
     annotations:
-      service.beta.kubernetes.io/aws-load-balancer-type: nlb
       service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
+      service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
+      service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+      service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+      service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: proxy_protocol_v2.enabled=true
+      service.beta.kubernetes.io/aws-load-balancer-type: external
+    loadBalancerClass: service.k8s.aws/nlb
   metrics:
     enabled: true
     serviceMonitor:
