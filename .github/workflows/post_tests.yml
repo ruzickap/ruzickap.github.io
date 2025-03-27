@@ -101,7 +101,7 @@ jobs:
             ) | tee -a "${GITHUB_STEP_SUMMARY}"
           fi
 
-          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )copilot ' && ! command -v copilot &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```^bash$' | grep -Eq '(^| )copilot ' && ! command -v copilot &> /dev/null ; then
             echo "*** Installing copilot"
             brew install copilot
           fi
