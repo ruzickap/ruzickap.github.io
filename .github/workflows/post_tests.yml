@@ -140,6 +140,6 @@ jobs:
             for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
               echo "*** ${POST_FILE} | destroy"
               # shellcheck disable=SC1090
-              source <(echo "set -euxo pipefail" ; cat"${POST_FILE}" | mdq '```^bash$'  -o plain) || true
+              source <(echo "set -euxo pipefail" ; cat "${POST_FILE}" | mdq '```^bash$'  -o plain) || true
             done
           fi
