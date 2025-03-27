@@ -78,6 +78,7 @@ jobs:
 
           export TMP_DIR="${PWD}"
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+          brew install mdq
 
           POST_FILES_ARRAY=()
           # shellcheck disable=SC2043
@@ -85,7 +86,7 @@ jobs:
             POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
           done
 
-          if grep -Eq '(^| )eksctl ' "${POST_FILES_ARRAY[@]}" && ! command -v eksctl &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```' | grep -Eq '(^| )eksctl ' && ! command -v eksctl &> /dev/null ; then
             echo "*** Installing eksctl"
             brew install eksctl
             (
@@ -100,22 +101,22 @@ jobs:
             ) | tee -a "${GITHUB_STEP_SUMMARY}"
           fi
 
-          if grep -Eq '(^| )copilot ' "${POST_FILES_ARRAY[@]}" && ! command -v copilot &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```' | grep -Eq '(^| )copilot ' && ! command -v copilot &> /dev/null ; then
             echo "*** Installing copilot"
             brew install copilot
           fi
 
-          if grep -Eq '(^| )cilium ' "${POST_FILES_ARRAY[@]}" && ! command -v cilium &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```' | grep -Eq '(^| )cilium ' && ! command -v cilium &> /dev/null ; then
             echo "*** Installing cilium"
             brew install cilium-cli
           fi
 
-          if grep -Eq '(^| )rain ' "${POST_FILES_ARRAY[@]}" && ! command -v rain &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```' | grep -Eq '(^| )rain ' && ! command -v rain &> /dev/null ; then
             echo "*** Installing rain"
             brew install rain
           fi
 
-          if grep -Eq '(^| )velero ' "${POST_FILES_ARRAY[@]}" && ! command -v velero &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```' | grep -Eq '(^| )velero ' && ! command -v velero &> /dev/null ; then
             echo "*** Installing velero"
             brew install velero
           fi
@@ -125,7 +126,7 @@ jobs:
             for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
               echo "*** ${POST_FILES_ARRAY[idx]} | build"
               # shellcheck disable=SC1090
-              source <(echo "set -euxo pipefail" ; sed -n "/^\s*\`\`\`bash$/,/^\s*\`\`\`$/p" "${POST_FILES_ARRAY[idx]}" | sed 's/^\s*```*//')
+              source <(echo "set -euxo pipefail" ; cat "${POST_FILES_ARRAY[idx]}" | mdq '```^bash$' -o plain)
             done
           fi
 
@@ -139,6 +140,6 @@ jobs:
             for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
               echo "*** ${POST_FILE} | destroy"
               # shellcheck disable=SC1090
-              source <(echo "set -euxo pipefail" ; sed -n "/^\`\`\`sh$/,/^\`\`\`$/p" "${POST_FILE}" | sed "/^\`\`\`*/d") || true
+              source <(echo "set -euxo pipefail" ; cat"${POST_FILE}" | mdq '```^bash$'  -o plain) || true
             done
           fi
