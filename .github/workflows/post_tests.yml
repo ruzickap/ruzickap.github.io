@@ -107,6 +107,10 @@ jobs:
                 mdq "${MDQ_CODE_BLOCK}" -o plain < "${POST_FILE}" >> "${TMP_DIR}/run.sh"
               done
               ;;
+            *)
+              echo "Unknown action: ${GH_ACTION}"
+              exit 1
+              ;;
           esac
 
           if cat "${POST_FILES_ARRAY[@]}" | mdq "${MDQ_CODE_BLOCK}" | grep -Eq '(^| )eksctl ' && ! command -v eksctl &> /dev/null ; then
