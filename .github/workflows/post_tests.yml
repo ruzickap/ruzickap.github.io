@@ -93,7 +93,7 @@ jobs:
               MDQ_CODE_BLOCK='```^bash$'
               for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
                 echo "*** ${POST_FILES_ARRAY[idx]} | build"
-                mdq "${MDQ_CODE_BLOCK}" -o plain < "${POST_FILES_ARRAY[idx]}") >> "${TMP_DIR}/run.sh"
+                mdq "${MDQ_CODE_BLOCK}" -o plain < "${POST_FILES_ARRAY[idx]}" >> "${TMP_DIR}/run.sh"
               done
               ;;
             destroy)
