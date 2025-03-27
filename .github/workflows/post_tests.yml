@@ -86,7 +86,7 @@ jobs:
             POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
           done
 
-          if mdq '```^bash$' < ${POST_FILES_ARRAY[@]} | grep -Eq '(^| )eksctl ' && ! command -v eksctl &> /dev/null ; then
+          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )eksctl ' && ! command -v eksctl &> /dev/null ; then
             echo "*** Installing eksctl"
             brew install eksctl
             (
@@ -101,22 +101,22 @@ jobs:
             ) | tee -a "${GITHUB_STEP_SUMMARY}"
           fi
 
-          if mdq '```^bash$' < ${POST_FILES_ARRAY[@]} | grep -Eq '(^| )copilot ' && ! command -v copilot &> /dev/null ; then
+          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )copilot ' && ! command -v copilot &> /dev/null ; then
             echo "*** Installing copilot"
             brew install copilot
           fi
 
-          if mdq '```^bash$' < ${POST_FILES_ARRAY[@]} | grep -Eq '(^| )cilium ' && ! command -v cilium &> /dev/null ; then
+          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )cilium ' && ! command -v cilium &> /dev/null ; then
             echo "*** Installing cilium"
             brew install cilium-cli
           fi
 
-          if mdq '```^bash$' < ${POST_FILES_ARRAY[@]} | grep -Eq '(^| )rain ' && ! command -v rain &> /dev/null ; then
+          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )rain ' && ! command -v rain &> /dev/null ; then
             echo "*** Installing rain"
             brew install rain
           fi
 
-          if mdq '```^bash$' < ${POST_FILES_ARRAY[@]} | grep -Eq '(^| )velero ' && ! command -v velero &> /dev/null ; then
+          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )velero ' && ! command -v velero &> /dev/null ; then
             echo "*** Installing velero"
             brew install velero
           fi
@@ -126,12 +126,13 @@ jobs:
             for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
               echo "*** ${POST_FILES_ARRAY[idx]} | build"
               # shellcheck disable=SC1090
-              source <(echo "set -euxo pipefail" ; mdq '```^bash$' -o plain < ${POST_FILES_ARRAY[idx]})
+              source <(echo "set -euxo pipefail" ; mdq '```^bash$' -o plain < "${POST_FILES_ARRAY[idx]}")
             done
           fi
 
           if [[ "${GH_ACTION}" =~ 'destroy' ]]; then
             echo -e "********************\n*** Destroy\n********************"
+            brew install eksctl
             if eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
               export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
               aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
@@ -140,6 +141,6 @@ jobs:
             for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
               echo "*** ${POST_FILE} | destroy"
               # shellcheck disable=SC1090
-              source <(echo "set -euxo pipefail" ; mdq '```^sh$'  -o plain < ${POST_FILE}) || true
+              source <(echo "set -euxo pipefail" ; mdq '```^sh$'  -o plain < "${POST_FILE}") || true
             done
           fi
