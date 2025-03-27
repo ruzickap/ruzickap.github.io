@@ -86,7 +86,7 @@ jobs:
             POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
           done
 
-          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )eksctl ' && ! command -v eksctl &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```^bash$' | grep -Eq '(^| )eksctl ' && ! command -v eksctl &> /dev/null ; then
             echo "*** Installing eksctl"
             brew install eksctl
             (
@@ -106,17 +106,17 @@ jobs:
             brew install copilot
           fi
 
-          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )cilium ' && ! command -v cilium &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```^bash$' | grep -Eq '(^| )cilium ' && ! command -v cilium &> /dev/null ; then
             echo "*** Installing cilium"
             brew install cilium-cli
           fi
 
-          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )rain ' && ! command -v rain &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```^bash$' | grep -Eq '(^| )rain ' && ! command -v rain &> /dev/null ; then
             echo "*** Installing rain"
             brew install rain
           fi
 
-          if mdq '```^bash$' < "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )velero ' && ! command -v velero &> /dev/null ; then
+          if cat "${POST_FILES_ARRAY[@]}" | mdq '```^bash$' | grep -Eq '(^| )velero ' && ! command -v velero &> /dev/null ; then
             echo "*** Installing velero"
             brew install velero
           fi
