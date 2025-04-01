@@ -88,6 +88,7 @@ jobs:
 
           case "${GH_ACTION}" in
             *"build"*)
+              echo "🔨 *** ${POST_FILES_ARRAY[@]} | build"
               MDQ_CODE_BLOCK='```^bash$'
               echo "set -euxo pipefail" > "${TMP_DIR}/run.sh"
               for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
@@ -96,6 +97,7 @@ jobs:
               done
               ;;&
             *"destroy"*)
+              echo "🔨 *** ${POST_FILES_ARRAY[@]} | destroy"
               MDQ_CODE_BLOCK='```^sh$'
               echo "set -x" >> "${TMP_DIR}/run.sh"
               if aws eks describe-cluster --name "${CLUSTER_NAME}" --query 'cluster.status' &> /dev/null; then
