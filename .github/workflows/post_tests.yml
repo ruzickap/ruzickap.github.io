@@ -87,15 +87,15 @@ jobs:
           done
 
           case "${GH_ACTION}" in
-            build)
+            *"build"*)
               MDQ_CODE_BLOCK='```^bash$'
               echo "set -euxo pipefail" > "${TMP_DIR}/run.sh"
               for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
-                echo "*** ${POST_FILES_ARRAY[idx]} | build"
+                echo "🔨 *** ${POST_FILES_ARRAY[idx]} | build"
                 mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_ARRAY[idx]}" >> "${TMP_DIR}/run.sh"
               done
-              ;;
-            destroy)
+              ;;&
+            *"destroy"*)
               MDQ_CODE_BLOCK='```^sh$'
               echo "set -x" > "${TMP_DIR}/run.sh"
               if aws eks describe-cluster --name "${CLUSTER_NAME}" --query 'cluster.status' &> /dev/null; then
@@ -103,18 +103,18 @@ jobs:
                 aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
               fi
               for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
-                echo "*** ${POST_FILE} | destroy"
+                echo "🗑️ *** ${POST_FILE} | destroy"
                 mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILE}" >> "${TMP_DIR}/run.sh"
               done
               ;;
             *)
-              echo "Unknown action: ${GH_ACTION}"
+              echo "❓ Unknown action: ${GH_ACTION}"
               exit 1
               ;;
           esac
 
           if mdq "${MDQ_CODE_BLOCK}" "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )eksctl ' && ! command -v eksctl &> /dev/null ; then
-            echo "*** Installing eksctl"
+            echo "📦 *** Installing eksctl"
             brew install eksctl
             (
               echo "<https://${CLUSTER_FQDN}>"
@@ -129,22 +129,22 @@ jobs:
           fi
 
           if mdq "${MDQ_CODE_BLOCK}" "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )copilot ' && ! command -v copilot &> /dev/null ; then
-            echo "*** Installing copilot"
+            echo "📦 *** Installing copilot"
             brew install copilot
           fi
 
           if mdq "${MDQ_CODE_BLOCK}" "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )cilium ' && ! command -v cilium &> /dev/null ; then
-            echo "*** Installing cilium"
+            echo "📦 *** Installing cilium"
             brew install cilium-cli
           fi
 
           if mdq "${MDQ_CODE_BLOCK}" "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )rain ' && ! command -v rain &> /dev/null ; then
-            echo "*** Installing rain"
+            echo "📦 *** Installing rain"
             brew install rain
           fi
 
           if mdq "${MDQ_CODE_BLOCK}" "${POST_FILES_ARRAY[@]}" | grep -Eq '(^| )velero ' && ! command -v velero &> /dev/null ; then
-            echo "*** Installing velero"
+            echo "📦 *** Installing velero"
             brew install velero
           fi
 
