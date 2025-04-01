@@ -90,8 +90,10 @@ jobs:
             *"build"*)
               MDQ_CODE_BLOCK='```^bash$'
               echo "set -euxo pipefail" > "${TMP_DIR}/run.sh"
-              POST_FILES_REVERSE=$(printf '%s\n' "${POST_FILES_ARRAY[@]}" | tac | tr '\n' ' ')
-              eval mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_REVERSE}" >> "${TMP_DIR}/run.sh"
+              for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
+                echo "🔨 *** ${POST_FILES_ARRAY[idx]} | build"
+                mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_ARRAY[idx]}" >> "${TMP_DIR}/run.sh"
+              done
               ;;&
             *"destroy"*)
               MDQ_CODE_BLOCK='```^sh$'
