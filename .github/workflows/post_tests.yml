@@ -86,35 +86,34 @@ jobs:
             POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
           done
 
-          echo "set -euxo pipefail" > "${TMP_DIR}/run.sh"
-
           case "${GH_ACTION}" in
-            build)
+            *"build"*)
+              echo "🔨 *** ${POST_FILES_ARRAY[@]} | build"
               MDQ_CODE_BLOCK='```^bash$'
+              echo "set -euxo pipefail" > "${TMP_DIR}/run.sh"
               for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
-                echo "*** ${POST_FILES_ARRAY[idx]} | build"
-                mdq "${MDQ_CODE_BLOCK}" -o plain < "${POST_FILES_ARRAY[idx]}" >> "${TMP_DIR}/run.sh"
+                echo "🔨 *** ${POST_FILES_ARRAY[idx]} | build"
+                mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_ARRAY[idx]}" >> "${TMP_DIR}/run.sh"
               done
-              ;;
-            destroy)
+              ;;&
+            *"destroy"*)
+              echo "🔨 *** ${POST_FILES_ARRAY[@]} | destroy"
               MDQ_CODE_BLOCK='```^sh$'
+              echo "set -x" >> "${TMP_DIR}/run.sh"
               if aws eks describe-cluster --name "${CLUSTER_NAME}" --query 'cluster.status' &> /dev/null; then
                 export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
                 aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
               fi
-              for POST_FILE in "${POST_FILES_ARRAY[@]}"; do
-                echo "*** ${POST_FILE} | destroy"
-                mdq "${MDQ_CODE_BLOCK}" -o plain < "${POST_FILE}" >> "${TMP_DIR}/run.sh"
-              done
+              mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_ARRAY[@]}" >> "${TMP_DIR}/run.sh"
               ;;
             *)
-              echo "Unknown action: ${GH_ACTION}"
+              echo "❓ Unknown action: ${GH_ACTION}"
               exit 1
               ;;
           esac
 
-          if cat "${POST_FILES_ARRAY[@]}" | mdq "${MDQ_CODE_BLOCK}" | grep -Eq '(^| )eksctl ' && ! command -v eksctl &> /dev/null ; then
-            echo "*** Installing eksctl"
+          if grep -Eq '(^| )eksctl ' "${TMP_DIR}/run.sh" && ! command -v eksctl &> /dev/null ; then
+            echo "📦 *** Installing eksctl"
             brew install eksctl
             (
               echo "<https://${CLUSTER_FQDN}>"
@@ -128,23 +127,23 @@ jobs:
             ) | tee -a "${GITHUB_STEP_SUMMARY}"
           fi
 
-          if cat "${POST_FILES_ARRAY[@]}" | mdq "${MDQ_CODE_BLOCK}" | grep -Eq '(^| )copilot ' && ! command -v copilot &> /dev/null ; then
-            echo "*** Installing copilot"
+          if grep -Eq '(^| )copilot ' "${TMP_DIR}/run.sh" && ! command -v copilot &> /dev/null ; then
+            echo "📦 *** Installing copilot"
             brew install copilot
           fi
 
-          if cat "${POST_FILES_ARRAY[@]}" | mdq "${MDQ_CODE_BLOCK}" | grep -Eq '(^| )cilium ' && ! command -v cilium &> /dev/null ; then
-            echo "*** Installing cilium"
+          if grep -Eq '(^| )cilium ' "${TMP_DIR}/run.sh" && ! command -v cilium &> /dev/null ; then
+            echo "📦 *** Installing cilium"
             brew install cilium-cli
           fi
 
-          if cat "${POST_FILES_ARRAY[@]}" | mdq "${MDQ_CODE_BLOCK}" | grep -Eq '(^| )rain ' && ! command -v rain &> /dev/null ; then
-            echo "*** Installing rain"
+          if grep -Eq '(^| )rain ' "${TMP_DIR}/run.sh" && ! command -v rain &> /dev/null ; then
+            echo "📦 *** Installing rain"
             brew install rain
           fi
 
-          if cat "${POST_FILES_ARRAY[@]}" | mdq "${MDQ_CODE_BLOCK}" | grep -Eq '(^| )velero ' && ! command -v velero &> /dev/null ; then
-            echo "*** Installing velero"
+          if grep -Eq '(^| )velero ' "${TMP_DIR}/run.sh" && ! command -v velero &> /dev/null ; then
+            echo "📦 *** Installing velero"
             brew install velero
           fi
 
