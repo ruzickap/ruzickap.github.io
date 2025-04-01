@@ -91,7 +91,7 @@ jobs:
               MDQ_CODE_BLOCK='```^bash$'
               echo "set -euxo pipefail" > "${TMP_DIR}/run.sh"
               POST_FILES_REVERSE=$(printf '%s\n' "${POST_FILES_ARRAY[@]}" | tac | tr '\n' ' ')
-              mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_REVERSE}" >> "${TMP_DIR}/run.sh"
+              eval mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_REVERSE}" >> "${TMP_DIR}/run.sh"
               ;;&
             *"destroy"*)
               MDQ_CODE_BLOCK='```^sh$'
