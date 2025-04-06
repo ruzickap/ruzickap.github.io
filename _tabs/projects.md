@@ -56,12 +56,15 @@ List of my GitHub projects:
 - CI/CD status:
 
   [![GitHub Actions status - check-broken-links](https://github.com/ruzickap/action-my-broken-link-checker/workflows/check-broken-links/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/check-broken-links.yml)
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/action-my-broken-link-checker/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-broken-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/docker-image.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/action-my-broken-link-checker/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/action-my-broken-link-checker/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/action-my-broken-link-checker/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-broken-link-checker/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/readme-commands-check.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-broken-link-checker/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-broken-link-checker/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/action-my-broken-link-checker/workflows/scorecards/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-broken-link-checker/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-broken-link-checker/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/stale.yml)
   [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-broken-link-checker/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/tests.yml)
@@ -203,6 +206,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/ansible-openwrt/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-openwrt/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-openwrt/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-openwrt/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/release-please.yml)
@@ -625,7 +629,6 @@ List of my GitHub projects:
 
 - CI/CD status:
 
-  [![GitHub Actions status - kube-linter](https://github.com/ruzickap/k8s-eks-flux/workflows/kube-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/kube-linter.yml)
   [![GitHub Actions status - links](https://github.com/ruzickap/k8s-eks-flux/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/links.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-eks-flux/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-eks-flux/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-eks-flux/actions/workflows/mega-linter.yml)
@@ -664,7 +667,6 @@ List of my GitHub projects:
 
 - CI/CD status:
 
-  [![GitHub Actions status - kube-linter](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/kube-linter/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/kube-linter.yml)
   [![GitHub Actions status - links](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/links/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/links.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/k8s-flagger-istio-flux/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/actions/workflows/mega-linter.yml)
@@ -999,6 +1001,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/malware-cryptominer-container/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - container-build](https://github.com/ruzickap/malware-cryptominer-container/workflows/container-build/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/container-build.yml)
   [![GitHub Actions status - ghcr-cleanup-br](https://github.com/ruzickap/malware-cryptominer-container/workflows/ghcr-cleanup-br/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/ghcr-cleanup-br.yml)
   [![GitHub Actions status - ghcr-cleanup](https://github.com/ruzickap/malware-cryptominer-container/workflows/ghcr-cleanup/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/ghcr-cleanup.yml)
@@ -1022,43 +1025,6 @@ List of my GitHub projects:
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/malware-cryptominer-container/latest)](https://github.com/ruzickap/malware-cryptominer-container/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container)
-
-## [my-git-projects](https://github.com/ruzickap/my-git-projects)
-
-- Description: My GitHub projects
-- Topics: github, projects, templates, public
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/my-git-projects.svg?style=social)](https://github.com/ruzickap/my-git-projects/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/my-git-projects.svg?style=social)](https://github.com/ruzickap/my-git-projects/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/my-git-projects.svg?style=social)](https://github.com/ruzickap/my-git-projects)
-
-- CI/CD status:
-
-  [![GitHub Actions status - aws-cloudformation-gh-action](https://github.com/ruzickap/my-git-projects/workflows/aws-cloudformation-gh-action/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/aws-cloudformation-gh-action.yml)
-  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/my-git-projects/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/markdown-check.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/my-git-projects/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - pre-commit-config](https://github.com/ruzickap/my-git-projects/workflows/pre-commit-config/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/pre-commit-config.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/my-git-projects/workflows/release-please/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate-working-days](https://github.com/ruzickap/my-git-projects/workflows/renovate-working-days/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/renovate-working-days.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/my-git-projects/workflows/renovate/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/my-git-projects/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/my-git-projects/workflows/stale/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/stale.yml)
-  [![GitHub Actions status - tofu-github-repositories](https://github.com/ruzickap/my-git-projects/workflows/tofu-github-repositories/badge.svg)](https://github.com/ruzickap/my-git-projects/actions/workflows/tofu-github-repositories.yaml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/my-git-projects/latest)](https://github.com/ruzickap/my-git-projects/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/my-git-projects.svg)](https://github.com/ruzickap/my-git-projects)
 
 ## [packer-templates](https://github.com/ruzickap/packer-templates)
 
@@ -1146,12 +1112,15 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/petr.ruzicka.dev/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - hugo-build](https://github.com/ruzickap/petr.ruzicka.dev/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/hugo-build.yml)
   [![GitHub Actions status - links](https://github.com/ruzickap/petr.ruzicka.dev/workflows/links/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/links.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/petr.ruzicka.dev/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/petr.ruzicka.dev/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/petr.ruzicka.dev/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/petr.ruzicka.dev/workflows/release-please/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/petr.ruzicka.dev/workflows/renovate/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/petr.ruzicka.dev/workflows/scorecards/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/petr.ruzicka.dev/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/petr.ruzicka.dev/workflows/stale/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/stale.yml)
 
@@ -1168,39 +1137,6 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev)
 
-## [ruzickap](https://github.com/ruzickap/ruzickap)
-
-- Description: GitHub profile repository
-- Topics: github, profile, public
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/ruzickap.svg?style=social)](https://github.com/ruzickap/ruzickap/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/ruzickap.svg?style=social)](https://github.com/ruzickap/ruzickap/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/ruzickap.svg?style=social)](https://github.com/ruzickap/ruzickap)
-
-- CI/CD status:
-
-  [![GitHub Actions status - Latest blog post workflow](https://github.com/ruzickap/ruzickap/workflows/Latest%20blog%20post%20workflow/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/blog-post-workflow.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ruzickap/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/ruzickap/workflows/release-please/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/ruzickap/workflows/renovate/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ruzickap/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/ruzickap/workflows/stale/badge.svg)](https://github.com/ruzickap/ruzickap/actions/workflows/stale.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ruzickap/latest)](https://github.com/ruzickap/ruzickap/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ruzickap.svg)](https://github.com/ruzickap/ruzickap)
-
 ## [ruzickap.github.io](https://github.com/ruzickap/ruzickap.github.io)
 
 - Description: ruzickap.github.io - personal blog 🏠
@@ -1216,6 +1152,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/ruzickap.github.io/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - dependency-review](https://github.com/ruzickap/ruzickap.github.io/workflows/dependency-review/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/dependency-review.yml)
   [![GitHub Actions status - generate-projects](https://github.com/ruzickap/ruzickap.github.io/workflows/generate-projects/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/generate-projects.yml)
   [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/ruzickap.github.io/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)
@@ -1243,39 +1180,6 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io)
 
-## [test_usb_stick_for_tv](https://github.com/ruzickap/test_usb_stick_for_tv)
-
-- Description: This script will store testing videos/music/pictures to your USB
-  Stick which can be used for testing TVs
-- Topics: usb, tv, android-tv, testing-tvs, test, testing, testing-tools, public
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/test_usb_stick_for_tv.svg?style=social)](https://github.com/ruzickap/test_usb_stick_for_tv/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/test_usb_stick_for_tv.svg?style=social)](https://github.com/ruzickap/test_usb_stick_for_tv/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/test_usb_stick_for_tv.svg?style=social)](https://github.com/ruzickap/test_usb_stick_for_tv)
-
-- CI/CD status:
-
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/release-please/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/renovate/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/test_usb_stick_for_tv/workflows/stale/badge.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/actions/workflows/stale.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/test_usb_stick_for_tv/latest)](https://github.com/ruzickap/test_usb_stick_for_tv/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/test_usb_stick_for_tv.svg)](https://github.com/ruzickap/test_usb_stick_for_tv)
-
 ## [xvx.cz](https://github.com/ruzickap/xvx.cz)
 
 - Description: xvx.cz
@@ -1290,12 +1194,15 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/xvx.cz/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - hugo-build](https://github.com/ruzickap/xvx.cz/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/hugo-build.yml)
   [![GitHub Actions status - links](https://github.com/ruzickap/xvx.cz/workflows/links/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/links.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/xvx.cz/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/xvx.cz/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/xvx.cz/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/xvx.cz/workflows/release-please/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/xvx.cz/workflows/renovate/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/xvx.cz/workflows/scorecards/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/xvx.cz/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/xvx.cz/workflows/stale/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/stale.yml)
 
