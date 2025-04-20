@@ -570,6 +570,8 @@ aws ec2 delete-key-pair --key-name "${AWS_EC2_KEY_PAIR_NAME}"
 for FILE in ${TMP_DIR}/{vpc_cloudformation_template.yml,KaliLinux-NICE-DCV.yaml,AmazonLinux-2023-LAMP-server.yaml,${AWS_EC2_KEY_PAIR_NAME}.pem,helm_values-wordpress.yml,kubeconfig-${CLUSTER_NAME}.conf}; do
   if [[ -f "${FILE}" ]]; then
     rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
   fi
 done
 ```

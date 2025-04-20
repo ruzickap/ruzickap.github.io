@@ -344,8 +344,7 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
     --stack-name "${CLUSTER_NAME}-route53-kms" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" --tags "${TAGS//,/ }"
 fi
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query 'Stacks[0].Outputs[? OutputKey==`KMSKeyArn` || OutputKey==`KMSKeyId`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query "Stacks[0].Outputs[? OutputKey==\`KMSKeyArn\` || OutputKey==\`KMSKeyId\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 ```
@@ -2311,8 +2310,11 @@ if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
   for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53,eksctl-${CLUSTER_NAME},k8s-karpenter-provisioner,helm_values-{aws-ebs-csi-driver,aws-for-fluent-bit,cert-manager,cilium,external-dns,forecastle,ingress-nginx,karpenter,kube-prometheus-stack,mailhog,oauth2-proxy},k8s-cert-manager-{certificate,clusterissuer}-staging}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
+    else
+      echo "*** File not found: ${FILE}"
     fi
   done
+  find "${TMP_DIR}/${CLUSTER_FQDN}" -ls
   rmdir "${TMP_DIR}/${CLUSTER_FQDN}"
 fi
 ```

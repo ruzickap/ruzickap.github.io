@@ -536,6 +536,8 @@ Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{helm_values-podinfo,k8s-deployment-nginx}.yml; do
   if [[ -f "${FILE}" ]]; then
     rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
   fi
 done
 ```

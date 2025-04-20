@@ -1438,6 +1438,8 @@ if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
   for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53,eksctl-${CLUSTER_NAME},k8s-karpenter-provisioner,helm_values-{aws-ebs-csi-driver,aws-for-fluent-bit,cert-manager,external-dns,forecastle,ingress-nginx,karpenter,kube-prometheus-stack,mailpit,oauth2-proxy},k8s-cert-manager-{certificate,clusterissuer}-staging}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
+    else
+      echo "*** File not found: ${FILE}"
     fi
   done
   rmdir "${TMP_DIR}/${CLUSTER_FQDN}"

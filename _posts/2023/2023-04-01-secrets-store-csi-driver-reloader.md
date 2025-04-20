@@ -168,8 +168,7 @@ use the secrets from [AWS Secrets Manager](https://aws.amazon.com/secrets-manage
 as mountpoint and also as K8s `Secret`.
 
 ```bash
-# shellcheck disable=SC2016
-SECRETS_MANAGER_KUARDSECRET_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret" --query 'Stacks[0].Outputs[?OutputKey==`SecretsManagerKuardSecretPolicyArn`].OutputValue' --output text)
+SECRETS_MANAGER_KUARDSECRET_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret" --query "Stacks[0].Outputs[?OutputKey==\`SecretsManagerKuardSecretPolicyArn\`].OutputValue" --output text)
 eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard --attach-policy-arn="${SECRETS_MANAGER_KUARDSECRET_POLICY_ARN}" --role-name="eksctl-${CLUSTER_NAME}-irsa-kuard" --approve
 ```
 
@@ -538,6 +537,8 @@ Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-secretmanager-secret,helm_values-{reloader,secrets-store-csi-driver}}.yml; do
   if [[ -f "${FILE}" ]]; then
     rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
   fi
 done
 ```

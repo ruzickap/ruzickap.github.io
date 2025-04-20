@@ -985,6 +985,8 @@ Remove files in `${TMP_DIR}` directory:
 for FILE in "${TMP_DIR}"/{krew-linux_amd64,rbac.html}; do
   if [[ -f "${FILE}" ]]; then
     rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
   fi
 done
 ```

@@ -962,6 +962,8 @@ Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{eksctl-${CLUSTER_NAME}-iam-podidentityassociations,helm_values-{velero,kube-prometheus-stack-velero-cert-manager},k8s-cert-manager-{clusterissuer,certificate}-production}.yml; do
   if [[ -f "${FILE}" ]]; then
     rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
   fi
 done
 ```
