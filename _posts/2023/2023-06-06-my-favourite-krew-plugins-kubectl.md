@@ -25,27 +25,6 @@ Links:
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 
-<!---
-docker run -it --rm \
-  -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN \
-  -e KUBECONFIG \
-  -v "${KUBECONFIG}:${KUBECONFIG}" \
-  -v "/tmp:/tmp" \
-  bash \
-  bash -eux -c " \
-    apk add aws-cli bash-completion github-cli jq sudo ;\
-    echo 'source /etc/bash/bash_completion.sh' >> ~/.bashrc ;\
-    KUBECTL_VER=$(wget -q https://dl.k8s.io/release/stable.txt -O -) ;\
-    wget "https://dl.k8s.io/release/\${KUBECTL_VER}/bin/linux/amd64/kubectl" ;\
-    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl ;\
-    kubectl completion bash > ~/kubectl ;\
-    echo 'source ~/kubectl' >> ~/.bashrc ;\
-    echo 'complete -o default -F __start_kubectl k' >> ~/.bashrc ;\
-    echo 'alias k=kubectl' >> ~/.bashrc ;\
-    bash
-  "
--->
-
 ## Install krew
 
 Install Krew plugin manager for kubectl command-line tool:
@@ -53,8 +32,9 @@ Install Krew plugin manager for kubectl command-line tool:
 ![Krew](https://raw.githubusercontent.com/kubernetes-sigs/krew/4ec386cc021b4a7896de95d91c5d8025d98eaa4f/assets/logo/horizontal/color/krew-horizontal-color.svg){:width="500"}
 
 ```bash
-gh release download --repo kubernetes-sigs/krew --pattern krew-linux_amd64.tar.gz --output - | sudo tar xz -C /tmp/
-/tmp/krew-linux_amd64 install krew
+export TMP_DIR="${TMP_DIR:-${PWD}}"
+curl -sL https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_amd64.tar.gz | tar xz -C "${TMP_DIR}"
+"${TMP_DIR}/krew-linux_amd64" install krew
 export PATH="${HOME}/.krew/bin:${PATH}"
 ```
 
@@ -615,7 +595,7 @@ kubectl rbac-tool lookup kube-prometheus
 Kubernetes RBAC visualizer:
 
 ```bash
-kubectl rbac-tool visualize --include-namespaces ingress-nginx,external-dns
+kubectl rbac-tool visualize --include-namespaces ingress-nginx,external-dns --outfile "${TMP_DIR}/rbac.html"
 ```
 
 ![rbac-tool visualize](/assets/img/posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl/kubectl-plugin-rbac-tool-vis-html.avif)
@@ -996,5 +976,17 @@ There are few "kubectl krew plugins" which I looked at, but I'm not using them:
 [pv-migrate](https://github.com/utkuozdemir/pv-migrate), [score](https://kube-score.com/),
 [ssh-jump](https://github.com/yokawasa/kubectl-plugin-ssh-jump), [tree](https://github.com/ahmetb/kubectl-tree),
 [unlimited](https://github.com/nilic/kubectl-unlimited), [whoami](https://github.com/rajatjindal/kubectl-whoami)
+
+## Clean-up
+
+Remove files in `${TMP_DIR}` directory:
+
+```sh
+for FILE in "${TMP_DIR}"/{krew-linux_amd64,rbac.html}; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  fi
+done
+```
 
 Enjoy ... 😉

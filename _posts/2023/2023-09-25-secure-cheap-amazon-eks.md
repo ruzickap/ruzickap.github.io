@@ -358,7 +358,7 @@ cluster.
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -454,7 +454,7 @@ Get the kubeconfig to access the cluster:
 ```bash
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
-    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
+    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" --kubeconfig "${KUBECONFIG}"
     # Add roles created by eksctl to the KMS policy to allow aws-ebs-csi-driver work with encrypted EBS volumes
     sed -i "s@# \(- \!Sub \"arn:aws:iam::\${AWS::AccountId}:role/eksctl-\${ClusterName}.*\)@\1@" "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml"
     eval aws cloudformation update-stack \
@@ -606,7 +606,7 @@ and modify the
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
 SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.0"
 
-helm repo add piraeus-charts https://piraeus.io/helm-charts/
+helm repo add --force-update piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
 kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=baseline
 ```
@@ -628,7 +628,7 @@ and modify the
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.28.1"
 
-helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo add --force-update aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" << EOF
 controller:
   enableMetrics: false
@@ -683,7 +683,7 @@ and modify the
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
 MAILPIT_HELM_CHART_VERSION="0.14.0"
 
-helm repo add jouve https://jouve.github.io/charts/
+helm repo add --force-update jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
 ingress:
   enabled: true
@@ -724,7 +724,7 @@ and modify the
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
 defaultRules:
   rules:
@@ -1037,7 +1037,7 @@ and modify the
 # renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
 AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.32"
 
-helm repo add eks https://aws.github.io/eks-charts/
+helm repo add --force-update eks https://aws.github.io/eks-charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" << EOF
 cloudWatchLogs:
   region: ${AWS_DEFAULT_REGION}
@@ -1076,7 +1076,7 @@ Service account `cert-manager` was created by `eksctl`.
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.14.4"
 
-helm repo add jetstack https://charts.jetstack.io
+helm repo add --force-update jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
@@ -1153,31 +1153,6 @@ spec:
 EOF
 ```
 
-### metrics-server
-
-[Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is
-a scalable, efficient source of container resource metrics for Kubernetes
-built-in autoscaling pipelines.
-
-Install `metrics-server`
-[helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
-and modify the
-[default values](https://github.com/kubernetes-sigs/metrics-server/blob/metrics-server-helm-chart-3.12.0/charts/metrics-server/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
-METRICS_SERVER_HELM_CHART_VERSION="3.12.0"
-
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
-metrics:
-  enabled: true
-serviceMonitor:
-  enabled: true
-EOF
-helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
-```
-
 ### external-dns
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
@@ -1196,7 +1171,7 @@ Service account `external-dns` was created by `eksctl`.
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.14.3"
 
-helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
+helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
 domainFilters:
   - ${CLUSTER_FQDN}
@@ -1229,7 +1204,7 @@ INGRESS_NGINX_HELM_CHART_VERSION="4.10.0"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
 
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   allowSnippetAnnotations: true
@@ -1304,7 +1279,7 @@ and modify the
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
 FORECASTLE_HELM_CHART_VERSION="1.0.138"
 
-helm repo add stakater https://stakater.github.io/stakater-charts
+helm repo add --force-update stakater https://stakater.github.io/stakater-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
 forecastle:
   config:
@@ -1348,8 +1323,8 @@ and modify the
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
 OAUTH2_PROXY_HELM_CHART_VERSION="6.24.2"
 
-helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
+helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
 config:
   clientID: ${GOOGLE_CLIENT_ID}
   clientSecret: ${GOOGLE_CLIENT_SECRET}
@@ -1429,7 +1404,9 @@ done
 Remove CloudWatch log group:
 
 ```sh
-aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
+  aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+fi
 ```
 
 Remove CloudFormation stack:
@@ -1457,7 +1434,14 @@ done
 Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
-[[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]] && rm -rvf "${TMP_DIR}/${CLUSTER_FQDN}" && [[ -d "${TMP_DIR}" ]] && rmdir -v "${TMP_DIR}" || true
+if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53,eksctl-${CLUSTER_NAME},k8s-karpenter-provisioner,helm_values-{aws-ebs-csi-driver,aws-for-fluent-bit,cert-manager,external-dns,forecastle,ingress-nginx,karpenter,kube-prometheus-stack,mailpit,oauth2-proxy},k8s-cert-manager-{certificate,clusterissuer}-staging}.yml}; do
+    if [[ -f "${FILE}" ]]; then
+      rm -v "${FILE}"
+    fi
+  done
+  rmdir "${TMP_DIR}/${CLUSTER_FQDN}"
+fi
 ```
 
 Enjoy ... 😉

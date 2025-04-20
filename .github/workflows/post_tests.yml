@@ -93,7 +93,7 @@ jobs:
               echo "set -euxo pipefail" > "${TMP_DIR}/run.sh"
               for (( idx=${#POST_FILES_ARRAY[@]}-1 ; idx>=0 ; idx-- )); do
                 echo "🔨 *** ${POST_FILES_ARRAY[idx]} | build"
-                mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_ARRAY[idx]}" >> "${TMP_DIR}/run.sh"
+                mdq "${MDQ_CODE_BLOCK}" --br -o plain "${POST_FILES_ARRAY[idx]}" >> "${TMP_DIR}/run.sh"
               done
               ;;&
             *"destroy"*)
@@ -104,7 +104,7 @@ jobs:
                 export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
                 aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
               fi
-              mdq "${MDQ_CODE_BLOCK}" -o plain "${POST_FILES_ARRAY[@]}" >> "${TMP_DIR}/run.sh"
+              mdq "${MDQ_CODE_BLOCK}" --br -o plain "${POST_FILES_ARRAY[@]}" >> "${TMP_DIR}/run.sh"
               ;;
             *)
               echo "❓ Unknown action: ${GH_ACTION}"

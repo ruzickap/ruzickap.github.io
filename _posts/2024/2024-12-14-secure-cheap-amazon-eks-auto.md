@@ -355,7 +355,7 @@ cluster.
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -398,7 +398,7 @@ cloudWatch:
     enableTypes:
       - all
 EOF
-eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}" || eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
+eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" --kubeconfig "${KUBECONFIG}" || eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
 I was not able to make the NetworkPolicy working with `kube-prometheus-stack`
@@ -501,7 +501,7 @@ and modify the
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
 MAILPIT_HELM_CHART_VERSION="0.21.0"
 
-helm repo add jouve https://jouve.github.io/charts/
+helm repo add --force-update jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
 ingress:
   enabled: true
@@ -547,7 +547,7 @@ and modify the
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="67.9.0"
 
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
 defaultRules:
   rules:
@@ -811,7 +811,7 @@ Service account `cert-manager` was created by `eksctl`.
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.16.3"
 
-helm repo add jetstack https://charts.jetstack.io
+helm repo add --force-update jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 crds:
   enabled: true
@@ -898,7 +898,7 @@ Service account `external-dns` was created by `eksctl`.
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.15.1"
 
-helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
+helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
 serviceAccount:
   name: external-dns
@@ -929,7 +929,7 @@ INGRESS_NGINX_HELM_CHART_VERSION="4.12.0"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=15m certificate ingress-cert-staging
 
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   config:
@@ -1010,8 +1010,8 @@ and modify the
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
 OAUTH2_PROXY_HELM_CHART_VERSION="7.9.2"
 
-helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
+helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
 config:
   clientID: ${GOOGLE_CLIENT_ID}
   clientSecret: ${GOOGLE_CLIENT_SECRET}
@@ -1062,7 +1062,7 @@ and modify the
 # renovate: datasource=helm depName=homepage registryUrl=http://jameswynn.github.io/helm-charts
 HOMEPAGE_HELM_CHART_VERSION="2.0.1"
 
-helm repo add jameswynn http://jameswynn.github.io/helm-charts
+helm repo add --force-update jameswynn http://jameswynn.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" << EOF
 enableRbac: true
 serviceAccount:
@@ -1171,13 +1171,22 @@ done
 Remove CloudWatch log group:
 
 ```sh
-aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
+  aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+fi
 ```
 
 Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
-[[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]] && rm -rvf "${TMP_DIR}/${CLUSTER_FQDN}"
+if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,eksctl-${CLUSTER_NAME},k8s-storage-storageclass,k8s-karpenter-nodepool,k8s-eks-nodeclass,helm_values-{cert-manager,external-dns,ingress-nginx,kube-prometheus-stack,mailpit,oauth2-proxy},k8s-cert-manager-{certificate,clusterissuer}-staging}.yml}; do
+    if [[ -f "${FILE}" ]]; then
+      rm -v "${FILE}"
+    fi
+  done
+  rmdir "${TMP_DIR}/${CLUSTER_FQDN}"
+fi
 ```
 
 Enjoy ... 😉

@@ -275,7 +275,7 @@ I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -350,7 +350,7 @@ Get the kubeconfig to access the cluster:
 ```bash
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
-    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
+    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" --kubeconfig "${KUBECONFIG}"
   else
     eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
   fi
@@ -450,7 +450,7 @@ and modify the
 # renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
 AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
-helm repo add eks https://aws.github.io/eks-charts/
+helm repo add --force-update eks https://aws.github.io/eks-charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-node-termination-handler.yml" << EOF
 awsRegion: ${AWS_DEFAULT_REGION}
 EOF
@@ -472,7 +472,7 @@ and modify the
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
 MAILHOG_HELM_CHART_VERSION="5.2.3"
 
-helm repo add codecentric https://codecentric.github.io/helm-charts
+helm repo add --force-update codecentric https://codecentric.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
 image:
   repository: docker.io/cd2team/mailhog
@@ -518,7 +518,7 @@ and modify the
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
 defaultRules:
   rules:
@@ -822,7 +822,7 @@ Service account `cert-manager` was created by `eksctl`.
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.14.3"
 
-helm repo add jetstack https://charts.jetstack.io
+helm repo add --force-update jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
@@ -898,31 +898,6 @@ spec:
 EOF
 ```
 
-### metrics-server
-
-[Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is
-a scalable, efficient source of container resource metrics for Kubernetes
-built-in autoscaling pipelines.
-
-Install `metrics-server`
-[helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
-and modify the
-[default values](https://github.com/kubernetes-sigs/metrics-server/blob/metrics-server-helm-chart-3.12.0/charts/metrics-server/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
-METRICS_SERVER_HELM_CHART_VERSION="3.12.0"
-
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
-metrics:
-  enabled: true
-serviceMonitor:
-  enabled: true
-EOF
-helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
-```
-
 ### external-dns
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
@@ -941,7 +916,7 @@ Service account `external-dns` was created by `eksctl`.
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.14.3"
 
-helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
+helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
 domainFilters:
   - ${CLUSTER_FQDN}
@@ -973,7 +948,7 @@ INGRESS_NGINX_HELM_CHART_VERSION="4.9.1"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
 
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   allowSnippetAnnotations: true
@@ -1047,7 +1022,7 @@ and modify the
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
 FORECASTLE_HELM_CHART_VERSION="1.0.136"
 
-helm repo add stakater https://stakater.github.io/stakater-charts
+helm repo add --force-update stakater https://stakater.github.io/stakater-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
 forecastle:
   config:
@@ -1090,8 +1065,8 @@ and modify the
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
 OAUTH2_PROXY_HELM_CHART_VERSION="6.24.1"
 
-helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
+helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
 config:
   clientID: ${GOOGLE_CLIENT_ID}
   clientSecret: ${GOOGLE_CLIENT_SECRET}
@@ -1160,7 +1135,9 @@ done
 Remove CloudWatch log group:
 
 ```sh
-aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
+  aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+fi
 ```
 
 Remove CloudFormation stack:
@@ -1188,7 +1165,14 @@ done
 Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
-[[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]] && rm -rf "${TMP_DIR}/${CLUSTER_FQDN}" && [[ -d "${TMP_DIR}" ]] && rmdir "${TMP_DIR}" || true
+if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53,eksctl-${CLUSTER_NAME},k8s-karpenter-provisioner,helm_values-{aws-node-termination-handler,cert-manager,external-dns,forecastle,ingress-nginx,karpenter,kube-prometheus-stack,mailhog,oauth2-proxy},k8s-cert-manager-{certificate,clusterissuer}-staging}.yml}; do
+    if [[ -f "${FILE}" ]]; then
+      rm -v "${FILE}"
+    fi
+  done
+  rmdir "${TMP_DIR}/${CLUSTER_FQDN}"
+fi
 ```
 
 Enjoy ... 😉

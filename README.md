@@ -7,7 +7,7 @@
 
 ## Overview
 
-My personal site and blog...
+Personal blog and website built with Jekyll using the Chirpy theme.
 
 [**ruzickap.github.io**](https://ruzickap.github.io/)
 
@@ -33,14 +33,46 @@ bundle exec jekyll s
 Using Docker:
 
 ```bash
-docker run --rm -it --volume="${PWD}:/srv/jekyll" -e JEKYLL_UID="${UID}" -e JEKYLL_GID="${GID}" jekyll/jekyll -- bash -c 'chown -R jekyll /usr/gem/ && jekyll build --destination "public"'
-docker run --rm -it --volume="${PWD}:/srv/jekyll" -e JEKYLL_UID="${UID}" -e JEKYLL_GID="${GID}" --publish 4000:4000 jekyll/jekyll -- bash -c 'chown -R jekyll /usr/gem/ && jekyll serve'
+# Build the site
+docker run --rm -it \
+  --volume="${PWD}:/srv/jekyll" \
+  -e JEKYLL_UID="${UID}" \
+  -e JEKYLL_GID="${GID}" \
+  jekyll/jekyll -- bash -c 'chown -R jekyll /usr/gem/ && jekyll build --destination "public"'
+
+# Serve the site locally
+docker run --rm -it \
+  --volume="${PWD}:/srv/jekyll" \
+  -e JEKYLL_UID="${UID}" \
+  -e JEKYLL_GID="${GID}" \
+  --publish 4000:4000 \
+  jekyll/jekyll -- bash -c 'chown -R jekyll /usr/gem/ && jekyll serve'
 ```
 
 Megalinter:
 
 ```bash
-mega-linter-runner --remove-container --container-name="mega-linter" --debug --env VALIDATE_ALL_CODEBASE=true
+mega-linter-runner --remove-container \
+  --container-name="mega-linter" \
+  --debug \
+  --env VALIDATE_ALL_CODEBASE=true
+```
+
+## Tests
+
+```bash
+docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock" \
+  --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env AWS_ROLE_TO_ASSUME \
+  --env GOOGLE_CLIENT_ID --env GOOGLE_CLIENT_SECRET --env FORCE_COLOR=1 --env USER \
+  --workdir /mnt \
+  ubuntu bash -c 'set -euo pipefail && \
+    apt update -qq && apt install -qqy bsdextrautils curl docker.io unzip wget && \
+    curl -sL https://github.com/yshavit/mdq/releases/download/v0.5.0/mdq-ubuntu.zip -o /tmp/mdq-ubuntu.zip && unzip -d /usr/local/bin/ /tmp/mdq-ubuntu.zip && \
+    chmod a+x /usr/local/bin/mdq && \
+    curl -sL https://mise.run -o - | bash && \
+    eval "$(~/.local/bin/mise activate bash)" && \
+    mise run "create-delete:posts:all" \
+  '
 ```
 
 ## Notes

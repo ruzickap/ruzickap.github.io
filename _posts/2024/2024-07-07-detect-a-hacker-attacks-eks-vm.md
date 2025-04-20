@@ -131,7 +131,7 @@ export WIZ_API_CLIENT_SECRET="xxxx"
 export WIZ_SENSOR_CONTAINER_REGISTRY_USERNAME="xxxx"
 export WIZ_SENSOR_CONTAINER_REGISTRY_PASSWORD="xxxx"
 
-helm repo add wiz-sec https://charts.wiz.io/
+helm repo add --force-update wiz-sec https://charts.wiz.io/
 helm upgrade --install --namespace wiz --create-namespace --values - wiz-kubernetes-integration wiz-sec/wiz-kubernetes-integration << EOF
 global:
   wizApiToken:
@@ -560,11 +560,18 @@ export CLUSTER_NAME="Amazon-EKS"
 aws cloudformation delete-stack --stack-name "${SOLUTION_KALI}"
 aws cloudformation delete-stack --stack-name "${SOLUTION_EC2_CONTAINER}"
 aws cloudformation delete-stack --stack-name "${SOLUTION_EC2}"
-eksctl delete cluster --name "${CLUSTER_NAME}"
+if eksctl get cluster --name="${CLUSTER_NAME}"; then
+  eksctl delete cluster --name="${CLUSTER_NAME}" --force
+fi
 aws cloudformation delete-stack --stack-name "${SOLUTION_KALI}-VPC"
 aws cloudformation delete-stack --stack-name "${SOLUTION_EC2_CONTAINER}-VPC"
 aws cloudformation delete-stack --stack-name "${SOLUTION_EC2}-VPC"
 aws ec2 delete-key-pair --key-name "${AWS_EC2_KEY_PAIR_NAME}"
+for FILE in ${TMP_DIR}/{vpc_cloudformation_template.yml,KaliLinux-NICE-DCV.yaml,AmazonLinux-2023-LAMP-server.yaml,${AWS_EC2_KEY_PAIR_NAME}.pem,helm_values-wordpress.yml,kubeconfig-${CLUSTER_NAME}.conf}; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  fi
+done
 ```
 
 Enjoy ... 😉

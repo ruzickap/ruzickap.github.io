@@ -134,7 +134,7 @@ and modify the
 # renovate: datasource=helm depName=secrets-store-csi-driver registryUrl=https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
 SECRETS_STORE_CSI_DRIVER_HELM_CHART_VERSION="1.4.1"
 
-helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+helm repo add --force-update secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-secrets-store-csi-driver.yml" << EOF
 syncSecret:
   enabled: true
@@ -150,7 +150,7 @@ Install `secrets-store-csi-driver-provider-aws`
 # renovate: datasource=helm depName=secrets-store-csi-driver-provider-aws registryUrl=https://aws.github.io/secrets-store-csi-driver-provider-aws
 SECRETS_STORE_CSI_DRIVER_PROVIDER_AWS_HELM_CHART_VERSION="0.3.6"
 
-helm repo add aws-secrets-manager https://aws.github.io/secrets-store-csi-driver-provider-aws
+helm repo add --force-update aws-secrets-manager https://aws.github.io/secrets-store-csi-driver-provider-aws
 helm upgrade --install --version "${SECRETS_STORE_CSI_DRIVER_PROVIDER_AWS_HELM_CHART_VERSION}" --namespace secrets-store-csi-driver --create-namespace --wait secrets-store-csi-driver-provider-aws aws-secrets-manager/secrets-store-csi-driver-provider-aws
 ```
 
@@ -454,7 +454,7 @@ Install `reloader`
 # renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts
 RELOADER_HELM_CHART_VERSION="1.0.69"
 
-helm repo add stakater https://stakater.github.io/stakater-charts
+helm repo add --force-update stakater https://stakater.github.io/stakater-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-reloader.yml" << EOF
 reloader:
   readOnlyRootFileSystem: true
@@ -526,8 +526,20 @@ To clean up the environment - delete IRSA, remove CloudFormation stack
 and namespace:
 
 ```sh
-eksctl delete iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard
+if eksctl get iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard; then
+  eksctl delete iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard
+fi
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret"
+```
+
+Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+
+```sh
+for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-secretmanager-secret,helm_values-{reloader,secrets-store-csi-driver}}.yml; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  fi
+done
 ```
 
 Enjoy ... 😉
