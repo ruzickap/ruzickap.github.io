@@ -16,7 +16,7 @@ eval "$(aws sts assume-role --role-arn "${AWS_ROLE_TO_ASSUME}" --role-session-na
 
 echo "💡 *** $*"
 
-readarray -td\| POSTS <<<"${1##*:}|"
+readarray -td\| POSTS <<< "${1##*:}|"
 unset 'POSTS[-1]'
 
 [[ ! -d "${TMP_DIR}" ]] && mkdir -v "${TMP_DIR}"
@@ -25,7 +25,7 @@ echo "set -euxo pipefail" > "${RUN_FILE}"
 case "${1%:*}" in
   create)
     MDQ_CODE_BLOCK='```^bash$'
-    for (( idx=${#POSTS[@]}-1 ; idx>=0 ; idx-- )); do
+    for ((idx = ${#POSTS[@]} - 1; idx >= 0; idx--)); do
       POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POSTS[idx]}*.md")")
     done
     ;;

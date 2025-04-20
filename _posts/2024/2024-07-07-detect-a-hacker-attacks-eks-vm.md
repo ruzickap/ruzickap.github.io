@@ -468,7 +468,7 @@ resource (stdin)> run
 ```
 
 The outputs above indicate that the attack on the WordPress site was successful.
-We retrieved information about the remote system, including a [list of processes](https://github.com/maguihong/notes/blob/ca47699c21005f045bebc2fa731ee4f793604930/tools/metasploit/metasploit-fundamentals/meterpreter.md#ps),
+We retrieved information about the remote system, including a list of processes,
 the `wp-config.php` file, system details, and a list of users along with
 password hashes.
 
