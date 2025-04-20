@@ -607,7 +607,6 @@ metadata:
 spec:
   consolidation:
     enabled: true
-  # https://karpenter.sh/preview/concepts/provisioners/#cilium-startup-taint
   startupTaints:
     - key: node.cilium.io/agent-not-ready
       value: "true"

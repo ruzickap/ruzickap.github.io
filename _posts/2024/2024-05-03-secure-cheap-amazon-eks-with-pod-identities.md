@@ -280,7 +280,6 @@ Resources:
       TTL: 60
       ResourceRecords: !GetAtt HostedZone.NameServers
   # https://karpenter.sh/docs/reference/cloudformation/
-  # https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v0.37/getting-started/getting-started-with-karpenter/cloudformation.yaml
   KarpenterNodeInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -631,7 +630,6 @@ Resources:
     Properties:
       AliasName: !Sub "alias/eks-${ClusterName}"
       TargetKeyId: !Ref KMSKey
-  # https://karpenter.sh/v0.37/troubleshooting/#node-terminates-before-ready-on-failed-encrypted-ebs-volume
   KMSKey:
     Type: AWS::KMS::Key
     Properties:
@@ -1286,7 +1284,6 @@ prometheus:
           resources:
             requests:
               storage: 2Gi
-    # https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v0.37/getting-started/getting-started-with-karpenter/prometheus-values.yaml
     additionalScrapeConfigs:
       - job_name: karpenter
         kubernetes_sd_configs:
