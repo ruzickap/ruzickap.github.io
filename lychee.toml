@@ -34,7 +34,7 @@ exclude = [
   # Ignore all URLs which starts with 'file://'
   'file://',
   'fonts\.(googleapis|gstatic)\.com',
-  'github\.com/.*?ref=.*',
+  'github\.com/.*//.*/?ref=.*',
   'kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090',
   'kubernetes-sigs\.github\.io/aws-ebs-csi-driver',
   'linkedin\.com',
