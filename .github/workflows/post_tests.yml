@@ -11,15 +11,15 @@ on:
         options:
           - 2022-11-27-cheapest-amazon-eks
           - 2022-12-24-amazon-eks-karpenter-tests 2022-11-27-cheapest-amazon-eks
-          - 2023-03-08-trivy-operator-grafana 2022-11-27-cheapest-amazon-eks
-          - 2023-03-20-velero-and-cert-manager 2022-11-27-cheapest-amazon-eks
+          # - 2023-03-08-trivy-operator-grafana 2022-11-27-cheapest-amazon-eks
+          # - 2023-03-20-velero-and-cert-manager 2022-11-27-cheapest-amazon-eks
           - 2023-04-01-secrets-store-csi-driver-reloader 2023-03-20-velero-and-cert-manager 2022-11-27-cheapest-amazon-eks
           - 2023-06-06-my-favourite-krew-plugins-kubectl 2022-11-27-cheapest-amazon-eks
           - 2023-08-03-cilium-amazon-eks
           - 2023-09-25-secure-cheap-amazon-eks
           - 2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1
           - 2024-05-03-secure-cheap-amazon-eks-with-pod-identities
-          - 2023-03-20-velero-and-cert-manager 2024-05-03-secure-cheap-amazon-eks-with-pod-identities
+          # - 2023-03-20-velero-and-cert-manager 2024-05-03-secure-cheap-amazon-eks-with-pod-identities
           - 2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2
           - 2024-07-07-detect-a-hacker-attacks-eks-vm
           - 2024-12-12-terraform-keep-sorted

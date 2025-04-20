@@ -36,6 +36,7 @@ exclude = [
   'fonts\.(googleapis|gstatic)\.com',
   'github\.com/.*?ref=.*',
   'kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090',
+  'kubernetes-sigs\.github\.io/aws-ebs-csi-driver',
   'linkedin\.com',
   'mylabs\.dev',
   'stackexchange\.com',
