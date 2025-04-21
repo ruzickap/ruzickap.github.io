@@ -167,8 +167,7 @@ rain deploy --yes "${TMP_DIR}/vpc_cloudformation_template.yml" "${SOLUTION_EC2_C
   --params "EnvironmentName=${SOLUTION_EC2_CONTAINER}" \
   --tags "Owner=${USER},Environment=dev,Solution=${SOLUTION_EC2_CONTAINER}"
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_EC2_CONTAINER}-VPC" --query 'Stacks[0].Outputs[? OutputKey==`PublicSubnet1` || OutputKey==`VPC`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_EC2_CONTAINER}-VPC" --query "Stacks[0].Outputs[? OutputKey==\`PublicSubnet1\` || OutputKey==\`VPC\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_VPC_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"VPC\") .OutputValue")
 AWS_SUBNET_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"PublicSubnet1\") .OutputValue")
 
@@ -264,8 +263,7 @@ rain deploy --yes "${TMP_DIR}/vpc_cloudformation_template.yml" "${SOLUTION_EC2}-
   --params "EnvironmentName=${SOLUTION_EC2}" \
   --tags "Owner=${USER},Environment=dev,Solution=${SOLUTION_EC2}"
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_EC2}-VPC" --query 'Stacks[0].Outputs[? OutputKey==`PublicSubnet1` || OutputKey==`VPC`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_EC2}-VPC" --query "Stacks[0].Outputs[? OutputKey==\`PublicSubnet1\` || OutputKey==\`VPC\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_VPC_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"VPC\") .OutputValue")
 AWS_SUBNET_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"PublicSubnet1\") .OutputValue")
 
@@ -325,8 +323,7 @@ rain deploy --yes "${TMP_DIR}/vpc_cloudformation_template.yml" "${SOLUTION_KALI}
   --params "EnvironmentName=${SOLUTION_KALI}" \
   --tags "Owner=${USER},Environment=dev,Solution=${SOLUTION_KALI}"
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_KALI}-VPC" --query 'Stacks[0].Outputs[? OutputKey==`PublicSubnet1` || OutputKey==`VPC`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_KALI}-VPC" --query "Stacks[0].Outputs[? OutputKey==\`PublicSubnet1\` || OutputKey==\`VPC\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_VPC_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"VPC\") .OutputValue")
 AWS_SUBNET_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"PublicSubnet1\") .OutputValue")
 

@@ -704,8 +704,7 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
     --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms-karpenter.yml" --tags "${TAGS//,/ }"
 fi
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --query 'Stacks[0].Outputs[? OutputKey==`KMSKeyArn` || OutputKey==`KMSKeyId` || OutputKey==`KarpenterNodeRoleArn` || OutputKey==`KarpenterNodeInstanceProfileName` || OutputKey==`KarpenterControllerPolicyArn`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --query "Stacks[0].Outputs[? OutputKey==\`KMSKeyArn\` || OutputKey==\`KMSKeyId\` || OutputKey==\`KarpenterNodeRoleArn\` || OutputKey==\`KarpenterNodeInstanceProfileName\` || OutputKey==\`KarpenterControllerPolicyArn\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 AWS_KARPENTER_NODE_ROLE_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KarpenterNodeRoleArn\") .OutputValue")
