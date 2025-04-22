@@ -324,7 +324,7 @@ Outputs:
     Value: !Ref S3ChangeNotificationTopic
 EOF
 
-  aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
+  eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
     --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
     --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
 fi
