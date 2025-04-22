@@ -338,7 +338,7 @@ to access S3 and EC2 resources.
 The created ServiceAccount `velero` will be specified in velero helm chart later.
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yaml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -380,7 +380,7 @@ iam:
             Resource:
               - "arn:aws:s3:::${CLUSTER_FQDN}"
 EOF
-eksctl create podidentityassociation --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yaml"
+eksctl create podidentityassociation --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yml"
 ```
 
 ```console
