@@ -131,6 +131,7 @@ jobs:
           if grep -Eq '(^| )copilot ' "${TMP_DIR}/run.sh" && ! command -v copilot &> /dev/null ; then
             echo "📦 *** Installing copilot"
             brew install copilot
+            copilot --version
           fi
 
           if grep -Eq '(^| )cilium ' "${TMP_DIR}/run.sh" && ! command -v cilium &> /dev/null ; then
