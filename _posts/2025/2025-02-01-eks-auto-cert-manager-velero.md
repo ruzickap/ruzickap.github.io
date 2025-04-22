@@ -103,29 +103,31 @@ kubectl label secret --namespace cert-manager letsencrypt-production-dns letsenc
 
 Create a new certificate and have it signed by Let's Encrypt for validation:
 
-```shell
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: ingress-cert-production
-  namespace: cert-manager
-  labels:
-    letsencrypt: production
-spec:
-  secretName: ingress-cert-production
-  secretTemplate:
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q .; then
+  tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
+  apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: ingress-cert-production
+    namespace: cert-manager
     labels:
       letsencrypt: production
-  issuerRef:
-    name: letsencrypt-production-dns
-    kind: ClusterIssuer
-  commonName: "*.${CLUSTER_FQDN}"
-  dnsNames:
-    - "*.${CLUSTER_FQDN}"
-    - "${CLUSTER_FQDN}"
+  spec:
+    secretName: ingress-cert-production
+    secretTemplate:
+      labels:
+        letsencrypt: production
+    issuerRef:
+      name: letsencrypt-production-dns
+      kind: ClusterIssuer
+    commonName: "*.${CLUSTER_FQDN}"
+    dnsNames:
+      - "*.${CLUSTER_FQDN}"
+      - "${CLUSTER_FQDN}"
 EOF
-kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-production
+  kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-production
+fi
 ```
 
 ### Create S3 bucket
@@ -137,8 +139,9 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 
 Use CloudFormation to create an S3 bucket for storing Velero backups.
 
-```shell
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}"; then
+  cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
@@ -321,9 +324,10 @@ Outputs:
     Value: !Ref S3ChangeNotificationTopic
 EOF
 
-aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
-  --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
+  aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
+    --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
+    --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
+fi
 ```
 
 ## Install Velero
@@ -534,8 +538,10 @@ default   aws        k01.k8s.mylabs.dev/velero   Available   2025-02-06 06:21:59
 
 Initiate the backup process and store the required cert-manager objects in S3.
 
-```shell
-velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q .; then
+  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
+fi
 ```
 
 Check the backup details:

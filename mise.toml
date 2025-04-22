@@ -7,6 +7,7 @@
 [tools]
 # keep-sorted start
 "ubi:aws-cloudformation/rain" = "1.23.0" # AWS CloudFormation CLI
+"ubi:yshavit/mdq" = "0.6.0"              # Markdown parser
 aws = "2.25.8"                           # AWS CLI
 aws-copilot = "1.34.0"                   # AWS Copilot CLI
 cilium-cli = "0.18.2"                    # Cilium networking CLI
@@ -14,7 +15,6 @@ eksctl = "0.206.0"                       # Amazon EKS CLI
 helm = "3.12.3"                          # Kubernetes package manager
 jq = "1.6"                               # JSON processor
 kubectl = "1.32.3"                       # Kubernetes CLI
-# "ubi:yshavit/mdq" = "0.5.0"              # Markdown parser
 velero = "1.15.2"                        # Backup and migrate K8s resources
 yq = "4.31.1"                            # YAML processor
 # keep-sorted end
@@ -154,17 +154,6 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2"]
 description = 'Delete: Exploit vulnerability in a WordPress plugin with Kali Linux 2'
-run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
-
-#------------------------------------------------------------------------------
-# Detect the hacker attacks on Amazon EKS and EC2 instances
-#------------------------------------------------------------------------------
-[tasks."create:2024-07-07-detect-a-hacker-attacks-eks-vm"]
-description = 'Create: Detect the hacker attacks on Amazon EKS and EC2 instances'
-run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
-
-[tasks."delete:2024-07-07-detect-a-hacker-attacks-eks-vm"]
-description = 'Delete: Detect the hacker attacks on Amazon EKS and EC2 instances'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------

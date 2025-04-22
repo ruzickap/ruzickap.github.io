@@ -67,8 +67,6 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
   --workdir /mnt \
   ubuntu bash -c 'set -euo pipefail && \
     apt update -qq && apt install -qqy bsdextrautils curl docker.io unzip wget && \
-    curl -sL https://github.com/yshavit/mdq/releases/download/v0.5.0/mdq-ubuntu.zip -o /tmp/mdq-ubuntu.zip && unzip -d /usr/local/bin/ /tmp/mdq-ubuntu.zip && \
-    chmod a+x /usr/local/bin/mdq && \
     curl -sL https://mise.run -o - | bash && \
     eval "$(~/.local/bin/mise activate bash)" && \
     mise run "create-delete:posts:all" \
