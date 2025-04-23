@@ -66,7 +66,7 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
   --env GOOGLE_CLIENT_ID --env GOOGLE_CLIENT_SECRET --env FORCE_COLOR=1 --env USER \
   --workdir /mnt \
   ubuntu bash -c 'set -euo pipefail && \
-    apt update -qq && apt install -qqy bsdextrautils curl docker.io unzip wget && \
+    apt update -qq && apt install -qqy bsdextrautils curl docker.io jq unzip wget && \
     curl -sL https://mise.run -o - | bash && \
     eval "$(~/.local/bin/mise activate bash)" && \
     mise run "create-delete:posts:all" \

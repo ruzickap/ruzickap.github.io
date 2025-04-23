@@ -167,17 +167,6 @@ description = 'Delete: Build secure and cheap Amazon EKS with Pod Identities'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
-# Build secure and cheap Amazon EKS with Pod Identities + Velero and cert-manager
-#------------------------------------------------------------------------------
-[tasks."create:2023-03-20-velero-and-cert-manager|2024-05-03-secure-cheap-amazon-eks-with-pod-identities"]
-description = "Create: Build secure and cheap Amazon EKS with Pod Identities + Velero and cert-manager"
-run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
-
-[tasks."delete:2023-03-20-velero-and-cert-manager|2024-05-03-secure-cheap-amazon-eks-with-pod-identities"]
-description = "Delete: Build secure and cheap Amazon EKS with Pod Identities + Velero and cert-manager"
-run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
-
-#------------------------------------------------------------------------------
 # Exploit vulnerability in a WordPress plugin with Kali Linux 2
 #------------------------------------------------------------------------------
 [tasks."create:2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2"]
