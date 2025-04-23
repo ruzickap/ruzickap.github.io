@@ -79,6 +79,28 @@ description = 'Delete: Amazon EKS - Karpenter tests'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
+# Velero and cert-manager
+#------------------------------------------------------------------------------
+[tasks."create:2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
+description = "Create: Velero and cert-manager"
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
+description = "Delete: Velero and cert-manager"
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Secrets Store CSI Driver and Reloader
+#------------------------------------------------------------------------------
+[tasks."create:2023-04-01-secrets-store-csi-driver-reloader|2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
+description = 'Create: Secrets Store CSI Driver and Reloader'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-04-01-secrets-store-csi-driver-reloader|2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
+description = 'Delete: Secrets Store CSI Driver and Reloader'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
 # Secrets Store CSI Driver and Reloader
 #------------------------------------------------------------------------------
 [tasks."create:2023-04-01-secrets-store-csi-driver-reloader|2022-11-27-cheapest-amazon-eks"]
@@ -142,6 +164,17 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2024-05-03-secure-cheap-amazon-eks-with-pod-identities"]
 description = 'Delete: Build secure and cheap Amazon EKS with Pod Identities'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Build secure and cheap Amazon EKS with Pod Identities + Velero and cert-manager
+#------------------------------------------------------------------------------
+[tasks."create:2023-03-20-velero-and-cert-manager|2024-05-03-secure-cheap-amazon-eks-with-pod-identities"]
+description = "Create: Build secure and cheap Amazon EKS with Pod Identities + Velero and cert-manager"
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-03-20-velero-and-cert-manager|2024-05-03-secure-cheap-amazon-eks-with-pod-identities"]
+description = "Delete: Build secure and cheap Amazon EKS with Pod Identities + Velero and cert-manager"
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
