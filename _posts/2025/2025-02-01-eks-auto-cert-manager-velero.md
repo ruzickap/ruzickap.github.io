@@ -104,7 +104,7 @@ kubectl label secret --namespace cert-manager letsencrypt-production-dns letsenc
 Create a new certificate and have it signed by Let's Encrypt for validation:
 
 ```bash
-if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q .; then
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q velero-monthly-backup-cert-manager-production; then
   tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
   apiVersion: cert-manager.io/v1
   kind: Certificate
@@ -539,7 +539,7 @@ default   aws        k01.k8s.mylabs.dev/velero   Available   2025-02-06 06:21:59
 Initiate the backup process and store the required cert-manager objects in S3.
 
 ```bash
-if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q .; then
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q velero-monthly-backup-cert-manager-production; then
   velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
 fi
 ```

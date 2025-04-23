@@ -85,8 +85,9 @@ kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready cluste
 
 Create new certificate and let it sign by Let's Encrypt to validate it:
 
-```shell
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q velero-weekly-backup-cert-manager; then
+  tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -107,7 +108,8 @@ spec:
     - "*.${CLUSTER_FQDN}"
     - "${CLUSTER_FQDN}"
 EOF
-kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-production
+  kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-production
+fi
 ```
 
 ### Create S3 bucket
@@ -120,8 +122,9 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 Use CloudFormation to create S3 bucket which will be used to store backups from
 Velero.
 
-```shell
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}"; then
+  cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
@@ -256,9 +259,10 @@ Outputs:
     Value: !Ref S3ChangeNotificationTopic
 EOF
 
-aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
-  --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
+  aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
+    --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
+    --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
+fi
 ```
 
 ## Install Velero
@@ -413,8 +417,10 @@ default   aws        k01.k8s.mylabs.dev/velero   Available   2023-03-23 20:16:20
 
 Initiate backup process and save the necessary cert-manager object to S3:
 
-```shell
-velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q velero-weekly-backup-cert-manager; then
+  velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
+fi
 ```
 
 Check the backup details:
@@ -670,7 +676,7 @@ Few commands showing the details after cert-manager renewed the certificate.
 
 Examine the certificate:
 
-```shell
+```bash
 kubectl describe certificates -n cert-manager ingress-cert-production
 ```
 
