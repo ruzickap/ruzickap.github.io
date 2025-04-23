@@ -805,7 +805,7 @@ Backup certificate before deleting the cluster (in case it was renewed):
 {% raw %}
 
 ```sh
-if ! kubectl get certificaterequests.cert-manager.io -n cert-manager --selector letsencrypt=production -o go-template='{{.items | len}}' | grep -qxF 0; then
+if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
   velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
 fi
 ```
@@ -823,8 +823,8 @@ for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-s3,helm_values-{ingress-nginx-prod
   else
     echo "*** File not found: ${FILE}"
   fi
-  find "${TMP_DIR}/${CLUSTER_FQDN}" -ls
 done
+find "${TMP_DIR}/${CLUSTER_FQDN}" -ls
 ```
 
 Enjoy ... 😉

@@ -1173,6 +1173,7 @@ if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
       echo "*** File not found: ${FILE}"
     fi
   done
+  find "${TMP_DIR}/${CLUSTER_FQDN}" -ls
   rmdir "${TMP_DIR}/${CLUSTER_FQDN}"
 fi
 ```
