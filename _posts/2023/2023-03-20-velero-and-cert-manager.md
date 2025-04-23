@@ -86,7 +86,7 @@ kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready cluste
 Create new certificate and let it sign by Let's Encrypt to validate it:
 
 ```bash
-if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q velero-weekly-backup-cert-manager; then
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-weekly-backup-cert-manager; then
   tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -418,7 +418,7 @@ default   aws        k01.k8s.mylabs.dev/velero   Available   2023-03-23 20:16:20
 Initiate backup process and save the necessary cert-manager object to S3:
 
 ```bash
-if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups" | grep -q velero-weekly-backup-cert-manager; then
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-weekly-backup-cert-manager; then
   velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
 fi
 ```
