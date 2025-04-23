@@ -812,4 +812,19 @@ fi
 
 {% endraw %}
 
+## Clean-up
+
+Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+
+```sh
+for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-s3,helm_values-{ingress-nginx-production-certs,kube-prometheus-stack-velero-cert-manager,velero},k8s-cert-manager-clusterissuer-production}.yml; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
+  fi
+  find "${TMP_DIR}/${CLUSTER_FQDN}" -ls
+done
+```
+
 Enjoy ... 😉
