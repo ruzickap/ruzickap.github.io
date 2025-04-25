@@ -32,9 +32,11 @@ Install Krew plugin manager for kubectl command-line tool:
 ![Krew](https://raw.githubusercontent.com/kubernetes-sigs/krew/4ec386cc021b4a7896de95d91c5d8025d98eaa4f/assets/logo/horizontal/color/krew-horizontal-color.svg){:width="500"}
 
 ```bash
-export TMP_DIR="${TMP_DIR:-${PWD}}"
-curl -sL https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_amd64.tar.gz | tar xz -C "${TMP_DIR}"
-"${TMP_DIR}/krew-linux_amd64" install krew
+TMP_DIR="${TMP_DIR:-${PWD}}"
+ARCH="amd64"
+curl -sL "https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_${ARCH}.tar.gz" | tar -xvzf -  -C "${TMP_DIR}" --no-same-owner --strip-components=1 --wildcards "*/krew-linux*"
+"${TMP_DIR}/krew-linux_${ARCH}" install krew
+rm "${TMP_DIR}/krew-linux_${ARCH}"
 export PATH="${HOME}/.krew/bin:${PATH}"
 ```
 

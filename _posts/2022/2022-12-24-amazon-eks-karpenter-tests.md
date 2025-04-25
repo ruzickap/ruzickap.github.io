@@ -47,8 +47,10 @@ Install handy tools:
 - [kube-capacity](https://github.com/robscott/kube-capacity)
 
 ```bash
-curl -sL https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_amd64.tar.gz | tar xz -C /tmp/
-/tmp/krew-linux_amd64 install krew
+ARCH="amd64"
+curl -sL "https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_${ARCH}.tar.gz" | tar -xvzf -  -C "${TMP_DIR}" --no-same-owner --strip-components=1 --wildcards "*/krew-linux*"
+"${TMP_DIR}/krew-linux_${ARCH}" install krew
+rm "${TMP_DIR}/krew-linux_${ARCH}"
 export PATH="${HOME}/.krew/bin:${PATH}"
 kubectl krew install resource-capacity view-allocations viewnode
 ```
