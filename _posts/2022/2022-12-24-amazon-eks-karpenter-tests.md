@@ -48,7 +48,7 @@ Install handy tools:
 
 ```bash
 ARCH="amd64"
-curl -sL "https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_${ARCH}.tar.gz" | tar -xvzf -  -C "${TMP_DIR}" --no-same-owner --strip-components=1 --wildcards "*/krew-linux*"
+curl -sL "https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_${ARCH}.tar.gz" | tar -xvzf - -C "${TMP_DIR}" --no-same-owner --strip-components=1 --wildcards "*/krew-linux*"
 "${TMP_DIR}/krew-linux_${ARCH}" install krew
 rm "${TMP_DIR}/krew-linux_${ARCH}"
 export PATH="${HOME}/.krew/bin:${PATH}"
