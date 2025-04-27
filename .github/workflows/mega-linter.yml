@@ -36,12 +36,11 @@ jobs:
           readarray -d '' MD_FILES < <(find . -type f -name "*.md" -print0)
           for MD_FILE in "${MD_FILES[@]}"; do
             for MDQ_CODE_BLOCK in bash sh shell; do
-              mdq '```/^'"${MDQ_CODE_BLOCK}"'$/' --br -o plain "$MD_FILE" > "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"
-              if [[ ! -s "${MD_FILE%.md}.sh" ]]; then
-                rm "${MD_FILE%.md}.sh"
-              else
+              if mdq '```/^'"${MDQ_CODE_BLOCK}"'$/' --br -o plain "$MD_FILE" > "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"; then
                 sed -i '1i#!/usr/bin/env bash' "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"
                 chmod a+x "${MD_FILE%.md}.sh"
+              else
+                rm "${MD_FILE%.md}.sh"
               fi
             done
           done
