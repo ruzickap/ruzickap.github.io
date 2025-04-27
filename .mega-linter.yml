@@ -7,6 +7,7 @@ BASH_SHELLCHECK_ARGUMENTS: --exclude=SC2317
 BASH_SHFMT_ARGUMENTS: --case-indent --indent 2 --space-redirects
 
 DISABLE_LINTERS:
+  - COPYPASTE_JSCPD
   - MARKDOWN_MARKDOWN_LINK_CHECK # Using lychee instead
   - SPELL_CSPELL
   - TERRAFORM_TERRASCAN # Hard to configure - no documentation of the config file

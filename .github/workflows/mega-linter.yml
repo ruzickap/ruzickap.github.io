@@ -29,13 +29,12 @@ jobs:
 
       - name: Extract commands from markdown files
         run: |
-          set -euxo pipefail
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install mdq
 
           readarray -d '' MD_FILES < <(find . -type f -name "*.md" -print0)
           for MD_FILE in "${MD_FILES[@]}"; do
-            echo "🔨 *** ${MD_FILE}"
+            echo "💡 *** ${MD_FILE}"
             for MDQ_CODE_BLOCK in bash sh shell; do
               if mdq '```/^'"${MDQ_CODE_BLOCK}"'$/' --br -o plain "$MD_FILE" > "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"; then
                 sed -i '1i#!/usr/bin/env bash' "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"
