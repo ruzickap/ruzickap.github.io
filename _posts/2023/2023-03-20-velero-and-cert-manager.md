@@ -824,7 +824,6 @@ for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-s3,helm_values-{ingress-nginx-prod
     echo "*** File not found: ${FILE}"
   fi
 done
-find "${TMP_DIR}/${CLUSTER_FQDN}" -ls
 ```
 
 Enjoy ... 😉

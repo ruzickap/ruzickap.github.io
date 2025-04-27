@@ -31,9 +31,10 @@ features, let's explore some examples.
 Install `keep-sorted`:
 
 ```bash
-brew install keep-sorted
 TMP_DIR="${TMP_DIR:-${PWD}}"
 mkdir -pv "${TMP_DIR}"
+wget -q "https://github.com/google/keep-sorted/releases/download/v0.6.1/keep-sorted_$(uname | tr '[:upper:]' '[:lower:]')" -O "${TMP_DIR}/keep-sorted"
+chmod +x "${TMP_DIR}/keep-sorted"
 ```
 
 Let's have some example `data.tf` file:
@@ -67,7 +68,7 @@ EOF
 Let's check the output after using [keep-sorted](https://github.com/google/keep-sorted):
 
 ```bash
-keep-sorted "${TMP_DIR}/data.tf" && cat "${TMP_DIR}/data.tf"
+"${TMP_DIR}/keep-sorted" "${TMP_DIR}/data.tf" && cat "${TMP_DIR}/data.tf"
 ```
 
 ```hcl
@@ -134,7 +135,7 @@ EOF
 ...and the output is:
 
 ```bash
-keep-sorted "${TMP_DIR}/main.tf" && cat "${TMP_DIR}/main.tf"
+"${TMP_DIR}/keep-sorted" "${TMP_DIR}/main.tf" && cat "${TMP_DIR}/main.tf"
 ```
 
 ```hcl
@@ -173,7 +174,7 @@ and as I mentioned before - it's not only for Terraform / OpenTofu.
 Delete all created files:
 
 ```sh
-rm -v "${TMP_DIR}"/{data,main}.tf
+rm -v "${TMP_DIR}"/{data,main}.tf "${TMP_DIR}/keep-sorted"
 ```
 
 Enjoy ... 😉
