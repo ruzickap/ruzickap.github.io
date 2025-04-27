@@ -85,8 +85,9 @@ kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready cluste
 
 Create new certificate and let it sign by Let's Encrypt to validate it:
 
-```shell
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-weekly-backup-cert-manager; then
+  tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -107,7 +108,8 @@ spec:
     - "*.${CLUSTER_FQDN}"
     - "${CLUSTER_FQDN}"
 EOF
-kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-production
+  kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-production
+fi
 ```
 
 ### Create S3 bucket
@@ -120,8 +122,9 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 Use CloudFormation to create S3 bucket which will be used to store backups from
 Velero.
 
-```shell
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}"; then
+  cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
@@ -256,9 +259,10 @@ Outputs:
     Value: !Ref S3ChangeNotificationTopic
 EOF
 
-aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
-  --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
+  aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
+    --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
+    --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml"
+fi
 ```
 
 ## Install Velero
@@ -267,8 +271,7 @@ Before installing Velero it is necessary to create IRSA with S3 policy. The
 created ServiceAccount `velero` will be specified in velero helm chart later.
 
 ```bash
-# shellcheck disable=SC2016
-S3_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-s3" --query 'Stacks[0].Outputs[?OutputKey==`S3PolicyArn`].OutputValue' --output text)
+S3_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-s3" --query "Stacks[0].Outputs[?OutputKey==\`S3PolicyArn\`].OutputValue" --output text)
 eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=velero --namespace=velero --attach-policy-arn="${S3_POLICY_ARN}" --role-name="eksctl-${CLUSTER_NAME}-irsa-velero" --approve
 ```
 
@@ -414,8 +417,10 @@ default   aws        k01.k8s.mylabs.dev/velero   Available   2023-03-23 20:16:20
 
 Initiate backup process and save the necessary cert-manager object to S3:
 
-```shell
-velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-weekly-backup-cert-manager; then
+  velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
+fi
 ```
 
 Check the backup details:
@@ -627,7 +632,7 @@ Use production Let's Encrypt certificate by `ingress-nginx`:
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.11.3"
+INGRESS_NGINX_HELM_CHART_VERSION="4.9.1"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx-production-certs.yml" << EOF
 controller:
@@ -671,7 +676,7 @@ Few commands showing the details after cert-manager renewed the certificate.
 
 Examine the certificate:
 
-```shell
+```bash
 kubectl describe certificates -n cert-manager ingress-cert-production
 ```
 
@@ -800,11 +805,25 @@ Backup certificate before deleting the cluster (in case it was renewed):
 {% raw %}
 
 ```sh
-if ! kubectl get certificaterequests.cert-manager.io -n cert-manager --selector letsencrypt=production -o go-template='{{.items | len}}' | grep -qxF 0; then
+if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
   velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
 fi
 ```
 
 {% endraw %}
+
+## Clean-up
+
+Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+
+```sh
+for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-s3,helm_values-{ingress-nginx-production-certs,kube-prometheus-stack-velero-cert-manager,velero},k8s-cert-manager-clusterissuer-production}.yml; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
+  fi
+done
+```
 
 Enjoy ... 😉

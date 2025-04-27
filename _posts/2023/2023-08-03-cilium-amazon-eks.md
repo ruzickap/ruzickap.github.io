@@ -344,8 +344,7 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
     --stack-name "${CLUSTER_NAME}-route53-kms" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" --tags "${TAGS//,/ }"
 fi
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query 'Stacks[0].Outputs[? OutputKey==`KMSKeyArn` || OutputKey==`KMSKeyId`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query "Stacks[0].Outputs[? OutputKey==\`KMSKeyArn\` || OutputKey==\`KMSKeyId\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 ```
@@ -372,7 +371,7 @@ I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -482,7 +481,7 @@ Get the kubeconfig to access the cluster:
 ```bash
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
-    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
+    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" --kubeconfig "${KUBECONFIG}"
     # Add roles created by eksctl to the KMS policy to allow aws-ebs-csi-driver work with encrypted EBS volumes
     sed -i "s@# \(- \!Sub \"arn:aws:iam::\${AWS::AccountId}:role/eksctl-\${ClusterName}.*\)@\1@" "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml"
     eval aws cloudformation update-stack \
@@ -607,7 +606,6 @@ metadata:
 spec:
   consolidation:
     enabled: true
-  # https://karpenter.sh/preview/concepts/provisioners/#cilium-startup-taint
   startupTaints:
     - key: node.cilium.io/agent-not-ready
       value: "true"
@@ -697,7 +695,7 @@ and modify the
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
 SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.0"
 
-helm repo add piraeus-charts https://piraeus.io/helm-charts/
+helm repo add --force-update piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
 ```
 
@@ -718,7 +716,7 @@ and modify the
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.27.0"
 
-helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo add --force-update aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" << EOF
 controller:
   enableMetrics: false
@@ -784,7 +782,7 @@ and modify the
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
 MAILHOG_HELM_CHART_VERSION="5.2.3"
 
-helm repo add codecentric https://codecentric.github.io/helm-charts
+helm repo add --force-update codecentric https://codecentric.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailhog.yml" << EOF
 image:
   repository: docker.io/cd2team/mailhog
@@ -844,7 +842,7 @@ and modify the
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
 defaultRules:
   rules:
@@ -1170,7 +1168,7 @@ helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace k
 Add hubble to Cilium, Prometheus, Metrics, ...
 
 ```bash
-helm repo add cilium https://helm.cilium.io/
+helm repo add --force-update cilium https://helm.cilium.io/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cilium.yml" << EOF
 hubble:
   metrics:
@@ -1246,7 +1244,7 @@ and modify the
 # renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
 AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION="0.1.32"
 
-helm repo add eks https://aws.github.io/eks-charts/
+helm repo add --force-update eks https://aws.github.io/eks-charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-for-fluent-bit.yml" << EOF
 cloudWatchLogs:
   region: ${AWS_DEFAULT_REGION}
@@ -1291,7 +1289,7 @@ Service account `cert-manager` was created by `eksctl`.
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.14.3"
 
-helm repo add jetstack https://charts.jetstack.io
+helm repo add --force-update jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
@@ -1369,40 +1367,6 @@ spec:
 EOF
 ```
 
-### metrics-server
-
-[Metrics Server](https://github.com/kubernetes-sigs/metrics-server) is
-a scalable, efficient source of container resource metrics for Kubernetes
-built-in autoscaling pipelines.
-
-Endpoint ports:
-
-- 10250 (https) -> 10252
-  (conflicts with kube-prometheus-stack-kubelet/https-metrics,
-  cert-manager-webhook/https)
-
-Install `metrics-server`
-[helm chart](https://artifacthub.io/packages/helm/metrics-server/metrics-server)
-and modify the
-[default values](https://github.com/kubernetes-sigs/metrics-server/blob/metrics-server-helm-chart-3.12.0/charts/metrics-server/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server/
-METRICS_SERVER_HELM_CHART_VERSION="3.12.0"
-
-helm repo add metrics-server https://kubernetes-sigs.github.io/metrics-server/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" << EOF
-containerPort: 10252
-hostNetwork:
-  enabled: true
-metrics:
-  enabled: true
-serviceMonitor:
-  enabled: true
-EOF
-helm upgrade --install --version "${METRICS_SERVER_HELM_CHART_VERSION}" --namespace kube-system --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-metrics-server.yml" metrics-server metrics-server/metrics-server
-```
-
 ### external-dns
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
@@ -1421,7 +1385,7 @@ Service account `external-dns` was created by `eksctl`.
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.14.3"
 
-helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
+helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
 domainFilters:
   - ${CLUSTER_FQDN}
@@ -1460,7 +1424,7 @@ INGRESS_NGINX_HELM_CHART_VERSION="4.9.1"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
 
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   hostNetwork: true
@@ -1535,7 +1499,7 @@ and modify the
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
 FORECASTLE_HELM_CHART_VERSION="1.0.136"
 
-helm repo add stakater https://stakater.github.io/stakater-charts
+helm repo add --force-update stakater https://stakater.github.io/stakater-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
 forecastle:
   config:
@@ -1578,8 +1542,8 @@ and modify the
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
 OAUTH2_PROXY_HELM_CHART_VERSION="6.24.1"
 
-helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
+helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
 config:
   clientID: ${GOOGLE_CLIENT_ID}
   clientSecret: ${GOOGLE_CLIENT_SECRET}
@@ -2303,7 +2267,7 @@ fi
 Remove orphan EC2s created by Karpenter:
 
 ```sh
-for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do
+for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
   echo "Removing EC2: ${EC2}"
   aws ec2 terminate-instances --instance-ids "${EC2}"
 done
@@ -2312,7 +2276,9 @@ done
 Remove CloudWatch log group:
 
 ```sh
-aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
+  aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+fi
 ```
 
 Remove CloudFormation stack:
@@ -2331,7 +2297,7 @@ aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAM
 Remove Volumes and Snapshots related to the cluster (just in case):
 
 ```sh
-for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
+for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text); do
   echo "*** Removing Volume: ${VOLUME}"
   aws ec2 delete-volume --volume-id "${VOLUME}"
 done
@@ -2340,7 +2306,16 @@ done
 Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
-[[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]] && rm -rf "${TMP_DIR}/${CLUSTER_FQDN}" && [[ -d "${TMP_DIR}" ]] && rmdir "${TMP_DIR}" || true
+if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,eksctl-${CLUSTER_NAME},k8s-karpenter-provisioner,helm_values-{aws-ebs-csi-driver,aws-for-fluent-bit,cert-manager,cilium,external-dns,forecastle,ingress-nginx,karpenter,kube-prometheus-stack,mailhog,oauth2-proxy},k8s-cert-manager-{certificate,clusterissuer}-staging}.yml}; do
+    if [[ -f "${FILE}" ]]; then
+      rm -v "${FILE}"
+    else
+      echo "*** File not found: ${FILE}"
+    fi
+  done
+  rmdir "${TMP_DIR}/${CLUSTER_FQDN}"
+fi
 ```
 
 Enjoy ... 😉

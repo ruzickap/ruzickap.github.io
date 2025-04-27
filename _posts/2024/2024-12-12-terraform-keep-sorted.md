@@ -31,13 +31,16 @@ features, let's explore some examples.
 Install `keep-sorted`:
 
 ```bash
-brew install keep-sorted
+TMP_DIR="${TMP_DIR:-${PWD}}"
+mkdir -pv "${TMP_DIR}"
+wget -q "https://github.com/google/keep-sorted/releases/download/v0.6.1/keep-sorted_$(uname | tr '[:upper:]' '[:lower:]')" -O "${TMP_DIR}/keep-sorted"
+chmod +x "${TMP_DIR}/keep-sorted"
 ```
 
 Let's have some example `data.tf` file:
 
 ```bash
-tee data.tf << EOF
+tee "${TMP_DIR}/data.tf" << EOF
 # keep-sorted start block=yes newline_separated=yes
 # [APIGateway-007] REST API Gateway 7
 data "wiz_cloud_configuration_rules" "apigateway-007" {
@@ -65,7 +68,7 @@ EOF
 Let's check the output after using [keep-sorted](https://github.com/google/keep-sorted):
 
 ```bash
-keep-sorted data.tf && cat data.tf
+"${TMP_DIR}/keep-sorted" "${TMP_DIR}/data.tf" && cat "${TMP_DIR}/data.tf"
 ```
 
 ```hcl
@@ -105,7 +108,7 @@ As you can see above:
 One more example - `main.tf`:
 
 ```bash
-tee main.tf << EOF
+tee "${TMP_DIR}/main.tf" << EOF
 locals {
   # keep-sorted start block=yes numeric=yes
   wiz_cloud_configuration_rules_20 = [
@@ -132,7 +135,7 @@ EOF
 ...and the output is:
 
 ```bash
-keep-sorted main.tf && cat main.tf
+"${TMP_DIR}/keep-sorted" "${TMP_DIR}/main.tf" && cat "${TMP_DIR}/main.tf"
 ```
 
 ```hcl
@@ -165,5 +168,13 @@ _keep-sorted main.tf diff_
 
 `keep-sorted` has few more features documented in the [README.md](https://github.com/google/keep-sorted/blob/main/README.md#options)
 and as I mentioned before - it's not only for Terraform / OpenTofu.
+
+## Cleanup
+
+Delete all created files:
+
+```sh
+rm -v "${TMP_DIR}"/{data,main}.tf "${TMP_DIR}/keep-sorted"
+```
 
 Enjoy ... 😉

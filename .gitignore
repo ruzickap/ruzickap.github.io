@@ -8,3 +8,6 @@ Gemfile.lock
 
 # Lychee cache
 .lycheecache
+
+# tmp files
+tmp/

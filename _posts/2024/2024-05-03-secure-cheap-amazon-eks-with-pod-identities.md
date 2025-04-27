@@ -280,7 +280,6 @@ Resources:
       TTL: 60
       ResourceRecords: !GetAtt HostedZone.NameServers
   # https://karpenter.sh/docs/reference/cloudformation/
-  # https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v0.37/getting-started/getting-started-with-karpenter/cloudformation.yaml
   KarpenterNodeInstanceProfile:
     Type: "AWS::IAM::InstanceProfile"
     Properties:
@@ -631,7 +630,6 @@ Resources:
     Properties:
       AliasName: !Sub "alias/eks-${ClusterName}"
       TargetKeyId: !Ref KMSKey
-  # https://karpenter.sh/v0.37/troubleshooting/#node-terminates-before-ready-on-failed-encrypted-ebs-volume
   KMSKey:
     Type: AWS::KMS::Key
     Properties:
@@ -706,8 +704,7 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
     --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms-karpenter.yml" --tags "${TAGS//,/ }"
 fi
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --query 'Stacks[0].Outputs[? OutputKey==`KMSKeyArn` || OutputKey==`KMSKeyId` || OutputKey==`KarpenterNodeRoleArn` || OutputKey==`KarpenterNodeInstanceProfileName` || OutputKey==`KarpenterControllerPolicyArn`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms-karpenter" --query "Stacks[0].Outputs[? OutputKey==\`KMSKeyArn\` || OutputKey==\`KMSKeyId\` || OutputKey==\`KarpenterNodeRoleArn\` || OutputKey==\`KarpenterNodeInstanceProfileName\` || OutputKey==\`KarpenterControllerPolicyArn\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 AWS_KARPENTER_NODE_ROLE_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KarpenterNodeRoleArn\") .OutputValue")
@@ -736,7 +733,7 @@ cluster.
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -839,7 +836,7 @@ Get the kubeconfig to access the cluster:
 ```bash
 if [[ ! -s "${KUBECONFIG}" ]]; then
   if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null; then
-    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yaml" --kubeconfig "${KUBECONFIG}"
+    eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" --kubeconfig "${KUBECONFIG}"
   else
     eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
   fi
@@ -911,7 +908,7 @@ and modify the
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
 SNAPSHOT_CONTROLLER_HELM_CHART_VERSION="2.2.2"
 
-helm repo add piraeus-charts https://piraeus.io/helm-charts/
+helm repo add --force-update piraeus-charts https://piraeus.io/helm-charts/
 helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSION}" --namespace snapshot-controller --create-namespace snapshot-controller piraeus-charts/snapshot-controller
 kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=baseline
 ```
@@ -933,7 +930,7 @@ and modify the
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.31.0"
 
-helm repo add aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
+helm repo add --force-update aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" << EOF
 controller:
   enableMetrics: false
@@ -987,7 +984,7 @@ and modify the
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
 MAILPIT_HELM_CHART_VERSION="0.17.4"
 
-helm repo add jouve https://jouve.github.io/charts/
+helm repo add --force-update jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
 ingress:
   enabled: true
@@ -1032,7 +1029,7 @@ and modify the
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
 KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION="56.6.2"
 
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo add --force-update prometheus-community https://prometheus-community.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack.yml" << EOF
 defaultRules:
   rules:
@@ -1286,7 +1283,6 @@ prometheus:
           resources:
             requests:
               storage: 2Gi
-    # https://github.com/aws/karpenter-provider-aws/blob/main/website/content/en/v0.37/getting-started/getting-started-with-karpenter/prometheus-values.yaml
     additionalScrapeConfigs:
       - job_name: karpenter
         kubernetes_sd_configs:
@@ -1428,7 +1424,7 @@ Service account `cert-manager` was created by `eksctl`.
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.15.0"
 
-helm repo add jetstack https://charts.jetstack.io
+helm repo add --force-update jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
 installCRDs: true
 serviceAccount:
@@ -1522,7 +1518,7 @@ Service account `external-dns` was created by `eksctl`.
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.14.4"
 
-helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
+helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
 domainFilters:
   - ${CLUSTER_FQDN}
@@ -1552,7 +1548,7 @@ and modify the
 # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
 AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.11.0"
 
-helm repo add eks https://aws.github.io/eks-charts
+helm repo add --force-update eks https://aws.github.io/eks-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" << EOF
 serviceAccount:
   name: aws-load-balancer-controller
@@ -1579,7 +1575,7 @@ INGRESS_NGINX_HELM_CHART_VERSION="4.12.0"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-staging
 
-helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
 controller:
   config:
@@ -1661,7 +1657,7 @@ and modify the
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
 FORECASTLE_HELM_CHART_VERSION="1.0.139"
 
-helm repo add stakater https://stakater.github.io/stakater-charts
+helm repo add --force-update stakater https://stakater.github.io/stakater-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-forecastle.yml" << EOF
 forecastle:
   config:
@@ -1709,8 +1705,8 @@ and modify the
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
 OAUTH2_PROXY_HELM_CHART_VERSION="7.7.1"
 
-helm repo add oauth2-proxy https://oauth2-proxy.github.io/manifests
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
+helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
 config:
   clientID: ${GOOGLE_CLIENT_ID}
   clientSecret: ${GOOGLE_CLIENT_SECRET}
@@ -1780,7 +1776,7 @@ aws ec2 describe-launch-templates --filters "Name=tag:karpenter.k8s.aws/cluster,
 Remove Volumes and Snapshots related to the cluster (just in case):
 
 ```sh
-for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text) ; do
+for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text); do
   echo "*** Removing Volume: ${VOLUME}"
   aws ec2 delete-volume --volume-id "${VOLUME}"
 done
@@ -1789,13 +1785,15 @@ done
 Remove CloudWatch log group:
 
 ```sh
-aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
+  aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+fi
 ```
 
 Remove orphan EC2s created by Karpenter:
 
 ```sh
-for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text) ; do
+for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
   echo "Removing EC2: ${EC2}"
   aws ec2 terminate-instances --instance-ids "${EC2}"
 done
@@ -1812,7 +1810,16 @@ aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAM
 Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
-[[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]] && rm -rvf "${TMP_DIR}/${CLUSTER_FQDN}" && [[ -d "${TMP_DIR}" ]] && rmdir -v "${TMP_DIR}" || true
+if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms-karpenter,eksctl-${CLUSTER_NAME},k8s-karpenter-nodepool-ec2nodeclass,helm_values-{aws-ebs-csi-driver,aws-load-balancer-controller,cert-manager,external-dns,forecastle,ingress-nginx,karpenter,kube-prometheus-stack,mailpit,oauth2-proxy},k8s-cert-manager-{certificate,clusterissuer}-staging}.yml}; do
+    if [[ -f "${FILE}" ]]; then
+      rm -v "${FILE}"
+    else
+      echo "*** File not found: ${FILE}"
+    fi
+  done
+  rmdir "${TMP_DIR}/${CLUSTER_FQDN}"
+fi
 ```
 
 Enjoy ... 😉

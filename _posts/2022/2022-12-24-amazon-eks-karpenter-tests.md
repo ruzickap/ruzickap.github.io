@@ -47,8 +47,10 @@ Install handy tools:
 - [kube-capacity](https://github.com/robscott/kube-capacity)
 
 ```bash
-gh release download --repo kubernetes-sigs/krew --pattern krew-linux_amd64.tar.gz --output - | sudo tar xz -C /tmp/
-/tmp/krew-linux_amd64 install krew
+ARCH="amd64"
+curl -sL "https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_${ARCH}.tar.gz" | tar -xvzf - -C "${TMP_DIR}" --no-same-owner --strip-components=1 --wildcards "*/krew-linux*"
+"${TMP_DIR}/krew-linux_${ARCH}" install krew
+rm "${TMP_DIR}/krew-linux_${ARCH}"
 export PATH="${HOME}/.krew/bin:${PATH}"
 kubectl krew install resource-capacity view-allocations viewnode
 ```
@@ -265,7 +267,7 @@ kubectl view-allocations --namespace test-karpenter --utilization --resource-nam
 Remove the nginx workload and the `test-karpenter` namespace:
 
 ```sh
-kubectl delete namespace test-karpenter
+kubectl delete namespace test-karpenter || true
 ```
 
 ![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-04-delete.avif)
@@ -528,6 +530,18 @@ Uninstall [Podinfo](https://github.com/stefanprodan/podinfo):
 
 ```sh
 kubectl delete namespace podinfo || true
+```
+
+Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+
+```sh
+for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{helm_values-podinfo,k8s-deployment-nginx}.yml; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
+  fi
+done
 ```
 
 Enjoy ... 😉

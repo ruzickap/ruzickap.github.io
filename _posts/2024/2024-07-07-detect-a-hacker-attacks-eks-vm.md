@@ -131,7 +131,7 @@ export WIZ_API_CLIENT_SECRET="xxxx"
 export WIZ_SENSOR_CONTAINER_REGISTRY_USERNAME="xxxx"
 export WIZ_SENSOR_CONTAINER_REGISTRY_PASSWORD="xxxx"
 
-helm repo add wiz-sec https://charts.wiz.io/
+helm repo add --force-update wiz-sec https://charts.wiz.io/
 helm upgrade --install --namespace wiz --create-namespace --values - wiz-kubernetes-integration wiz-sec/wiz-kubernetes-integration << EOF
 global:
   wizApiToken:
@@ -167,8 +167,7 @@ rain deploy --yes "${TMP_DIR}/vpc_cloudformation_template.yml" "${SOLUTION_EC2_C
   --params "EnvironmentName=${SOLUTION_EC2_CONTAINER}" \
   --tags "Owner=${USER},Environment=dev,Solution=${SOLUTION_EC2_CONTAINER}"
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_EC2_CONTAINER}-VPC" --query 'Stacks[0].Outputs[? OutputKey==`PublicSubnet1` || OutputKey==`VPC`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_EC2_CONTAINER}-VPC" --query "Stacks[0].Outputs[? OutputKey==\`PublicSubnet1\` || OutputKey==\`VPC\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_VPC_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"VPC\") .OutputValue")
 AWS_SUBNET_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"PublicSubnet1\") .OutputValue")
 
@@ -264,8 +263,7 @@ rain deploy --yes "${TMP_DIR}/vpc_cloudformation_template.yml" "${SOLUTION_EC2}-
   --params "EnvironmentName=${SOLUTION_EC2}" \
   --tags "Owner=${USER},Environment=dev,Solution=${SOLUTION_EC2}"
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_EC2}-VPC" --query 'Stacks[0].Outputs[? OutputKey==`PublicSubnet1` || OutputKey==`VPC`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_EC2}-VPC" --query "Stacks[0].Outputs[? OutputKey==\`PublicSubnet1\` || OutputKey==\`VPC\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_VPC_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"VPC\") .OutputValue")
 AWS_SUBNET_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"PublicSubnet1\") .OutputValue")
 
@@ -325,8 +323,7 @@ rain deploy --yes "${TMP_DIR}/vpc_cloudformation_template.yml" "${SOLUTION_KALI}
   --params "EnvironmentName=${SOLUTION_KALI}" \
   --tags "Owner=${USER},Environment=dev,Solution=${SOLUTION_KALI}"
 
-# shellcheck disable=SC2016
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_KALI}-VPC" --query 'Stacks[0].Outputs[? OutputKey==`PublicSubnet1` || OutputKey==`VPC`].{OutputKey:OutputKey,OutputValue:OutputValue}')
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${SOLUTION_KALI}-VPC" --query "Stacks[0].Outputs[? OutputKey==\`PublicSubnet1\` || OutputKey==\`VPC\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_VPC_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"VPC\") .OutputValue")
 AWS_SUBNET_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"PublicSubnet1\") .OutputValue")
 
@@ -468,7 +465,7 @@ resource (stdin)> run
 ```
 
 The outputs above indicate that the attack on the WordPress site was successful.
-We retrieved information about the remote system, including a [list of processes](https://github.com/maguihong/notes/blob/ca47699c21005f045bebc2fa731ee4f793604930/tools/metasploit/metasploit-fundamentals/meterpreter.md#ps),
+We retrieved information about the remote system, including a list of processes,
 the `wp-config.php` file, system details, and a list of users along with
 password hashes.
 
@@ -556,15 +553,26 @@ export SOLUTION_KALI="KaliLinux-NICE-DCV"
 export SOLUTION_EC2_CONTAINER="Amazon-EC2-Container"
 export SOLUTION_EC2="Amazon-EC2"
 export CLUSTER_NAME="Amazon-EKS"
+export TMP_DIR="${TMP_DIR:-${PWD}}"
+export KUBECONFIG="${TMP_DIR}/kubeconfig-${CLUSTER_NAME}.conf"
 
 aws cloudformation delete-stack --stack-name "${SOLUTION_KALI}"
 aws cloudformation delete-stack --stack-name "${SOLUTION_EC2_CONTAINER}"
 aws cloudformation delete-stack --stack-name "${SOLUTION_EC2}"
-eksctl delete cluster --name "${CLUSTER_NAME}"
+if eksctl get cluster --name="${CLUSTER_NAME}"; then
+  eksctl delete cluster --name="${CLUSTER_NAME}" --force
+fi
 aws cloudformation delete-stack --stack-name "${SOLUTION_KALI}-VPC"
 aws cloudformation delete-stack --stack-name "${SOLUTION_EC2_CONTAINER}-VPC"
 aws cloudformation delete-stack --stack-name "${SOLUTION_EC2}-VPC"
 aws ec2 delete-key-pair --key-name "${AWS_EC2_KEY_PAIR_NAME}"
+for FILE in ${TMP_DIR}/{vpc_cloudformation_template.yml,KaliLinux-NICE-DCV.yaml,AmazonLinux-2023-LAMP-server.yaml,${AWS_EC2_KEY_PAIR_NAME}.pem,helm_values-wordpress.yml,kubeconfig-${CLUSTER_NAME}.conf}; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
+  fi
+done
 ```
 
 Enjoy ... 😉

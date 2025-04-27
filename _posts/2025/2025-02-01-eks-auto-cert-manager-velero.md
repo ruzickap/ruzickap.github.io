@@ -103,29 +103,31 @@ kubectl label secret --namespace cert-manager letsencrypt-production-dns letsenc
 
 Create a new certificate and have it signed by Let's Encrypt for validation:
 
-```shell
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: ingress-cert-production
-  namespace: cert-manager
-  labels:
-    letsencrypt: production
-spec:
-  secretName: ingress-cert-production
-  secretTemplate:
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
+  tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
+  apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: ingress-cert-production
+    namespace: cert-manager
     labels:
       letsencrypt: production
-  issuerRef:
-    name: letsencrypt-production-dns
-    kind: ClusterIssuer
-  commonName: "*.${CLUSTER_FQDN}"
-  dnsNames:
-    - "*.${CLUSTER_FQDN}"
-    - "${CLUSTER_FQDN}"
+  spec:
+    secretName: ingress-cert-production
+    secretTemplate:
+      labels:
+        letsencrypt: production
+    issuerRef:
+      name: letsencrypt-production-dns
+      kind: ClusterIssuer
+    commonName: "*.${CLUSTER_FQDN}"
+    dnsNames:
+      - "*.${CLUSTER_FQDN}"
+      - "${CLUSTER_FQDN}"
 EOF
-kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-production
+  kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate ingress-cert-production
+fi
 ```
 
 ### Create S3 bucket
@@ -137,8 +139,9 @@ kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certif
 
 Use CloudFormation to create an S3 bucket for storing Velero backups.
 
-```shell
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}"; then
+  cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
 AWSTemplateFormatVersion: 2010-09-09
 
 Parameters:
@@ -321,9 +324,10 @@ Outputs:
     Value: !Ref S3ChangeNotificationTopic
 EOF
 
-aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
-  --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
+  eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
+    --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
+    --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
+fi
 ```
 
 ## Install Velero
@@ -334,7 +338,7 @@ to access S3 and EC2 resources.
 The created ServiceAccount `velero` will be specified in velero helm chart later.
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yaml" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yml" << EOF
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -376,7 +380,7 @@ iam:
             Resource:
               - "arn:aws:s3:::${CLUSTER_FQDN}"
 EOF
-eksctl create podidentityassociation --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yaml"
+eksctl create podidentityassociation --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yml"
 ```
 
 ```console
@@ -534,8 +538,10 @@ default   aws        k01.k8s.mylabs.dev/velero   Available   2025-02-06 06:21:59
 
 Initiate the backup process and store the required cert-manager objects in S3.
 
-```shell
-velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
+  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
+fi
 ```
 
 Check the backup details:
@@ -955,5 +961,17 @@ fi
 ```
 
 {% endraw %}
+
+Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+
+```sh
+for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-s3,eksctl-${CLUSTER_NAME}-iam-podidentityassociations,helm_values-{ingress-nginx-production-certs,kube-prometheus-stack-velero-cert-manager,velero},k8s-cert-manager-{clusterissuer,certificate}-production}.yml; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
+  fi
+done
+```
 
 Enjoy ... 😉
