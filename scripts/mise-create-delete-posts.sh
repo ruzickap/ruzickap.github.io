@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 : "${AWS_ACCESS_KEY_ID:?Error: AWS_ACCESS_KEY_ID environment variable is not set!}"
 : "${AWS_DEFAULT_REGION:?Error: AWS_DEFAULT_REGION environment variable is not set!}"
@@ -31,10 +31,6 @@ case "${1%:*}" in
     ;;
   delete)
     MDQ_CODE_BLOCK='```^sh$'
-    if aws eks describe-cluster --name "${CLUSTER_NAME}" --query 'cluster.status' &> /dev/null; then
-      export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
-      aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
-    fi
     for POST_FILE in "${POSTS[@]}"; do
       POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
     done

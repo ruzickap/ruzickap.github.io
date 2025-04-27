@@ -10,8 +10,18 @@ on:
 permissions: read-all
 
 jobs:
+  github-context:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: |
+          echo "${GITHUB_CONTEXT}"
+
   mega-linter:
     runs-on: ubuntu-latest
+    if: ${{ (!startsWith(github.ref_name, 'renovate/') && !startsWith(github.ref_name, 'release-please--')) || github.event_name == 'workflow_dispatch' }}
     timeout-minutes: 30
     steps:
       - name: Checkout Code
@@ -22,9 +32,19 @@ jobs:
           set -euxo pipefail
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install mdq
-          echo '#!/usr/bin/env bash' > README.sh
-          find . -type f -name "*.md" -print0 | xargs -r0 mdq '```/^bash$|^shell$|^sh$/' --br -o plain >> README.sh
-          chmod a+x README.sh
+
+          readarray -d '' MD_FILES < <(find . -type f -name "*.md" -print0)
+          for MD_FILE in "${MD_FILES[@]}"; do
+            for MDQ_CODE_BLOCK in bash sh shell; do
+              mdq '```/^'"${MDQ_CODE_BLOCK}"'$/' --br -o plain "$MD_FILE" > "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"
+              if [[ ! -s "${MD_FILE%.md}.sh" ]]; then
+                rm "${MD_FILE%.md}.sh"
+              else
+                sed -i '1i#!/usr/bin/env bash' "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"
+                chmod a+x "${MD_FILE%.md}.sh"
+              fi
+            done
+          done
 
       - name: 💡 MegaLinter
         uses: oxsecurity/megalinter@146333030da68e2e58c6ff826633824fabe01eaf # v8.5.0
