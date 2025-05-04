@@ -29,7 +29,6 @@ exclude = [
   # Ignore all URLs with '$' - BASH variable in URL
   '\$',
   '\.local',
-  'analytics\.eu\.umami\.is/',
   'cdn\.com',
   # Ignore all URLs which starts with 'file://'
   'file://',
