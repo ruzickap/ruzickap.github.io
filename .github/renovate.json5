@@ -1,5 +1,6 @@
 {
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  // # keep-sorted start block=yes
   customDatasources: {
     "grafana-dashboards": {
       defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
@@ -29,6 +30,7 @@
   ],
   packageRules: [
     {
+      description: "Disable auto-merge for major updates",
       matchUpdateTypes: ["major"],
       automerge: false,
     },
@@ -63,7 +65,8 @@
   ],
   prBodyTemplate: "{{{table}}}{{{notes}}}{{{changelogs}}}",
   rebaseWhen: "behind-base-branch",
-  customManagers: [
+  // Custom version extraction
+  regexManagers: [
     {
       description: "Regular expressions inside md, YAML, Dockerfile or entrypoint.sh looking for '# renovate:' comments",
       customType: "regex",
@@ -95,4 +98,5 @@
     },
   ],
   separateMinorPatch: true,
+  // # keep-sorted end
 }
