@@ -17,7 +17,7 @@ max_concurrency = 128
 #############################  Requests  ############################
 
 # Comma-separated list of accepted status codes for valid links.
-accept = [999]
+accept = [429, 999]
 
 #############################  Exclusions  ##########################
 
