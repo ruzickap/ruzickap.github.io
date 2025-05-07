@@ -97,12 +97,15 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/docker-image.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/readme-commands-check.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/scorecards/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/stale.yml)
   [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/tests.yml)
@@ -134,12 +137,15 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/action-my-markdown-linter/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - docker-image](https://github.com/ruzickap/action-my-markdown-linter/workflows/docker-image/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/docker-image.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/action-my-markdown-linter/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/action-my-markdown-linter/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/action-my-markdown-linter/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-markdown-linter/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/readme-commands-check.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-markdown-linter/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-markdown-linter/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/action-my-markdown-linter/workflows/scorecards/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-markdown-linter/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-markdown-linter/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/stale.yml)
   [![GitHub Actions status - tests](https://github.com/ruzickap/action-my-markdown-linter/workflows/tests/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/tests.yml)
@@ -172,11 +178,14 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/ansible-my_workstation/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - fedora](https://github.com/ruzickap/ansible-my_workstation/workflows/fedora/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/fedora.yml)
   [![GitHub Actions status - macos](https://github.com/ruzickap/ansible-my_workstation/workflows/macos/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/macos.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-my_workstation/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-my_workstation/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-my_workstation/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-my_workstation/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-my_workstation/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-my_workstation/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-my_workstation/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/stale.yml)
 
@@ -242,10 +251,13 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - create-rpi-image](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/create-rpi-image/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/create-rpi-image.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/stale.yml)
 
@@ -276,11 +288,14 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/molecule.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-role-my_common_defaults/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/actions/workflows/stale.yml)
 
@@ -313,12 +328,15 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/molecule.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-ansible-galaxy](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/release-ansible-galaxy/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/release-ansible-galaxy.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-role-proxy_settings/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/actions/workflows/stale.yml)
 
@@ -350,12 +368,15 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/ansible-role-virtio-win/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/ansible-role-virtio-win/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/ansible-role-virtio-win/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - molecule](https://github.com/ruzickap/ansible-role-virtio-win/workflows/molecule/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/molecule.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-role-virtio-win/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-ansible-galaxy](https://github.com/ruzickap/ansible-role-virtio-win/workflows/release-ansible-galaxy/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/release-ansible-galaxy.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-role-virtio-win/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-role-virtio-win/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-role-virtio-win/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-role-virtio-win/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-role-virtio-win/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-role-virtio-win/actions/workflows/stale.yml)
 
@@ -422,6 +443,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/cheatsheet-atom/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - latex-build](https://github.com/ruzickap/cheatsheet-atom/workflows/latex-build/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/latex-build.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/cheatsheet-atom/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-atom/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/pr-slack-notification.yml)
@@ -457,6 +479,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/cheatsheet-macos/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - latex-build](https://github.com/ruzickap/cheatsheet-macos/workflows/latex-build/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/latex-build.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/cheatsheet-macos/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-macos/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/pr-slack-notification.yml)
@@ -492,6 +515,7 @@ List of my GitHub projects:
 
 - CI/CD status:
 
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/cheatsheet-systemd/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - latex-build](https://github.com/ruzickap/cheatsheet-systemd/workflows/latex-build/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/latex-build.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/cheatsheet-systemd/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-systemd/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/pr-slack-notification.yml)
@@ -528,7 +552,14 @@ List of my GitHub projects:
 
 - CI/CD status:
 
-  [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/cks-notes/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/linter.yml)
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/cks-notes/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/codeql-actions.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/cks-notes/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cks-notes/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/pr-slack-notification.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/cks-notes/workflows/release-please/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/cks-notes/workflows/renovate/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/cks-notes/workflows/scorecards/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/scorecards.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cks-notes/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/cks-notes/workflows/stale/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/stale.yml)
 
 - Issue tracking:
 
@@ -1042,13 +1073,15 @@ List of my GitHub projects:
 - CI/CD status:
 
   [![GitHub Actions status - build](https://github.com/ruzickap/packer-templates/workflows/build/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/build.yml)
-  [![GitHub Actions status - links](https://github.com/ruzickap/packer-templates/workflows/links/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/links.yml)
+  [![GitHub Actions status - CodeQL GitHub Actions](https://github.com/ruzickap/packer-templates/workflows/CodeQL%20GitHub%20Actions/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/codeql-actions.yml)
   [![GitHub Actions status - markdown-mdspell](https://github.com/ruzickap/packer-templates/workflows/markdown-mdspell/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/markdown-mdspell.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/packer-templates/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - packer-templates](https://github.com/ruzickap/packer-templates/workflows/packer-templates/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/packer-templates.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/packer-templates/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/packer-templates/workflows/release-please/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/release-please.yml)
   [![GitHub Actions status - remote_build_server](https://github.com/ruzickap/packer-templates/workflows/remote_build_server/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/remote_build_server.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/packer-templates/workflows/renovate/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/packer-templates/workflows/scorecards/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/packer-templates/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/packer-templates/workflows/stale/badge.svg)](https://github.com/ruzickap/packer-templates/actions/workflows/stale.yml)
 
