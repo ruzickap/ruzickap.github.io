@@ -67,7 +67,7 @@ jobs:
           files: "_posts/**"
 
       - name: 💡 Self-hosted Renovate
-        uses: renovatebot/github-action@67a664fc9b4481b33a3eff6ee9edfb7a7b9dfa1e # v41.0.2
+        uses: renovatebot/github-action@f5c3383cb7cbf7711d8b66b809375b2d5f4e2d1d # v42.0.2
         env:
           RENOVATE_INCLUDE_PATHS: ${{ steps.changed-files.outputs.all_changed_files }}
         with:
