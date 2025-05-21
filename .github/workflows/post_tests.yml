@@ -107,8 +107,10 @@ jobs:
               mdq "${MDQ_CODE_BLOCK}" --br -o plain "${POST_FILES_ARRAY[@]}" >> "${TMP_DIR}/run.sh"
               ;;
             *)
-              echo "❓ Unknown action: ${GH_ACTION}"
-              exit 1
+              if [[ "${GH_ACTION}" != "build" ]]; then
+                echo "❓ Unknown action: ${GH_ACTION}"
+                exit 1
+              fi
               ;;
           esac
 
