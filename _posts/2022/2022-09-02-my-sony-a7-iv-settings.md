@@ -1,8 +1,8 @@
 ---
-title: My Sony A7 IV settings
+title: My Sony A7 IV Settings
 author: Petr Ruzicka
 date: 2022-09-02
-description: My Photo and Video Sony A7 IV settings
+description: My photo and video Sony A7 IV settings
 categories: [Photography, Cameras]
 tags: [Sony A7 IV, settings, video, photo, cameras]
 mermaid: true
@@ -11,7 +11,7 @@ image: /assets/img/posts/2022/2022-09-02-my-sony-a7-iv-settings/Sony_A7_IV_(ILCE
 
 I wanted to summarize my notes about the Sony A7 IV settings.
 
-Settings are separate into Photo and Video section to have them separated.
+The settings are separated into photo and video sections.
 
 ## Photo
 
@@ -51,7 +51,7 @@ flowchart LR
     BF1[Focus]              --> BF2(Peaking \n Display)      --> BF3(On)
     BG1[Focus]              --> BG2(Peaking \n Display)      --> BG3(Peaking Color)               --> BG4(Red)
     BH1[Playback]           --> BH2(Magnification)           --> BH3(Enlarge Initial \n Position) --> BH4(Focused Position)
-    BI1[Playback]           --> BI2(Delete)                  --> BI3(Delete pressing \n twice)    --> BI4(On)
+    BI1[Playback]           --> BI2(Delete)                  --> BI3(Delete Pressing \n Twice)    --> BI4(On)
     BJ1[Playback]           --> BJ2(Playback \n Option)      --> BJ3(Focus \n Frame Display)      --> BJ4(On)
     BK1[Network]            --> BK2(Smartphone \n Connect)   --> BK3(Smartphone Regist.)
     BL1[Network]            --> BL2(Smartphone \n Connect)   --> BL3(Remote \n Shoot Setting)     --> BL4(Still Img. \n Save Dest.) --> BL5(Camera Only)
@@ -78,7 +78,7 @@ flowchart LR
     CH1[Setup]              --> CH2(Power Setting \n Option) --> CH3(Auto Power OFF \n Temp.)     --> CH4(High)
     CI1[Setup]              --> CI2(Sound Option)            --> CI3(Audio signals)               --> CI4(Off)
     CJ1[Setup]              --> CJ2(Setup Option)            --> CJ3(Anti-dust Function)          --> CJ4(Shutter When \n Pwr OFF)  --> CJ5(On)
-    CK1[Setup]              --> CK2(USB)                     --> CK3(USB Connection \n Mode)      --> CK4("MassStorage(MSC)")
+    CK1[Setup]              --> CK2(USB)                     --> CK3(USB Connection \n Mode)      --> CK4("Mass Storage (MSC)")
 ```
 
 ## Video
@@ -91,13 +91,13 @@ flowchart LR
     D1[Shooting]         --> D2(File)                    --> D3(File Name Format)              --> D4(Date + Title)
     E1[Shooting]         --> E2(File)                    --> E3(File Name Format)              --> E4(Title Name \n Settings) --> E5(A74_)
     F1[Exposure / Color] --> F2(Color / Tone)            --> F3(Picture Profile)               --> F4(PP11)
-    G1[Setup]            --> G2(Operations \n Customize) --> G3(Different Set \n for Still/Mv) --> G4("(Select all)")
+    G1[Setup]            --> G2(Operations \n Customize) --> G3(Different Set \n for Still/Mv) --> G4("(Select All)")
     H1[Setup]            --> H2(Operations \n Customize) --> H3(REC w/ Shutter)                --> H4(On)
 ```
 
 Links:
 
-- [Sony A7IV BEGINNER'S GUIDE to Custom Settings - Part 1](https://youtu.be/-HhGqIgPh5w)
-- [Top 7 Settings to Change on Sony a7 IV](https://youtu.be/NtKcMXIPMK8)
-- [Sony A7IV – Best Settings For Photography](https://youtu.be/lXQy1xWNyJM)
-- [Sony A7 IV Beginners Guide - Set-Up, Menus, & How-To Use the Camera](https://youtu.be/Vt3g42Y56jI)
+- [Sony A7IV Beginner's Guide to Custom Settings - Part 1](https://youtu.be/-HhGqIgPh5w)
+- [Top 7 Settings to Change on the Sony A7 IV](https://youtu.be/NtKcMXIPMK8)
+- [Sony A7IV – Best Settings for Photography](https://youtu.be/lXQy1xWNyJM)
+- [Sony A7 IV Beginner's Guide - Set-Up, Menus, & How-To Use the Camera](https://youtu.be/Vt3g42Y56jI)

@@ -19,11 +19,11 @@ Personal blog and website built with Jekyll using the Chirpy theme.
 Chirpy:
 
 - [GitHub](https://github.com/cotes2020/jekyll-theme-chirpy)
-- [Example and tips/best practices](https://chirpy.cotes.page/)
+- [Examples and tips/best practices](https://chirpy.cotes.page/)
 
-## Building / Testing Locally
+## Building/Testing Locally
 
-On Ubuntu / Intel-based Mac:
+On Ubuntu or an Intel-based Mac:
 
 ```bash
 bundle install
@@ -69,14 +69,12 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
     apt update -qq && apt install -qqy bsdextrautils curl docker.io jq unzip wget && \
     curl -sL https://mise.run -o - | bash && \
     eval "$(~/.local/bin/mise activate bash)" && \
-    mise run "create-delete:posts:all" \
-  '
+    mise run "create-delete:posts:all"'
 ```
 
 ## Notes
 
-- Use ` ```bash ` to run commands during the [post_tests](./.github/workflows/post_tests.yml)
-  "create" execution:
+- Use ` ```bash ` to run commands during the [post_tests](./.github/workflows/post_tests.yml) "create" execution:
 
   ````md
   ```bash
@@ -84,8 +82,7 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
   ```
   ````
 
-- Use ` ```shell ` not to run commands during the [post_tests](./.github/workflows/post_tests.yml)
-  execution (they will be only displayed on the web pages):
+- Use ` ```shell ` to not run commands during the [post_tests](./.github/workflows/post_tests.yml) execution (they will only be displayed on the web pages):
 
   ````md
   ```shell
@@ -93,8 +90,7 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
   ```
   ````
 
-- Use ` ```sh ` to run commands during the [post_tests](./.github/workflows/post_tests.yml)
-  "destroy" execution:
+- Use ` ```sh ` to run commands during the [post_tests](./.github/workflows/post_tests.yml) "destroy" execution:
 
   ````md
   ```sh

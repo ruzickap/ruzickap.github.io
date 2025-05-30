@@ -2,47 +2,35 @@
 title: Trivy Operator Dashboard in Grafana
 author: Petr Ruzicka
 date: 2023-03-08
-description: Deploy Trivy Operator and Grafana Dashboard
+description: Deploy Trivy Operator and a Grafana Dashboard
 categories: [Kubernetes, Amazon EKS, Security]
 tags: [Amazon EKS, k8s, kubernetes, grafana, trivy-operator, dashboard]
 image: https://raw.githubusercontent.com/aquasecurity/trivy-vscode-extension/02fa1bf2b5e1333647ebd1bced679f4e94f8bf39/media/trivy.svg
 ---
 
-In the previous post related to
-[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
-I decided to install [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-to enable cluster monitoring containing [Grafana](https://grafana.com/), [Prometheus](https://prometheus.io/)
-and few other components.
+In a previous post related to the [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}), I installed [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack) to enable cluster monitoring, which includes [Grafana](https://grafana.com/), [Prometheus](https://prometheus.io/), and a few other components.
 
-There are many tools which allows you to scan container images and show their
-vulnerabilities like [Trivy](https://trivy.dev/), [Grype](https://github.com/anchore/grype)
-or [Clair](https://github.com/quay/clair).
+Many tools allow you to scan container images and identify their vulnerabilities, such as [Trivy](https://trivy.dev/), [Grype](https://github.com/anchore/grype), or [Clair](https://github.com/quay/clair).
 
-Unfortunately there are not so many OSS tools which can show you vulnerabilities
-of the container images running inside the K8s.
-This is usually paid offering provided by 3rd party vendors like [Palo Alto](https://www.paloaltonetworks.com/prisma/cloud),
-[Aqua](https://www.aquasec.com/), [Wiz](https://www.wiz.io/), and many others...
+Unfortunately, not many open-source tools can show you the vulnerabilities of container images running inside Kubernetes. This functionality is usually a paid offering from third-party vendors like [Palo Alto Networks](https://www.paloaltonetworks.com/prisma/cloud), [Aqua Security](https://www.aquasec.com/), [Wiz](https://www.wiz.io/), and many others.
 
-Let's looks at the [Trivy Operator](https://github.com/aquasecurity/trivy-operator)
-which can help you build the security posture (Compliance, Vulnerabilities,
-RBAC, ...) for your Kubernetes cluster.
+Let's explore the [Trivy Operator](https://github.com/aquasecurity/trivy-operator), which can help you assess the security posture (compliance, vulnerabilities, RBAC, etc.) of your Kubernetes cluster.
 
-I'll walk you through the installation, integration it with Prometheus+Grafana
-and some examples to better understand how it works...
+I'll guide you through the installation, its integration with Prometheus and Grafana, and provide some examples to help you better understand how it works.
 
 Links:
 
 - [Trivy Operator Dashboard in Grafana](https://aquasecurity.github.io/trivy-operator/v0.12.0/tutorials/grafana-dashboard/)
 - [Kubernetes Benchmark Scans with Trivy: CIS and NSA Reports](https://blog.aquasec.com/kubernetes-benchmark-scans-trivy-cis-nsa-reports)
 
-## Requirements
+## Prerequisites
 
-- Amazon EKS cluster with [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-  installed (described in
+- An Amazon EKS cluster with [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+  installed (as described in
   [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
 - [Helm](https://helm.sh)
 
-Variables which are being used in the next steps:
+The variables used in the following steps are:
 
 ```bash
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
@@ -56,10 +44,7 @@ mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 
 ## Install Trivy Operator
 
-Install `trivy-operator`
-[helm chart](https://artifacthub.io/packages/helm/trivy-operator/trivy-operator)
-and modify the
-[default values](https://github.com/aquasecurity/trivy-operator/blob/main/deploy/helm/values.yaml).
+Install the `trivy-operator` [Helm chart](https://artifacthub.io/packages/helm/trivy-operator/trivy-operator) and modify its [default values](https://github.com/aquasecurity/trivy-operator/blob/main/deploy/helm/values.yaml).
 
 ![trivy-operator](https://raw.githubusercontent.com/aquasecurity/trivy-operator/e5722da903ff16d5fd926ed46fdffacf5d50d9b5/docs/images/trivy-operator-logo.png){:width="500"}
 
@@ -77,8 +62,7 @@ EOF
 helm upgrade --install --version "${TRIVY_OPERATOR_HELM_CHART_VERSION}" --namespace trivy-system --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-trivy-operator.yml" trivy-operator aqua/trivy-operator
 ```
 
-Once the helm chart is installed you can see the trivy-operator initiated
-"scanning":
+Once the Helm chart is installed, you can see the Trivy Operator initiating "scanning":
 
 ```bash
 kubectl get pods -n trivy-system
@@ -103,19 +87,17 @@ trivy-operator-56bdc96f8-dls8c              1/1     Running     0          15s
 
 ## Trivy Operator details
 
-Let's take some examples to see how the [Trivy Operator](https://github.com/aquasecurity/trivy-operator)
-can help with identifying the security issues in the K8s cluster.
+Let's look at some examples to see how the [Trivy Operator](https://github.com/aquasecurity/trivy-operator) can help identify security issues in your K8s cluster.
 
 <!-- prettier-ignore-start -->
-> The outputs below were created on the 2023-03-12 and will be different in the
+> The outputs below were created on 2023-03-12 and will be different in the
 > future...
 {: .prompt-warning }
 <!-- prettier-ignore-end -->
 
 ### Vulnerability Reports
 
-Deploy vulnerable (old) version of the [nginx:1.22.0](https://hub.docker.com/layers/library/nginx/1.22.0/images/sha256-b3a676a9145dc005062d5e79b92d90574fb3bf2396f4913dc1732f9065f55c4b?context=explore)
-to the cluster:
+Deploy a vulnerable (old) version of [nginx:1.22.0](https://hub.docker.com/layers/library/nginx/1.22.0/images/sha256-b3a676a9145dc005062d5e79b92d90574fb3bf2396f4913dc1732f9065f55c4b?context=explore) to the cluster:
 
 [//]: # "https://github.com/kubernetes/kubernetes/issues/83242"
 
@@ -134,8 +116,7 @@ done
 
 {% endraw %}
 
-See the summary of the container image vulnerabilities which are present in old
-version of nginx:
+See the summary of container image vulnerabilities present in the old version of Nginx:
 
 ```bash
 kubectl get vulnerabilityreports -n test-trivy1 -o wide
@@ -146,10 +127,7 @@ NAME              REPOSITORY      TAG      SCANNER   AGE     CRITICAL   HIGH   M
 pod-nginx-nginx   library/nginx   1.22.0   Trivy     4m33s   3          18     39       0     0
 ```
 
-Examine [VulnerabilityReports](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/vulnerability-report/)
-which represents the latest vulnerabilities found in a container image of
-a given Kubernetes workload. It consists of a list of OS package and application
-vulnerabilities with a summary of vulnerabilities grouped by severity.
+Examine [VulnerabilityReports](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/vulnerability-report/), which represent the latest vulnerabilities found in a container image of a given Kubernetes workload. Each report consists of a list of OS package and application vulnerabilities, with a summary of vulnerabilities grouped by severity.
 
 ```bash
 kubectl describe vulnerabilityreports -n test-trivy1
@@ -233,8 +211,7 @@ Report:
 ...
 ```
 
-You can easily get the list of container image vulnerabilities for the whole
-cluster:
+You can easily get the list of container image vulnerabilities for the whole cluster:
 
 ```bash
 kubectl get vulnerabilityreports --all-namespaces -o wide
@@ -271,8 +248,7 @@ trivy-system            replicaset-trivy-operator-56bdc96f8-trivy-operator      
 
 ### Compliance Reports
 
-I'm going to deploy a pod with `hostIPC: true` and then look at the compliance
-report.
+I'm going to deploy a pod with `hostIPC: true` and then examine the compliance report.
 
 Links:
 
@@ -296,8 +272,7 @@ pss-baseline     15m
 pss-restricted   15m
 ```
 
-We are currently interested in [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
-and [Minimize the admission of containers wishing to share the host IPC namespace](https://github.com/aquasecurity/kube-bench/blob/7aeb6c39774763e74979a0904e374df01844bf21/cfg/cis-1.20/policies.yaml):
+We are currently interested in the [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes) and specifically in minimizing the admission of containers wishing to share the host IPC namespace, as outlined in the [CIS policies](https://github.com/aquasecurity/kube-bench/blob/7aeb6c39774763e74979a0904e374df01844bf21/cfg/cis-1.20/policies.yaml):
 
 ```bash
 kubectl get clustercompliancereports cis -o json | jq '.spec.compliance.controls[] | select(.name=="Minimize the admission of containers wishing to share the host IPC namespace")'
@@ -317,8 +292,7 @@ kubectl get clustercompliancereports cis -o json | jq '.spec.compliance.controls
 }
 ```
 
-Let's create new namespace with the pod which has `hostIPC: true` parameter
-present k8s yaml manifest:
+Let's create a new namespace with a pod that has the `hostIPC: true` parameter in its K8s YAML manifest:
 
 {% raw %}
 
@@ -367,10 +341,10 @@ done
 {% endraw %}
 
 An instance of the [ConfigAuditReports](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/configaudit-report/)
-represents checks performed by [Trivy](https://trivy.dev/), against a Kubernetes
+represents checks performed by [Trivy](https://trivy.dev/) against a Kubernetes
 object's configuration.
 
-The introduced security issue is visible in [ConfigAuditReports](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/configaudit-report/):
+The introduced security issue is visible in the [ConfigAuditReports](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/configaudit-report/):
 
 ```bash
 kubectl describe configauditreports -n test-trivy2
@@ -428,7 +402,7 @@ Report:
 Events:              <none>
 ```
 
-Like in previous example you can see the compliance report of the whole cluster:
+As in the previous example, you can see the compliance report for the whole cluster:
 
 ```bash
 kubectl get configauditreports --all-namespaces -o wide
@@ -490,11 +464,10 @@ trivy-system            service-trivy-operator                                  
 
 ### Exposed Secrets Report
 
-[ExposedSecretReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/exposedsecret-report/)
-represents the secrets found in a container image of a given Kubernetes
-workload.
+An [ExposedSecretReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/exposedsecret-report/)
+represents the secrets found in a container image of a given Kubernetes workload.
 
-Look at the example of the container which has ssh keys inside it:
+Let's look at an example of a container that has SSH keys embedded in it:
 
 {% raw %}
 
@@ -511,8 +484,7 @@ done
 
 {% endraw %}
 
-After looking into the [ExposedSecretReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/exposedsecret-report/)
-details it should be easy to identify the problem:
+After examining the [ExposedSecretReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/exposedsecret-report/) details, it should be easy to identify the problem:
 
 ```bash
 kubectl describe exposedsecretreport -n test-trivy3
@@ -585,7 +557,7 @@ Report:
 Events:              <none>
 ```
 
-Cluster wide output will show us the whole picture of the Exposed Secrets:
+The cluster-wide output will show us the complete picture of the exposed secrets:
 
 ```bash
 kubectl get exposedsecretreport -n test-trivy3 -o wide
@@ -605,7 +577,7 @@ RBAC Assessment Report exists in two "versions" (CRDs):
 
 #### RbacAssessmentReport
 
-Let's have example with role which allows manipulation and reading the secrets:
+Let's consider an example with a role that allows manipulation and reading of secrets:
 
 {% raw %}
 
@@ -631,8 +603,7 @@ done
 
 {% endraw %}
 
-The generated [RbacAssessmentReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/rbacassessment-report/)
-will look contain the CRITICAL issue about secret management:
+The generated [RbacAssessmentReport](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/rbacassessment-report/) will highlight the CRITICAL issue regarding secret management:
 
 ```bash
 kubectl describe rbacassessmentreport --namespace test-trivy4
@@ -697,7 +668,7 @@ Report:
 Events:              <none>
 ```
 
-You can also look at all the "Role issues" in cluster:
+You can also look at all the "Role issues" in the cluster:
 
 ```bash
 kubectl get rbacassessmentreport --all-namespaces --output=wide
@@ -735,9 +706,7 @@ trivy-system            role-trivy-operator-leader-election              Trivy  
 
 #### ClusterRbacAssessmentReport
 
-Creating the following [ClusterRole](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole)
-will make another security violation against [Least privilege](https://kubernetes.io/docs/concepts/security/rbac-good-practices/#least-privilege)
-principles.
+Creating the following [ClusterRole](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#role-and-clusterrole) will introduce another security violation by disregarding the principle of [least privilege](https://kubernetes.io/docs/concepts/security/rbac-good-practices/#least-privilege).
 
 ```bash
 kubectl apply -f - << \EOF
@@ -815,7 +784,7 @@ Report:
 Events:              <none>
 ```
 
-Look at all the "ClusterRole issues" in cluster:
+Look at all the "ClusterRole issues" in the cluster:
 
 ```bash
 kubectl get clusterrbacassessmentreport --all-namespaces --output=wide
@@ -941,9 +910,7 @@ clusterrole-wildcard-resource                                    Trivy     97s  
 
 ### Cluster Infra Assessment Reports
 
-Cluster Infra Assessment Reports should help you hardening your k8s cluster.
-Because I'm using Amazon EKS (managed service) I'm not sure how useful it is,
-but I can test it for the reference.
+Cluster Infra Assessment Reports should help you harden your K8s cluster. Since I'm using Amazon EKS (a managed service), I'm not sure how useful this is, but I'll test it for reference.
 
 Cluster summary of node issues:
 
@@ -1110,8 +1077,7 @@ EOF
 helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-trivy-operator-grafana.yml" kube-prometheus-stack prometheus-community/kube-prometheus-stack
 ```
 
-Add the following Grafana Dashboards to existng [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-helm chart:
+Add the following Grafana Dashboards to the existing [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack) Helm chart:
 
 - [16652] - [Trivy Operator Dashboard](https://grafana.com/grafana/dashboards/17813-trivy-operator-dashboard/)
   ![Trivy Operator Dashboard](/assets/img/posts/2023/2023-03-08-trivy-operator-grafana/grafana-dashboard-17813-trivy-operator-dashboard.avif)

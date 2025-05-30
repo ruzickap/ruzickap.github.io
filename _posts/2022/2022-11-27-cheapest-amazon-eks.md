@@ -2,7 +2,7 @@
 title: Run the cheapest Amazon EKS
 author: Petr Ruzicka
 date: 2022-11-27
-description: Start cheapest Amazon EKS using eksctl
+description: Start the cheapest Amazon EKS using eksctl
 categories: [Kubernetes, Amazon EKS]
 tags:
   [
@@ -18,33 +18,27 @@ tags:
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 
-Sometimes it is necessary to save costs and run the [Amazon EKS](https://aws.amazon.com/eks/)
-the "cheapest way".
+Sometimes, it is necessary to save costs and run [Amazon EKS](https://aws.amazon.com/eks/) in the most cost-effective way.
 
-The following notes are about running [Amazon EKS](https://aws.amazon.com/eks/)
-with lowest price.
+This post outlines how to run [Amazon EKS](https://aws.amazon.com/eks/) at the lowest possible price.
 
-Requirements:
+The key requirements for this setup are:
 
-- Two AZ, use one zone if possible (less payments for cross AZ traffic)
-- Spot instances
-- Less expensive region - `us-east-1`
-- Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
-  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
-- Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) - small
-  operation system / CPU / Memory footprint
-- Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
-  as a most cost efficient + cost optimized load balancer
-- Run as many pods as possible on worker nodes `max-pods-per-node`
-  - <https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks>
-  - <https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/>
+- Using two Availability Zones (AZs), or ideally one zone to reduce cross-AZ traffic costs.
+- Utilizing Spot Instances.
+- Choosing a less expensive AWS region, such as `us-east-1`.
+- Selecting the most price-efficient EC2 instance type: `t4g.medium` (2 CPUs, 4 GB RAM), based on ARM [AWS Graviton](https://aws.amazon.com/ec2/graviton/) processors.
+- Employing [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for its small operating system, CPU, and memory footprint.
+- Using [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/) as the most cost-efficient load balancing solution.
+- Maximizing the number of pods per worker node (`max-pods-per-node`).
+  - See <https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks>
+  - See <https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/>
 
-## Build Amazon EKS cluster
+## Build Amazon EKS Cluster
 
-### Requirements
+### Prerequisites
 
-You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
-and other secrets/variables.
+You will need to configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) and other secrets/variables.
 
 ```shell
 # AWS Credentials
@@ -56,8 +50,7 @@ export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
 export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```
 
-If you would like to follow this documents and it's task you will need to set up
-few environment variables like:
+To follow this document and its tasks, set up the following environment variables:
 
 ```bash
 # AWS Region
@@ -77,7 +70,7 @@ AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) &&
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
-Verify if all the necessary variables were set:
+Verify that all the necessary variables have been set:
 
 ```bash
 : "${AWS_ACCESS_KEY_ID?}"
@@ -90,27 +83,26 @@ Verify if all the necessary variables were set:
 echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
 ```
 
-Install necessary tools:
+Install the necessary tools:
 
 <!-- prettier-ignore-start -->
-> You can skip these steps if you have all the required software already
-> installed.
+> You can skip these steps if you have all the required software already installed.
 {: .prompt-tip }
 <!-- prettier-ignore-end -->
 
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
-- [helm](https://github.com/helm/helm)
+- [Helm](https://github.com/helm/helm)
 
-## Configure AWS Route 53 Domain delegation
+## Configure AWS Route 53 Domain Delegation
 
 <!-- prettier-ignore-start -->
-> DNS delegation steps should be done only once
+> DNS delegation steps should be done only once.
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Create DNS zone for EKS clusters:
+Create a DNS zone for your EKS clusters:
 
 ```shell
 export CLOUDFLARE_EMAIL="petr.ruzicka@gmail.com"
@@ -125,9 +117,7 @@ aws route53 create-hosted-zone --output json \
 ![Route53 k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedzones-k8s.mylabs.dev-1.avif)
 _Route53 k8s.mylabs.dev zone_
 
-Use your domain registrar to change the nameservers for your zone (for example
-`mylabs.dev`) to use the Amazon Route 53 nameservers. Here is the way how you
-can find out the the Route 53 nameservers:
+Use your domain registrar to change the nameservers for your zone (e.g., `mylabs.dev`) to use the Amazon Route 53 nameservers. Here's how to find the Route 53 nameservers:
 
 ```shell
 NEW_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${BASE_DOMAIN}.\`].Id" --output text)
@@ -136,9 +126,7 @@ NEW_ZONE_NS1=$(echo "${NEW_ZONE_NS}" | jq -r ".[0]")
 NEW_ZONE_NS2=$(echo "${NEW_ZONE_NS}" | jq -r ".[1]")
 ```
 
-Create the NS record in `k8s.mylabs.dev` (`BASE_DOMAIN`) for
-proper zone delegation. This step depends on your domain registrar - I'm using
-CloudFlare and using Ansible to automate it:
+Create the NS record in `k8s.mylabs.dev` (`BASE_DOMAIN`) for proper zone delegation. This step depends on your domain registrar; I use Cloudflare and Ansible to automate this:
 
 ```shell
 ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS1} solo=true proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
@@ -213,13 +201,12 @@ _CloudFlare mylabs.dev zone_
 
 ### Create Route53
 
-Create CloudFormation template containing [Route53](https://aws.amazon.com/route53/)
+Create a CloudFormation template containing the [Route53](https://aws.amazon.com/route53/)
 zone.
 
-Put new domain `CLUSTER_FQDN` to the Route 53 and configure the DNS delegation
-from the `BASE_DOMAIN`.
+Put the new domain `CLUSTER_FQDN` into Route 53 and configure DNS delegation from `BASE_DOMAIN`.
 
-Create Route53 zone:
+Create the Route 53 zone:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53.yml" << \EOF
@@ -258,7 +245,7 @@ if [[ $(aws cloudformation list-stacks --stack-status-filter CREATE_COMPLETE --q
 fi
 ```
 
-After running the CF stack you should see the following Route53 zones:
+After running the CF stack, you should see the following Route 53 zones:
 
 ![Route53 k01.k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedzones-k01.k8s.mylabs.dev.avif)
 _Route53 k01.k8s.mylabs.dev zone_
@@ -272,7 +259,7 @@ I'm going to use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
-Create [Amazon EKS](https://aws.amazon.com/eks/) using [eksctl](https://eksctl.io/):
+Create an [Amazon EKS](https://aws.amazon.com/eks/) cluster using [eksctl](https://eksctl.io/):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" << EOF
@@ -302,7 +289,7 @@ iam:
       wellKnownPolicies:
         externalDNS: true
       roleName: eksctl-${CLUSTER_NAME}-irsa-external-dns
-# Allow users which are consuming the AWS_ROLE_TO_ASSUME to access the EKS
+# Allow users who are consuming the AWS_ROLE_TO_ASSUME to access the EKS
 iamIdentityMappings:
   - arn: arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin
     groups:
@@ -327,10 +314,10 @@ addons:
 managedNodeGroups:
   - name: mng01-ng
     amiFamily: Bottlerocket
-    # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
-    # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
+    # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - $0.0336 hourly
+    # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - $0.0336 hourly
     instanceType: t4g.medium
-    # Due to karpenter we need 2 instances
+    # Due to Karpenter, we need 2 instances
     desiredCapacity: 2
     availabilityZones:
       - ${AWS_DEFAULT_REGION}a
@@ -339,13 +326,13 @@ managedNodeGroups:
     volumeSize: 20
     disablePodIMDS: true
     volumeEncrypted: true
-    # For instances with less than 30 vCPUs the maximum number is 110 and for all other instances the maximum number is 250
+    # For instances with less than 30 vCPUs, the maximum number is 110, and for all other instances, the maximum number is 250.
     # https://docs.aws.amazon.com/eks/latest/userguide/cni-increase-ip-addresses.html
     maxPodsPerNode: 110
 EOF
 ```
 
-Get the kubeconfig to access the cluster:
+Get the kubeconfig file to access the cluster:
 
 ```bash
 if [[ ! -s "${KUBECONFIG}" ]]; then
@@ -361,7 +348,7 @@ aws eks update-kubeconfig --name="${CLUSTER_NAME}"
 
 ### Karpenter
 
-[Karpenter](https://karpenter.sh/) is a Kubernetes Node Autoscaler built
+[Karpenter](https://karpenter.sh/) is a Kubernetes node autoscaler built
 for flexibility, performance, and simplicity.
 
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="500"}
@@ -375,8 +362,8 @@ kind: Provisioner
 metadata:
   name: default
 spec:
-  # Enables consolidation which attempts to reduce cluster cost by both removing
-  # un-needed nodes and down-sizing those that can't be removed.
+  # Enables consolidation, which attempts to reduce cluster cost by both removing
+  # unneeded nodes and downsizing those that can't be removed.
   # https://youtu.be/OB7IZolZk78?t=2629
   consolidation:
     enabled: true
@@ -403,7 +390,7 @@ spec:
       memory: 32Gi
   providerRef:
     name: default
-  # Labels are arbitrary key-values that are applied to all nodes
+  # Labels are arbitrary key-values that are applied to all nodes.
   labels:
     managedBy: karpenter
     provisioner: default
@@ -438,13 +425,10 @@ EOF
 
 ### aws-node-termination-handler
 
-[AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
-gracefully handle EC2 instance shutdown within Kubernetes.
+The [AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
+gracefully handles EC2 instance shutdowns within Kubernetes.
 
-Install `aws-node-termination-handler`
-[helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
-and modify the
-[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
+Install the `aws-node-termination-handler` [Helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler) and modify its [default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
@@ -459,14 +443,11 @@ helm upgrade --install --version "${AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERS
 
 ### mailhog
 
-Mailhog will be used to receive email alerts form the Prometheus.
+Mailhog will be used to receive email alerts from Prometheus.
 
 ![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png){:width="200"}
 
-Install `mailhog`
-[helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
-and modify the
-[default values](https://github.com/codecentric/helm-charts/blob/mailhog-5.2.3/charts/mailhog/values.yaml).
+Install the `mailhog` [Helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog) and modify its [default values](https://github.com/codecentric/helm-charts/blob/mailhog-5.2.3/charts/mailhog/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
@@ -500,19 +481,16 @@ helm upgrade --install --version "${MAILHOG_HELM_CHART_VERSION}" --namespace mai
 
 ### kube-prometheus-stack
 
-[kube-prometheus stack](https://github.com/prometheus-operator/kube-prometheus)
+The [kube-prometheus stack](https://github.com/prometheus-operator/kube-prometheus)
 is a collection of Kubernetes manifests, [Grafana](https://grafana.com/)
-dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
-combined with documentation and scripts to provide easy to operate end-to-end
+dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/),
+combined with documentation and scripts to provide easy-to-operate end-to-end
 Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using
 the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
 
 ![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="500"}
 
-Install `kube-prometheus-stack`
-[helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-and modify the
-[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-56.6.2/charts/kube-prometheus-stack/values.yaml):
+Install the `kube-prometheus-stack` [Helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack) and modify its [default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-56.6.2/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -783,10 +761,7 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 
 ### karpenter
 
-Change [karpenter](https://karpenter.sh/) default installation by upgrading:
-[helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
-and modify the
-[default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml).
+Change the [Karpenter](https://karpenter.sh/) default installation by upgrading its [Helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter) and modifying the [default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml).
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
@@ -807,16 +782,12 @@ helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace k
 ### cert-manager
 
 [cert-manager](https://cert-manager.io/) adds certificates and certificate
-issuers as resource types in Kubernetes clusters, and simplifies the process
-of obtaining, renewing and using those certificates.
+issuers as resource types in Kubernetes clusters and simplifies the process
+of obtaining, renewing, and using those certificates.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="200"}
 
-Install `cert-manager`
-[helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-and modify the
-[default values](https://github.com/cert-manager/cert-manager/blob/v1.14.3/deploy/charts/cert-manager/values.yaml).
-Service account `cert-manager` was created by `eksctl`.
+Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager) and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.14.3/deploy/charts/cert-manager/values.yaml). The `cert-manager` service account was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
@@ -872,7 +843,7 @@ EOF
 kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
 ```
 
-Create certificate:
+Create a certificate:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-staging.yml" << EOF | kubectl apply -f -
@@ -905,12 +876,7 @@ exposed Kubernetes Services and Ingresses with DNS providers.
 
 ![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="300"}
 
-Install `external-dns`
-[helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
-and modify the
-[default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml).
-`external-dns` will take care about DNS records.
-Service account `external-dns` was created by `eksctl`.
+Install the `external-dns` [Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns) and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml). `external-dns` will manage DNS records. The `external-dns` service account was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
@@ -933,14 +899,11 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 
 ### ingress-nginx
 
-[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
-controller for Kubernetes using [NGINX](https://www.nginx.org/) as a reverse
+[Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+controller for Kubernetes that uses [NGINX](https://www.nginx.org/) as a reverse
 proxy and load balancer.
 
-Install `ingress-nginx`
-[helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
-and modify the
-[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.9.1/charts/ingress-nginx/values.yaml).
+Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx) and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.9.1/charts/ingress-nginx/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -1007,16 +970,13 @@ helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespa
 
 ### forecastle
 
-[Forecastle](https://github.com/stakater/Forecastle) is a control panel which
+[Forecastle](https://github.com/stakater/Forecastle) is a control panel that
 dynamically discovers and provides a launchpad to access applications deployed
 on Kubernetes.
 
 ![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png){:width="200"}
 
-Install `forecastle`
-[helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
-and modify the
-[default values](https://github.com/stakater/Forecastle/blob/v1.0.136/deployments/kubernetes/chart/forecastle/values.yaml).
+Install the `forecastle` [Helm chart](https://artifacthub.io/packages/helm/stakater/forecastle) and modify its [default values](https://github.com/stakater/Forecastle/blob/v1.0.136/deployments/kubernetes/chart/forecastle/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
@@ -1052,14 +1012,11 @@ helm upgrade --install --version "${FORECASTLE_HELM_CHART_VERSION}" --namespace 
 ### oauth2-proxy
 
 Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
-the endpoints by Google Authentication.
+the endpoints with Google Authentication.
 
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="400"}
 
-Install `oauth2-proxy`
-[helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
-and modify the
-[default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-6.24.1/helm/oauth2-proxy/values.yaml).
+Install the `oauth2-proxy` [Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy) and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-6.24.1/helm/oauth2-proxy/values.yaml).
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
@@ -1100,7 +1057,7 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 
 ![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="400"}
 
-Remove EKS cluster and created components:
+Remove the EKS cluster and its created components:
 
 ```sh
 if eksctl get cluster --name="${CLUSTER_NAME}"; then
@@ -1108,7 +1065,7 @@ if eksctl get cluster --name="${CLUSTER_NAME}"; then
 fi
 ```
 
-Remove Route 53 DNS records from DNS Zone:
+Remove Route 53 DNS records from the DNS zone:
 
 ```sh
 CLUSTER_FQDN_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${CLUSTER_FQDN}.\`].Id" --output text)
@@ -1123,7 +1080,7 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
 fi
 ```
 
-Remove orphan EC2s created by Karpenter:
+Remove orphaned EC2s created by Karpenter:
 
 ```sh
 for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
@@ -1132,7 +1089,7 @@ for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluste
 done
 ```
 
-Remove CloudWatch log group:
+Remove the CloudWatch log group:
 
 ```sh
 if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
@@ -1140,7 +1097,7 @@ if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/e
 fi
 ```
 
-Remove CloudFormation stack:
+Remove the CloudFormation stack:
 
 ```sh
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53"
@@ -1153,7 +1110,7 @@ aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-rout
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
 ```
 
-Remove Volumes and Snapshots related to the cluster (just in case):
+Remove volumes and snapshots related to the cluster (just in case):
 
 ```sh
 for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text); do
@@ -1162,7 +1119,7 @@ for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Va
 done
 ```
 
-Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
