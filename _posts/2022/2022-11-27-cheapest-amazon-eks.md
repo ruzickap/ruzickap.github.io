@@ -28,8 +28,10 @@ The key requirements for this setup are:
 - Utilizing Spot Instances.
 - Choosing a less expensive AWS region, such as `us-east-1`.
 - Selecting the most price-efficient EC2 instance type: `t4g.medium` (2 CPUs, 4 GB RAM), based on ARM [AWS Graviton](https://aws.amazon.com/ec2/graviton/) processors.
-- Employing [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for its small operating system, CPU, and memory footprint.
-- Using [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/) as the most cost-efficient load balancing solution.
+- Employing [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket)
+  for its small operating system, CPU, and memory footprint.
+- Using [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
+  as the most cost-efficient load balancing solution.
 - Maximizing the number of pods per worker node (`max-pods-per-node`).
   - See <https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks>
   - See <https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/>
@@ -38,7 +40,9 @@ The key requirements for this setup are:
 
 ### Prerequisites
 
-You will need to configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) and other secrets/variables.
+You will need to configure the
+[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+and other secrets/variables.
 
 ```shell
 # AWS Credentials
@@ -431,7 +435,8 @@ gracefully handles EC2 instance shutdowns within Kubernetes.
 Install the `aws-node-termination-handler` [Helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler) and modify its [default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=aws-node-termination-handler registryUrl=https://aws.github.io/eks-charts
+# renovate: datasource=helm depName=aws-node-termination-handler
+# registryUrl=https://aws.github.io/eks-charts
 AWS_NODE_TERMINATION_HANDLER_HELM_CHART_VERSION="0.21.0"
 
 helm repo add --force-update eks https://aws.github.io/eks-charts/

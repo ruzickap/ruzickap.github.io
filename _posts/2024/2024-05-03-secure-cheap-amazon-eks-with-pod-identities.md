@@ -31,23 +31,30 @@ The Amazon EKS setup should align with these cost-effective criteria:
 - Employ Spot Instances.
 - Choose a less expensive AWS region, such as `us-east-1`.
 - Select the most price-efficient EC2 instance type: `t4g.medium` (2 CPUs, 4GB RAM), based on ARM [AWS Graviton](https://aws.amazon.com/ec2/graviton/) processors.
-- Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for its minimal operating system, CPU, and memory footprint.
-- Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/) as the most cost-efficient and cost-optimized load balancing solution.
+- Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket)
+  for its minimal operating system, CPU, and memory footprint.
+- Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
+  as the most cost-efficient and cost-optimized load balancing solution.
 - Implement [Karpenter](https://karpenter.sh/) to enable automatic node scaling that matches the specific resource requirements of pods.
 
 Additionally, the Amazon EKS setup should meet the following security requirements:
 
-- The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html).
+- The Amazon EKS control plane must be
+  [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html).
 - Worker node EBS volumes must be encrypted.
 - Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be configured.
-- [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/) should be enabled wherever they are supported.
-- [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html) should be used to allow applications/pods to communicate with the AWS API.
+- [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+  should be enabled wherever they are supported.
+- [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
+  should be used to allow applications/pods to communicate with the AWS API.
 
 ## Build Amazon EKS cluster
 
 ### Requirements
 
-You will need to configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html) and other secrets/variables.
+You will need to configure the
+[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+and other secrets/variables.
 
 ```shell
 # AWS Credentials
@@ -1379,7 +1386,8 @@ of obtaining, renewing and using those certificates.
 Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager) and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.15.0/deploy/charts/cert-manager/values.yaml). The `cert-manager` service account was created by `eksctl`.
 
 ```bash
-# renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
+# renovate: datasource=helm depName=cert-manager
+# registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.15.0"
 
 helm repo add --force-update jetstack https://charts.jetstack.io
@@ -1468,7 +1476,8 @@ exposed Kubernetes Services and Ingresses with DNS providers.
 Install the `external-dns` [Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns) and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.4/charts/external-dns/values.yaml). `external-dns` will manage DNS records. The `external-dns` service account was created by `eksctl`.
 
 ```bash
-# renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
+# renovate: datasource=helm depName=external-dns
+# registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.14.4"
 
 helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
@@ -1495,7 +1504,8 @@ being used by `ingress-nginx`.
 Install the `aws-load-balancer-controller` [Helm chart](https://artifacthub.io/packages/helm/aws/aws-load-balancer-controller) and modify its [default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.11.0/helm/aws-load-balancer-controller/values.yaml).
 
 ```bash
-# renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
+# renovate: datasource=helm depName=aws-load-balancer-controller
+# registryUrl=https://aws.github.io/eks-charts
 AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.11.0"
 
 helm repo add --force-update eks https://aws.github.io/eks-charts

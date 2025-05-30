@@ -74,7 +74,7 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
 
 ## Notes
 
-- Use ` ```bash ` to run commands during the [post_tests](./.github/workflows/post_tests.yml) "create" execution:
+- Use ` ```bash ` to run commands during the [post_tests] "create" execution:
 
   ````md
   ```bash
@@ -82,7 +82,8 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
   ```
   ````
 
-- Use ` ```shell ` to not run commands during the [post_tests](./.github/workflows/post_tests.yml) execution (they will only be displayed on the web pages):
+- Use ` ```shell ` to not run commands during the [post_tests] execution
+  (they will only be displayed on the web pages):
 
   ````md
   ```shell
@@ -90,10 +91,12 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
   ```
   ````
 
-- Use ` ```sh ` to run commands during the [post_tests](./.github/workflows/post_tests.yml) "destroy" execution:
+- Use ` ```sh ` to run commands during the [post_tests] "destroy" execution:
 
   ````md
   ```sh
   ### <some clean-up/destroy commands...>
   ```
   ````
+
+[post_tests]: ./.github/workflows/post_tests.yml
