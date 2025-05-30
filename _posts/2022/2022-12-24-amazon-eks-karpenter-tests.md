@@ -8,11 +8,14 @@ tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl]
 image: https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 ---
 
-In a previous post related to the [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}), I decided to install [Karpenter](https://karpenter.sh/) to improve the efficiency and cost-effectiveness of running workloads on the cluster.
+In a previous post related to the [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}),
+I decided to install [Karpenter](https://karpenter.sh/) to improve the
+efficiency and cost-effectiveness of running workloads on the cluster.
 
 Many articles describe what Karpenter is, how it works, and its benefits.
 
-This post shares a few notes from my testing and discovery process while working with real-world examples.
+This post shares a few notes from my testing and discovery process while
+working with real-world examples.
 
 ## Prerequisites
 
@@ -107,7 +110,9 @@ EOF
 kubectl wait --for=condition=Available=True --timeout=5m --namespace=test-karpenter deployment nginx-deployment
 ```
 
-Karpenter will start a new [t3a.small](https://aws.amazon.com/ec2/instance-types/t3/) `ip-192-168-66-142.ec2.internal` spot EC2 instance:
+Karpenter will start a new
+[t3a.small](https://aws.amazon.com/ec2/instance-types/t3/)
+`ip-192-168-66-142.ec2.internal` spot EC2 instance:
 
 ![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-01-replicas-2.avif)
 

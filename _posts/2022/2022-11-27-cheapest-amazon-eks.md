@@ -795,7 +795,8 @@ of obtaining, renewing, and using those certificates.
 Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager) and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.14.3/deploy/charts/cert-manager/values.yaml). The `cert-manager` service account was created by `eksctl`.
 
 ```bash
-# renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
+# renovate: datasource=helm depName=cert-manager
+# registryUrl=https://charts.jetstack.io
 CERT_MANAGER_HELM_CHART_VERSION="1.14.3"
 
 helm repo add --force-update jetstack https://charts.jetstack.io
@@ -884,7 +885,8 @@ exposed Kubernetes Services and Ingresses with DNS providers.
 Install the `external-dns` [Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns) and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml). `external-dns` will manage DNS records. The `external-dns` service account was created by `eksctl`.
 
 ```bash
-# renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
+# renovate: datasource=helm depName=external-dns
+# registryUrl=https://kubernetes-sigs.github.io/external-dns/
 EXTERNAL_DNS_HELM_CHART_VERSION="1.14.3"
 
 helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
@@ -1140,3 +1142,5 @@ fi
 ```
 
 Enjoy ... 😉
+
+[end of _posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities.md]

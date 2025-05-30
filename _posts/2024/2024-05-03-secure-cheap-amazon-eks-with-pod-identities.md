@@ -1774,5 +1774,3 @@ fi
 ```
 
 Enjoy ... 😉
-
-[end of _posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities.md]
