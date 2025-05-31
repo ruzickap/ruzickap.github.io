@@ -23,20 +23,26 @@ tags:
 image: https://raw.githubusercontent.com/kubernetes/community/487f994c013ea61d92cf9a341af7620037abbce3/icons/svg/resources/unlabeled/secret.svg
 ---
 
-Sometimes it is necessary to store the secrets in the [HashiCorp Vault](https://www.vaultproject.io/),
-[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/), [Azure Key Vault](https://azure.microsoft.com/en-us/products/key-vault/)
-or others and use them in Kubernetes.
+Sometimes it is necessary to store secrets in
+[HashiCorp Vault](https://www.vaultproject.io/),
+[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/),
+[Azure Key Vault](https://azure.microsoft.com/en-us/products/key-vault/), or
+others and use them in Kubernetes.
 
-In this post I would like to look at the way how to store secrets in
-[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) retrieve them
-using [Kubernetes Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io)
-with [AWS Secrets and Configuration Provider (ASCP)](https://github.com/aws/secrets-store-csi-driver-provider-aws)
-and use them as Kubernetes Secret and also mount them directly into the pod as
-files.
+In this post, I would like to look at how to store secrets in
+[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/), retrieve them
+using the
+[Kubernetes Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io)
+with
+[AWS Secrets and Configuration Provider (ASCP)](https://github.com/aws/secrets-store-csi-driver-provider-aws),
+and use them as Kubernetes Secrets. I will also show how to mount them directly
+into the pod as files.
 
-When the Secret is rotated and [defined](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/)
-as environment variable in the Pod specification (using `secretKeyRef`) it is
-necessary to refresh/restart the pod using tools like [Reloader](https://github.com/stakater/Reloader).
+When a Secret is rotated and
+[defined](https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/)
+as an environment variable in the Pod specification (using `secretKeyRef`), it
+is necessary to refresh/restart the pod using tools like
+[Reloader](https://github.com/stakater/Reloader).
 
 ![secrets-store-csi-driver](https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/2002e15ac974b15cd0bb89de689f924afbae9bdd/docs/book/src/images/diagram.png)
 _secrets-store-csi-driver architecture_
@@ -49,11 +55,11 @@ Links:
 
 ## Requirements
 
-- Amazon EKS cluster (described in
-  [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
+- Amazon EKS cluster (described in [Cheapest Amazon
+  EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
 - [Helm](https://helm.sh)
 
-Variables which are being used in the next steps:
+Variables that are being used in the next steps:
 
 ```bash
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
@@ -67,7 +73,8 @@ mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 
 ## Create secret in AWS Secrets Manager
 
-Use CloudFormation to create Policy and Secrets in [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/):
+Use CloudFormation to create a Policy and Secrets in
+[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/):
 
 ```bash
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-secretmanager-secret.yml" << \EOF
@@ -125,7 +132,7 @@ _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret_
 
 ## Install Secrets Store CSI Driver and AWS Provider
 
-Install `secrets-store-csi-driver`
+Install the `secrets-store-csi-driver`
 [helm chart](https://github.com/kubernetes-sigs/secrets-store-csi-driver/tree/main/charts/secrets-store-csi-driver)
 and modify the
 [default values](https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/v1.4.1/charts/secrets-store-csi-driver/values.yaml).
@@ -143,7 +150,7 @@ EOF
 helm upgrade --install --version "${SECRETS_STORE_CSI_DRIVER_HELM_CHART_VERSION}" --namespace secrets-store-csi-driver --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-secrets-store-csi-driver.yml" secrets-store-csi-driver secrets-store-csi-driver/secrets-store-csi-driver
 ```
 
-Install `secrets-store-csi-driver-provider-aws`
+Install the `secrets-store-csi-driver-provider-aws`
 [helm chart](https://github.com/aws/secrets-store-csi-driver-provider-aws/tree/main/charts/secrets-store-csi-driver-provider-aws).
 
 ```bash
@@ -154,27 +161,28 @@ helm repo add --force-update aws-secrets-manager https://aws.github.io/secrets-s
 helm upgrade --install --version "${SECRETS_STORE_CSI_DRIVER_PROVIDER_AWS_HELM_CHART_VERSION}" --namespace secrets-store-csi-driver --create-namespace --wait secrets-store-csi-driver-provider-aws aws-secrets-manager/secrets-store-csi-driver-provider-aws
 ```
 
-The necessary components are ready...
+The necessary components are ready.
 
 ## Install kuard
 
-[kuard](https://github.com/kubernetes-up-and-running/kuard) is a simple app
-which can be used to display various pod details created for the
+[kuard](https://github.com/kubernetes-up-and-running/kuard) is a simple app that
+can be used to display various pod details created for the
 [Kubernetes: Up and Running](https://books.google.cz/books/about/Kubernetes_Up_and_Running.html?id=fF4KswEACAAJ)
 book.
 
-Install [kuard](https://github.com/kubernetes-up-and-running/kuard) which will
-use the secrets from [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
-as mountpoint and also as K8s `Secret`.
+Install [kuard](https://github.com/kubernetes-up-and-running/kuard), which will
+use the secrets from
+[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/) as a mountpoint
+and also as a K8s `Secret`.
 
 ```bash
 SECRETS_MANAGER_KUARDSECRET_POLICY_ARN=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret" --query "Stacks[0].Outputs[?OutputKey==\`SecretsManagerKuardSecretPolicyArn\`].OutputValue" --output text)
 eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard --attach-policy-arn="${SECRETS_MANAGER_KUARDSECRET_POLICY_ARN}" --role-name="eksctl-${CLUSTER_NAME}-irsa-kuard" --approve
 ```
 
-Create the `SecretProviderClass` which tells the AWS provider which secrets will
-be mounted in the pod. It will also create `Secret` called "kuard-secret" which will
-be synchronized with the data stored in AWS Secrets Manager.
+Create the `SecretProviderClass`. This tells the AWS provider which secrets will
+be mounted in the pod. It will also create a `Secret` called "kuard-secret" that
+will be synchronized with the data stored in AWS Secrets Manager.
 
 ```bash
 kubectl apply -f - << EOF
@@ -306,8 +314,8 @@ spec:
 EOF
 ```
 
-After the successful deployment of the "kuard" you should see the credentials
-in the `kuard-secret`:
+After the successful deployment of "kuard", you should see the credentials in
+the `kuard-secret`:
 
 {% raw %}
 
@@ -373,15 +381,15 @@ Go to these URLs and check the credentials synced from AWS Secrets Manager:
   ```
 <!-- prettier-ignore-end -->
 
-After the commands executed above the secret from the AWS secret manager
-are copied to Kubernetes Secret (`kuard-secret`) and it is also present as file
-(`/mnt/secrets-store/KuardSecret`) and environment variable (`KUARDSECRET`)
+After the commands executed above, the secret from AWS Secrets Manager is copied
+to the Kubernetes Secret (`kuard-secret`). It is also present as a file
+(`/mnt/secrets-store/KuardSecret`) and an environment variable (`KUARDSECRET`)
 inside the pod.
 
 ## Rotate AWS Secret
 
-Let's change/rotate credentials inside AWS Secret to see if the change will be
-reflected also in the Kubernetes objects:
+Let's change/rotate credentials inside the AWS Secret to see if the change will
+be reflected in the Kubernetes objects as well:
 
 ```bash
 aws secretsmanager update-secret --secret-id "k01.k8s.mylabs.dev-KuardSecret" \
@@ -389,7 +397,7 @@ aws secretsmanager update-secret --secret-id "k01.k8s.mylabs.dev-KuardSecret" \
 sleep 200
 ```
 
-After changing the password in the AWS Secret Manager you should see also the
+After changing the password in AWS Secrets Manager, you should also see the
 change in the K8s Secret and in the `/mnt/secrets-store/KuardSecret` file inside
 the pod:
 
@@ -421,7 +429,7 @@ kubectl exec -i -n kuard deployments/kuard-deployment -- cat /mnt/secrets-store/
 ```
 <!-- prettier-ignore-end -->
 
-Environment variable inside the pod is not going to be changed:
+The environment variable inside the pod is not going to be changed:
 
 ```bash
 kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSECRET}"
@@ -433,20 +441,20 @@ kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSEC
 ```
 <!-- prettier-ignore-end -->
 
-The only way how to change the pre-defined environment variable inside the pod
-is to restart the pod...
+The only way to change the pre-defined environment variable inside the pod is to
+restart the pod.
 
 ## Install Reloader to do rolling upgrades when Secrets get changed
 
-In case of changes in the Secret (`kuard-secret`) the rolling upgrade should be
-performed on Deployment (`kuard`) to "refresh" the environment variables.
+In case of changes in the Secret (`kuard-secret`), a rolling upgrade should be
+performed on the Deployment (`kuard`) to "refresh" the environment variables.
 
-It is time to use [Reloader](https://github.com/stakater/Reloader) which can do
-it automatically.
+It is time to use [Reloader](https://github.com/stakater/Reloader), which can do
+this automatically.
 
 ![Reloader](https://raw.githubusercontent.com/stakater/Reloader/b73f14aef9d0ff24b91e4682223ecce485b8d21c/assets/web/reloader-round-100px.png)
 
-Install `reloader`
+Install the `reloader`
 [helm chart](https://github.com/stakater/Reloader/blob/v1.0.69/deployments/kubernetes/chart/reloader/values.yaml).
 
 ```bash
@@ -469,7 +477,7 @@ You need to annotate the `kuard` deployment to enable Pod rolling upgrades:
 kubectl annotate -n kuard deployment kuard-deployment 'reloader.stakater.com/auto=true'
 ```
 
-Let's do credential change one more time:
+Let's do the credential change one more time:
 
 ```bash
 aws secretsmanager update-secret --secret-id "k01.k8s.mylabs.dev-KuardSecret" \
@@ -482,7 +490,7 @@ Screenshot from AWS Secrets Manager:
 ![aws-secrets-manager-03-secrets-kuardsecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/aws-secrets-manager-03-secrets-kuardsecret.avif){:width="500"}
 _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret_
 
-After some time changes are detected in `kuard-secret` secret and pods are
+After some time, changes are detected in the `kuard-secret` secret, and pods are
 restarted:
 
 ```bash
@@ -500,7 +508,7 @@ time="2023-04-17T18:08:57Z" level=info msg="Starting Controller to watch resourc
 time="2023-04-17T18:12:17Z" level=info msg="Changes detected in 'kuard-secret' of type 'SECRET' in namespace 'kuard', Updated 'kuard-deployment' of type 'Deployment' in namespace 'kuard'"
 ```
 
-After the pod reload the environment variable `KUARDSECRET` should contain the
+After the pod reload, the environment variable `KUARDSECRET` should contain the
 proper value:
 
 ```bash
@@ -513,15 +521,15 @@ kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSEC
 ```
 <!-- prettier-ignore-end -->
 
-It is possible to use/synchronize credentials form the AWS Secret Manager to:
+It is possible to use/synchronize credentials from AWS Secrets Manager to:
 
-- File inside the pod
-- Kubernetes Secret
-- Environment variable inside the pod
+- A file inside the pod
+- A Kubernetes Secret
+- An environment variable inside the pod
 
 ---
 
-To clean up the environment - delete IRSA, remove CloudFormation stack
+To clean up the environment, delete the IRSA, remove the CloudFormation stack,
 and namespace:
 
 ```sh
@@ -531,7 +539,7 @@ fi
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-aws-secretmanager-secret"
 ```
 
-Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+Remove files from the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-secretmanager-secret,helm_values-{reloader,secrets-store-csi-driver}}.yml; do

@@ -2,8 +2,20 @@
 title: Detect the hacker attacks on Amazon EKS and EC2 instances
 author: Petr Ruzicka
 date: 2024-07-07
-description: Use the security tools to detect the hacker attacks on Amazon EKS and EC2 instances
-categories: [Kubernetes, Amazon EKS, Security, Exploit, Vulnerability, Kali Linux, EC2, Docker]
+description:
+  Use the security tools to detect the hacker attacks on Amazon EKS and EC2
+  instances
+categories:
+  [
+    Kubernetes,
+    Amazon EKS,
+    Security,
+    Exploit,
+    Vulnerability,
+    Kali Linux,
+    EC2,
+    Docker,
+  ]
 tags:
   [
     Amazon EKS,
@@ -24,19 +36,22 @@ tags:
 image: https://user-images.githubusercontent.com/45159366/128566095-253303e2-25d8-42f1-a06d-0b38ca079a1a.png
 ---
 
-In previous posts [1]({%post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1%})
-and [2]({%post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2%})
+In previous posts
+[1]({% post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1 %})
+and
+[2]({% post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2 %}),
 I've shown how to exploit a vulnerability in a WordPress plugin running on
-Amazon EKS, EC2 and EC2 with Docker instances using [Kali Linux](https://www.kali.org/)
-and [Metasploit](https://www.metasploit.com/).
+Amazon EKS, EC2, and EC2 with Docker instances using
+[Kali Linux](https://www.kali.org/) and
+[Metasploit](https://www.metasploit.com/).
 
-In this post, I would like to look at the way to detect the hacker attacks using
-the [Wiz](https://wiz.io/) security tool.
+In this post, I would like to look at how to detect hacker attacks using the
+[Wiz](https://wiz.io/) security tool.
 
 I'm going to cover the following steps:
 
-- Install vulnerable Wordpress Application + Plugin to Amazon EKS, EC2
-  and EC2+Docker instances
+- Install vulnerable Wordpress Application + Plugin to Amazon EKS, EC2 and
+  EC2+Docker instances
 - Secure the Amazon EKS and EC2 instances using the security tool
 - Exploit vulnerability in a WordPress plugin using Kali Linux and Metasploit
 - Summarize the results
@@ -49,10 +64,11 @@ _Kali Linux attacks WordPress on EKS, VM, and VM with Docker_
 ## Build the Amazon EKS, EC2 instances with Wordpress Application and Kali Linux
 
 This section contains the commands needed to build the Amazon EKS and EC2
-instances with the vulnerable Wordpress Application.
-I'm not going to cover all the details, because they were already described in
-previous posts [1]({%post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1%})
-and [2]({%post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2%}).
+instances with the vulnerable WordPress Application. I'm not going to cover all
+the details because they were already described in previous posts
+[1]({% post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1 %})
+and
+[2]({% post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2 %}).
 
 Requirements:
 
@@ -92,8 +108,8 @@ chmod 600 "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem"
 
 ### Amazon EKS with Wordpress
 
-Install the Amazon EKS cluster using the [eksctl](https://eksctl.io/) running
-vulnerable Wordpress and connect the cluster to Wiz.
+Install the Amazon EKS cluster using [eksctl](https://eksctl.io/), running
+vulnerable WordPress, and connect the cluster to Wiz.
 
 ```bash
 export CLUSTER_NAME="Amazon-EKS"
@@ -157,8 +173,9 @@ EOF
 
 ### Amazon EC2 with Wordpress container
 
-Create a new [Amazon Linux 2023 EC2 instance](https://github.com/aws-samples/ec2-lamp-server/blob/main/AmazonLinux-2023-LAMP-server.yaml),
-install Docker and run a WordPress container.
+Create a new
+[Amazon Linux 2023 EC2 instance](https://github.com/aws-samples/ec2-lamp-server/blob/main/AmazonLinux-2023-LAMP-server.yaml),
+install Docker, and run a WordPress container.
 
 ```bash
 export SOLUTION_EC2_CONTAINER="Amazon-EC2-Container"
@@ -253,7 +270,8 @@ EOF2
 
 ### Amazon EC2 with Wordpress
 
-Launch a new [Amazon Linux 2023 EC2 instance](https://github.com/aws-samples/ec2-lamp-server/blob/main/AmazonLinux-2023-LAMP-server.yaml)
+Launch a new
+[Amazon Linux 2023 EC2 instance](https://github.com/aws-samples/ec2-lamp-server/blob/main/AmazonLinux-2023-LAMP-server.yaml)
 with WordPress.
 
 ```bash
@@ -334,11 +352,14 @@ rain deploy --yes --node-style original "${TMP_DIR}/KaliLinux-NICE-DCV.yaml" "${
 
 ## Attack the Wordpress Application from Kali Linux
 
-The following part describes the usage of [Metasploit Framework](https://www.metasploit.com/)
-to exploit the vulnerability in the [WordPress Backup Migration Plugin](https://wordpress.org/plugins/backup-backup/)
+The following part describes the usage of the
+[Metasploit Framework](https://www.metasploit.com/) to exploit the vulnerability
+in the
+[WordPress Backup Migration Plugin](https://wordpress.org/plugins/backup-backup/)
 and [Loginizer](https://wordpress.org/plugins/loginizer/) plugins.
 
-Allow my user to connect to Kali Linux instance using SSH and install Metasploit:
+Allow my user to connect to Kali Linux instance using SSH and install
+Metasploit:
 
 ```bash
 AWS_EC2_KALI_LINUX_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Solution,Values=${SOLUTION_KALI}" --query "Reservations[].Instances[].PublicIpAddress" --output text)
@@ -352,7 +373,7 @@ EOF
 ```
 
 Run Metasploit Framework and exploit the vulnerability in all three environments
-(EKS, standalone EC2 instance and EC2 with Docker):
+(EKS, standalone EC2 instance, and EC2 with Docker):
 
 ```bash
 # shellcheck disable=SC2087
@@ -471,8 +492,8 @@ password hashes.
 
 ## Details in Security tool
 
-Explore the [Wiz](https://wiz.io/) security tool and learn how it can assist
-in identifying hacker attacks.
+Explore the [Wiz](https://wiz.io/) security tool and learn how it can assist in
+identifying hacker attacks.
 
 ### Wiz Sensor details
 
@@ -487,7 +508,7 @@ _Wiz -> Settings -> Deployment -> Sensor - EC2_
 
 ### Examine the details about the breach
 
-First place where to look in Wiz is the "Issues" tab:
+The first place to look in Wiz is the "Issues" tab:
 
 ![Wiz Issues](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-issues.avif)
 _Wiz -> Issues_
@@ -536,15 +557,16 @@ vulnerabilities:
 ![Wiz Container image details](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-wordpress-container.avif)
 _Wiz -> Container Image details_
 
-The screenshots above illustrate the Detection capabilities of [Wiz](https://www.wiz.io/)
-combined with [Wiz Sensor](https://www.wiz.io/lp/wiz-runtime-sensor), enabling
-Security teams to identify system breaches. It's essential to configure
-notifications and responses to ensure timely alerts in the event of an attack...
+The screenshots above illustrate the Detection capabilities of
+[Wiz](https://www.wiz.io/) combined with
+[Wiz Sensor](https://www.wiz.io/lp/wiz-runtime-sensor), enabling Security teams
+to identify system breaches. It's essential to configure notifications and
+responses to ensure timely alerts in the event of an attack.
 
 ## Cleanup
 
-Delete the Amazon EKS cluster, the Kali Linux EC2 instance, and
-the EC2 Key Pair:
+Delete the Amazon EKS cluster, the Kali Linux EC2 instance, and the EC2 Key
+Pair:
 
 ```sh
 export AWS_REGION="eu-central-1"

@@ -2,7 +2,9 @@
 title: Build secure and cheap Amazon EKS
 author: Petr Ruzicka
 date: 2023-09-25
-description: Build "cheap and secure" Amazon EKS with network policies, cluster encryption and logging
+description:
+  Build "cheap and secure" Amazon EKS with network policies, cluster encryption
+  and logging
 categories: [Kubernetes, Amazon EKS, Security]
 tags:
   [
@@ -22,9 +24,10 @@ tags:
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 
-I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)
-environment that is cost-effective while prioritizing security, and include
-standard applications in the configuration.
+I will outline the steps for setting up an
+[Amazon EKS](https://aws.amazon.com/eks/) environment that is cost-effective
+while prioritizing security, and include standard applications in the
+configuration.
 
 Amazon EKS should align with these cost-effective criteria:
 
@@ -35,15 +38,18 @@ Amazon EKS should align with these cost-effective criteria:
   [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
 - Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) -
   minimal operation system / CPU / Memory footprint
-- Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
+- Use
+  [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
   as a most cost efficient + cost optimized load balancer
 - [Karpenter](https://karpenter.sh/) - enables automatic node scaling to match
   the specific resource requirements of pods
 
 Amazon EKS should meet the following security requirements:
 
-- Amazon EKS must be [encrypted by KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
-- Worker node [EBS volumes needs to be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
+- Amazon EKS must be
+  [encrypted by KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
+- Worker node
+  [EBS volumes needs to be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
 - Cluster logging ([CloudWatch](https://aws.amazon.com/cloudwatch/)) needs to be
   configured
 - [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
@@ -53,7 +59,8 @@ Amazon EKS should meet the following security requirements:
 
 ### Requirements
 
-You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+You will need to configure
+[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
 and other secrets/variables.
 
 ```shell
@@ -224,8 +231,9 @@ _CloudFlare mylabs.dev zone_
 
 ### Create Route53 zone and KMS key
 
-Generate a CloudFormation template that encompasses an [Amazon Route 53](https://aws.amazon.com/route53/)
-zone and a [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
+Generate a CloudFormation template that encompasses an
+[Amazon Route 53](https://aws.amazon.com/route53/) zone and a
+[AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
 
 Add the new domain `CLUSTER_FQDN` to Route 53 and set up DNS delegation from the
 `BASE_DOMAIN`.
@@ -352,8 +360,8 @@ _KMS key_
 
 ## Create Amazon EKS
 
-I'm going to use [eksctl](https://eksctl.io/) to create the [Amazon EKS](https://aws.amazon.com/eks/)
-cluster.
+I'm going to use [eksctl](https://eksctl.io/) to create the
+[Amazon EKS](https://aws.amazon.com/eks/) cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
@@ -481,7 +489,8 @@ AWS_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,
 AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_VPC_ID}" --query 'NetworkAcls[*].NetworkAclId' --output text)
 ```
 
-Enhance the security stance of the EKS cluster by addressing the following concerns:
+Enhance the security stance of the EKS cluster by addressing the following
+concerns:
 
 - Default security group should have no rules configured:
 
@@ -490,7 +499,8 @@ Enhance the security stance of the EKS cluster by addressing the following conce
   aws ec2 revoke-security-group-ingress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --source-group "${AWS_SECURITY_GROUP_ID}" | jq || true
   ```
 
-- VPC NACL allows unrestricted SSH access + VPC NACL allows unrestricted RDP access:
+- VPC NACL allows unrestricted SSH access + VPC NACL allows unrestricted RDP
+  access:
 
   ```bash
   aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 1 --protocol tcp --port-range "From=22,To=22" --cidr-block 0.0.0.0/0 --rule-action Deny
@@ -505,8 +515,8 @@ Enhance the security stance of the EKS cluster by addressing the following conce
 
 ### Karpenter
 
-[Karpenter](https://karpenter.sh/) is a Kubernetes Node Autoscaler built
-for flexibility, performance, and simplicity.
+[Karpenter](https://karpenter.sh/) is a Kubernetes Node Autoscaler built for
+flexibility, performance, and simplicity.
 
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="500"}
 
@@ -614,7 +624,8 @@ kubectl label namespace snapshot-controller pod-security.kubernetes.io/enforce=b
 ### aws-ebs-csi-driver
 
 The [Amazon Elastic Block Store](https://aws.amazon.com/ebs/) Container Storage
-Interface (CSI) Driver provides a [CSI](https://github.com/container-storage-interface/spec/blob/master/spec.md)
+Interface (CSI) Driver provides a
+[CSI](https://github.com/container-storage-interface/spec/blob/master/spec.md)
 interface used by Container Orchestrators to manage the lifecycle of Amazon EBS
 volumes.
 
@@ -675,8 +686,7 @@ Mailpit will be used to receive email alerts from the Prometheus.
 ![mailpit](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png){:width="200"}
 
 Install `mailpit`
-[helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
-and modify the
+[helm chart](https://artifacthub.io/packages/helm/jouve/mailpit) and modify the
 [default values](https://github.com/jouve/charts/blob/mailpit-0.14.0/charts/mailpit/values.yaml).
 
 ```bash
@@ -708,10 +718,12 @@ metrics to it.
 
 [kube-prometheus stack](https://github.com/prometheus-operator/kube-prometheus)
 is a collection of Kubernetes manifests, [Grafana](https://grafana.com/)
-dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
+dashboards, and
+[Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
 combined with documentation and scripts to provide easy to operate end-to-end
 Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using
-the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
+the
+[Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
 
 ![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="500"}
 
@@ -1000,8 +1012,8 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 resources to handle your cluster's applications.
 
 Change [karpenter](https://karpenter.sh/) default installation by upgrading:
-[helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
-and modify the
+[helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter) and
+modify the
 [default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml).
 
 ```bash
@@ -1029,8 +1041,8 @@ different sources, enrich them with filters and send them to multiple
 destinations.
 
 Install `aws-for-fluent-bit`
-[helm chart](https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit)
-and modify the
+[helm chart](https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit) and
+modify the
 [default values](https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml):
 
 ```bash
@@ -1061,14 +1073,14 @@ helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --na
 ### cert-manager
 
 [cert-manager](https://cert-manager.io/) adds certificates and certificate
-issuers as resource types in Kubernetes clusters, and simplifies the process
-of obtaining, renewing and using those certificates.
+issuers as resource types in Kubernetes clusters, and simplifies the process of
+obtaining, renewing and using those certificates.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="200"}
 
 Install `cert-manager`
-[helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-and modify the
+[helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager) and
+modify the
 [default values](https://github.com/cert-manager/cert-manager/blob/v1.14.4/deploy/charts/cert-manager/values.yaml).
 Service account `cert-manager` was created by `eksctl`.
 
@@ -1161,11 +1173,11 @@ exposed Kubernetes Services and Ingresses with DNS providers.
 ![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="300"}
 
 Install `external-dns`
-[helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
-and modify the
+[helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns) and
+modify the
 [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml).
-`external-dns` will take care about DNS records.
-Service account `external-dns` was created by `eksctl`.
+`external-dns` will take care about DNS records. Service account `external-dns`
+was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
@@ -1271,8 +1283,8 @@ on Kubernetes.
 ![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png){:width="200"}
 
 Install `forecastle`
-[helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
-and modify the
+[helm chart](https://artifacthub.io/packages/helm/stakater/forecastle) and
+modify the
 [default values](https://github.com/stakater/Forecastle/blob/v1.0.138/deployments/kubernetes/chart/forecastle/values.yaml).
 
 ```bash
@@ -1309,14 +1321,14 @@ kubectl label namespace forecastle pod-security.kubernetes.io/enforce=baseline
 
 ### oauth2-proxy
 
-Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
-the endpoints by Google Authentication.
+Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect the
+endpoints by Google Authentication.
 
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="400"}
 
 Install `oauth2-proxy`
-[helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
-and modify the
+[helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy) and
+modify the
 [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-6.24.2/helm/oauth2-proxy/values.yaml).
 
 ```bash
@@ -1363,7 +1375,8 @@ Label all namespaces to warn when going against the Pod Security Standards:
 kubectl label namespace --all pod-security.kubernetes.io/warn=baseline
 ```
 
-Details can be found in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
+Details can be found in:
+[Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
 
 ## Clean-up
 

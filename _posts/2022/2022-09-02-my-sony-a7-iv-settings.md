@@ -11,7 +11,7 @@ image: /assets/img/posts/2022/2022-09-02-my-sony-a7-iv-settings/Sony_A7_IV_(ILCE
 
 I wanted to summarize my notes about the Sony A7 IV settings.
 
-Settings are separate into Photo and Video section to have them separated.
+Settings are separated into Photo and Video sections to have them distinct.
 
 ## Photo
 

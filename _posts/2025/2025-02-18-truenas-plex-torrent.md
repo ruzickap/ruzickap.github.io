@@ -3,15 +3,16 @@ title: TrueNAS CE 25.04 with Plex and qBittorrent
 author: Petr Ruzicka
 date: 2025-02-18
 description: Install TrueNAS Community Edition 25.04 with Plex and qBittorrent
-categories: [ qbittorrent, plex, truenas ]
+categories: [qbittorrent, plex, truenas]
 mermaid: true
-tags: [ qbittorrent, plex, truenas ]
+tags: [qbittorrent, plex, truenas]
 image: https://raw.githubusercontent.com/truenas/documentation/3abfe90c0491c6944d0608c8913b596b03d2678a/static/images/TrueNAS_Community_Edition.png
 ---
 
-I had the opportunity to test the [Dell OptiPlex 3000 Thin Client](https://www.dell.com/en-us/shop/cty/pdp/spd/optiplex-3000-thin-client)
+I had the opportunity to test the
+[Dell OptiPlex 3000 Thin Client](https://www.dell.com/en-us/shop/cty/pdp/spd/optiplex-3000-thin-client)
 with the TrueNAS Community Edition 25.04. The machine is equipped with 2 CPUs,
-8GB of RAM and a 64GB eMMC storage.
+8GB of RAM, and 64GB eMMC storage.
 
 🕹️ Recorded screen cast:
 
@@ -28,23 +29,24 @@ on a USB stick using [balenaEtcher](https://etcher.balena.io/).
 
 Boot TrueNAS from the USB stick and follow the steps:
 
-* Shell
-  * Run commands:
+- Shell
+
+  - Run commands:
 
     ```bash
     sed -i 's/-n3:0:0/-n3:0:+16G/' /usr/lib/python3/dist-packages/truenas_installer/install.py
     exit
     ```
 
-* Install/Upgrade
-* Select the disk to install TrueNAS (`mmcblk0`)
-* Administrative user (truenas_admin)
-* ...
+- Install/Upgrade
+- Select the disk to install TrueNAS (`mmcblk0`)
+- Administrative user (truenas_admin)
+- ...
 
 Links:
 
-* [How to Install TrueNAS CORE on an SSD NVMe/SATA Partition and Reclaim Unused Boot-Pool Space](https://youtu.be/ZMSSE6FViak?si=b-sz-fPk6xwol0ea&t=50)
-* [Install TrueNAS SCALE on a partition instead of the full disk](https://gist.github.com/gangefors/2029e26501601a99c501599f5b100aa6)
+- [How to Install TrueNAS CORE on an SSD NVMe/SATA Partition and Reclaim Unused Boot-Pool Space](https://youtu.be/ZMSSE6FViak?si=b-sz-fPk6xwol0ea&t=50)
+- [Install TrueNAS SCALE on a partition instead of the full disk](https://gist.github.com/gangefors/2029e26501601a99c501599f5b100aa6)
 
 ## Configuration
 
@@ -55,9 +57,8 @@ Links:
 
 ### [Settings](https://www.truenas.com/docs/scale/25.04/scaletutorials/systemsettings/)
 
-Configure General Settings (GUI, Localization and Email Settings),
-Advanced Settings (Access), Services (SMB, SSH), and Shell (Create + Export
-pool):
+Configure General Settings (GUI, Localization, and Email Settings), Advanced
+Settings (Access), Services (SMB, SSH), and Shell (Create + Export pool):
 
 ```mermaid
 graph LR
@@ -160,8 +161,8 @@ graph LR
 
 ### [Configure Credentials](https://www.truenas.com/docs/scale/25.04/scaletutorials/credentials/backupcredentials/addcloudcredentials/)
 
-Create a new user named `ruzickap` and update the password and email address
-for the existing `truenas_admin` user:
+Create a new user named `ruzickap` and update the password and email address for
+the existing `truenas_admin` user:
 
 ```mermaid
 graph LR
@@ -201,8 +202,8 @@ graph LR
 
 ### [Add Applications](https://www.truenas.com/docs/scale/25.04/scaleuireference/apps/)
 
-Configure the applications to use `my-local-disk-pool` pool as the designated
-storage location:
+Configure the applications to use the `my-local-disk-pool` pool as the
+designated storage location:
 
 ```mermaid
 graph LR
@@ -271,12 +272,13 @@ Test the [File Browser](https://filebrowser.org/) web interface by clicking on
 the [File Browser](http://truenas.local:30051/) link and use the following login
 credentials:
 
-* User: `admin`
-* Password: `admin`
+- User: `admin`
+- Password: `admin`
 
 #### [qBittorrent](https://www.qbittorrent.org/)
 
-Install [qBittorrent](https://www.qbittorrent.org/) application to download torrents:
+Install the [qBittorrent](https://www.qbittorrent.org/) application to download
+torrents:
 
 ![qBittorrent](https://raw.githubusercontent.com/qbittorrent/qBittorrent/ab91d546e51bdd104d6d520dc2a000ade79b207b/src/icons/qbittorrent-tray.svg){:width="100"}
 
@@ -299,7 +301,8 @@ graph LR
 
 ##### [qBittorrent](https://www.qbittorrent.org/) Configuration
 
-It is necessary to configure the qBittorrent to work properly with pools and datasets.
+It is necessary to configure qBittorrent to work properly with pools and
+datasets.
 
 ![qBittorrent](https://raw.githubusercontent.com/qbittorrent/qBittorrent/ab91d546e51bdd104d6d520dc2a000ade79b207b/src/icons/mascot.png)
 

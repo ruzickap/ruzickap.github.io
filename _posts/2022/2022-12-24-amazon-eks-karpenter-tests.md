@@ -8,24 +8,24 @@ tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl]
 image: https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 ---
 
-In the previous post related to
-[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
-I decided to install [Karpenter](https://karpenter.sh/) to improve
-the efficiency and cost of running workloads on the cluster.
+In the previous post related to [Cheapest Amazon
+EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}), I decided to install
+[Karpenter](https://karpenter.sh/) to improve the efficiency and cost of running
+workloads on the cluster.
 
-There are many articles describing what Karpenter is, how it works and what are
-the benefits of using it.
+There are many articles describing what Karpenter is, how it works, and what the
+benefits of using it are.
 
-Here are few notes when I was testing it + discover how it works on real
-examples.
+Here are a few notes from when I was testing it and discovering how it works
+with real examples.
 
 ## Requirements
 
-- Amazon EKS cluster with Karpenter configuration described in
-  [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
+- Amazon EKS cluster with Karpenter configuration described in [Cheapest Amazon
+  EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})
 - [Helm](https://helm.sh)
 
-Variables which are being used in the next steps:
+Variables that are being used in the next steps:
 
 ```bash
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
@@ -62,8 +62,8 @@ works.
 
 ### Consolidation example
 
-Start the amd64 [nginx](https://hub.docker.com/_/nginx) pods in `test-karpenter`
-namespace:
+Start the amd64 [nginx](https://hub.docker.com/_/nginx) pods in the
+`test-karpenter` namespace:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-deployment-nginx.yml" << EOF | kubectl apply -f -
@@ -114,7 +114,8 @@ EOF
 kubectl wait --for=condition=Available=True --timeout=5m --namespace=test-karpenter deployment nginx-deployment
 ```
 
-Karpenter will start new [t3a.small](https://aws.amazon.com/ec2/instance-types/t3/)
+Karpenter will start a new
+[t3a.small](https://aws.amazon.com/ec2/instance-types/t3/)
 `ip-192-168-66-142.ec2.internal` spot EC2 instance:
 
 ![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-01-replicas-2.avif)
@@ -157,8 +158,8 @@ Outputs:
 2023-01-29T18:35:19.382Z  INFO  controller.provisioner.cloudprovider  launched new instance  {"commit": "5a7faa0-dirty", "provisioner": "default", "id": "i-059d06b02509680a0", "hostname": "ip-192-168-66-142.ec2.internal", "instance-type": "t3a.small", "zone": "us-east-1a", "capacity-type": "spot"}
 ```
 
-Increase replicas to `5` - this will add a new spot worker node which is going
-to run `3` new "nginx" pods:
+Increase replicas to `5`. This will add a new spot worker node which is going to
+run `3` new "nginx" pods:
 
 ```bash
 kubectl scale deployment nginx-deployment --namespace test-karpenter --replicas 5
@@ -214,8 +215,8 @@ Outputs:
 2023-01-29T18:38:09.682Z  INFO  controller.provisioner.cloudprovider  launched new instance  {"commit": "5a7faa0-dirty", "provisioner": "default", "id": "i-008c19ef038857a28", "hostname": "ip-192-168-94-105.ec2.internal", "instance-type": "t3a.small", "zone": "us-east-1a", "capacity-type": "spot"}
 ```
 
-If the number of replicas goes again to `3` Karpenter will find out, that
-workload running on `2` spot nodes can be "merged" to single one:
+If the number of replicas goes again to `3`, Karpenter will find out that the
+workload running on `2` spot nodes can be "merged" into a single one:
 
 ```bash
 kubectl scale deployment nginx-deployment --namespace test-karpenter --replicas 3
@@ -225,8 +226,10 @@ sleep 20
 
 ![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-03-replicas-3.avif)
 
-Thanks to the [consolidation](https://karpenter.sh/v0.32/concepts/disruption/#consolidation)
-function (described in [AWS re:Invent 2022 - Kubernetes virtually anywhere, for everyone](https://youtu.be/OB7IZolZk78?t=2629))
+Thanks to the
+[consolidation](https://karpenter.sh/v0.32/concepts/disruption/#consolidation)
+function (described in
+[AWS re:Invent 2022 - Kubernetes virtually anywhere, for everyone](https://youtu.be/OB7IZolZk78?t=2629))
 logs will look like:
 
 ```bash
@@ -274,12 +277,12 @@ kubectl delete namespace test-karpenter || true
 
 ### Simple autoscaling
 
-It would be handy to document the normal "autoscaling" example with all
-outputs + logs...
+It would be handy to document the normal "autoscaling" example with all outputs
+and logs.
 
 Install `podinfo`
-[helm chart](https://artifacthub.io/packages/helm/podinfo/podinfo)
-and modify the
+[helm chart](https://artifacthub.io/packages/helm/podinfo/podinfo) and modify
+the
 [default values](https://github.com/stefanprodan/podinfo/blob/6.5.4/charts/podinfo/values.yaml).
 
 ![podinfo](https://raw.githubusercontent.com/stefanprodan/podinfo/a7be119f20369b97f209d220535506af7c49b4ea/screens/podinfo-ui-v3.png){:width="500"}
@@ -313,7 +316,7 @@ EOF
 helm upgrade --install --version "${PODINFO_HELM_CHART_VERSION}" --namespace podinfo --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-podinfo.yml" podinfo sp/podinfo
 ```
 
-Check cluster + node details:
+Check cluster and node details:
 
 ```bash
 kubectl get nodes -o wide
@@ -352,7 +355,8 @@ ip-192-168-16-172.ec2.internal   1415m (73%)    1900m (98%)   82m (4%)     1524M
 ip-192-168-84-230.ec2.internal   1155m (59%)    300m (15%)    37m (1%)     136Mi (9%)        768Mi (55%)     453Mi (32%)    6/11
 ```
 
-Graphical view of cpu + memory utilization per node (+ prices) produced by [eks-node-viewer](https://github.com/awslabs/eks-node-viewer):
+Graphical view of CPU and memory utilization per node (+ prices) produced by
+[eks-node-viewer](https://github.com/awslabs/eks-node-viewer):
 
 ```shell
 eks-node-viewer --resources cpu,memory
@@ -422,7 +426,8 @@ kubectl viewnode --all-namespaces --show-metrics
   * podinfo: podinfo-59d6468db-jmwxh (running | mem usage: 13.4 MiB)
 ```
 
-Other details produced by [kubectl-view-allocations](https://github.com/davidB/kubectl-view-allocations):
+Other details produced by
+[kubectl-view-allocations](https://github.com/davidB/kubectl-view-allocations):
 
 ```bash
 kubectl view-allocations --utilization

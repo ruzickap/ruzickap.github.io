@@ -2,22 +2,16 @@
 title: Using keep-sorted to organize Terraform objects
 author: Petr Ruzicka
 date: 2024-12-12
-description: Use keep-sorted to organize your Terraform objects in sorted order within your code
+description:
+  Use keep-sorted to organize your Terraform objects in sorted order within your
+  code
 categories: [Terraform, OpenTofu, keep-sorted, sort, iac, code]
-tags:
-  [
-    Terraform,
-    OpenTofu,
-    keep-sorted,
-    sort,
-    iac,
-    code,
-  ]
+tags: [Terraform, OpenTofu, keep-sorted, sort, iac, code]
 image: https://opengraph.githubassets.com/main/google/keep-sorted
 ---
 
 Alphabetically sorting variables, sets, arrays, and other strings has long been
-considered a good practice, not just in Terraform/OpenTofu code.
+considered good practice, not just in Terraform/OpenTofu code.
 
 I want to explore how to sort Terraform/OpenTofu resources, outputs, lists, and
 more.
@@ -25,8 +19,9 @@ more.
 I'll explain how to use [keep-sorted](https://github.com/google/keep-sorted)
 from Google to maintain well-organized, properly sorted Terraform/OpenTofu code.
 
-Rather than diving into a lengthy description of [keep-sorted](https://github.com/google/keep-sorted)
-features, let's explore some examples.
+Rather than diving into a lengthy description of
+[keep-sorted](https://github.com/google/keep-sorted) features, let's explore
+some examples.
 
 Install `keep-sorted`:
 
@@ -65,7 +60,8 @@ data "wiz_cloud_configuration_rules" "apigateway-002" {
 EOF
 ```
 
-Let's check the output after using [keep-sorted](https://github.com/google/keep-sorted):
+Let's check the output after using
+[keep-sorted](https://github.com/google/keep-sorted):
 
 ```bash
 "${TMP_DIR}/keep-sorted" "${TMP_DIR}/data.tf" && cat "${TMP_DIR}/data.tf"
@@ -102,8 +98,8 @@ _keep-sorted data.tf diff_
 
 As you can see above:
 
-* The data resources were sorted
-* The comments were preserved with the data sources
+- The data resources were sorted
+- The comments were preserved with the data sources
 
 One more example - `main.tf`:
 
@@ -166,8 +162,9 @@ Diff:
 ![keep-sorted main.tf diff](/assets/img/posts/2024/2024-12-12-terraform-keep-sorted/main-diff.avif)
 _keep-sorted main.tf diff_
 
-`keep-sorted` has few more features documented in the [README.md](https://github.com/google/keep-sorted/blob/main/README.md#options)
-and as I mentioned before - it's not only for Terraform / OpenTofu.
+`keep-sorted` has a few more features documented in the
+[README.md](https://github.com/google/keep-sorted/blob/main/README.md#options)
+and as I mentioned before - it's not only for Terraform/OpenTofu.
 
 ## Cleanup
 
