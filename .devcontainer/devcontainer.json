@@ -5,62 +5,61 @@
     "vscode": {
       "extensions": [
         // keep-sorted start case=no
+        "adamhartford.vscode-base64",
+        "antfu.slidev",
+        "bierner.markdown-mermaid",
         "bierner.markdown-preview-github-styles",
-        "DavidAnson.vscode-markdownlint",
-        "dedsec727.jekyll-run",
+        "davidanson.vscode-markdownlint",
         "esbenp.prettier-vscode",
-        "GitHub.copilot",
-        "me-dutour-mathieu.vscode-github-actions",
-        "timonwong.shellcheck",
-        "Tyriar.sort-lines",
+        "github.copilot",
+        "github.vscode-github-actions",
+        "github.vscode-pull-request-github",
+        "hashicorp.terraform",
+        "hverlin.mise-vscode",
+        "mechatroner.rainbow-csv",
+        "pkief.material-icon-theme",
+        "redhat.vscode-yaml",
+        "streetsidesoftware.code-spell-checker",
+        "tyriar.sort-lines",
         "yzhang.markdown-all-in-one"
         // keep-sorted end
       ],
-      "settings": {
-        // keep-sorted start block=yes
-        "[json][markdown][yaml]": {
-          "editor.defaultFormatter": "esbenp.prettier-vscode"
-        },
-        "[markdown]": {
-          "editor.wordWrap": "off"
-        },
-        "editor.autoClosingQuotes": "never",
-        "editor.cursorBlinking": "smooth",
-        "editor.dragAndDrop": false,
-        "editor.hover.enabled": false,
-        "editor.parameterHints.enabled": false,
-        "editor.quickSuggestions": {
-          "other": "off"
-        },
-        "editor.rulers": [80],
-        "editor.smoothScrolling": true,
-        "editor.tabSize": 2,
-        "extensions.ignoreRecommendations": true,
-        "files.insertFinalNewline": true,
-        "files.trimFinalNewlines": true,
-        "files.trimTrailingWhitespace": true,
-        "git.autofetch": true,
-        "github.copilot.enable": {
-          "*": true,
-          "plaintext": true,
-          "markdown": true
-        }
-        // keep-sorted end
-      }
+      // Do not use the `settings` - it is populated by the `pre-build` script.
+      "settings": {}
     }
+  },
+
+  "features": {
+    // keep-sorted start
+    "ghcr.io/devcontainers-extra/features/mise:1": {},
+    "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
+    "ghcr.io/devcontainers-extra/features/starship:1": {}
+    // keep-sorted end
   },
 
   "forwardPorts": [4000],
 
   "image": "mcr.microsoft.com/devcontainers/jekyll:latest",
 
+  "initializeCommand": "bash .devcontainer/pre-build.sh",
+
   "name": "ruzickap.github.io",
+
+  "onCreateCommand": [
+    "bash",
+    "-c",
+    "echo -e 'eval \"$(mise activate bash)\"\neval \"$(starship init bash)\"' >> ~/.bashrc"
+  ],
 
   "portsAttributes": {
     "4000": {
       "label": "jekyll",
       "onAutoForward": "openPreview"
     }
-  }
+  },
+
+  "postStartCommand": "wget https://raw.githubusercontent.com/ruzickap/ansible-my_workstation/refs/heads/main/ansible/files/home/myusername/.config/Code/User/settings.json -O ~/.vscode-remote/data/Machine/settings.json",
+
+  "remoteUser": "vscode"
   // keep-sorted end
 }

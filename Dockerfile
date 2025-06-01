@@ -1,4 +1,3 @@
-# https://github.com/devcontainers/images/tree/main/src/jekyll/.devcontainer
 FROM ruby:3-slim AS build
 
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
