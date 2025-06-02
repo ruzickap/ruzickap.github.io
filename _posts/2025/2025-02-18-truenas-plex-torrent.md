@@ -9,9 +9,10 @@ tags: [ qbittorrent, plex, truenas ]
 image: https://raw.githubusercontent.com/truenas/documentation/3abfe90c0491c6944d0608c8913b596b03d2678a/static/images/TrueNAS_Community_Edition.png
 ---
 
-I had the opportunity to test the [Dell OptiPlex 3000 Thin Client](https://www.dell.com/en-us/shop/cty/pdp/spd/optiplex-3000-thin-client)
-with the TrueNAS Community Edition 25.04. The machine is equipped with 2 CPUs,
-8GB of RAM and a 64GB eMMC storage.
+I had the opportunity to test the
+[Dell OptiPlex 3000 Thin Client](https://www.dell.com/en-us/shop/cty/pdp/spd/optiplex-3000-thin-client)
+with TrueNAS Community Edition 25.04. The machine is equipped with 2 CPUs,
+8GB of RAM, and 64GB of eMMC storage.
 
 🕹️ Recorded screen cast:
 
@@ -21,12 +22,12 @@ with the TrueNAS Community Edition 25.04. The machine is equipped with 2 CPUs,
 
 ![TrueNAS](https://raw.githubusercontent.com/truenas/documentation/3abfe90c0491c6944d0608c8913b596b03d2678a/static/images/TrueNAS_Community_Edition.png){:width="400"}
 
-Put the [TrueNAS CE 25.04 iso](https://www.truenas.com/download-truenas-scale/)
+Put the [TrueNAS CE 25.04 ISO](https://www.truenas.com/download-truenas-scale/)
 on a USB stick using [balenaEtcher](https://etcher.balena.io/).
 
 > Make sure to disable **Secure Boot** in the BIOS before proceeding.
 
-Boot TrueNAS from the USB stick and follow the steps:
+Boot TrueNAS from the USB stick and follow these steps:
 
 * Shell
   * Run commands:
@@ -37,8 +38,8 @@ Boot TrueNAS from the USB stick and follow the steps:
     ```
 
 * Install/Upgrade
-* Select the disk to install TrueNAS (`mmcblk0`)
-* Administrative user (truenas_admin)
+* Select the disk where TrueNAS will be installed (`mmcblk0`).
+* Set up the administrative user (e.g., `truenas_admin`).
 * ...
 
 Links:
@@ -51,13 +52,12 @@ Links:
 ![TrueNAS](https://raw.githubusercontent.com/truenas/documentation/1bb5fd6adb68b18aad6476bcab61d46bad2f0e2e/static/images/truenas-logo-mark.png)
 
 > The admin username for the TrueNAS WebUI is `truenas_admin`, and the password
-> is the same as the root password set during installation.
+> is the same as the root password set during the installation.
 
 ### [Settings](https://www.truenas.com/docs/scale/25.04/scaletutorials/systemsettings/)
 
-Configure General Settings (GUI, Localization and Email Settings),
-Advanced Settings (Access), Services (SMB, SSH), and Shell (Create + Export
-pool):
+Configure General Settings (GUI, Localization, and Email Settings), Advanced
+Settings (Access), Services (SMB, SSH), and Shell (Create and Export pool):
 
 ```mermaid
 graph LR
@@ -96,7 +96,7 @@ graph LR
 ### [Create and Import Storage pool](https://www.truenas.com/docs/scale/25.04/scaletutorials/storage/createpoolwizard/)
 
 Import the previously created pool (`my-local-disk-pool`) and create a new pool
-named (`my-pool`):
+named `my-pool`:
 
 ```mermaid
 graph LR
@@ -115,8 +115,8 @@ graph LR
 
 ### [Create Dataset](https://www.truenas.com/docs/scale/25.04/scaletutorials/datasets/datasetsscale/)
 
-Create the `data` dataset in the `my-pool` and the `plex` dataset in the
-`my-local-disk-pool` storage pools, ensuring proper permissions are configured
+Create the `data` dataset in the `my-pool` pool and the `plex` dataset in the
+`my-local-disk-pool` storage pool, ensuring proper permissions are configured
 for each:
 
 ```mermaid
@@ -160,7 +160,7 @@ graph LR
 
 ### [Configure Credentials](https://www.truenas.com/docs/scale/25.04/scaletutorials/credentials/backupcredentials/addcloudcredentials/)
 
-Create a new user named `ruzickap` and update the password and email address
+Create a new user named `ruzickap`, and update the password and email address
 for the existing `truenas_admin` user:
 
 ```mermaid
@@ -201,8 +201,8 @@ graph LR
 
 ### [Add Applications](https://www.truenas.com/docs/scale/25.04/scaleuireference/apps/)
 
-Configure the applications to use `my-local-disk-pool` pool as the designated
-storage location:
+Configure the applications to use the `my-local-disk-pool` pool as their
+designated storage location:
 
 ```mermaid
 graph LR
@@ -217,9 +217,9 @@ graph LR
     click apps "https://truenas.local/ui/apps/installed"
 ```
 
-#### [Open Speed Test](https://openspeedtest.com/)
+#### [OpenSpeedTest](https://openspeedtest.com/)
 
-Install the [Open Speed Test](https://openspeedtest.com/) application to easily
+Install the [OpenSpeedTest](https://openspeedtest.com/) application to easily
 measure network speed and performance:
 
 ![Open Speed Test](https://raw.githubusercontent.com/openspeedtest/Docker-Image/43006f052f08495881e3a63be13700954440bbb8/files/www/assets/images/icons/android-chrome-512x512.png){:width="100"}
@@ -237,15 +237,15 @@ graph LR
     click apps "https://truenas.local/ui/apps/installed"
 ```
 
-Test the [Open Speed Test](https://openspeedtest.com/) web interface by
-accessing it through the [local instance](http://truenas.local:30116/).
+Test the [OpenSpeedTest](https://openspeedtest.com/) web interface by accessing
+it through the [local instance](http://truenas.local:30116/).
 
 ![SpeedTest by OpenSpeedTest](https://github.com/openspeedtest/v2-Test/raw/main/images/10G-S.gif){:width="500"}
 
 #### [File Browser](https://filebrowser.org/)
 
-Add the [File Browser](https://filebrowser.org/) application to easily manage
-files through a user-friendly web interface:
+Add the [File Browser](https://filebrowser.org/) application to manage files
+easily through a user-friendly web interface:
 
 ![File Browser](https://raw.githubusercontent.com/filebrowser/filebrowser/7414ca10b3141853c89ecd752aa732d5755ff1bf/frontend/public/img/logo.svg){:width="100"}
 
@@ -267,8 +267,8 @@ graph LR
     click apps "https://truenas.local/ui/apps/installed"
 ```
 
-Test the [File Browser](https://filebrowser.org/) web interface by clicking on
-the [File Browser](http://truenas.local:30051/) link and use the following login
+Test the [File Browser](https://filebrowser.org/) web interface by clicking the
+[File Browser](http://truenas.local:30051/) link and using the following login
 credentials:
 
 * User: `admin`
@@ -276,7 +276,8 @@ credentials:
 
 #### [qBittorrent](https://www.qbittorrent.org/)
 
-Install [qBittorrent](https://www.qbittorrent.org/) application to download torrents:
+Install the [qBittorrent](https://www.qbittorrent.org/) application to download
+torrents:
 
 ![qBittorrent](https://raw.githubusercontent.com/qbittorrent/qBittorrent/ab91d546e51bdd104d6d520dc2a000ade79b207b/src/icons/qbittorrent-tray.svg){:width="100"}
 
@@ -299,11 +300,12 @@ graph LR
 
 ##### [qBittorrent](https://www.qbittorrent.org/) Configuration
 
-It is necessary to configure the qBittorrent to work properly with pools and datasets.
+It is necessary to configure qBittorrent to work properly with the configured
+pools and datasets.
 
 ![qBittorrent](https://raw.githubusercontent.com/qbittorrent/qBittorrent/ab91d546e51bdd104d6d520dc2a000ade79b207b/src/icons/mascot.png)
 
-Obtain the username and password for qBittorrent:
+Obtain the username and password for qBittorrent.
 
 ```mermaid
 graph LR
@@ -321,9 +323,10 @@ graph LR
 ```
 
 Access the [qBittorrent](http://truenas.local:30024/) web interface and log in
-using the provided credentials.
+using the credentials obtained from the logs.
 
-Click the Options icon at the top and configure the following settings:
+Click the **Options** icon (typically a gear symbol) at the top and configure
+the following settings:
 
 ```mermaid
 graph LR
@@ -336,7 +339,7 @@ graph LR
 
 #### [Plex](https://www.plex.tv/)
 
-Install the [Plex](https://www.plex.tv/) application for media streaming:
+Install the [Plex](https://www.plex.tv/) application for media streaming.
 
 ![Plex](https://raw.githubusercontent.com/plexinc/pms-docker/8db104bcc92596266bfc37f746b9fb923a890337/img/plex-server.png){:width="100"}
 
@@ -364,7 +367,7 @@ graph LR
 
 ### [Configure Data Protection](https://www.truenas.com/docs/scale/25.04/scaletutorials/dataprotection/cloudsynctasks/)
 
-Configure Cloud Sync Tasks to back up Plex data to Microsoft OneDrive and
+Configure Cloud Sync Tasks to back up Plex data to Microsoft OneDrive, and
 schedule regular S.M.A.R.T. tests:
 
 ```mermaid
@@ -390,3 +393,5 @@ graph LR
 ![TrueNAS](https://raw.githubusercontent.com/truenas/documentation/1bb5fd6adb68b18aad6476bcab61d46bad2f0e2e/static/images/full-rgb.png)
 
 Enjoy ... 😉
+
+[end of _posts/2025/2025-02-18-truenas-plex-torrent.md]

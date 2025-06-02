@@ -17,18 +17,20 @@ image: https://opengraph.githubassets.com/main/google/keep-sorted
 ---
 
 Alphabetically sorting variables, sets, arrays, and other strings has long been
-considered a good practice, not just in Terraform/OpenTofu code.
+considered good practice, not just in Terraform/OpenTofu code.
 
 I want to explore how to sort Terraform/OpenTofu resources, outputs, lists, and
-more.
+more using a dedicated tool.
 
-I'll explain how to use [keep-sorted](https://github.com/google/keep-sorted)
-from Google to maintain well-organized, properly sorted Terraform/OpenTofu code.
+I will explain how to use [keep-sorted](https://github.com/google/keep-sorted)
+from Google to maintain well-organized and properly sorted Terraform/OpenTofu
+code.
 
-Rather than diving into a lengthy description of [keep-sorted](https://github.com/google/keep-sorted)
-features, let's explore some examples.
+Rather than diving into a lengthy description of
+[keep-sorted](https://github.com/google/keep-sorted)'s features, let's explore
+some examples.
 
-Install `keep-sorted`:
+Install `keep-sorted` by following these steps:
 
 ```bash
 TMP_DIR="${TMP_DIR:-${PWD}}"
@@ -37,7 +39,7 @@ wget -q "https://github.com/google/keep-sorted/releases/download/v0.6.1/keep-sor
 chmod +x "${TMP_DIR}/keep-sorted"
 ```
 
-Let's have some example `data.tf` file:
+Let's consider an example `data.tf` file:
 
 ```bash
 tee "${TMP_DIR}/data.tf" << EOF
@@ -65,7 +67,8 @@ data "wiz_cloud_configuration_rules" "apigateway-002" {
 EOF
 ```
 
-Let's check the output after using [keep-sorted](https://github.com/google/keep-sorted):
+Let's check the output after applying
+[keep-sorted](https://github.com/google/keep-sorted):
 
 ```bash
 "${TMP_DIR}/keep-sorted" "${TMP_DIR}/data.tf" && cat "${TMP_DIR}/data.tf"
@@ -100,12 +103,13 @@ Diff:
 ![keep-sorted data.tf diff](/assets/img/posts/2024/2024-12-12-terraform-keep-sorted/data-diff.avif)
 _keep-sorted data.tf diff_
 
-As you can see above:
+As you can see in the output above:
 
-* The data resources were sorted
-* The comments were preserved with the data sources
+* The data resources were sorted alphabetically by their names.
+* The comments associated with each data source were preserved and moved along
+  with their respective blocks.
 
-One more example - `main.tf`:
+Here's one more example, this time with a `main.tf` file:
 
 ```bash
 tee "${TMP_DIR}/main.tf" << EOF
@@ -132,7 +136,7 @@ locals {
 EOF
 ```
 
-...and the output is:
+...and the resulting output is:
 
 ```bash
 "${TMP_DIR}/keep-sorted" "${TMP_DIR}/main.tf" && cat "${TMP_DIR}/main.tf"
@@ -166,12 +170,13 @@ Diff:
 ![keep-sorted main.tf diff](/assets/img/posts/2024/2024-12-12-terraform-keep-sorted/main-diff.avif)
 _keep-sorted main.tf diff_
 
-`keep-sorted` has few more features documented in the [README.md](https://github.com/google/keep-sorted/blob/main/README.md#options)
-and as I mentioned before - it's not only for Terraform / OpenTofu.
+`keep-sorted` has several other features documented in its
+[README.md](https://github.com/google/keep-sorted/blob/main/README.md#options).
+As I mentioned before, it's not limited to use with only Terraform/OpenTofu.
 
 ## Cleanup
 
-Delete all created files:
+Delete all created files using the following command:
 
 ```sh
 rm -v "${TMP_DIR}"/{data,main}.tf "${TMP_DIR}/keep-sorted"

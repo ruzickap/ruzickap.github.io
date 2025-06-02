@@ -8,9 +8,10 @@ tags: [kubernetes, krew, kubectl, plugins, plugin-manager]
 image: https://raw.githubusercontent.com/kubernetes-sigs/krew/4ec386cc021b4a7896de95d91c5d8025d98eaa4f/assets/logo/stacked/color/krew-stacked-color.svg
 ---
 
-I would like to share few notes about kubectl plugins installed by [krew](https://krew.sigs.k8s.io/)
-which I'm using... It should not be comprehensive description of plugins, but I
-prefer to focus on the examples and screenshots.
+I would like to share a few notes about the kubectl plugins I use, installed
+via [krew](https://krew.sigs.k8s.io/). This is not intended to be a
+comprehensive description of these plugins; instead, I prefer to focus on
+examples and screenshots.
 
 Links:
 
@@ -21,13 +22,13 @@ Links:
 
 ## Requirements
 
-- Amazon EKS cluster (described in
-  [Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))
-- [kubectl](https://kubernetes.io/docs/reference/kubectl/)
+- An Amazon EKS cluster (as described in
+  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})").
+- [kubectl](https://kubernetes.io/docs/reference/kubectl/).
 
 ## Install krew
 
-Install Krew plugin manager for kubectl command-line tool:
+Install Krew, the plugin manager for the kubectl command-line tool:
 
 ![Krew](https://raw.githubusercontent.com/kubernetes-sigs/krew/4ec386cc021b4a7896de95d91c5d8025d98eaa4f/assets/logo/horizontal/color/krew-horizontal-color.svg){:width="500"}
 
@@ -42,23 +43,23 @@ export PATH="${HOME}/.krew/bin:${PATH}"
 
 ## My Favorite krew + kubectl plugins
 
-List of my favorite krew + kubectl plugins:
+Here is a list of my favorite Krew and kubectl plugins:
 
 ### [cert-manager](https://github.com/cert-manager/cert-manager)
 
-- Kubectl add-on to automate the management and issuance of TLS certificates.
-  Allows for direct interaction with cert-manager resources e.g. manual renewal
-  of Certificate resources.
+- This kubectl add-on automates the management and issuance of TLS
+  certificates. It allows for direct interaction with cert-manager resources,
+  such as performing manual renewal of Certificate resources.
 
-[cert-manager](https://github.com/cert-manager/cert-manager) krew plugin
-installation:
+Installation of the [cert-manager](https://github.com/cert-manager/cert-manager)
+Krew plugin:
 
 ```bash
 kubectl krew install cert-manager
 ```
 
 Get details about the current status of a cert-manager Certificate resource,
-including information on related resources like CertificateRequest or Order:
+including information on related resources like CertificateRequest or Order.
 
 ```bash
 kubectl cert-manager status certificate --namespace cert-manager ingress-cert-staging
@@ -107,7 +108,7 @@ Renewal Time: 2023-08-17T06:36:22Z
 No CertificateRequest found for this Certificate
 ```
 
-Mark cert-manager Certificate resources for manual renewal:
+Mark cert-manager Certificate resources for manual renewal.
 
 ```bash
 kubectl cert-manager renew --namespace cert-manager ingress-cert-staging
@@ -123,20 +124,21 @@ Validity period:
   Not After: Sat, 16 Sep 2023 07:15:57 UTC
 ```
 
-The Certificate was created at `2023-06-18 06:36:23` and then rotated
-`18 Jun 2023 07:15:58`...
+The Certificate was created at `2023-06-18 06:36:23` and then rotated on
+`18 Jun 2023 07:15:58`.
 
 ### [get-all](https://github.com/corneliusweig/ketall)
 
-- Like `kubectl get all`, but get really all resources.
+- Similar to `kubectl get all`, but it retrieves truly all resources.
 
-[get-all](https://github.com/corneliusweig/ketall) krew plugin installation:
+Installation of the [get-all](https://github.com/corneliusweig/ketall) Krew
+plugin:
 
 ```bash
 kubectl krew install get-all
 ```
 
-Get all resources from `default` namespace:
+Get all resources from the `default` namespace.
 
 ```bash
 kubectl get-all -n default
@@ -153,16 +155,17 @@ endpointslice.discovery.k8s.io/kubernetes  default    69m
 
 ### [ice](https://github.com/NimbleArchitect/kubectl-ice)
 
-- [ice](https://github.com/NimbleArchitect/kubectl-ice) is an open-source tool
-  for Kubernetes users to monitor and optimize container resource usage.
+- [Ice](https://github.com/NimbleArchitect/kubectl-ice) is an open-source tool
+  that helps Kubernetes users monitor and optimize container resource usage.
 
-[ice](https://github.com/NimbleArchitect/kubectl-ice) krew plugin installation:
+Installation of the [ice](https://github.com/NimbleArchitect/kubectl-ice) Krew
+plugin:
 
 ```bash
 kubectl krew install ice
 ```
 
-List containers cpu info from pods:
+List CPU information for containers within pods.
 
 ```bash
 kubectl ice cpu -n kube-prometheus-stack --sort used
@@ -183,7 +186,7 @@ kube-prometheus-stack-grafana-896f8645-6q9lb               grafana              
 prometheus-kube-prometheus-stack-prometheus-0              prometheus              52m   -        -      -     -
 ```
 
-List containers memory info from pods:
+List memory information for containers within pods.
 
 ```bash
 kubectl ice memory -n kube-prometheus-stack --node-tree
@@ -223,7 +226,7 @@ kube-prometheus-stack    └─Container/prometheus                             
 kube-prometheus-stack    └─Container/config-reloader                                       6.38Mi   50Mi     50Mi     12.77 12.77
 ```
 
-List containers image info from pods:
+List image information for containers within pods.
 
 ```bash
 kubectl ice image -n cert-manager
@@ -236,7 +239,7 @@ cert-manager-cainjector-65857fccf8-krpr9  cert-manager-cainjector  IfNotPresent 
 cert-manager-webhook-54f9d96756-plv84     cert-manager-webhook     IfNotPresent  quay.io/jetstack/cert-manager-webhook     v1.12.2
 ```
 
-List individual container status from pods:
+List the status of individual containers within pods.
 
 ```bash
 kubectl ice status -n kube-prometheus-stack
@@ -262,9 +265,9 @@ prometheus-kube-prometheus-stack-prometheus-0              prometheus           
 
 ### [ktop](https://github.com/vladimirvivien/ktop)
 
-- A top-like tool for your Kubernetes clusters.
+- A `top`-like tool for your Kubernetes clusters.
 
-[ktop](https://github.com/vladimirvivien/ktop) krew plugin installation:
+Installation of the [ktop](https://github.com/vladimirvivien/ktop) Krew plugin:
 
 ```bash
 kubectl krew install ktop
@@ -281,19 +284,20 @@ _ktop screenshot_
 
 ### [kubepug](https://github.com/rikatz/kubepug)
 
-- Kubernetes PreUpGrade (Checker)
+- A Kubernetes Pre-Upgrade Checker.
 
 ![ktop screenshot](https://raw.githubusercontent.com/rikatz/kubepug/a5c56351c64a3b8328fe9412b732930b199f716d/assets/kubepug.png)
 _KubePug logo_
 
-[deprecations](https://github.com/rikatz/kubepug) krew plugin installation:
+Installation of the [deprecations](https://github.com/rikatz/kubepug) Krew
+plugin:
 
 ```bash
 kubectl krew install deprecations
 ```
 
-Shows all the deprecated objects in a Kubernetes cluster allowing the operator
-to verify them before upgrading the cluster:
+This plugin shows all deprecated objects in a Kubernetes cluster, allowing an
+operator to verify them before upgrading the cluster.
 
 ```bash
 kubectl deprecations --k8s-version=v1.27.0
@@ -325,18 +329,18 @@ _deprecations screenshot from official GitHub repository_
 
 ### [node-ssm](https://github.com/VioletCranberry/kubectl-node-ssm)
 
-- Kubectl plugin that allows direct connections to AWS EKS cluster Systems
-  Manager managed nodes relying on local AWS CLI and session-manager-plugin
-  installed.
+- This kubectl plugin allows direct connections to AWS EKS cluster nodes
+  managed by Systems Manager, relying on the local AWS CLI and the
+  session-manager-plugin being installed.
 
-[node-ssm](https://github.com/VioletCranberry/kubectl-node-ssm) krew plugin
-installation:
+Installation of the
+[node-ssm](https://github.com/VioletCranberry/kubectl-node-ssm) Krew plugin:
 
 ```bash
 kubectl krew install node-ssm
 ```
 
-Access the node using SSM:
+Access a node using SSM.
 
 ```shell
 K8S_NODE=$(kubectl get nodes -o custom-columns=NAME:.metadata.name --no-headers | head -n 1)
@@ -356,16 +360,16 @@ Starting session with SessionId: ruzickap@M-C02DP163ML87-k8s-1687787750-03553ad5
 
 ### [ns](https://github.com/ahmetb/kubectx)
 
-- Faster way to switch between namespaces in kubectl.
+- A faster way to switch between namespaces in kubectl.
 
-[ns](https://github.com/ahmetb/kubectx) krew plugin installation:
+Installation of the [ns](https://github.com/ahmetb/kubectx) Krew plugin:
 
 ```bash
 kubectl krew install ns
 ```
 
-Change the active namespace of current context and list secrets from
-`cert-manager` without using `--namespace` or `-n` option:
+Change the active namespace of the current context and list secrets from
+`cert-manager` without using the `--namespace` or `-n` option.
 
 ```bash
 kubectl ns cert-manager
@@ -385,17 +389,17 @@ sh.helm.release.v1.cert-manager.v1   helm.sh/release.v1   1      107m
 
 ### [open-svc](https://github.com/superbrothers/kubectl-open-svc-plugin)
 
-- Kubectl open-svc plugin makes services accessible via their ClusterIP from
+- The kubectl open-svc plugin makes services accessible via their ClusterIP from
   outside your cluster.
 
-[open-svc](https://github.com/superbrothers/kubectl-open-svc-plugin) krew plugin
-installation:
+Installation of the
+[open-svc](https://github.com/superbrothers/kubectl-open-svc-plugin) Krew plugin:
 
 ```bash
 kubectl krew install open-svc
 ```
 
-Open Grafana Dashboard URL in the browser:
+Open the Grafana Dashboard URL in the browser.
 
 ```shell
 kubectl open-svc kube-prometheus-stack-grafana -n kube-prometheus-stack
@@ -406,20 +410,20 @@ _open-svc screenshot from official GitHub repository_
 
 ### [pod-lens](https://github.com/sunny0826/kubectl-pod-lens)
 
-- Kubectl plugin for show pod-related resources.
+- A kubectl plugin to show pod-related resources.
 
 ![pod-lens screenshot](https://raw.githubusercontent.com/sunny0826/kubectl-pod-lens/c66b6e7c9a0ace381f14daa3ff15ed20fdf3edde/docs/static/logo.png){:width="150"}
 _pod-lens logo_
 
-[pod-lens](https://github.com/sunny0826/kubectl-pod-lens) krew plugin
-installation:
+Installation of the [pod-lens](https://github.com/sunny0826/kubectl-pod-lens)
+Krew plugin:
 
 ```bash
 kubectl krew install pod-lens
 ```
 
 Find related workloads, namespace, node, service, configmap, secret, ingress,
-PVC, HPA and PDB by pod name and display them in a tree:
+PVC, HPA, and PDB by pod name and display them in a tree structure.
 
 ```bash
 kubectl pod-lens -n kube-prometheus-stack prometheus-kube-prometheus-stack-prometheus-0
@@ -515,14 +519,14 @@ _pod-lens showing details in karpenter namespace_
 
 ### [rbac-tool](https://github.com/alcideio/rbac-tool)
 
-[rbac-tool](https://github.com/alcideio/rbac-tool) krew plugin
-installation:
+Installation of the
+[rbac-tool](https://github.com/alcideio/rbac-tool) Krew plugin:
 
 ```bash
 kubectl krew install rbac-tool
 ```
 
-Shows which subjects have RBAC `get` permissions to `/apis`:
+Shows which subjects have RBAC `get` permissions for `/apis`.
 
 ```bash
 kubectl rbac-tool who-can get /apis
@@ -536,7 +540,7 @@ kubectl rbac-tool who-can get /apis
   User  | eks:addon-manager    |
 ```
 
-Shows which subjects have RBAC `watch` permissions to `deployments.apps`:
+Shows which subjects have RBAC `watch` permissions for `deployments.apps`.
 
 ```bash
 kubectl rbac-tool who-can watch deployments.apps
@@ -559,7 +563,7 @@ kubectl rbac-tool who-can watch deployments.apps
   User           | system:kube-controller-manager           |
 ```
 
-Get details about the current "user":
+Get details about the current "user".
 
 ```shell
 kubectl rbac-tool whoami
@@ -577,8 +581,8 @@ kubectl rbac-tool whoami
             sessionName:  ["ruzickap@mymac-k8s-1111111111"]}}
 ```
 
-List Kubernetes RBAC Roles/ClusterRoles used by a given
-User/ServiceAccount/Group:
+List the Kubernetes RBAC Roles/ClusterRoles used by a given User,
+ServiceAccount, or Group.
 
 ```bash
 kubectl rbac-tool lookup kube-prometheus
@@ -594,7 +598,7 @@ kubectl rbac-tool lookup kube-prometheus
   kube-prometheus-stack-prometheus         | ServiceAccount | ClusterRole |                       | kube-prometheus-stack-prometheus
 ```
 
-Kubernetes RBAC visualizer:
+Visualize Kubernetes RBAC relationships:
 
 ```bash
 kubectl rbac-tool visualize --include-namespaces ingress-nginx,external-dns --outfile "${TMP_DIR}/rbac.html"
@@ -605,17 +609,17 @@ _rbac-tool visualize_
 
 ### [resource-capacity](https://github.com/robscott/kube-capacity)
 
-- Provides an overview of the resource requests, limits, and utilization
-  in a Kubernetes cluster.
+- This plugin provides an overview of resource requests, limits, and
+  utilization in a Kubernetes cluster.
 
-[resource-capacity](https://github.com/robscott/kube-capacity) krew plugin
-installation:
+Installation of the
+[resource-capacity](https://github.com/robscott/kube-capacity) Krew plugin:
 
 ```bash
 kubectl krew install resource-capacity
 ```
 
-Resources + capacity of the nodes:
+Display resource requests, limits, and utilization for nodes.
 
 ```bash
 kubectl resource-capacity --pod-count --util
@@ -628,7 +632,7 @@ ip-192-168-26-84.ec2.internal   515m (26%)     0m (0%)      72m (3%)    590Mi (2
 ip-192-168-7-23.ec2.internal    615m (31%)     400m (20%)   64m (3%)    660Mi (29%)       2404Mi (105%)   1103Mi (48%)   13/110
 ```
 
-List Resources + capacity of the pods:
+List resource requests, limits, and utilization for pods.
 
 ```bash
 kubectl resource-capacity --pods --util
@@ -674,16 +678,16 @@ ip-192-168-7-23.ec2.internal    kube-prometheus-stack   prometheus-kube-promethe
 
 ### [rolesum](https://github.com/Ladicle/kubectl-rolesum)
 
-- Summarize Kubernetes RBAC roles for the specified subjects.
+- This plugin summarizes Kubernetes RBAC roles for specified subjects.
 
-[rbac-tool](https://github.com/alcideio/rbac-tool) krew plugin
-installation:
+Installation of the
+[rbac-tool](https://github.com/alcideio/rbac-tool) Krew plugin:
 
 ```bash
 kubectl krew install rolesum
 ```
 
-Show karpenter `ServiceAccount` details:
+Show details for the `karpenter` `ServiceAccount`.
 
 ```bash
 kubectl rolesum --namespace karpenter karpenter
@@ -742,16 +746,15 @@ _rolesum screenshot_
 
 ### [stern](https://github.com/stern/stern)
 
-- Multi pod and container log tailing for Kubernetes.
+- A tool for multi-pod and multi-container log tailing in Kubernetes.
 
-[stern](https://github.com/stern/stern) krew plugin
-installation:
+Installation of the [stern](https://github.com/stern/stern) Krew plugin:
 
 ```bash
 kubectl krew install stern
 ```
 
-Check logs for all pods in `cert-manager` namespace in past 1 hour:
+Check logs for all pods in the `cert-manager` namespace from the past hour.
 
 ```bash
 kubectl stern -n cert-manager . --tail 5 --since 1h --no-follow
@@ -788,11 +791,12 @@ _stern screenshot_
 
 ### [view-allocations](https://github.com/davidB/kubectl-view-allocations)
 
-- Kubectl plugin lists allocations for resources (cpu, memory, gpu,...) as
-  defined into the manifest of nodes and running pods.
+- This kubectl plugin lists resource allocations (CPU, memory, GPU, etc.) as
+  defined in the manifests of nodes and running pods.
 
-[view-allocations](https://github.com/davidB/kubectl-view-allocations) krew plugin
-installation:
+Installation of the
+[view-allocations](https://github.com/davidB/kubectl-view-allocations) Krew
+plugin:
 
 ```bash
 kubectl krew install view-allocations
@@ -886,10 +890,11 @@ _view-allocations screenshot_
 
 ### [viewnode](https://github.com/NTTDATA-DACH/viewnode)
 
-- Viewnode displays Kubernetes cluster nodes with their pods and containers.
+- [Viewnode](https://github.com/NTTDATA-DACH/viewnode) displays Kubernetes
+  cluster nodes along with their pods and containers.
 
-[viewnode](https://github.com/NTTDATA-DACH/viewnode) krew plugin
-installation:
+Installation of the [viewnode](https://github.com/NTTDATA-DACH/viewnode) Krew
+plugin:
 
 ```bash
 kubectl krew install viewnode
@@ -936,7 +941,7 @@ kubectl viewnode --all-namespaces --show-metrics
   * mailhog: mailhog-6f54fccf85-6s7bt (running | mem usage: 3.4 MiB)
 ```
 
-Show various details for `kube-prometheus-stack` namespace:
+Show various details for the `kube-prometheus-stack` namespace.
 
 ```bash
 kubectl viewnode -n kube-prometheus-stack --container-block-view --show-containers --show-metrics --show-pod-start-times --show-requests-and-limits
@@ -968,20 +973,29 @@ kubectl viewnode -n kube-prometheus-stack --container-block-view --show-containe
     1: prometheus (running) [cpu: - | mem: - | mem usage: 322.0 MiB]
 ```
 
-There are few "kubectl krew plugins" which I looked at, but I'm not using them:
-[aks](https://github.com/Azure/kubectl-aks), [view-cert](https://github.com/lmolas/kubectl-view-cert),
-[cost](https://github.com/kubecost/kubectl-cost), [cyclonus](https://github.com/mattfenwick/kubectl-cyclonus),
-[graph](https://github.com/steveteuber/kubectl-graph), [ingress-nginx](https://kubernetes.github.io/ingress-nginx/kubectl-plugin/)
-[node-shell](https://github.com/kvaps/kubectl-node-shell), [nodepools](https://github.com/grafana/kubectl-nodepools),
-[np-viewer](https://github.com/runoncloud/kubectl-np-viewer), [oomd](https://github.com/jdockerty/kubectl-oomd),
-[permissions](https://github.com/garethjevans/kubectl-permissions), [popeye](https://popeyecli.io/),
-[pv-migrate](https://github.com/utkuozdemir/pv-migrate), [score](https://kube-score.com/),
-[ssh-jump](https://github.com/yokawasa/kubectl-plugin-ssh-jump), [tree](https://github.com/ahmetb/kubectl-tree),
-[unlimited](https://github.com/nilic/kubectl-unlimited), [whoami](https://github.com/rajatjindal/kubectl-whoami)
+There are a few other kubectl Krew plugins that I have looked at but am not
+currently using: [aks](https://github.com/Azure/kubectl-aks),
+[view-cert](https://github.com/lmolas/kubectl-view-cert),
+[cost](https://github.com/kubecost/kubectl-cost),
+[cyclonus](https://github.com/mattfenwick/kubectl-cyclonus),
+[graph](https://github.com/steveteuber/kubectl-graph),
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/kubectl-plugin/)
+[node-shell](https://github.com/kvaps/kubectl-node-shell),
+[nodepools](https://github.com/grafana/kubectl-nodepools),
+[np-viewer](https://github.com/runoncloud/kubectl-np-viewer),
+[oomd](https://github.com/jdockerty/kubectl-oomd),
+[permissions](https://github.com/garethjevans/kubectl-permissions),
+[popeye](https://popeyecli.io/),
+[pv-migrate](https://github.com/utkuozdemir/pv-migrate),
+[score](https://kube-score.com/),
+[ssh-jump](https://github.com/yokawasa/kubectl-plugin-ssh-jump),
+[tree](https://github.com/ahmetb/kubectl-tree),
+[unlimited](https://github.com/nilic/kubectl-unlimited),
+[whoami](https://github.com/rajatjindal/kubectl-whoami)
 
 ## Clean-up
 
-Remove files in `${TMP_DIR}` directory:
+Remove files from the `${TMP_DIR}` directory:
 
 ```sh
 for FILE in "${TMP_DIR}"/{krew-linux_amd64,rbac.html}; do
@@ -994,3 +1008,5 @@ done
 ```
 
 Enjoy ... 😉
+
+[end of _posts/2023/2023-06-06-my-favourite-krew-plugins-kubectl.md]

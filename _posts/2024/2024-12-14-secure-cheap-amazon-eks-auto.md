@@ -21,35 +21,42 @@ tags:
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 
-I will outline the steps for setting up an [Amazon EKS Auto Mode](https://aws.amazon.com/eks/auto-mode/)
-environment that is cost-effective while prioritizing security, and include
-standard applications in the configuration.
+I will outline the steps for setting up an
+[Amazon EKS Auto Mode](https://aws.amazon.com/eks/auto-mode/) environment that
+is both cost-effective and prioritizes security, including the configuration of
+standard applications.
 
-Amazon EKS Auto Mode should align with these cost-effective criteria:
+The Amazon EKS Auto Mode setup should align with the following
+cost-effectiveness criteria:
 
-- Two AZ, use one zone if possible (less payments for cross AZ traffic)
-- Spot instances
-- Less expensive region - `us-east-1`
+- Utilize two Availability Zones (AZs), or a single zone if possible, to reduce
+  payments for cross-AZ traffic.
+- Spot instances.
+- Less expensive region - `us-east-1`.
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
-  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
-- Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) -
-  minimal operation system / CPU / Memory footprint
+  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM.
+- Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for a
+  minimal operating system, CPU, and memory footprint.
 - Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
-  as a most cost efficient + cost optimized load balancer
+  as a most cost efficient + cost optimized load balancer.
+- [Karpenter](https://karpenter.sh/) to enable automatic node scaling that
+  matches the specific resource requirements of pods.
 
-Amazon EKS Auto Mode should meet the following security requirements:
+The Amazon EKS Auto Mode setup should also meet the following security
+requirements:
 
-- Amazon EKS Auto Mode must be [encrypted by KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
-- Worker node [EBS volumes needs to be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
-- Cluster logging ([CloudWatch](https://aws.amazon.com/cloudwatch/)) needs to be
-  configured
+- The Amazon EKS Auto Mode control plane must be
+  [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html).
+- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html).
+- Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be
+  configured.
 
 ## Build Amazon EKS Auto Mode
 
 ### Requirements
 
-You will need to configure [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
-and other secrets/variables.
+You will need to configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+and set up other necessary secrets and variables.
 
 ```shell
 # AWS Credentials
@@ -61,12 +68,12 @@ export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
 export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```
 
-If you would like to follow this documents and it's task you will need to set up
-few environment variables like:
+If you plan to follow this document and its tasks, you will need to set up a
+few environment variables, such as:
 
 ```bash
 # AWS Region
-export AWS_REGION="${AWS_REGION:-us-east-1}"
+export AWS_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="k01.k8s.mylabs.dev"
 # Base Domain: k8s.mylabs.dev
@@ -83,7 +90,7 @@ AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) &&
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
-Confirm whether all essential variables have been properly configured:
+Confirm that all essential variables have been properly configured:
 
 ```bash
 : "${AWS_ACCESS_KEY_ID?}"
@@ -96,10 +103,10 @@ Confirm whether all essential variables have been properly configured:
 echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
 ```
 
-Deploy the required tools:
+Install the required tools:
 
 <!-- prettier-ignore-start -->
-> You may bypass these procedures if you already have all the essential software
+> You can bypass these procedures if you already have all the essential software
 > installed.
 {: .prompt-tip }
 <!-- prettier-ignore-end -->
@@ -112,11 +119,11 @@ Deploy the required tools:
 ## Configure AWS Route 53 Domain delegation
 
 <!-- prettier-ignore-start -->
-> DNS delegation tasks should be executed as a one-time operation
+> The DNS delegation tasks should be executed as a one-time operation.
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Create DNS zone for EKS clusters:
+Create a DNS zone for the EKS clusters:
 
 ```shell
 export CLOUDFLARE_EMAIL="petr.ruzicka@gmail.com"
@@ -131,9 +138,9 @@ aws route53 create-hosted-zone --output json \
 ![Route53 k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedzones-k8s.mylabs.dev-1.avif)
 _Route53 k8s.mylabs.dev zone_
 
-Utilize your domain registrar to update the nameservers for your zone, such as
-`mylabs.dev` to point to the Amazon Route 53 nameservers. Here's the process to
-discover the Route 53 nameservers.
+Utilize your domain registrar to update the nameservers for your zone (e.g.,
+`mylabs.dev`) to point to Amazon Route 53 nameservers. Here's how to discover
+the required Route 53 nameservers:
 
 ```shell
 NEW_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${BASE_DOMAIN}.\`].Id" --output text)
@@ -142,10 +149,9 @@ NEW_ZONE_NS1=$(echo "${NEW_ZONE_NS}" | jq -r ".[0]")
 NEW_ZONE_NS2=$(echo "${NEW_ZONE_NS}" | jq -r ".[1]")
 ```
 
-Establish the NS record in `k8s.mylabs.dev` (`BASE_DOMAIN`) for proper zone
-delegation. This operation's specifics may vary based on your domain registrar.
-In my case, I'm utilizing CloudFlare and employing Ansible for automation
-purposes:
+Establish the NS record in `k8s.mylabs.dev` (your `BASE_DOMAIN`) for proper zone
+delegation. This operation's specifics may vary based on your domain
+registrar; I use Cloudflare and employ Ansible for automation:
 
 ```shell
 ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS1} solo=true proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
@@ -221,11 +227,12 @@ _CloudFlare mylabs.dev zone_
 ## Create the service-linked role
 
 <!-- prettier-ignore-start -->
-> Creating service-linked role for Spot Instance is a one-time operation
+> Creating the service-linked role for Spot Instances is a one-time operation.
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Create `AWSServiceRoleForEC2Spot` to use spot instances in the Amazon EKS cluster:
+Create the `AWSServiceRoleForEC2Spot` role to use Spot Instances in the Amazon
+EKS cluster:
 
 ```shell
 aws iam create-service-linked-role --aws-service-name spot.amazonaws.com
@@ -235,11 +242,12 @@ Details: [Work with Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/Us
 
 ## Create Route53 zone and KMS key infrastructure
 
-Generate a CloudFormation template that encompasses an [Amazon Route 53](https://aws.amazon.com/route53/)
-zone and a [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
+Generate a CloudFormation template that defines an
+[Amazon Route 53](https://aws.amazon.com/route53/) zone and an
+[AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
 
-Add the new domain `CLUSTER_FQDN` to Route 53 and set up DNS delegation from the
-`BASE_DOMAIN`.
+Add the new domain `CLUSTER_FQDN` to Route 53, and set up DNS delegation from
+the `BASE_DOMAIN`.
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" << \EOF
@@ -333,7 +341,8 @@ AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.Ou
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 ```
 
-After running the CF stack you should see the following Route53 zones:
+After running the CloudFormation stack, you should see the following Route53
+zones:
 
 ![Route53 k01.k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedzones-k01.k8s.mylabs.dev.avif)
 _Route53 k01.k8s.mylabs.dev zone_
@@ -341,15 +350,15 @@ _Route53 k01.k8s.mylabs.dev zone_
 ![Route53 k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedones-k8s.mylabs.dev-2.avif)
 _Route53 k8s.mylabs.dev zone_
 
-You should see the following KMS key:
+You should also see the following KMS key:
 
 ![KMS key](/assets/img/posts/2023/2023-08-03-cilium-amazon-eks/kms-key.avif)
 _KMS key_
 
 ## Create Amazon EKS Auto Mode
 
-I'm going to use [eksctl](https://eksctl.io/) to create the [Amazon EKS Auto Mode](https://aws.amazon.com/eks/auto-mode/)
-cluster.
+I will use [eksctl](https://eksctl.io/) to create the
+[Amazon EKS Auto Mode](https://aws.amazon.com/eks/auto-mode/) cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
@@ -400,15 +409,15 @@ EOF
 eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" --kubeconfig "${KUBECONFIG}" || eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
-I was not able to make the NetworkPolicy working with `kube-prometheus-stack`
-properly in the EKS Auto Mode. Prometheus is getting the
-`dial tcp 10.100.0.1:443: i/o timeout` error and is not able to get the metric
-data - therefore I will keep the NetworkPolicy turned off.
+I was not able to get NetworkPolicy working correctly with
+`kube-prometheus-stack` in EKS Auto Mode. Prometheus was encountering a
+`dial tcp 10.100.0.1:443: i/o timeout` error and could not retrieve metric
+data. Therefore, I will keep NetworkPolicy turned off for this setup.
 
 Create a [Node Class](https://docs.aws.amazon.com/eks/latest/userguide/create-node-class.html)
-for Amazon EKS which  defines infrastructure-level settings that apply to groups
-of nodes in your EKS cluster, including network configuration, storage settings,
-and resource tagging:
+for Amazon EKS. This defines infrastructure-level settings that apply to groups
+of nodes in your EKS cluster, including network configuration, storage
+settings, and resource tagging:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-eks-nodeclass.yml" << EOF | kubectl apply -f -
@@ -426,9 +435,9 @@ $(kubectl get nodeclasses default -o yaml | yq '.spec | pick(["role", "securityG
 EOF
 ```
 
-Create a Node Pool for EKS Auto Mode to define specific requirements for your
-compute resources, including instance types, availability zones, architectures,
-and capacity types:
+Create a Node Pool for EKS Auto Mode. This defines specific requirements for
+your compute resources, including instance types, availability zones,
+architectures, and capacity types:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-nodepool.yml" << EOF | kubectl apply -f -
@@ -465,7 +474,8 @@ spec:
 EOF
 ```
 
-Create a new StorageClass based upon [EBS CSI driver](https://github.com/kubernetes-sigs/aws-ebs-csi-driver):
+Create a new StorageClass based on the
+[EBS CSI driver](https://github.com/kubernetes-sigs/aws-ebs-csi-driver):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-storage-storageclass.yml" << EOF | kubectl apply -f -
@@ -487,13 +497,13 @@ EOF
 
 ### Mailpit
 
-Mailpit will be used to receive email alerts from the Prometheus.
+Mailpit will be used to receive email alerts from Prometheus.
 
 ![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="150"}
 
-Install `mailpit`
-[helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
-and modify the
+Install the `mailpit`
+[Helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
+and modify its
 [default values](https://github.com/jouve/charts/blob/mailpit-0.18.6/charts/mailpit/values.yaml).
 
 ```bash
@@ -524,22 +534,22 @@ Screenshot:
 
 ### kube-prometheus-stack
 
-Prometheus should be the initial application installed on the Kubernetes cluster
-because numerous K8s services and applications have the capability to export
-metrics to it.
+Prometheus should be one of the initial applications installed on the
+Kubernetes cluster because numerous Kubernetes services and applications can
+export metrics to it.
 
-[kube-prometheus stack](https://github.com/prometheus-operator/kube-prometheus)
+The [kube-prometheus-stack](https://github.com/prometheus-operator/kube-prometheus)
 is a collection of Kubernetes manifests, [Grafana](https://grafana.com/)
-dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/)
-combined with documentation and scripts to provide easy to operate end-to-end
-Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/) using
-the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
+dashboards, and [Prometheus rules](https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/).
+It's combined with documentation and scripts to provide easy-to-operate,
+end-to-end Kubernetes cluster monitoring with [Prometheus](https://prometheus.io/)
+using the [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator).
 
 ![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="400"}
 
-Install `kube-prometheus-stack`
-[helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-and modify the
+Install the `kube-prometheus-stack`
+[Helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+and modify its
 [default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-67.9.0/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
@@ -563,6 +573,9 @@ alertmanager:
       group_by: ["alertname", "job"]
       receiver: email
       routes:
+        - receiver: 'null'
+          matchers:
+            - alertname =~ "InfoInhibitor|Watchdog"
         - receiver: email
           matchers:
             - severity =~ "warning|critical"
@@ -794,17 +807,17 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 
 ### cert-manager
 
-[cert-manager](https://cert-manager.io/) adds certificates and certificate
-issuers as resource types in Kubernetes clusters, and simplifies the process
-of obtaining, renewing and using those certificates.
+[Cert-manager](https://cert-manager.io/) adds certificates and certificate
+issuers as resource types in Kubernetes clusters and simplifies the process of
+obtaining, renewing, and using those certificates.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="150"}
 
-Install `cert-manager`
-[helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-and modify the
+Install the `cert-manager`
+[Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
+and modify its
 [default values](https://github.com/cert-manager/cert-manager/blob/v1.16.2/deploy/charts/cert-manager/values.yaml).
-Service account `cert-manager` was created by `eksctl`.
+The `cert-manager` ServiceAccount was created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
@@ -824,8 +837,8 @@ EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
 
-Add ClusterIssuers for Let's Encrypt staging (the Cereated certificates will not
-be valid when using "staging"):
+Add ClusterIssuers for the Let's Encrypt staging environment (certificates
+created using "staging" will not be publicly valid):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-staging.yml" << EOF | kubectl apply -f -
@@ -853,7 +866,7 @@ kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready cluste
 kubectl label secret --namespace cert-manager letsencrypt-staging-dns letsencrypt=staging
 ```
 
-Create certificate:
+Create the certificate:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-staging.yml" << EOF | kubectl apply -f -
@@ -882,16 +895,16 @@ EOF
 ### ExternalDNS
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
-exposed Kubernetes Services and Ingresses with DNS providers.
+exposed Kubernetes services and ingresses with DNS providers.
 
 ![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="200"}
 
-Install `external-dns`
-[helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
-and modify the
+Install the `external-dns`
+[Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
+and modify its
 [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.15.0/charts/external-dns/values.yaml).
-`external-dns` will take care about DNS records.
-Service account `external-dns` was created by `eksctl`.
+ExternalDNS will manage the DNS records. The `external-dns` ServiceAccount was
+created by `eksctl`.
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
@@ -913,13 +926,13 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 
 ### Ingress NGINX Controller
 
-[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
-controller for Kubernetes using [NGINX](https://www.nginx.org/) as a reverse
-proxy and load balancer.
+[Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+controller for Kubernetes that uses [NGINX](https://www.nginx.org/) as a
+reverse proxy and load balancer.
 
-Install `ingress-nginx`
-[helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
-and modify the
+Install the `ingress-nginx`
+[Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
+and modify its
 [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.12.0/charts/ingress-nginx/values.yaml).
 
 ```bash
@@ -995,14 +1008,14 @@ helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespa
 
 ### OAuth2 Proxy
 
-Use [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
-the endpoints by Google Authentication.
+Use [OAuth2 Proxy](https://oauth2-proxy.github.io/oauth2-proxy/) to protect
+application endpoints with Google Authentication.
 
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="300"}
 
-Install `oauth2-proxy`
-[helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
-and modify the
+Install the `oauth2-proxy`
+[Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
+and modify its
 [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-7.8.2/helm/oauth2-proxy/values.yaml).
 
 ```bash
@@ -1048,13 +1061,13 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 
 ### Homepage
 
-Install [homepage](https://gethomepage.dev/) to have a nice dashboard.
+Install [Homepage](https://gethomepage.dev/) to provide a nice dashboard.
 
 ![Homepage](https://raw.githubusercontent.com/gethomepage/homepage/e56dccc7f17144a53b97a315c2e4f622fa07e58d/images/banner_light%402x.png){:width="300"}
 
-Install `homepage`
-[helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.0.1/charts/homepage)
-and modify the
+Install the `homepage`
+[Helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.0.1/charts/homepage)
+and modify its
 [default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.0.1/charts/homepage/values.yaml).
 
 ```bash
@@ -1127,7 +1140,7 @@ helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace ho
 
 ![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="300"}
 
-Remove EKS cluster and created components:
+Remove the EKS cluster and its created components:
 
 ```sh
 if eksctl get cluster --name="${CLUSTER_NAME}"; then
@@ -1135,7 +1148,7 @@ if eksctl get cluster --name="${CLUSTER_NAME}"; then
 fi
 ```
 
-Remove Route 53 DNS records from DNS Zone:
+Remove the Route 53 DNS records from the DNS Zone:
 
 ```sh
 CLUSTER_FQDN_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${CLUSTER_FQDN}.\`].Id" --output text)
@@ -1150,7 +1163,7 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
 fi
 ```
 
-Remove CloudFormation stack:
+Remove the CloudFormation stack:
 
 ```sh
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
@@ -1158,7 +1171,7 @@ aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-rout
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
 ```
 
-Remove Volumes and Snapshots related to the cluster (just in case):
+Remove volumes and snapshots related to the cluster (as a precaution):
 
 ```sh
 for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text); do
@@ -1167,7 +1180,7 @@ for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Va
 done
 ```
 
-Remove CloudWatch log group:
+Remove the CloudWatch log group:
 
 ```sh
 if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
@@ -1175,7 +1188,7 @@ if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/e
 fi
 ```
 
-Remove `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
@@ -1191,3 +1204,5 @@ fi
 ```
 
 Enjoy ... 😉
+
+[end of _posts/2024/2024-12-14-secure-cheap-amazon-eks-auto.md]

