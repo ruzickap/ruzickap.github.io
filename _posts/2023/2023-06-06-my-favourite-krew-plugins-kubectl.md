@@ -582,7 +582,7 @@ kubectl rbac-tool whoami
 ```
 
 List the Kubernetes RBAC Roles/ClusterRoles used by a given User,
-ServiceAccount, or Group.
+ServiceAccount, or Group:
 
 ```bash
 kubectl rbac-tool lookup kube-prometheus

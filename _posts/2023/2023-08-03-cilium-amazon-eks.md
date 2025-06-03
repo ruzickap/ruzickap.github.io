@@ -44,8 +44,7 @@ The Amazon EKS setup aims to meet the following cost-efficiency requirements:
 
 The Amazon EKS setup should also meet the following security requirements:
 
-- The Amazon EKS control plane must be
-  [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
+- The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
 - Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
 - Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be
   configured
@@ -239,9 +238,8 @@ _CloudFlare mylabs.dev zone_
 
 ### Create Route53 zone and KMS key
 
-Create a CloudFormation template that defines the
-[Route53](https://aws.amazon.com/route53/) zone and a
-[KMS](https://aws.amazon.com/kms/) key.
+Create a CloudFormation template that defines the [Route53](https://aws.amazon.com/route53/)
+zone and a [KMS](https://aws.amazon.com/kms/) key.
 
 Add the new domain `CLUSTER_FQDN` to Route 53 and configure DNS delegation
 from the `BASE_DOMAIN`.
@@ -372,8 +370,7 @@ I will use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
-Create the [Amazon EKS](https://aws.amazon.com/eks/) cluster using
-[eksctl](https://eksctl.io/):
+Create the [Amazon EKS](https://aws.amazon.com/eks/) cluster using [eksctl](https://eksctl.io/):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" << EOF
@@ -517,7 +514,7 @@ AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:alpha.eksctl.io/cluster-n
 AWS_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=${AWS_VPC_ID}" "Name=group-name,Values=default" --query 'SecurityGroups[*].GroupId' --output text)
 ```
 
-Fix a "high" rated security issue: "Default security group should have no rules
+Fix a "high" rated security issue "Default security group should have no rules
 configured":
 
 ```bash
@@ -1395,7 +1392,7 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 
 ### ingress-nginx
 
-[Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
 controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 

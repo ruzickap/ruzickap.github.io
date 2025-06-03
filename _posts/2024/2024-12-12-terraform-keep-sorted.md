@@ -26,9 +26,8 @@ I will explain how to use [keep-sorted](https://github.com/google/keep-sorted)
 from Google to maintain well-organized and properly sorted Terraform/OpenTofu
 code.
 
-Rather than diving into a lengthy description of
-[keep-sorted](https://github.com/google/keep-sorted)'s features, let's explore
-some examples.
+Rather than diving into a lengthy description of [keep-sorted](https://github.com/google/keep-sorted)'s
+features, let's explore some examples.
 
 Install `keep-sorted` by following these steps:
 

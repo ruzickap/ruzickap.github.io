@@ -912,7 +912,7 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 
 ### Ingress NGINX Controller
 
-[Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
 controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 

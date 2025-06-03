@@ -115,7 +115,7 @@ kubectl wait --for=condition=Available=True --timeout=5m --namespace=test-karpen
 ```
 
 Karpenter will start a new `t3a.small` spot EC2 instance
-(`ip-192-168-66-142.ec2.internal`):
+`ip-192-168-66-142.ec2.internal`:
 
 ![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-01-replicas-2.avif)
 

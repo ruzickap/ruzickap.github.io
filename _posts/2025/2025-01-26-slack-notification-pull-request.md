@@ -208,7 +208,6 @@ The Slack message "emoji" updates cover the following scenarios:
 The screencast above showcases some of these actions.
 
 > The GitHub Action workflow code and its description may change in the future.
-> The latest version of the code can be found here:
-> [pr-slack-notification.yml](https://github.com/ruzickap/malware-cryptominer-container/blob/main/.github/workflows/pr-slack-notification.yml)
+> The latest version of the code can be found here: [pr-slack-notification.yml](https://github.com/ruzickap/malware-cryptominer-container/blob/main/.github/workflows/pr-slack-notification.yml)
 
 Enjoy ... 😉

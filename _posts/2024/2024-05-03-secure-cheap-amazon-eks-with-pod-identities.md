@@ -45,7 +45,7 @@ criteria:
 
 The Amazon EKS setup should also meet the following security requirements:
 
-- The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html).
+- The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
 - Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
 - Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be
   configured
@@ -891,7 +891,7 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
 ### EKS Pod Identities
 
 Here is a screenshot from the AWS Console showing the EKS Pod Identity
-associations:
+Associations:
 
 ![EKS Pod Identity associations](/assets/img/posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities/amazon-eks-clusters-access.avif)
 _EKS Pod Identity associations_
@@ -1552,7 +1552,7 @@ kubectl label namespace aws-load-balancer-controller pod-security.kubernetes.io/
 
 ### Ingress NGINX Controller
 
-[Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
 controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 

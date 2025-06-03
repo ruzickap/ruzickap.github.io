@@ -27,18 +27,18 @@ at the lowest possible price.
 Requirements:
 
 - Utilize two Availability Zones (AZs), or use a single zone if feasible to
-  reduce costs associated with cross-AZ traffic.
-- Use Spot instances.
-- Choose a less expensive AWS region, such as `us-east-1`.
+  reduce costs associated with cross-AZ traffic
+- Use Spot instances
+- Choose a less expensive AWS region, such as `us-east-1`
 - Employ the most price-efficient EC2 instance type, `t4g.medium` (2 CPUs,
   4GB RAM), which uses [AWS Graviton](https://aws.amazon.com/ec2/graviton/)
-  processors based on ARM architecture.
+  processors based on ARM architecture
 - Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for a
-  minimal operating system, CPU, and memory footprint.
+  minimal operating system, CPU, and memory footprint
 - Use a [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
-  as it is a cost-efficient and optimized load balancing solution.
+  as it is a cost-efficient and optimized load balancing solution
 - Configure worker nodes to run the maximum number of pods possible using the
-  `max-pods-per-node` setting.
+  `max-pods-per-node` setting
   - <https://stackoverflow.com/questions/57970896/pod-limit-on-node-aws-eks>
   - <https://aws.amazon.com/blogs/containers/amazon-vpc-cni-increases-pods-per-node-limits/>
 
@@ -785,7 +785,7 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 
 Customize the [karpenter](https://karpenter.sh/) default installation by
 upgrading its [Helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
-and modifying the [default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml).
+and modifying the [default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml):
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$

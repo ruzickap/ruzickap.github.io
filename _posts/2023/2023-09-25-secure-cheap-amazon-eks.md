@@ -487,7 +487,7 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
 Enhance the security posture of the EKS cluster by addressing the following
 concerns:
 
-- The default security group should have no rules configured
+- The default security group should have no rules configured:
 
   ```bash
   aws ec2 revoke-security-group-egress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --cidr 0.0.0.0/0 | jq || true
@@ -495,14 +495,14 @@ concerns:
   ```
 
 - The VPC NACL allows unrestricted SSH access, and the VPC NACL allows
-  unrestricted RDP access
+  unrestricted RDP access:
 
   ```bash
   aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 1 --protocol tcp --port-range "From=22,To=22" --cidr-block 0.0.0.0/0 --rule-action Deny
   aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 2 --protocol tcp --port-range "From=3389,To=3389" --cidr-block 0.0.0.0/0 --rule-action Deny
   ```
 
-- The namespace does not have a PSS level assigned
+- The namespace does not have a PSS level assigned:
 
   ```bash
   kubectl label namespace default pod-security.kubernetes.io/enforce=baseline
@@ -1180,7 +1180,7 @@ kubectl label namespace external-dns pod-security.kubernetes.io/enforce=baseline
 
 ### ingress-nginx
 
-[Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
 controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 

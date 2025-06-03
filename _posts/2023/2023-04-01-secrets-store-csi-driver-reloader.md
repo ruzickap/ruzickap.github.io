@@ -143,7 +143,7 @@ EOF
 helm upgrade --install --version "${SECRETS_STORE_CSI_DRIVER_HELM_CHART_VERSION}" --namespace secrets-store-csi-driver --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-secrets-store-csi-driver.yml" secrets-store-csi-driver secrets-store-csi-driver/secrets-store-csi-driver
 ```
 
-Install the `secrets-store-csi-driver-provider-aws` [Helm chart](https://github.com/aws/secrets-store-csi-driver-provider-aws/tree/main/charts/secrets-store-csi-driver-provider-aws).
+Install the `secrets-store-csi-driver-provider-aws` [Helm chart](https://github.com/aws/secrets-store-csi-driver-provider-aws/tree/main/charts/secrets-store-csi-driver-provider-aws):
 
 ```bash
 # renovate: datasource=helm depName=secrets-store-csi-driver-provider-aws registryUrl=https://aws.github.io/secrets-store-csi-driver-provider-aws
@@ -344,7 +344,7 @@ I0416 12:18:56.016290       1 secretproviderclasspodstatus_controller.go:222] "r
 I0416 12:18:56.220255       1 secretproviderclasspodstatus_controller.go:366] "reconcile complete" spc="kuard/kuard-deployment-aws-secrets" pod="kuard/kuard-deployment-756f6cd885-6mzrq" spcps="kuard/kuard-deployment-756f6cd885-6mzrq-kuard-kuard-deployment-aws-secrets"
 ```
 
-Go to these URLs and check the credentials synced from AWS Secrets Manager.
+Go to these URLs and check the credentials synced from AWS Secrets Manager:
 
 - [https://kuard.k01.k8s.mylabs.dev/fs/mnt/secrets-store/](https://kuard.k01.k8s.mylabs.dev/fs/mnt/secrets-store/)
   ![kuard-fs-mnt-secrets-store-KuardSecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/kuard-fs-mnt-secrets-store-KuardSecret.avif)
