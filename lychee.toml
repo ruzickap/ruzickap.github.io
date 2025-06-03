@@ -1,3 +1,4 @@
+# Configuration for lychee link checker
 # https://lychee.cli.rs/#/usage/config
 
 #############################  Cache  ###############################
@@ -28,34 +29,22 @@ exclude = [
   '%7B.*%7D',
   # Ignore all URLs with '$' - BASH variable in URL
   '\$',
-  '\.local',
-  'cdn\.com',
   # Ignore all URLs which starts with 'file://'
   'file://',
-  'fonts\.(googleapis|gstatic)\.com',
-  'github\.com/.*//.*/?ref=.*',
-  'kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090',
-  'kubernetes-sigs\.github\.io/aws-ebs-csi-driver',
-  'linkedin\.com',
-  'mylabs\.dev',
+  # returns 403 when accessed from GitHub Action
   'stackexchange\.com',
+  # returns 403 when accessed from GitHub Action
   'stackoverflow\.com',
-  'stefanprodan\.github\.io/podinfo',
-  'username\.github\.io',
-  'www\.dell\.com',
-  'www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL',
-  'www\.googletagmanager\.com',
-  'www\.threads\.net/intent/post',
   # keep-sorted end
 ]
 
 # Exclude these filesystem paths from getting checked
 exclude_path = [
   "CHANGELOG.md",
-  "_tabs/projects.md",
+  "package-lock.json",
 ]
 
-# Exclude all private IPs from checking.
+# Exclude all private IPs from checking
 # Equivalent to setting `exclude_private`, `exclude_link_local`, and
 # `exclude_loopback` to true
 exclude_all_private = true
