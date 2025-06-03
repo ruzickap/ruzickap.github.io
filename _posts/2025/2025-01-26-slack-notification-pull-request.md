@@ -14,27 +14,28 @@ tags:
 image: https://raw.githubusercontent.com/kubevela/kube-trigger/cfa3e2e367b2886cf80735de795dbe45c94fb8bf/docs/img/overview/slack-logo.svg
 ---
 
-When working on code and collaborating with teammates, it can be helpful to
-set up Slack notifications whenever a new GitHub Pull Request is created. This
-is a widely recognized best practice, and many people use the [slack-github-action](https://github.com/slackapi/slack-github-action)
-to implement it. Less commonly used, however, are Slack reactions for Pull
-Request updates.
+When working on code and collaborating with teammates, setting up Slack
+notifications for new GitHub Pull Requests can be helpful. This is a widely
+recognized best practice, and many people use the [slack-github-action](https://github.com/slackapi/slack-github-action)
+to implement it. However, using Slack reactions for Pull Request updates is less
+common.
 
-Here's a screencast showing what the Slack notification with status updates
-looks like:
+Here's a screencast demonstrating what the Slack notification with status
+updates looks like:
 
 ![Slack notification for GitHub Pull Requests with status updates](/assets/img/posts/2025/2025-01-26-slack-notification-pull-request/pr-update-slack-notification-status-update.avif)
 
-In this article, I'll walk you through setting up Slack notifications for GitHub
-Pull Requests with status updates using GitHub Actions.
+In this article, I will walk you through setting up Slack notifications for
+GitHub Pull Requests, including status updates, using GitHub Actions.
 
 ## Requirements
 
-* The first step is to create GitHub Action secrets `MY_SLACK_BOT_TOKEN` and
-  `MY_SLACK_CHANNEL_ID`. You can find detailed instructions for this in the [slack-github-action](https://github.com/slackapi/slack-github-action)
+- First, create GitHub Action secrets named `MY_SLACK_BOT_TOKEN` and
+  `MY_SLACK_CHANNEL_ID`. Detailed instructions for this can be found in the
+  [slack-github-action](https://github.com/slackapi/slack-github-action)
   repository.
-* Next, create a new GitHub Action workflow file named `.github/workflows/pr-slack-notification.yml`
-  with the following content:
+- Next, create a new GitHub Action workflow file named
+  `.github/workflows/pr-slack-notification.yml` with the following content.
 
 {% raw %}
 
@@ -185,28 +186,28 @@ jobs:
 
 ## Description
 
-The workflow file contains two jobs: `pr-slack-notification` and
+The workflow file defines two jobs: `pr-slack-notification` and
 `slack-emoji-react`.
 
-* The `pr-slack-notification` job sends a message to Slack when a Pull Request
-  is opened or ready for review.
-* The `slack-emoji-react` job adds an emoji reaction to the Slack message when
-  a Pull Request is closed or reviewed. The `slack-emoji-react` job also updates
-  the original message with a success message when the Pull Request is merged.
+- The `pr-slack-notification` job sends a message to Slack when a Pull Request
+  is opened or marked as ready for review.
+- The `slack-emoji-react` job adds an emoji reaction to the Slack message when
+  a Pull Request is closed or reviewed. This job also updates the original
+  message with a success indicator when the Pull Request is merged.
 
-The slack message "emoji" updates contains the following scenarios:
+The Slack message "emoji" updates cover the following scenarios:
 
-* 💬 - a new comment is added to the pull request through either a "Pull Request
+- 💬 - a new comment is added to the pull request through either a "Pull Request
   Comment" or a "Review Changes Comment"
-* 🔁 - the reviewer has requested changes
-* 🆗 - the reviewer has approved the Pull Request
-* 👀 - The Pull Request owner has requested the reviewer to review the Pull
+- 🔁 - the reviewer has requested changes
+- 🆗 - the reviewer has approved the Pull Request
+- 👀 - The Pull Request owner has requested the reviewer to review the Pull
   Request
-* ✅ - The Pull Request has been merged
+- ✅ - The Pull Request has been merged
 
-The screencast showcasing some of these actions is shown above.
+The screencast above showcases some of these actions.
 
-> The GitHub Acction workflow code and it's description can be change in the future.
+> The GitHub Action workflow code and its description may change in the future.
 > The latest version of the code can be found here: [pr-slack-notification.yml](https://github.com/ruzickap/malware-cryptominer-container/blob/main/.github/workflows/pr-slack-notification.yml)
 
 Enjoy ... 😉

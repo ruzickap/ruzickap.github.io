@@ -20,17 +20,19 @@ image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19
 ---
 
 <!-- markdownlint-disable MD013 MD033 -->
-In the previous post, [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})
-I used [cert-manager](https://cert-manager.io/) to obtain a [wildcard certificate](https://en.wikipedia.org/wiki/Public_key_certificate#Wildcard_certificate)
+In the previous post,
+"[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})",
+I used [cert-manager](https://cert-manager.io/) to obtain a
+[wildcard certificate](https://en.wikipedia.org/wiki/Public_key_certificate#Wildcard_certificate)
 for the [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 <!-- markdownlint-enable MD013 MD033 -->
 
 When using Let's Encrypt [production](https://letsencrypt.org/about/)
-certificates, it's useful to back them up and restore them when recreating the
-cluster.
+certificates, it is useful to back them up and restore them when recreating
+the cluster.
 
 Here are a few steps to install [Velero](https://velero.io/) and perform the
-[backup + restore](https://cert-manager.io/docs/tutorials/backup/) procedure
+[backup and restore](https://cert-manager.io/docs/tutorials/backup/) procedure
 for cert-manager objects.
 
 Links:
@@ -40,15 +42,15 @@ Links:
 ## Requirements
 
 <!-- markdownlint-disable MD013 MD033 -->
-- Amazon EKS Auto Mode cluster (described in
-  [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %}))
+- An Amazon EKS Auto Mode cluster (as described in
+  "[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})")
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
 - [Helm](https://helm.sh)
 - [kubectl](https://github.com/kubernetes/kubectl)
 <!-- markdownlint-enable MD013 MD033 -->
 
-Variables used in the following steps:
+The following variables are used in the subsequent steps:
 
 ```bash
 export AWS_REGION="${AWS_REGION:-us-east-1}"
@@ -66,14 +68,15 @@ mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ### Generate a Let's Encrypt production certificate
 
 <!-- prettier-ignore-start -->
-> These steps only need to be performed once
+> These steps only need to be performed once.
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Production-ready Let's Encrypt certificates should be generated only once.
-The goal is to back up the certificate and restore it whenever needed in a new cluster.
+Production-ready Let's Encrypt certificates should generally be generated only
+once. The goal is to back up the certificate and then restore it whenever
+needed for a new cluster.
 
-Create Let's Encrypt production `ClusterIssuer`:
+Create a Let's Encrypt production `ClusterIssuer`:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-production.yml" << EOF | kubectl apply -f -
@@ -133,11 +136,12 @@ fi
 ### Create S3 bucket
 
 <!-- prettier-ignore-start -->
-> The following step needs to be performed only once
+> The following step needs to be performed only once.
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Use CloudFormation to create an S3 bucket for storing Velero backups.
+Use CloudFormation to create an S3 bucket that will be used for storing Velero
+backups.
 
 ```bash
 if ! aws s3 ls "s3://${CLUSTER_FQDN}"; then
@@ -332,10 +336,10 @@ fi
 
 ## Install Velero
 
-Before installing Velero, you must create the Pod Identity Association to grant
+Before installing Velero, you must create a Pod Identity Association to grant
 Velero the [necessary permissions](https://github.com/vmware-tanzu/velero-plugin-for-aws/blob/644e43f9ca39dc951b6fafa596311fe5659e8dc6/README.md?plain=1#L89-L141)
-to access S3 and EC2 resources.
-The created ServiceAccount `velero` will be specified in velero helm chart later.
+to access S3 and EC2 resources. The created `velero` ServiceAccount will be
+specified in the Velero Helm chart later.
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}-iam-podidentityassociations.yml" << EOF
@@ -396,12 +400,10 @@ eksctl create podidentityassociation --config-file "${TMP_DIR}/${CLUSTER_FQDN}/e
 2025-02-06 06:15:27 [ℹ]  all tasks were completed successfully
 ```
 
-Install `velero`
-[helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
-and modify the
-[default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-8.3.0/charts/velero/values.yaml).
-
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
+
+Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
+and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-8.3.0/charts/velero/values.yaml):
 
 {% raw %}
 
@@ -521,11 +523,11 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 ## Backup cert-manager objects
 
 <!-- prettier-ignore-start -->
-> These steps should be done only once
+> These steps should be done only once.
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Verify if the `backup-location` is set properly to AWS S3 and is available:
+Verify that the `backup-location` is set properly to AWS S3 and is available:
 
 ```bash
 velero get backup-location
@@ -647,16 +649,16 @@ aws s3 ls --recursive "s3://${CLUSTER_FQDN}/velero/backups"
 
 ## Restore cert-manager objects
 
-The following steps will guide you through restoring the Let's Encrypt
-production certificate, previously backed up by Velero to S3, onto a new cluster.
+The following steps will guide you through restoring a Let's Encrypt production
+certificate, previously backed up by Velero to S3, onto a new cluster.
 
-Initiate the restore process for cert-manager objects.
+Initiate the restore process for the cert-manager objects.
 
 ```bash
 velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 ```
 
-Details about the restore process:
+View details about the restore process:
 
 ```bash
 velero restore describe --selector letsencrypt=production --details
@@ -715,7 +717,7 @@ Resource List:
     - cert-manager/letsencrypt-production-dns(updated)
 ```
 
-Verify if the certificate was restored properly:
+Verify that the certificate was restored properly:
 
 ```bash
 kubectl describe certificates -n cert-manager ingress-cert-production
@@ -766,7 +768,7 @@ Events:                    <none>
 The previous steps restored the Let's Encrypt production certificate (`cert-manager/ingress-cert-production`).
 Now, let's configure `ingress-nginx` to use this certificate.
 
-First, check the current "staging" certificate, which will be replaced by the
+First, check the current "staging" certificate; this will be replaced by the
 production certificate:
 
 ```bash
@@ -824,7 +826,7 @@ Verify return code: 20 (unable to get local issuer certificate)
 DONE
 ```
 
-Configure `ingress-nginx` to use the Let's Encrypt production certificate.
+Configure `ingress-nginx` to use the production Let's Encrypt certificate.
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -838,7 +840,7 @@ EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --reuse-values --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx-production-certs.yml" ingress-nginx ingress-nginx/ingress-nginx
 ```
 
-The production certificate is now ready for use.
+The production certificate should now be active and in use.
 
 ```bash
 while ! curl -sk "https://${CLUSTER_FQDN}" > /dev/null; do
@@ -896,11 +898,11 @@ Verify return code: 0 (ok)
 DONE
 ```
 
-Here is the SSL Labs report: [SSL Labs](https://www.ssllabs.com):
+Here is the report from [SSL Labs](https://www.ssllabs.com):
 
 ![ssl-labs-report](/assets/img/posts/2023/2023-03-20-velero-and-cert-manager/ssl-labs-report.avif)
 
-Examine the certificate:
+Examine the certificate details:
 
 ```bash
 kubectl describe certificates -n cert-manager ingress-cert-production
@@ -950,7 +952,7 @@ Events:                    <none>
 
 ![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="300"}
 
-Backup certificate before deleting the cluster (in case it was renewed):
+Back up the certificate before deleting the cluster (in case it was renewed):
 
 {% raw %}
 
@@ -962,7 +964,7 @@ fi
 
 {% endraw %}
 
-Remove files from `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+Remove files from the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-s3,eksctl-${CLUSTER_NAME}-iam-podidentityassociations,helm_values-{ingress-nginx-production-certs,kube-prometheus-stack-velero-cert-manager,velero},k8s-cert-manager-{clusterissuer,certificate}-production}.yml; do
