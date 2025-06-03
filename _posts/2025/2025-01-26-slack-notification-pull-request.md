@@ -16,9 +16,8 @@ image: https://raw.githubusercontent.com/kubevela/kube-trigger/cfa3e2e367b2886cf
 
 When working on code and collaborating with teammates, setting up Slack
 notifications for new GitHub Pull Requests can be helpful. This is a widely
-recognized best practice, and many people use the
-[slack-github-action](https://github.com/slackapi/slack-github-action) to
-implement it. However, using Slack reactions for Pull Request updates is less
+recognized best practice, and many people use the [slack-github-action](https://github.com/slackapi/slack-github-action)
+to implement it. However, using Slack reactions for Pull Request updates is less
 common.
 
 Here's a screencast demonstrating what the Slack notification with status
@@ -31,12 +30,12 @@ GitHub Pull Requests, including status updates, using GitHub Actions.
 
 ## Requirements
 
-* First, create GitHub Action secrets named `MY_SLACK_BOT_TOKEN` and
+- First, create GitHub Action secrets named `MY_SLACK_BOT_TOKEN` and
   `MY_SLACK_CHANNEL_ID`. Detailed instructions for this can be found in the
   [slack-github-action](https://github.com/slackapi/slack-github-action)
   repository.
-* Next, create a new GitHub Action workflow file named
-  `.github/workflows/pr-slack-notification.yml` with the following content:
+- Next, create a new GitHub Action workflow file named
+  `.github/workflows/pr-slack-notification.yml` with the following content.
 
 {% raw %}
 
@@ -190,20 +189,21 @@ jobs:
 The workflow file defines two jobs: `pr-slack-notification` and
 `slack-emoji-react`.
 
-* The `pr-slack-notification` job sends a message to Slack when a Pull Request
+- The `pr-slack-notification` job sends a message to Slack when a Pull Request
   is opened or marked as ready for review.
-* The `slack-emoji-react` job adds an emoji reaction to the Slack message when
+- The `slack-emoji-react` job adds an emoji reaction to the Slack message when
   a Pull Request is closed or reviewed. This job also updates the original
   message with a success indicator when the Pull Request is merged.
 
 The Slack message "emoji" updates cover the following scenarios:
 
-* 💬: A new comment is added to the pull request, either as a
-  "Pull Request Comment" or a "Review Changes Comment".
-* 🔁: The reviewer has requested changes.
-* 🆗: The reviewer has approved the Pull Request.
-* 👀: The Pull Request owner has requested a review from a specific reviewer.
-* ✅: The Pull Request has been merged.
+- 💬 - a new comment is added to the pull request through either a "Pull Request
+  Comment" or a "Review Changes Comment"
+- 🔁 - the reviewer has requested changes
+- 🆗 - the reviewer has approved the Pull Request
+- 👀 - The Pull Request owner has requested the reviewer to review the Pull
+  Request
+- ✅ - The Pull Request has been merged
 
 The screencast above showcases some of these actions.
 

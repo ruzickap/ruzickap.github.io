@@ -20,7 +20,8 @@ image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19
 ---
 
 <!-- markdownlint-disable MD013 MD033 -->
-In the previous post, "[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %}),"
+In the previous post,
+"[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})",
 I used [cert-manager](https://cert-manager.io/) to obtain a
 [wildcard certificate](https://en.wikipedia.org/wiki/Public_key_certificate#Wildcard_certificate)
 for the [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
@@ -42,11 +43,11 @@ Links:
 
 <!-- markdownlint-disable MD013 MD033 -->
 - An Amazon EKS Auto Mode cluster (as described in
-  "[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})").
-- [AWS CLI](https://aws.amazon.com/cli/).
-- [eksctl](https://eksctl.io/).
-- [Helm](https://helm.sh).
-- [kubectl](https://github.com/kubernetes/kubectl).
+  "[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})")
+- [AWS CLI](https://aws.amazon.com/cli/)
+- [eksctl](https://eksctl.io/)
+- [Helm](https://helm.sh)
+- [kubectl](https://github.com/kubernetes/kubectl)
 <!-- markdownlint-enable MD013 MD033 -->
 
 The following variables are used in the subsequent steps:
@@ -103,7 +104,7 @@ kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready cluste
 kubectl label secret --namespace cert-manager letsencrypt-production-dns letsencrypt=production
 ```
 
-Create a new certificate and have it signed by Let's Encrypt for validation.
+Create a new certificate and have it signed by Let's Encrypt for validation:
 
 ```bash
 if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
@@ -336,8 +337,7 @@ fi
 ## Install Velero
 
 Before installing Velero, you must create a Pod Identity Association to grant
-Velero the
-[necessary permissions](https://github.com/vmware-tanzu/velero-plugin-for-aws/blob/644e43f9ca39dc951b6fafa596311fe5659e8dc6/README.md?plain=1#L89-L141)
+Velero the [necessary permissions](https://github.com/vmware-tanzu/velero-plugin-for-aws/blob/644e43f9ca39dc951b6fafa596311fe5659e8dc6/README.md?plain=1#L89-L141)
 to access S3 and EC2 resources. The created `velero` ServiceAccount will be
 specified in the Velero Helm chart later.
 
@@ -400,12 +400,10 @@ eksctl create podidentityassociation --config-file "${TMP_DIR}/${CLUSTER_FQDN}/e
 2025-02-06 06:15:27 [ℹ]  all tasks were completed successfully
 ```
 
-Install the `velero`
-[Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
-and modify its
-[default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-8.3.0/charts/velero/values.yaml).
-
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
+
+Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
+and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-8.3.0/charts/velero/values.yaml):
 
 {% raw %}
 
@@ -503,7 +501,7 @@ helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace vele
 
 {% endraw %}
 
-Add the Velero Grafana dashboard for enhanced monitoring and visualization.
+Add the Velero Grafana dashboard for enhanced monitoring and visualization:
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -548,7 +546,7 @@ if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-b
 fi
 ```
 
-Check the backup details.
+Check the backup details:
 
 ```bash
 velero backup describe --selector letsencrypt=production --details
@@ -628,7 +626,7 @@ HooksAttempted:  0
 HooksFailed:     0
 ```
 
-List the files in the S3 bucket.
+List the files in the S3 bucket:
 
 ```bash
 aws s3 ls --recursive "s3://${CLUSTER_FQDN}/velero/backups"
@@ -969,7 +967,7 @@ fi
 Remove files from the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
-for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-s3,eksctl-${CLUSTER_NAME}-iam-podidentityassociations,helm_values-{ingress-nginx-production-certs,kube-prometheus-stack-velero-cert-manager,velero},k8s-cert-manager-{clusterissuer,certificate}-production}.yml}; do
+for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{aws-s3,eksctl-${CLUSTER_NAME}-iam-podidentityassociations,helm_values-{ingress-nginx-production-certs,kube-prometheus-stack-velero-cert-manager,velero},k8s-cert-manager-{clusterissuer,certificate}-production}.yml; do
   if [[ -f "${FILE}" ]]; then
     rm -v "${FILE}"
   else
@@ -979,5 +977,3 @@ done
 ```
 
 Enjoy ... 😉
-
-[end of _posts/2025/2025-02-01-eks-auto-cert-manager-velero.md]

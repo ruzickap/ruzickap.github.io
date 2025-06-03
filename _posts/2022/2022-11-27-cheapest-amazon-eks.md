@@ -276,8 +276,7 @@ I will use [eksctl](https://eksctl.io/) to create the Amazon EKS cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
-Create the [Amazon EKS](https://aws.amazon.com/eks/) cluster using
-[eksctl](https://eksctl.io/):
+Create the [Amazon EKS](https://aws.amazon.com/eks/) cluster using [eksctl](https://eksctl.io/):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" << EOF
@@ -447,10 +446,8 @@ EOF
 The [AWS Node Termination Handler](https://github.com/aws/aws-node-termination-handler)
 gracefully handles EC2 instance shutdowns within Kubernetes.
 
-Install the `aws-node-termination-handler`
-[Helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
-and modify its
-[default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml)
+Install the `aws-node-termination-handler` [Helm chart](https://artifacthub.io/packages/helm/aws/aws-node-termination-handler)
+and modify its [default values](https://github.com/aws/aws-node-termination-handler/blob/main/config/helm/aws-node-termination-handler/values.yaml)
 as shown below:
 
 ```bash
@@ -470,10 +467,8 @@ MailHog will be used to receive email alerts from Prometheus.
 
 ![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png){:width="200"}
 
-Install the `mailhog`
-[Helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
-and modify its
-[default values](https://github.com/codecentric/helm-charts/blob/mailhog-5.2.3/charts/mailhog/values.yaml).
+Install the `mailhog` [Helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
+and modify its [default values](https://github.com/codecentric/helm-charts/blob/mailhog-5.2.3/charts/mailhog/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
@@ -516,10 +511,8 @@ using the [Prometheus Operator](https://github.com/prometheus-operator/prometheu
 
 ![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="500"}
 
-Install the `kube-prometheus-stack`
-[Helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-and modify its
-[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-56.6.2/charts/kube-prometheus-stack/values.yaml):
+Install the `kube-prometheus-stack` [Helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+and modify its [default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-56.6.2/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -790,10 +783,9 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 
 ### karpenter
 
-Customize the [Karpenter](https://karpenter.sh/) default installation by
+Customize the [karpenter](https://karpenter.sh/) default installation by
 upgrading its [Helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
-and modifying the
-[default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml).
+and modifying the [default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml).
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
@@ -813,17 +805,15 @@ helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace k
 
 ### cert-manager
 
-[Cert-manager](https://cert-manager.io/) adds certificates and certificate
+[cert-manager](https://cert-manager.io/) adds certificates and certificate
 issuers as resource types in Kubernetes clusters. It also simplifies the
 process of obtaining, renewing, and using those certificates.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="200"}
 
-Install the `cert-manager`
-[Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-and modify its
-[default values](https://github.com/cert-manager/cert-manager/blob/v1.14.3/deploy/charts/cert-manager/values.yaml).
 The `cert-manager` service account was previously created by `eksctl`.
+Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
+and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.14.3/deploy/charts/cert-manager/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
@@ -908,16 +898,14 @@ EOF
 ### external-dns
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
-exposed Kubernetes services and ingresses with DNS providers.
+exposed Kubernetes Services and Ingresses with DNS providers.
 
 ![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="300"}
 
-Install the `external-dns`
-[Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
-and modify its
-[default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml).
 ExternalDNS will manage the DNS records. The `external-dns` service account
 was previously created by `eksctl`.
+Install the `external-dns` [Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
+and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
@@ -940,14 +928,12 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 
 ### ingress-nginx
 
-[Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
-controller for Kubernetes that uses [NGINX](https://www.nginx.org/) as a
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
+controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 
-Install the `ingress-nginx`
-[Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
-and modify its
-[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.9.1/charts/ingress-nginx/values.yaml).
+Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
+and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.9.1/charts/ingress-nginx/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -1020,10 +1006,8 @@ deployed on Kubernetes.
 
 ![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png){:width="200"}
 
-Install the `forecastle`
-[Helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
-and modify its
-[default values](https://github.com/stakater/Forecastle/blob/v1.0.136/deployments/kubernetes/chart/forecastle/values.yaml).
+Install the `forecastle` [Helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
+and modify its [default values](https://github.com/stakater/Forecastle/blob/v1.0.136/deployments/kubernetes/chart/forecastle/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
@@ -1063,10 +1047,8 @@ application endpoints with Google Authentication.
 
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="400"}
 
-Install the `oauth2-proxy`
-[Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
-and modify its
-[default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-6.24.1/helm/oauth2-proxy/values.yaml).
+Install the `oauth2-proxy` [Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
+and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-6.24.1/helm/oauth2-proxy/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests

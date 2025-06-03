@@ -8,15 +8,15 @@ tags: [Amazon EKS, k8s, kubernetes, grafana, trivy-operator, dashboard]
 image: https://raw.githubusercontent.com/aquasecurity/trivy-vscode-extension/02fa1bf2b5e1333647ebd1bced679f4e94f8bf39/media/trivy.svg
 ---
 
-In a previous post, "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}),"
+In a previous post,
+"[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})",
 I installed the [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 to enable cluster monitoring, which includes [Grafana](https://grafana.com/),
 [Prometheus](https://prometheus.io/), and a few other components.
 
 Many tools allow you to scan container images and display their
-vulnerabilities, such as [Trivy](https://trivy.dev/),
-[Grype](https://github.com/anchore/grype), or
-[Clair](https://github.com/quay/clair).
+vulnerabilities, such as [Trivy](https://trivy.dev/), [Grype](https://github.com/anchore/grype),
+or [Clair](https://github.com/quay/clair).
 
 Unfortunately, there are not as many open-source (OSS) tools that can show
 vulnerabilities of container images running inside Kubernetes (K8s). This
@@ -41,8 +41,8 @@ Links:
 
 - An Amazon EKS cluster with the [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
   installed (as described in
-  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})").
-- [Helm](https://helm.sh).
+  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))"
+- [Helm](https://helm.sh)
 
 The following variables are used in the subsequent steps:
 
@@ -58,12 +58,8 @@ mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 
 ## Install Trivy Operator
 
-Install the `trivy-operator`
-[Helm chart](https://artifacthub.io/packages/helm/trivy-operator/trivy-operator)
-and modify its
-[default values](https://github.com/aquasecurity/trivy-operator/blob/main/deploy/helm/values.yaml).
-
-![trivy-operator](https://raw.githubusercontent.com/aquasecurity/trivy-operator/e5722da903ff16d5fd926ed46fdffacf5d50d9b5/docs/images/trivy-operator-logo.png){:width="500"}
+Install the `trivy-operator` [Helm chart](https://artifacthub.io/packages/helm/trivy-operator/trivy-operator)
+and modify its [default values](https://github.com/aquasecurity/trivy-operator/blob/main/deploy/helm/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=trivy-operator registryUrl=https://aquasecurity.github.io/helm-charts/
@@ -78,6 +74,8 @@ trivy:
 EOF
 helm upgrade --install --version "${TRIVY_OPERATOR_HELM_CHART_VERSION}" --namespace trivy-system --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-trivy-operator.yml" trivy-operator aqua/trivy-operator
 ```
+
+![trivy-operator](https://raw.githubusercontent.com/aquasecurity/trivy-operator/e5722da903ff16d5fd926ed46fdffacf5d50d9b5/docs/images/trivy-operator-logo.png){:width="500"}
 
 Once the Helm chart is installed, you can see the trivy-operator initiating
 scans:
@@ -105,8 +103,7 @@ trivy-operator-56bdc96f8-dls8c              1/1     Running     0          15s
 
 ## Trivy Operator details
 
-Let's look at some examples to see how the
-[Trivy Operator](https://github.com/aquasecurity/trivy-operator)
+Let's look at some examples to see how the [Trivy Operator](https://github.com/aquasecurity/trivy-operator)
 can help identify security issues in a Kubernetes cluster.
 
 <!-- prettier-ignore-start -->
@@ -117,8 +114,7 @@ can help identify security issues in a Kubernetes cluster.
 
 ### Vulnerability Reports
 
-Deploy a vulnerable (old) version of
-[NGINX 1.22.0](https://hub.docker.com/layers/library/nginx/1.22.0/images/sha256-b3a676a9145dc005062d5e79b92d90574fb3bf2396f4913dc1732f9065f55c4b?context=explore)
+Deploy a vulnerable (old) version of [nginx:1.22.0](https://hub.docker.com/layers/library/nginx/1.22.0/images/sha256-b3a676a9145dc005062d5e79b92d90574fb3bf2396f4913dc1732f9065f55c4b?context=explore)
 to the cluster:
 
 [//]: # "https://github.com/kubernetes/kubernetes/issues/83242"
@@ -139,7 +135,7 @@ done
 {% endraw %}
 
 View a summary of the container image vulnerabilities present in the old
-version of NGINX:
+version of nginx:
 
 ```bash
 kubectl get vulnerabilityreports -n test-trivy1 -o wide
@@ -302,7 +298,8 @@ pss-restricted   15m
 ```
 
 We are currently interested in the [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
-and specifically the control to "[Minimize the admission of containers wishing to share the host IPC namespace](https://github.com/aquasecurity/kube-bench/blob/7aeb6c39774763e74979a0904e374df01844bf21/cfg/cis-1.20/policies.yaml)":
+and specifically the control to
+"[Minimize the admission of containers wishing to share the host IPC namespace](https://github.com/aquasecurity/kube-bench/blob/7aeb6c39774763e74979a0904e374df01844bf21/cfg/cis-1.20/policies.yaml)":
 
 ```bash
 kubectl get clustercompliancereports cis -o json | jq '.spec.compliance.controls[] | select(.name=="Minimize the admission of containers wishing to share the host IPC namespace")'
@@ -375,8 +372,7 @@ An instance of the [ConfigAuditReports](https://aquasecurity.github.io/trivy-ope
 resource represents checks performed by [Trivy](https://trivy.dev/) against a
 Kubernetes object's configuration.
 
-The introduced security issue is visible in the
-[ConfigAuditReports](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/configaudit-report/):
+The introduced security issue is visible in the [ConfigAuditReports](https://aquasecurity.github.io/trivy-operator/v0.12.0/docs/crds/configaudit-report/):
 
 ```bash
 kubectl describe configauditreports -n test-trivy2
@@ -1119,8 +1115,7 @@ EOF
 helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-trivy-operator-grafana.yml" kube-prometheus-stack prometheus-community/kube-prometheus-stack
 ```
 
-Add the following Grafana Dashboards to the existing
-[kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+Add the following Grafana Dashboards to the existing [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 Helm chart configuration:
 
 - [16652] - [Trivy Operator Dashboard](https://grafana.com/grafana/dashboards/17813-trivy-operator-dashboard/)

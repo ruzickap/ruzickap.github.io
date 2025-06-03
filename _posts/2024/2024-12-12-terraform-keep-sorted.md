@@ -67,8 +67,7 @@ data "wiz_cloud_configuration_rules" "apigateway-002" {
 EOF
 ```
 
-Let's check the output after applying
-[keep-sorted](https://github.com/google/keep-sorted):
+Let's check the output after applying [keep-sorted](https://github.com/google/keep-sorted):
 
 ```bash
 "${TMP_DIR}/keep-sorted" "${TMP_DIR}/data.tf" && cat "${TMP_DIR}/data.tf"
@@ -105,9 +104,9 @@ _keep-sorted data.tf diff_
 
 As you can see in the output above:
 
-* The data resources were sorted alphabetically by their names.
+* The data resources were sorted alphabetically by their names
 * The comments associated with each data source were preserved and moved along
-  with their respective blocks.
+  with their respective blocks
 
 Here's one more example, this time with a `main.tf` file:
 
@@ -170,8 +169,7 @@ Diff:
 ![keep-sorted main.tf diff](/assets/img/posts/2024/2024-12-12-terraform-keep-sorted/main-diff.avif)
 _keep-sorted main.tf diff_
 
-`keep-sorted` has several other features documented in its
-[README.md](https://github.com/google/keep-sorted/blob/main/README.md#options).
+`keep-sorted` has several other features documented in its [README.md](https://github.com/google/keep-sorted/blob/main/README.md#options).
 As I mentioned before, it's not limited to use with only Terraform/OpenTofu.
 
 ## Cleanup

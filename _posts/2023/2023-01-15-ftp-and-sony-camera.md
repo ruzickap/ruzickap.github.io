@@ -17,9 +17,8 @@ decided to explore [SFTPGo](https://github.com/drakkan/sftpgo).
 ![SFTPGo](https://raw.githubusercontent.com/drakkan/sftpgo/5d7f6960f30fc4ba9606d5569dddf8bf5b4764bb/static/img/logo.png)
 
 The main reason I wanted to run my own FTP server on my laptop was to
-transfer photos wirelessly from my
-[Sony A7 IV](https://en.wikipedia.org/wiki/Sony_%CE%B17_IV) camera,
-eliminating the need for cables or SD card swapping.
+transfer photos wirelessly from my [Sony A7 IV](https://en.wikipedia.org/wiki/Sony_%CE%B17_IV)
+camera, eliminating the need for cables or SD card swapping.
 
 ## SFTPGo
 
@@ -125,9 +124,8 @@ Now, you need to configure your Sony camera (Sony A7 IV), connect it to your
 Wi-Fi network, and set up FTP transfer.
 
 - Configure the Wi-Fi connection to your Access Point or wireless router.
-  Alternatively, you can create a
-  [Personal Hotspot](https://support.apple.com/en-us/HT204023) on your iPhone,
-  as I did:
+  Alternatively, you can create a [Personal Hotspot](https://support.apple.com/en-us/HT204023)
+  on your iPhone, as I did:
 
   ```mermaid
   flowchart LR
@@ -143,7 +141,7 @@ Wi-Fi network, and set up FTP transfer.
 <!-- prettier-ignore-end -->
 
 - Find your Mac's local IP address by running the `ifconfig` command in the
-  [Terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac):
+  [terminal](https://support.apple.com/guide/terminal/open-or-quit-terminal-apd5265185d-f365-44cb-8b09-71a064a42125/mac):
 
   ```console
   ❯ ifconfig en0
@@ -186,7 +184,8 @@ Wi-Fi network, and set up FTP transfer.
   _Sony A7 IV FTP Transfer_
 
 The camera configuration process, including Wi-Fi setup, FTP settings, and
-photo transfer, can be viewed in the video [here](https://youtu.be/TAH83ezrxbU):
+photo transfer, can be viewed in the video
+[Transfer photos wirelessly from Sony Cameras](https://youtu.be/TAH83ezrxbU):
 
 {% include embed/youtube.html id='TAH83ezrxbU' %}
 

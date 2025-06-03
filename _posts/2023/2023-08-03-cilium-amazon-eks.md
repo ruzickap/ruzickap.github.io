@@ -30,39 +30,39 @@ Karpenter and Cilium, along with other standard applications.
 The Amazon EKS setup aims to meet the following cost-efficiency requirements:
 
 - Use only two Availability Zones (AZs) to reduce payments for cross-AZ
-  traffic.
-- Spot instances.
-- Less expensive region - `us-east-1`.
+  traffic
+- Spot instances
+- Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
-  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM.
+  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
 - Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) - small
-  operation system / CPU / Memory footprint.
+  operation system / CPU / Memory footprint
 - Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
-  as a most cost efficient + cost optimized load balancer.
+  as a most cost efficient + cost optimized load balancer
 - [Karpenter](https://karpenter.sh/) to autoscale with appropriately sized nodes
-  matching pod requirements.
+  matching pod requirements
 
 The Amazon EKS setup should also meet the following security requirements:
 
 - The Amazon EKS control plane must be
-  [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html).
-- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html).
+  [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
+- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
 - Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be
-  configured.
-- [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/).
+  configured
+- [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 
 The Cilium installation aims to meet these requirements:
 
 - [Transparent network encryption](https://isovalent.com/videos/wireguard-node-to-node-encryption-on-cilium/)
-  for node-to-node traffic should be enabled.
+  for node-to-node traffic should be enabled
 - Encryption should use [WireGuard](https://en.wikipedia.org/wiki/WireGuard) as
-  it is considered a fast encryption method.
+  it is considered a fast encryption method
 - Use [Elastic Network Interface (ENI)](https://docs.cilium.io/en/v1.14/network/concepts/ipam/eni/#aws-eni)
-  integration.
+  integration
 - [Layer 7 network observability](https://docs.cilium.io/en/v1.14/observability/visibility/)
-  should be enabled.
+  should be enabled
 - The Cilium [Hubble](https://github.com/cilium/hubble) UI should be protected by
-  Single Sign-On (SSO).
+  Single Sign-On (SSO)
 
 ## Build Amazon EKS cluster
 
@@ -518,7 +518,7 @@ AWS_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,
 ```
 
 Fix a "high" rated security issue: "Default security group should have no rules
-configured".
+configured":
 
 ```bash
 aws ec2 revoke-security-group-egress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --cidr 0.0.0.0/0 | jq || true
@@ -693,10 +693,8 @@ kubectl apply --kustomize 'https://github.com/kubernetes-csi/external-snapshotte
 
 ![CSI](https://raw.githubusercontent.com/cncf/artwork/d8ed92555f9aae960ebd04788b788b8e8d65b9f6/other/csi/horizontal/color/csi-horizontal-color.svg){:width="500"}
 
-Install the volume snapshot controller `snapshot-controller`
-[Helm chart](https://github.com/piraeusdatastore/helm-charts/tree/main/charts/snapshot-controller)
-and modify its
-[default values](https://github.com/piraeusdatastore/helm-charts/blob/snapshot-controller-2.2.0/charts/snapshot-controller/values.yaml).
+Install the volume snapshot controller `snapshot-controller` [Helm chart](https://github.com/piraeusdatastore/helm-charts/tree/main/charts/snapshot-controller)
+and modify its [default values](https://github.com/piraeusdatastore/helm-charts/blob/snapshot-controller-2.2.0/charts/snapshot-controller/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=snapshot-controller registryUrl=https://piraeus.io/helm-charts/
@@ -709,16 +707,13 @@ helm upgrade --wait --install --version "${SNAPSHOT_CONTROLLER_HELM_CHART_VERSIO
 ### aws-ebs-csi-driver
 
 The [Amazon Elastic Block Store](https://aws.amazon.com/ebs/) (Amazon EBS)
-Container Storage Interface (CSI) Driver provides a
-[CSI](https://github.com/container-storage-interface/spec/blob/master/spec.md)
+Container Storage Interface (CSI) Driver provides a [CSI](https://github.com/container-storage-interface/spec/blob/master/spec.md)
 interface used by Container Orchestrators to manage the lifecycle of Amazon EBS
 volumes.
 
-Install the Amazon EBS CSI Driver `aws-ebs-csi-driver`
-[Helm chart](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/charts/aws-ebs-csi-driver)
-and modify its
-[default values](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/helm-chart-aws-ebs-csi-driver-2.27.0/charts/aws-ebs-csi-driver/values.yaml).
-(The `ebs-csi-controller-sa` ServiceAccount was created by `eksctl`.)
+The `ebs-csi-controller-sa` ServiceAccount was created by `eksctl`.
+Install the Amazon EBS CSI Driver `aws-ebs-csi-driver` [Helm chart](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/tree/master/charts/aws-ebs-csi-driver)
+and modify its [default values](https://github.com/kubernetes-sigs/aws-ebs-csi-driver/blob/helm-chart-aws-ebs-csi-driver-2.27.0/charts/aws-ebs-csi-driver/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
@@ -770,10 +765,8 @@ Many Kubernetes services and applications can export metrics to Prometheus. For
 this reason, Prometheus should be one of the first applications installed on a
 Kubernetes cluster.
 
-Then, you will need some basic tools and integrations, such as
-[external-dns](https://github.com/kubernetes-sigs/external-dns),
-[ingress-nginx](https://kubernetes.github.io/ingress-nginx/),
-[cert-manager](https://cert-manager.io/),
+Then, you will need some basic tools and integrations, such as [external-dns](https://github.com/kubernetes-sigs/external-dns),
+[ingress-nginx](https://kubernetes.github.io/ingress-nginx/), [cert-manager](https://cert-manager.io/),
 [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/), and others.
 
 ### mailhog
@@ -782,10 +775,8 @@ MailHog will be used to receive email alerts from Prometheus.
 
 ![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png){:width="200"}
 
-Install the `mailhog`
-[Helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
-and modify its
-[default values](https://github.com/codecentric/helm-charts/blob/mailhog-5.2.3/charts/mailhog/values.yaml).
+Install the `mailhog` [Helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
+and modify its [default values](https://github.com/codecentric/helm-charts/blob/mailhog-5.2.3/charts/mailhog/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=mailhog registryUrl=https://codecentric.github.io/helm-charts
@@ -842,10 +833,8 @@ Endpoint ports:
 
 ![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="500"}
 
-Install the `kube-prometheus-stack`
-[Helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-and modify its
-[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-56.6.2/charts/kube-prometheus-stack/values.yaml):
+Install the `kube-prometheus-stack` [Helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+and modify its [default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-56.6.2/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -1150,8 +1139,7 @@ Endpoint ports:
 
 Customize the [Karpenter](https://karpenter.sh/) default installation by
 upgrading its [Helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
-and modifying the
-[default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml).
+and modifying the [default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml):
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
@@ -1175,7 +1163,7 @@ helm upgrade --install --version "${KARPENTER_HELM_CHART_VERSION}" --namespace k
 ### Cilium - monitoring
 
 Add Hubble to Cilium, enabling Prometheus metrics and other observability
-features.
+features:
 
 ```bash
 helm repo add --force-update cilium https://helm.cilium.io/
@@ -1245,10 +1233,8 @@ Endpoint ports:
 
 - 2020 (monitor-agent)
 
-Install the `aws-for-fluent-bit`
-[Helm chart](https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit)
-and modify its
-[default values](https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml):
+Install the `aws-for-fluent-bit` [Helm chart](https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit)
+and modify its [default values](https://github.com/aws/eks-charts/blob/master/stable/aws-for-fluent-bit/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=aws-for-fluent-bit registryUrl=https://aws.github.io/eks-charts
@@ -1279,7 +1265,7 @@ helm upgrade --install --version "${AWS_FOR_FLUENT_BIT_HELM_CHART_VERSION}" --na
 
 ### cert-manager
 
-[Cert-manager](https://cert-manager.io/) adds certificates and certificate
+[cert-manager](https://cert-manager.io/) adds certificates and certificate
 issuers as resource types in Kubernetes clusters and simplifies the process of
 obtaining, renewing, and using those certificates.
 
@@ -1290,11 +1276,9 @@ Endpoint ports:
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="200"}
 
-Install the `cert-manager`
-[Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-and modify its
-[default values](https://github.com/cert-manager/cert-manager/blob/v1.14.3/deploy/charts/cert-manager/values.yaml).
 The `cert-manager` ServiceAccount was created by `eksctl`.
+Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
+and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.14.3/deploy/charts/cert-manager/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
@@ -1381,16 +1365,14 @@ EOF
 ### external-dns
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
-exposed Kubernetes services and ingresses with DNS providers.
+exposed Kubernetes Services and Ingresses with DNS providers.
 
 ![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="300"}
 
-Install the `external-dns`
-[Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
-and modify its
-[default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml).
 ExternalDNS will manage the DNS records. The `external-dns` ServiceAccount was
 created by `eksctl`.
+Install the `external-dns` [Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
+and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.14.3/charts/external-dns/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
@@ -1414,7 +1396,7 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 ### ingress-nginx
 
 [Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
-controller for Kubernetes that uses [NGINX](https://www.nginx.org/) as a
+controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 
 Endpoint ports:
@@ -1424,10 +1406,8 @@ Endpoint ports:
 - 8443 (https-webhook)
 - 10254 (metrics)
 
-Install the `ingress-nginx`
-[Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
-and modify its
-[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.9.1/charts/ingress-nginx/values.yaml).
+Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
+and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.9.1/charts/ingress-nginx/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -1501,10 +1481,8 @@ deployed on Kubernetes.
 
 ![Forecastle](https://raw.githubusercontent.com/stakater/Forecastle/c70cc130b5665be2649d00101670533bba66df0c/frontend/public/logo512.png){:width="200"}
 
-Install the `forecastle`
-[Helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
-and modify its
-[default values](https://github.com/stakater/Forecastle/blob/v1.0.136/deployments/kubernetes/chart/forecastle/values.yaml).
+Install the `forecastle` [Helm chart](https://artifacthub.io/packages/helm/stakater/forecastle)
+and modify its [default values](https://github.com/stakater/Forecastle/blob/v1.0.136/deployments/kubernetes/chart/forecastle/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=forecastle registryUrl=https://stakater.github.io/stakater-charts
@@ -1544,10 +1522,8 @@ application endpoints with Google Authentication.
 
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="400"}
 
-Install the `oauth2-proxy`
-[Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
-and modify its
-[default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-6.24.2/helm/oauth2-proxy/values.yaml).
+Install the `oauth2-proxy` [Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
+and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-6.24.2/helm/oauth2-proxy/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
@@ -2306,7 +2282,7 @@ aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-rout
 aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
 ```
 
-Remove volumes and snapshots related to the cluster (as a precaution):
+Remove Volumes and Snapshots related to the cluster (as a precaution):
 
 ```sh
 for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text); do
@@ -2331,5 +2307,3 @@ fi
 ```
 
 Enjoy ... 😉
-
-[end of _posts/2023/2023-08-03-cilium-amazon-eks.md]

@@ -9,8 +9,7 @@ tags: [ qbittorrent, plex, truenas ]
 image: https://raw.githubusercontent.com/truenas/documentation/3abfe90c0491c6944d0608c8913b596b03d2678a/static/images/TrueNAS_Community_Edition.png
 ---
 
-I had the opportunity to test the
-[Dell OptiPlex 3000 Thin Client](https://www.dell.com/en-us/shop/cty/pdp/spd/optiplex-3000-thin-client)
+I had the opportunity to test the [Dell OptiPlex 3000 Thin Client](https://www.dell.com/en-us/shop/cty/pdp/spd/optiplex-3000-thin-client)
 with TrueNAS Community Edition 25.04. The machine is equipped with 2 CPUs,
 8GB of RAM, and 64GB of eMMC storage.
 
@@ -38,8 +37,8 @@ Boot TrueNAS from the USB stick and follow these steps:
     ```
 
 * Install/Upgrade
-* Select the disk where TrueNAS will be installed (`mmcblk0`).
-* Set up the administrative user (e.g., `truenas_admin`).
+* Select the disk to install TrueNAS (`mmcblk0`)
+* Administrative user (truenas_admin)
 * ...
 
 Links:
@@ -305,7 +304,7 @@ pools and datasets.
 
 ![qBittorrent](https://raw.githubusercontent.com/qbittorrent/qBittorrent/ab91d546e51bdd104d6d520dc2a000ade79b207b/src/icons/mascot.png)
 
-Obtain the username and password for qBittorrent.
+Obtain the username and password for qBittorrent:
 
 ```mermaid
 graph LR
@@ -339,7 +338,7 @@ graph LR
 
 #### [Plex](https://www.plex.tv/)
 
-Install the [Plex](https://www.plex.tv/) application for media streaming.
+Install the [Plex](https://www.plex.tv/) application for media streaming:
 
 ![Plex](https://raw.githubusercontent.com/plexinc/pms-docker/8db104bcc92596266bfc37f746b9fb923a890337/img/plex-server.png){:width="100"}
 
@@ -393,5 +392,3 @@ graph LR
 ![TrueNAS](https://raw.githubusercontent.com/truenas/documentation/1bb5fd6adb68b18aad6476bcab61d46bad2f0e2e/static/images/full-rgb.png)
 
 Enjoy ... 😉
-
-[end of _posts/2025/2025-02-18-truenas-plex-torrent.md]

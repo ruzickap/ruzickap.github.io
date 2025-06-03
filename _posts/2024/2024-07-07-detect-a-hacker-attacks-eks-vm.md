@@ -27,8 +27,8 @@ image: https://user-images.githubusercontent.com/45159366/128566095-253303e2-25d
 In previous posts, [1]({%post_url /2024/2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1%})
 and [2]({%post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2%}),
 I demonstrated how to exploit a vulnerability in a WordPress plugin running on
-Amazon EKS, EC2, and EC2 with Docker instances using
-[Kali Linux](https://www.kali.org/) and [Metasploit](https://www.metasploit.com/).
+Amazon EKS, EC2, and EC2 with Docker instances using [Kali Linux](https://www.kali.org/)
+and [Metasploit](https://www.metasploit.com/).
 
 In this post, I would like to explore how to detect hacker attacks using the
 [Wiz](https://wiz.io/) security tool.
@@ -36,11 +36,11 @@ In this post, I would like to explore how to detect hacker attacks using the
 I will cover the following steps:
 
 - Install a vulnerable WordPress application and plugin to Amazon EKS, EC2, and
-  EC2+Docker instances.
-- Secure the Amazon EKS and EC2 instances using a security tool.
+  EC2+Docker instances
+- Secure the Amazon EKS and EC2 instances using a security tool
 - Exploit a vulnerability in a WordPress plugin using Kali Linux and
-  Metasploit.
-- Summarize the detection results.
+  Metasploit
+- Summarize the detection results
 
 Architecture diagram:
 
@@ -335,24 +335,9 @@ rain deploy --yes --node-style original "${TMP_DIR}/KaliLinux-NICE-DCV.yaml" "${
 
 ## Attack the Wordpress Application from Kali Linux
 
-The following section describes using the
-[Metasploit Framework](https://www.metasploit.com/) to exploit vulnerabilities
-in the [WordPress Backup Migration Plugin](https://wordpress.org/plugins/backup-backup/)
+The following section describes using the [Metasploit Framework](https://www.metasploit.com/)
+to exploit vulnerabilities in the [WordPress Backup Migration Plugin](https://wordpress.org/plugins/backup-backup/)
 and [Loginizer](https://wordpress.org/plugins/loginizer/) plugins.
-
-Details about the WordPress plugin vulnerabilities can be found here:
-
-- [WordPress Backup Migration Plugin](https://wordpress.org/plugins/backup-backup/)
-  - [WordPress Backup Migration Plugin PHP Filter Chain RCE](https://www.rapid7.com/db/modules/exploit/multi/http/wp_backup_migration_php_filter/)
-  - [Vulnerability Details : CVE-2023-6553](https://www.cvedetails.com/cve/CVE-2023-6553/)
-  - [CVE-2023-6553 Exploit V2](https://github.com/Chocapikk/CVE-2023-6553)
-  - [CVE-2023-6553 Detail](https://nvd.nist.gov/vuln/detail/CVE-2023-6553)
-  - [Unauth RCE in the WordPress plugin: Backup Migration (<= 1.3.7)](https://github.com/rapid7/metasploit-framework/blob/6d8666e35b96b3c16e63acb57381b5efdcafb0d0/documentation/modules/exploit/multi/http/wp_backup_migration_php_filter.md)
-- [Loginizer](https://wordpress.org/plugins/loginizer/)
-  - [WordPress Loginizer log SQLi Scanner](https://www.rapid7.com/db/modules/auxiliary/scanner/http/wp_loginizer_log_sqli/)
-  - [Vulnerability Details : CVE-2020-27615](https://www.cvedetails.com/cve/CVE-2020-27615/)
-  - [CVE-2020-27615 Detail](https://nvd.nist.gov/vuln/detail/CVE-2020-27615)
-  - [Loginizer timebased SQL injection in versions before 1.6.4](https://github.com/rapid7/metasploit-framework/blob/980230e5f1b8b34656f75eda1d5fde47cfd9866c/documentation/modules/auxiliary/scanner/http/wp_loginizer_log_sqli.md)
 
 Allow your user to connect to the Kali Linux instance using SSH and then
 install Metasploit:
@@ -360,16 +345,13 @@ install Metasploit:
 ```bash
 AWS_EC2_KALI_LINUX_PUBLIC_IP=$(aws ec2 describe-instances --filters "Name=tag:Solution,Values=${SOLUTION_KALI}" --query "Reservations[].Instances[].PublicIpAddress" --output text)
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "kali@${AWS_EC2_KALI_LINUX_PUBLIC_IP}" 'curl -Ls https://github.com/ruzickap.keys >> ~/.ssh/authorized_keys'
-scp -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" "kali@${AWS_EC2_KALI_LINUX_PUBLIC_IP}":~
+scp -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" "kali@${AWS_EC2_KALI_LINUX_PUBLIC_IP}:~"
 ssh -i "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem" -o StrictHostKeyChecking=no "kali@${AWS_EC2_KALI_LINUX_PUBLIC_IP}" << EOF
 touch ~/.hushlogin
 sudo snap install metasploit-framework
 msfdb init
 EOF
 ```
-
-![Metasploit](https://user-images.githubusercontent.com/63872951/187396388-1c15dd6e-95a0-438a-ada5-71e49ff17f4e.jpg){:width="500"}
-_Metasploit logo_
 
 Run the Metasploit Framework and exploit the vulnerability in all three
 environments (EKS, a standalone EC2 instance, and EC2 with Docker):
@@ -542,7 +524,7 @@ _Wiz -> Amazon EKS_
 _Wiz -> Amazon EKS -> Issues -> Details -> Investigation_
 
 Additional breach details can be found in the "Runtime Response Policies"
-section.
+section:
 
 ![Wiz Runtime Response Policies](/assets/img/posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm/wiz-response-policy.avif)
 _Wiz -> Policies -> Runtime Response Policies -> Details_
@@ -557,10 +539,9 @@ vulnerabilities:
 _Wiz -> Container Image details_
 
 The screenshots above illustrate the detection capabilities of
-[Wiz](https://www.wiz.io/) combined with the
-[Wiz Sensor](https://www.wiz.io/lp/wiz-runtime-sensor), enabling security teams
-to identify system breaches. It's essential to configure notifications and
-responses to ensure timely alerts in the event of an attack.
+[Wiz](https://www.wiz.io/) combined with the [Wiz Sensor](https://www.wiz.io/lp/wiz-runtime-sensor),
+enabling security teams to identify system breaches. It's essential to configure
+notifications and responses to ensure timely alerts in the event of an attack.
 
 ## Cleanup
 
@@ -597,5 +578,3 @@ done
 ```
 
 Enjoy ... 😉
-
-[end of _posts/2024/2024-07-07-detect-a-hacker-attacks-eks-vm.md]

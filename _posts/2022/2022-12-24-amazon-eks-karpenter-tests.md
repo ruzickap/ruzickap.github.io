@@ -8,7 +8,8 @@ tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl]
 image: https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 ---
 
-In the previous post, "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}),"
+In the previous post,
+"[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})",
 I described installing [Karpenter](https://karpenter.sh/) to improve the
 efficiency and cost-effectiveness of running workloads on the cluster.
 
@@ -21,8 +22,8 @@ real-world examples.
 ## Requirements
 
 - An Amazon EKS cluster with Karpenter configured as described in
-  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})."
-- [Helm](https://helm.sh).
+  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})"
+- [Helm](https://helm.sh)
 
 The following variables are used in the subsequent steps:
 
@@ -61,7 +62,7 @@ functions.
 
 ### Consolidation example
 
-Start `amd64` [NGINX](https://hub.docker.com/_/nginx) pods in the
+Start `amd64` [nginx](https://hub.docker.com/_/nginx) pods in the
 `test-karpenter` namespace:
 
 ```bash
@@ -157,7 +158,7 @@ Outputs:
 ```
 
 Increase the replica count to `5`. This will prompt Karpenter to add a new
-spot worker node to run the `3` additional NGINX pods:
+spot worker node to run the `3` additional nginx pods:
 
 ```bash
 kubectl scale deployment nginx-deployment --namespace test-karpenter --replicas 5
@@ -225,7 +226,8 @@ sleep 20
 ![eks-node-viewer](/assets/img/posts/2022/2022-12-24-amazon-eks-karpenter-tests/eks-node-viewer-nginx-03-replicas-3.avif)
 
 Thanks to the [consolidation](https://karpenter.sh/v0.32/concepts/disruption/#consolidation)
-feature (described in the "[AWS re:Invent 2022 - Kubernetes virtually anywhere, for everyone](https://youtu.be/OB7IZolZk78?t=2629)"
+feature (described in the
+"[AWS re:Invent 2022 - Kubernetes virtually anywhere, for everyone](https://youtu.be/OB7IZolZk78?t=2629)"
 talk), the logs will look like this:
 
 ```bash
@@ -263,7 +265,7 @@ kubectl view-allocations --namespace test-karpenter --utilization --resource-nam
      └─ nginx-deployment-589b44547-vjzns        2.6Mi       16.0Mi     __           __      __
 ```
 
-Remove the NGINX workload and the `test-karpenter` namespace:
+Remove the nginx workload and the `test-karpenter` namespace:
 
 ```sh
 kubectl delete namespace test-karpenter || true
@@ -276,12 +278,10 @@ kubectl delete namespace test-karpenter || true
 It would be helpful to document a standard autoscaling example, including all
 relevant outputs and logs.
 
-Install the `podinfo`
-[Helm chart](https://artifacthub.io/packages/helm/podinfo/podinfo)
-and modify its
-[default values](https://github.com/stefanprodan/podinfo/blob/6.5.4/charts/podinfo/values.yaml).
-
 ![podinfo](https://raw.githubusercontent.com/stefanprodan/podinfo/a7be119f20369b97f209d220535506af7c49b4ea/screens/podinfo-ui-v3.png){:width="500"}
+
+Install the `podinfo` [Helm chart](https://artifacthub.io/packages/helm/podinfo/podinfo)
+and modify its [default values](https://github.com/stefanprodan/podinfo/blob/6.5.4/charts/podinfo/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=podinfo registryUrl=https://stefanprodan.github.io/podinfo
@@ -422,8 +422,7 @@ kubectl viewnode --all-namespaces --show-metrics
   * podinfo: podinfo-59d6468db-jmwxh (running | mem usage: 13.4 MiB)
 ```
 
-Further details, produced by
-[kubectl-view-allocations](https://github.com/davidB/kubectl-view-allocations):
+Further details, produced by [kubectl-view-allocations](https://github.com/davidB/kubectl-view-allocations):
 
 ```bash
 kubectl view-allocations --utilization
@@ -527,7 +526,7 @@ kubectl view-allocations --utilization
 
 ---
 
-Uninstall [Podinfo](https://github.com/stefanprodan/podinfo).
+Uninstall [Podinfo](https://github.com/stefanprodan/podinfo):
 
 ```sh
 kubectl delete namespace podinfo || true

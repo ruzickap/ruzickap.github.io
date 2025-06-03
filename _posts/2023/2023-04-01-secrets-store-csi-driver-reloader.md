@@ -24,8 +24,7 @@ image: https://raw.githubusercontent.com/kubernetes/community/487f994c013ea61d92
 ---
 
 Sometimes it is necessary to store secrets in services like
-[HashiCorp Vault](https://www.vaultproject.io/),
-[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/),
+[HashiCorp Vault](https://www.vaultproject.io/), [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/),
 [Azure Key Vault](https://azure.microsoft.com/en-us/products/key-vault/),
 or others, and then use them in Kubernetes.
 
@@ -53,8 +52,8 @@ Links:
 ## Requirements
 
 - An Amazon EKS cluster (as described in
-  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})").
-- [Helm](https://helm.sh).
+  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))"
+- [Helm](https://helm.sh)
 
 The following variables are used in the subsequent steps:
 
@@ -70,8 +69,7 @@ mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 
 ## Create secret in AWS Secrets Manager
 
-Use CloudFormation to create a Policy and Secrets in
-[AWS Secrets Manager](https://aws.amazon.com/secrets-manager/):
+Use CloudFormation to create a Policy and Secrets in [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/):
 
 ```bash
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-secretmanager-secret.yml" << \EOF
@@ -129,10 +127,8 @@ _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret_
 
 ## Install Secrets Store CSI Driver and AWS Provider
 
-Install the `secrets-store-csi-driver`
-[Helm chart](https://github.com/kubernetes-sigs/secrets-store-csi-driver/tree/main/charts/secrets-store-csi-driver)
-and modify its
-[default values](https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/v1.4.1/charts/secrets-store-csi-driver/values.yaml).
+Install the `secrets-store-csi-driver` [Helm chart](https://github.com/kubernetes-sigs/secrets-store-csi-driver/tree/main/charts/secrets-store-csi-driver)
+and modify its [default values](https://github.com/kubernetes-sigs/secrets-store-csi-driver/blob/v1.4.1/charts/secrets-store-csi-driver/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=secrets-store-csi-driver registryUrl=https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
@@ -147,8 +143,7 @@ EOF
 helm upgrade --install --version "${SECRETS_STORE_CSI_DRIVER_HELM_CHART_VERSION}" --namespace secrets-store-csi-driver --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-secrets-store-csi-driver.yml" secrets-store-csi-driver secrets-store-csi-driver/secrets-store-csi-driver
 ```
 
-Install the `secrets-store-csi-driver-provider-aws`
-[Helm chart](https://github.com/aws/secrets-store-csi-driver-provider-aws/tree/main/charts/secrets-store-csi-driver-provider-aws).
+Install the `secrets-store-csi-driver-provider-aws` [Helm chart](https://github.com/aws/secrets-store-csi-driver-provider-aws/tree/main/charts/secrets-store-csi-driver-provider-aws).
 
 ```bash
 # renovate: datasource=helm depName=secrets-store-csi-driver-provider-aws registryUrl=https://aws.github.io/secrets-store-csi-driver-provider-aws
@@ -164,7 +159,7 @@ The necessary components are now ready.
 
 [Kuard](https://github.com/kubernetes-up-and-running/kuard) is a simple
 application that can be used to display various pod details, created for the
-book "[Kubernetes: Up and Running](https://books.google.cz/books/about/Kubernetes_Up_and_Running.html?id=fF4KswEACAAJ)."
+book "[Kubernetes: Up and Running](https://books.google.cz/books/about/Kubernetes_Up_and_Running.html?id=fF4KswEACAAJ)".
 
 Install [Kuard](https://github.com/kubernetes-up-and-running/kuard), which will
 use the secrets from [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
@@ -177,7 +172,7 @@ eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --names
 
 Create the `SecretProviderClass`. This object tells the AWS provider which
 secrets to mount in the pod. It will also create a `Secret` named
-"kuard-secret" that will be synchronized with the data stored in
+`kuard-secret` that will be synchronized with the data stored in
 AWS Secrets Manager.
 
 ```bash
@@ -451,8 +446,7 @@ perform this action automatically.
 
 ![Reloader](https://raw.githubusercontent.com/stakater/Reloader/b73f14aef9d0ff24b91e4682223ecce485b8d21c/assets/web/reloader-round-100px.png)
 
-Install the `reloader`
-[Helm chart](https://github.com/stakater/Reloader/blob/v1.0.69/deployments/kubernetes/chart/reloader/values.yaml).
+Install the `reloader` [Helm chart](https://github.com/stakater/Reloader/blob/v1.0.69/deployments/kubernetes/chart/reloader/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts
@@ -468,8 +462,7 @@ EOF
 helm upgrade --install --version "${RELOADER_HELM_CHART_VERSION}" --namespace reloader --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-reloader.yml" reloader stakater/reloader
 ```
 
-You need to annotate the `kuard-deployment` Deployment to enable Pod rolling
-upgrades:
+You need to annotate the `kuard` deployment to enable Pod rolling upgrades:
 
 ```bash
 kubectl annotate -n kuard deployment kuard-deployment 'reloader.stakater.com/auto=true'
@@ -488,7 +481,7 @@ Screenshot from AWS Secrets Manager:
 ![aws-secrets-manager-03-secrets-kuardsecret](/assets/img/posts/2023/2023-04-01-secrets-store-csi-driver-reloader/aws-secrets-manager-03-secrets-kuardsecret.avif){:width="500"}
 _AWS Secrets Manager - Secrets - k01.k8s.mylabs.dev-KuardSecret_
 
-After some time, changes are detected in the `kuard-secret` Secret, and the
+After some time, changes are detected in the `kuard-secret` secret, and the
 pods are restarted:
 
 ```bash
@@ -522,9 +515,9 @@ kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSEC
 It is possible to use and synchronize credentials from AWS Secrets Manager to
 the following locations within a pod:
 
-- A file inside the pod.
-- A Kubernetes Secret.
-- An environment variable inside the pod.
+- A file inside the pod
+- A Kubernetes Secret
+- An environment variable inside the pod
 
 ---
 

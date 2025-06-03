@@ -30,26 +30,25 @@ The Amazon EKS Auto Mode setup should align with the following
 cost-effectiveness criteria:
 
 - Utilize two Availability Zones (AZs), or a single zone if possible, to reduce
-  payments for cross-AZ traffic.
-- Spot instances.
-- Less expensive region - `us-east-1`.
+  payments for cross-AZ traffic
+- Spot instances
+- Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
-  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM.
+  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
 - Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for a
-  minimal operating system, CPU, and memory footprint.
+  minimal operating system, CPU, and memory footprint
 - Use [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
-  as a most cost efficient + cost optimized load balancer.
+  as a most cost efficient + cost optimized load balancer
 - [Karpenter](https://karpenter.sh/) to enable automatic node scaling that
-  matches the specific resource requirements of pods.
+  matches the specific resource requirements of pods
 
 The Amazon EKS Auto Mode setup should also meet the following security
 requirements:
 
-- The Amazon EKS Auto Mode control plane must be
-  [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html).
-- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html).
+- The Amazon EKS Auto Mode control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
+- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
 - Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be
-  configured.
+  configured
 
 ## Build Amazon EKS Auto Mode
 
@@ -73,7 +72,7 @@ few environment variables, such as:
 
 ```bash
 # AWS Region
-export AWS_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="k01.k8s.mylabs.dev"
 # Base Domain: k8s.mylabs.dev
@@ -242,9 +241,8 @@ Details: [Work with Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/Us
 
 ## Create Route53 zone and KMS key infrastructure
 
-Generate a CloudFormation template that defines an
-[Amazon Route 53](https://aws.amazon.com/route53/) zone and an
-[AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
+Generate a CloudFormation template that defines an [Amazon Route 53](https://aws.amazon.com/route53/)
+zone and an [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
 
 Add the new domain `CLUSTER_FQDN` to Route 53, and set up DNS delegation from
 the `BASE_DOMAIN`.
@@ -357,8 +355,8 @@ _KMS key_
 
 ## Create Amazon EKS Auto Mode
 
-I will use [eksctl](https://eksctl.io/) to create the
-[Amazon EKS Auto Mode](https://aws.amazon.com/eks/auto-mode/) cluster.
+I will use [eksctl](https://eksctl.io/) to create the [Amazon EKS Auto Mode](https://aws.amazon.com/eks/auto-mode/)
+cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
 
@@ -474,8 +472,7 @@ spec:
 EOF
 ```
 
-Create a new StorageClass based on the
-[EBS CSI driver](https://github.com/kubernetes-sigs/aws-ebs-csi-driver):
+Create a new StorageClass based on the [EBS CSI driver](https://github.com/kubernetes-sigs/aws-ebs-csi-driver):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-storage-storageclass.yml" << EOF | kubectl apply -f -
@@ -501,10 +498,8 @@ Mailpit will be used to receive email alerts from Prometheus.
 
 ![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="150"}
 
-Install the `mailpit`
-[Helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
-and modify its
-[default values](https://github.com/jouve/charts/blob/mailpit-0.18.6/charts/mailpit/values.yaml).
+Install the `mailpit` [Helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
+and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.18.6/charts/mailpit/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
@@ -547,10 +542,8 @@ using the [Prometheus Operator](https://github.com/prometheus-operator/prometheu
 
 ![Prometheus](https://raw.githubusercontent.com/cncf/artwork/40e2e8948509b40e4bad479446aaec18d6273bf2/projects/prometheus/horizontal/color/prometheus-horizontal-color.svg){:width="400"}
 
-Install the `kube-prometheus-stack`
-[Helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
-and modify its
-[default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-67.9.0/charts/kube-prometheus-stack/values.yaml):
+Install the `kube-prometheus-stack` [Helm chart](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+and modify its [default values](https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-67.9.0/charts/kube-prometheus-stack/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
@@ -573,9 +566,6 @@ alertmanager:
       group_by: ["alertname", "job"]
       receiver: email
       routes:
-        - receiver: 'null'
-          matchers:
-            - alertname =~ "InfoInhibitor|Watchdog"
         - receiver: email
           matchers:
             - severity =~ "warning|critical"
@@ -807,17 +797,15 @@ helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" -
 
 ### cert-manager
 
-[Cert-manager](https://cert-manager.io/) adds certificates and certificate
+[cert-manager](https://cert-manager.io/) adds certificates and certificate
 issuers as resource types in Kubernetes clusters and simplifies the process of
 obtaining, renewing, and using those certificates.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="150"}
 
-Install the `cert-manager`
-[Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-and modify its
-[default values](https://github.com/cert-manager/cert-manager/blob/v1.16.2/deploy/charts/cert-manager/values.yaml).
 The `cert-manager` ServiceAccount was created by `eksctl`.
+Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
+and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.16.2/deploy/charts/cert-manager/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
@@ -895,16 +883,14 @@ EOF
 ### ExternalDNS
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronizes
-exposed Kubernetes services and ingresses with DNS providers.
+exposed Kubernetes Services and Ingresses with DNS providers.
 
 ![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="200"}
 
-Install the `external-dns`
-[Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
-and modify its
-[default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.15.0/charts/external-dns/values.yaml).
 ExternalDNS will manage the DNS records. The `external-dns` ServiceAccount was
 created by `eksctl`.
+Install the `external-dns` [Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
+and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.15.0/charts/external-dns/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
@@ -927,13 +913,11 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 ### Ingress NGINX Controller
 
 [Ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
-controller for Kubernetes that uses [NGINX](https://www.nginx.org/) as a
+controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 
-Install the `ingress-nginx`
-[Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
-and modify its
-[default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.12.0/charts/ingress-nginx/values.yaml).
+Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
+and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.12.0/charts/ingress-nginx/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -1013,10 +997,8 @@ application endpoints with Google Authentication.
 
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="300"}
 
-Install the `oauth2-proxy`
-[Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
-and modify its
-[default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-7.8.2/helm/oauth2-proxy/values.yaml).
+Install the `oauth2-proxy` [Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
+and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-7.8.2/helm/oauth2-proxy/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
@@ -1065,10 +1047,8 @@ Install [Homepage](https://gethomepage.dev/) to provide a nice dashboard.
 
 ![Homepage](https://raw.githubusercontent.com/gethomepage/homepage/e56dccc7f17144a53b97a315c2e4f622fa07e58d/images/banner_light%402x.png){:width="300"}
 
-Install the `homepage`
-[Helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.0.1/charts/homepage)
-and modify its
-[default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.0.1/charts/homepage/values.yaml).
+Install the `homepage` [Helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.0.1/charts/homepage)
+and modify its [default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.0.1/charts/homepage/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=homepage registryUrl=http://jameswynn.github.io/helm-charts
@@ -1204,5 +1184,3 @@ fi
 ```
 
 Enjoy ... 😉
-
-[end of _posts/2024/2024-12-14-secure-cheap-amazon-eks-auto.md]

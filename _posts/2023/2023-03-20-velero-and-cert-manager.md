@@ -8,7 +8,8 @@ tags: [Amazon EKS, k8s, kubernetes, velero, cert-manager, certificates]
 image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
 ---
 
-In a previous post, "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}),"
+In a previous post,
+"[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})",
 I used [cert-manager](https://cert-manager.io/) to obtain a wildcard
 certificate for the ingress.
 
@@ -27,8 +28,8 @@ Links:
 ## Requirements
 
 - An Amazon EKS cluster (as described in
-  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})").
-- [Helm](https://helm.sh).
+  "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))"
+- [Helm](https://helm.sh)
 
 The following variables are used in the subsequent steps:
 
@@ -292,12 +293,10 @@ eksctl create iamserviceaccount --cluster="${CLUSTER_NAME}" --name=velero --name
 2023-03-23 20:14:35 [ℹ]  created serviceaccount "velero/velero"
 ```
 
-Install the `velero`
-[Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
-and modify its
-[default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-7.2.1/charts/velero/values.yaml).
-
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
+
+Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
+and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-7.2.1/charts/velero/values.yaml):
 
 {% raw %}
 
@@ -423,7 +422,7 @@ if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-weekly-ba
 fi
 ```
 
-Check the backup details.
+Check the backup details:
 
 ```bash
 velero backup describe --selector letsencrypt=production --details
@@ -605,7 +604,7 @@ The previous steps restored the Let's Encrypt production certificate
 `cert-manager/ingress-cert-production`. Let's configure `ingress-nginx` to use
 this certificate.
 
-Check the current "staging" certificate; this will be replaced by the
+Check the current "staging" certificate - this will be replaced by the
 "production" one:
 
 ```bash
