@@ -164,7 +164,7 @@ List of my GitHub projects:
 
 ## [ansible-my_workstation](https://github.com/ruzickap/ansible-my_workstation)
 
-- Description: Ansible playbooks to configure my workstation base on Fedora /
+- Description: Ansible playbooks to configure my workstation based on Fedora /
   macOS
 - Topics: fedora, macos, ansible, configuration, ansible-playbook, public,
   workstation
