@@ -917,11 +917,11 @@ controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 
 Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
-and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.12.0/charts/ingress-nginx/values.yaml):
+and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.12.3/charts/ingress-nginx/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.12.0"
+INGRESS_NGINX_HELM_CHART_VERSION="4.12.3"
 
 kubectl wait --namespace cert-manager --for=condition=Ready --timeout=15m certificate ingress-cert-staging
 
