@@ -407,6 +407,44 @@ EOF
 eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" --kubeconfig "${KUBECONFIG}" || eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
+Enhance the security posture of the EKS cluster by addressing the following
+concerns:
+
+```bash
+AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:alpha.eksctl.io/cluster-name,Values=${CLUSTER_NAME}" --query 'Vpcs[*].VpcId' --output text)
+AWS_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=${AWS_VPC_ID}" "Name=group-name,Values=default" --query 'SecurityGroups[*].GroupId' --output text)
+AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_VPC_ID}" --query 'NetworkAcls[*].NetworkAclId' --output text)
+```
+
+- The default security group should have no rules configured:
+
+  ```bash
+  aws ec2 revoke-security-group-egress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --cidr 0.0.0.0/0 | jq || true
+  aws ec2 revoke-security-group-ingress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --source-group "${AWS_SECURITY_GROUP_ID}" | jq || true
+  ```
+
+- The VPC NACL allows unrestricted SSH access, and the VPC NACL allows
+  unrestricted RDP access:
+
+  ```bash
+  aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 1 --protocol tcp --port-range "From=22,To=22" --cidr-block 0.0.0.0/0 --rule-action Deny
+  aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 2 --protocol tcp --port-range "From=3389,To=3389" --cidr-block 0.0.0.0/0 --rule-action Deny
+  ```
+
+- The VPC should have Route 53 DNS resolver with logging enabled:
+
+  ```bash
+  AWS_CLUSTER_LOG_GROUP_ARN=$(aws logs describe-log-groups --query "logGroups[?logGroupName=='/aws/eks/${CLUSTER_NAME}/cluster'].arn" --output text)
+  AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver create-resolver-query-log-config \
+    --name "${CLUSTER_NAME}-vpc-dns-logs" \
+    --destination-arn "${AWS_CLUSTER_LOG_GROUP_ARN}" \
+    --creator-request-id "$(uuidgen)" --query 'ResolverQueryLogConfig.Id' --output text)
+
+  aws route53resolver associate-resolver-query-log-config \
+    --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
+    --resource-id "${AWS_VPC_ID}"
+  ```
+
 I was not able to get NetworkPolicy working correctly with
 `kube-prometheus-stack` in EKS Auto Mode. Prometheus was encountering a
 `dial tcp 10.100.0.1:443: i/o timeout` error and could not retrieve metric
@@ -1126,6 +1164,25 @@ Remove the EKS cluster and its created components:
 if eksctl get cluster --name="${CLUSTER_NAME}"; then
   eksctl delete cluster --name="${CLUSTER_NAME}" --force
 fi
+```
+
+Remove the Query logging configuration:
+
+```sh
+AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:alpha.eksctl.io/cluster-name,Values=${CLUSTER_NAME}" --query 'Vpcs[*].VpcId' --output text)
+
+AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver list-resolver-query-log-config-associations \
+  --query "ResolverQueryLogConfigAssociations[?ResourceId=='${AWS_VPC_ID}'].ResolverQueryLogConfigId" --output text)
+
+aws route53resolver disassociate-resolver-query-log-config \
+  --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" \
+  --resource-id "${AWS_VPC_ID}"
+
+AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver list-resolver-query-log-configs \
+  --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" --output text)
+
+aws route53resolver delete-resolver-query-log-config \
+  --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
 ```
 
 Remove the Route 53 DNS records from the DNS Zone:
