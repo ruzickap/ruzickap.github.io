@@ -1166,9 +1166,9 @@ AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:alpha.eksctl.io/cluster-n
 if [[ -n "${AWS_VPC_ID}" ]]; then
   AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver list-resolver-query-log-config-associations \
     --query "ResolverQueryLogConfigAssociations[?ResourceId=='${AWS_VPC_ID}'].ResolverQueryLogConfigId" --output text)
-  aws route53resolver disassociate-resolver-query-log-config \
-    --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" \
-    --resource-id "${AWS_VPC_ID}"
+  if [[ -n "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" ]]; then
+    aws route53resolver disassociate-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" --resource-id "${AWS_VPC_ID}"
+  fi
 fi
 
 aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" | jq -r '.[]' |
