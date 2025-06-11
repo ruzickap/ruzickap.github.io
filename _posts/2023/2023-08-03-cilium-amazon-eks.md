@@ -87,7 +87,7 @@ few environment variables, such as:
 # AWS Region
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 # Hostname / FQDN definitions
-export CLUSTER_FQDN="k01.k8s.mylabs.dev"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Base Domain: k8s.mylabs.dev
 export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 # Cluster Name: k01
