@@ -54,7 +54,7 @@ jobs:
       contents: read
     name: "${{ inputs.action }} | ${{ inputs.posts }}"
     concurrency:
-      group: post_tests
+      group: post_tests-${{ inputs.cluster_fqdn }}
     timeout-minutes: 100
     steps:
       - name: Configure AWS credentials
