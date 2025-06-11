@@ -182,46 +182,6 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
               KMSMasterKeyID: alias/aws/s3
-      NotificationConfiguration:
-        TopicConfigurations:
-          - Event: s3:ObjectCreated:*
-            Topic: !Ref S3ChangeNotificationTopic
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: velero/backups/
-                  - Name: suffix
-                    Value: velero-backup.json
-          - Event: s3:ObjectRemoved:*
-            Topic: !Ref S3ChangeNotificationTopic
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: velero/
-                  - Name: suffix
-                    Value: velero-backup.json
-          - Event: s3:ReducedRedundancyLostObject
-            Topic: !Ref S3ChangeNotificationTopic
-          - Event: s3:LifecycleTransition
-            Topic: !Ref S3ChangeNotificationTopic
-            Filter:
-              S3Key:
-                Rules:
-                  - Name: prefix
-                    Value: velero/backups/
-                  - Name: suffix
-                    Value: velero-backup.json
-          - Event: s3:LifecycleExpiration:*
-            Topic: !Ref S3ChangeNotificationTopic
-            Filter:
-              S3Key:
-                 Rules:
-                  - Name: prefix
-                    Value: velero/backups/
-                  - Name: suffix
-                    Value: velero-backup.json
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -240,50 +200,6 @@ Resources:
             Condition:
               Bool:
                 aws:SecureTransport: "false"
-  S3ChangeNotificationTopic:
-    Type: AWS::SNS::Topic
-    Properties:
-      TopicName: !Join ["-", !Split [".", !Sub "${S3BucketName}"]]
-      DisplayName: S3 Change Notification Topic
-      # The KmsMasterKeyId doesn't work with S3 bucket notifications
-      # KmsMasterKeyId: alias/aws/sns
-  S3ChangeNotificationSubscription:
-    Type: AWS::SNS::Subscription
-    Properties:
-      TopicArn: !Ref S3ChangeNotificationTopic
-      Protocol: email
-      Endpoint: !Ref EmailToSubscribe
-  SNSTopicPolicyResponse:
-    Type: AWS::SNS::TopicPolicy
-    Properties:
-      Topics:
-        - !Ref S3ChangeNotificationTopic
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal: "*"
-            Action: SNS:Publish
-            Resource: !Ref S3ChangeNotificationTopic
-            Condition:
-              ArnLike:
-                aws:SourceArn: !Sub arn:${AWS::Partition}:s3:::${S3BucketName}
-  SNSTopicPolicy:
-    Type: AWS::SNS::TopicPolicy
-    Properties:
-      Topics:
-        - !Ref S3ChangeNotificationTopic
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: s3.amazonaws.com
-            Action: sns:Publish
-            Resource: !Ref S3ChangeNotificationTopic
-            Condition:
-              ArnEquals:
-                aws:SourceArn: !GetAtt S3Bucket.Arn
   S3Policy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -323,9 +239,6 @@ Outputs:
   S3Bucket:
     Description: The name of the created Amazon S3 bucket
     Value: !Ref S3Bucket
-  S3ChangeNotificationTopicArn:
-    Description: ARN of the SNS Topic for S3 change notifications
-    Value: !Ref S3ChangeNotificationTopic
 EOF
 
   eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
