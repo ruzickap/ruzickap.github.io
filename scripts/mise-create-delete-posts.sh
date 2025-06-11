@@ -62,9 +62,11 @@ echo "⏰ *** $(date)"
 echo "⏰ *** $(date)"
 
 rm -v "${RUN_FILE}"
+
 if [[ "${GITHUB_STEP_SUMMARY}" =~ ${TMP_DIR} ]] && [[ -f "${GITHUB_STEP_SUMMARY}" ]]; then
   rm -v "${GITHUB_STEP_SUMMARY}"
 fi
+
 if [[ -z "$(ls -A "${TMP_DIR}")" ]]; then
   rmdir -v "${TMP_DIR}"
 else
