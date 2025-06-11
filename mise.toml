@@ -40,9 +40,9 @@ GOOGLE_CLIENT_ID = { value = "{{ env.GOOGLE_CLIENT_ID }}", redact = true }
 GOOGLE_CLIENT_SECRET = { value = "{{ env.GOOGLE_CLIENT_SECRET }}", redact = true }
 
 # Cluster Configuration
-CLUSTER_NAME = "k01"
-CLUSTER_FQDN = "{{ env.CLUSTER_NAME }}.k8s.mylabs.dev"
-TAGS = "product_id='12345',used_for=dev,owner=petr.ruzicka@gmail.com,cluster=k01.k8s.mylabs.dev"
+CLUSTER_FQDN = "{{ get_env(name='CLUSTER_FQDN', default='k01.k8s.mylabs.dev') }}"
+CLUSTER_NAME = "{{ env.CLUSTER_FQDN | split(pat='.') | first }}"
+TAGS = "product_id='12345',used_for=dev,owner=petr.ruzicka@gmail.com,cluster={{ env.CLUSTER_FQDN }}"
 
 # Path Configuration
 TMP_DIR = "{{ cwd }}/tmp"

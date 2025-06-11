@@ -74,7 +74,7 @@ few environment variables, such as:
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
-export CLUSTER_FQDN="k01.k8s.mylabs.dev"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Base Domain: k8s.mylabs.dev
 export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 # Cluster Name: k01
@@ -1166,23 +1166,18 @@ if eksctl get cluster --name="${CLUSTER_NAME}"; then
 fi
 ```
 
-Remove the Query logging configuration:
+Disassociate a Route 53 Resolver query log configuration from an Amazon VPC:
 
 ```sh
 AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:alpha.eksctl.io/cluster-name,Values=${CLUSTER_NAME}" --query 'Vpcs[*].VpcId' --output text)
 
-AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver list-resolver-query-log-config-associations \
-  --query "ResolverQueryLogConfigAssociations[?ResourceId=='${AWS_VPC_ID}'].ResolverQueryLogConfigId" --output text)
-
-aws route53resolver disassociate-resolver-query-log-config \
-  --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" \
-  --resource-id "${AWS_VPC_ID}"
-
-AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver list-resolver-query-log-configs \
-  --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" --output text)
-
-aws route53resolver delete-resolver-query-log-config \
-  --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
+if [[ -n "${AWS_VPC_ID}" ]]; then
+  AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver list-resolver-query-log-config-associations \
+    --query "ResolverQueryLogConfigAssociations[?ResourceId=='${AWS_VPC_ID}'].ResolverQueryLogConfigId" --output text)
+  if [[ -n "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" ]]; then
+    aws route53resolver disassociate-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" --resource-id "${AWS_VPC_ID}"
+  fi
+fi
 ```
 
 Remove the Route 53 DNS records from the DNS Zone:
@@ -1198,6 +1193,15 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
         --output text --query 'ChangeInfo.Id'
     done
 fi
+```
+
+Clean up AWS Route 53 Resolver query log configurations:
+
+```sh
+aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" | jq -r '.[]' |
+  while read -r AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID; do
+    aws route53resolver delete-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
+  done
 ```
 
 Remove the CloudFormation stack:
