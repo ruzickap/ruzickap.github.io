@@ -102,7 +102,7 @@ jobs:
           EOF
 
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@80501a7b4d229a89df2bf50ac1bc99bc0f305ae9 # v3.0.2
         if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/gh-pages' }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
