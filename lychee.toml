@@ -35,6 +35,8 @@ exclude = [
   'stackexchange\.com',
   # returns 403 when accessed from GitHub Action
   'stackoverflow\.com',
+  # Ignore errors like: [403] https://www.cvedetails.com/cve/CVE-2020-27615/ | Network error: Forbidden
+  'www\.cvedetails\.com',
   # keep-sorted end
 ]
 
