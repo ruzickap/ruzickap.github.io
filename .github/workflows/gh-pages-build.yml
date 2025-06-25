@@ -11,9 +11,15 @@ on:
   push:
     branches-ignore:
       - renovate/**
-    paths-ignore:
-      - ".github/**"
-      - "!.github/workflows/gh-pages-build.yml"
+    paths:
+      - "_config.yml"
+      - "_data/"
+      - "_plugins/"
+      - "_posts/"
+      - "_tabs/"
+      - ".ruby-lint.yml"
+      - "assets/"
+      - Gemfile
 
 permissions: read-all
 
