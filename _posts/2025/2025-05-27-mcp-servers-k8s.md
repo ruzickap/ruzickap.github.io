@@ -53,14 +53,14 @@ You will need the following environment variables. Replace the placeholder
 values with your actual credentials:
 
 ```shell
-LIBRECHAT_CREDS_KEY="$(openssl rand -hex 32)" \
-LIBRECHAT_CREDS_IV="$(openssl rand -hex 16)" \
-LIBRECHAT_JWT_SECRET="$(openssl rand -hex 32)" \
-LIBRECHAT_JWT_REFRESH_SECRET="$(openssl rand -hex 32)" \
-export LIBRECHAT_CREDS_KEY LIBRECHAT_CREDS_IV LIBRECHAT_JWT_SECRET LIBRECHAT_JWT_REFRESH_SECRET
+LIBRECHAT_CREDS_KEY="$(openssl rand -hex 32)"
+LIBRECHAT_CREDS_IV="$(openssl rand -hex 16)"
+LIBRECHAT_JWT_SECRET="$(openssl rand -hex 32)"
+LIBRECHAT_JWT_REFRESH_SECRET="$(openssl rand -hex 32)"
 LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN="github_pat_11AAxxxxxxxxxxxxxxxDW"
-LIBRECHAT_OPENAI_API_KEY="eyJ...TqQ" \
+LIBRECHAT_OPENAI_API_KEY="eyJ...TqQ"
 LIBRECHAT_OPENAI_BASE_URL="https://openai....com/b8...82/v1"
+export LIBRECHAT_CREDS_KEY LIBRECHAT_CREDS_IV LIBRECHAT_JWT_SECRET LIBRECHAT_JWT_REFRESH_SECRET
 ```
 
 Variables used in the following steps:
