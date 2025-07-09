@@ -53,13 +53,14 @@ You will need the following environment variables. Replace the placeholder
 values with your actual credentials:
 
 ```shell
-export LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN="github_pat_11AAxxxxxxxxxxxxxxxDW"
-export LIBRECHAT_CREDS_KEY="$(openssl rand -hex 32)" \
-export LIBRECHAT_CREDS_IV="$(openssl rand -hex 16)" \
-export LIBRECHAT_JWT_SECRET="$(openssl rand -hex 32)" \
-export LIBRECHAT_JWT_REFRESH_SECRET="$(openssl rand -hex 32)" \
-export LIBRECHAT_OPENAI_API_KEY="eyJ...TqQ" \
-export LIBRECHAT_OPENAI_BASE_URL="https://openai....com/b8...82/v1"
+LIBRECHAT_CREDS_KEY="$(openssl rand -hex 32)" \
+LIBRECHAT_CREDS_IV="$(openssl rand -hex 16)" \
+LIBRECHAT_JWT_SECRET="$(openssl rand -hex 32)" \
+LIBRECHAT_JWT_REFRESH_SECRET="$(openssl rand -hex 32)" \
+export LIBRECHAT_CREDS_KEY LIBRECHAT_CREDS_IV LIBRECHAT_JWT_SECRET LIBRECHAT_JWT_REFRESH_SECRET
+LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN="github_pat_11AAxxxxxxxxxxxxxxxDW"
+LIBRECHAT_OPENAI_API_KEY="eyJ...TqQ" \
+LIBRECHAT_OPENAI_BASE_URL="https://openai....com/b8...82/v1"
 ```
 
 Variables used in the following steps:
@@ -117,7 +118,7 @@ Create a secret with your GitHub token and deploy the `fetch`, `github`,
 and `mkp` MCP servers:
 
 ```bash
-kubectl create secret generic github-token --namespace=toolhive-system --from-literal=token="${LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN}"                                                                                                                                                   │
+kubectl create secret generic github-token --namespace=toolhive-system --from-literal=token="${LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN}"
 # renovate: datasource=github-tags depName=stacklok/toolhive
 TOOLHIVE_VERSION="v0.1.0"
 kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_fetch.yaml
