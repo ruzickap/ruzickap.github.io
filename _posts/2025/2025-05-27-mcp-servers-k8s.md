@@ -108,7 +108,7 @@ Install the `toolhive-operator-crds` and `toolhive-operator` Helm charts:
 TOOLHIVE_OPERATOR_CRDS_HELM_CHART_VERSION="0.0.7"
 helm upgrade --install --version="${TOOLHIVE_OPERATOR_CRDS_HELM_CHART_VERSION}" toolhive-operator-crds oci://ghcr.io/stacklok/toolhive/toolhive-operator-crds
 # renovate: datasource=github-tags depName=stacklok/toolhive extractVersion=^toolhive-operator-(?<version>.*)$
-TOOLHIVE_OPERATOR_HELM_CHART_VERSION="0.1.0"
+TOOLHIVE_OPERATOR_HELM_CHART_VERSION="0.0.11"
 helm upgrade --install --version="${TOOLHIVE_OPERATOR_HELM_CHART_VERSION}" --namespace toolhive-system --create-namespace toolhive-operator oci://ghcr.io/stacklok/toolhive/toolhive-operator
 ```
 
@@ -120,10 +120,10 @@ and `mkp` MCP servers:
 ```bash
 kubectl create secret generic github-token --namespace=toolhive-system --from-literal=token="${LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN}"
 # renovate: datasource=github-tags depName=stacklok/toolhive
-TOOLHIVE_VERSION="v0.1.0"
-kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_fetch.yaml
-kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_github.yaml
-kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
+TOOLHIVE_VERSION="0.1.0"
+kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_fetch.yaml
+kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_github.yaml
+kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
 ```
 
 ## Install Librechat
