@@ -229,7 +229,7 @@ kubectl create namespace open-webui
 #   --from-literal="openai_api_base_url=${LIBRECHAT_OPENAI_BASE_URL}"
 
 # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com
-OPEN_WEBUI_HELM_CHART_VERSION="6.19.0"
+OPEN_WEBUI_HELM_CHART_VERSION="6.22.0"
 
 helm repo add open-webui https://helm.openwebui.com/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" << EOF
