@@ -498,6 +498,9 @@ spec:
         - key: topology.kubernetes.io/zone
           operator: In
           values: ["${AWS_REGION}a"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["arm64"]
         - key: kubernetes.io/os
           operator: In
           values: ["linux"]
