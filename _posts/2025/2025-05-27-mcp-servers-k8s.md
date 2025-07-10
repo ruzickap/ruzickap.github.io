@@ -32,11 +32,13 @@ This post will guide you through the following steps:
 - **MCP Server Deployment**: Deploying `fetch`, `github`, and `mkp` MCP servers.
 - **LibreChat Installation**: Installing and configuring LibreChat,
   a self-hosted web chat application.
+- **vLLM Installation**: Setting up vLLM, a high-throughput inference engine
+  for Large Language Models.
 - **Open WebUI Installation**: Setting up Open WebUI, a user-friendly interface
   for chat interactions.
 
 By the end of this tutorial, you'll have a fully functional chat application
-powered by MCP servers running on your EKS cluster.
+powered by MCP servers and local LLM inference running on your EKS cluster.
 
 ## Requirements
 
@@ -152,7 +154,7 @@ and modify the [default values](https://github.com/danny-avila/LibreChat/blob/ma
 
 ```bash
 # renovate: datasource=helm depName=librechat registryUrl=https://charts.blue-atlas.de
-LIBRECHAT_HELM_CHART_VERSION="1.8.10"
+LIBRECHAT_HELM_CHART_VERSION="1.8.9"
 
 helm repo add librechat https://charts.blue-atlas.de
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-librechat.yml" << EOF
@@ -165,14 +167,15 @@ librechat:
     ENDPOINTS: agents,custom
     existingSecretName: librechat-credentials-env
   # https://github.com/danny-avila/LibreChat/blob/main/librechat.example.yaml
-  configYamlContent:
+  configYamlContent: |
     version: 1.2.1
     cache: true
     endpoints:
       custom:
         - name: My OpenAI Gateway
           apiKey: ${LIBRECHAT_OPENAI_API_KEY}
-          baseURL: ${LIBRECHAT_OPENAI_BASE_URL}
+          baseURL: https://api.openai.com/v1
+          # baseURL: ${LIBRECHAT_OPENAI_BASE_URL}
           models:
             default: ["gpt-4"]
     mcpServers:
@@ -184,6 +187,8 @@ librechat:
         url: http://mcp-mkp-proxy.toolhive-system.svc.cluster.local:8080/sse
   imageVolume:
     enabled: false
+image:
+  tag: v0.7.9-rc1
 ingress:
   annotations:
     gethomepage.dev/enabled: "true"
@@ -213,6 +218,38 @@ meilisearch:
   enabled: false
 EOF
 helm upgrade --install --version "${LIBRECHAT_HELM_CHART_VERSION}" --namespace librechat --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-librechat.yml" librechat librechat/librechat
+```
+
+## Install vLLM
+
+[vLLM](https://github.com/vllm-project/vllm) is a high-throughput and memory-efficient
+inference engine for Large Language Models (LLMs). It provides fast and scalable
+LLM serving with features like continuous batching, PagedAttention, and support
+for various model architectures.
+
+![vLLM](https://raw.githubusercontent.com/vllm-project/vllm/a1fe24d961d85089c8a254032d35e4bdbca278d6/docs/assets/logos/vllm-logo-text-dark.png){:width="300"}
+
+Install `vllm` [helm chart](https://github.com/vllm-project/production-stack/tree/vllm-stack-0.1.5/helm)
+and modify the [default values](https://github.com/vllm-project/production-stack/blob/vllm-stack-0.1.5/helm/values.yaml).
+
+```bash
+# renovate: datasource=helm depName=vllm registryUrl=https://vllm-project.github.io/production-stack
+VLLM_HELM_CHART_VERSION="0.1.5"
+
+helm repo add vllm https://vllm-project.github.io/production-stack
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" << EOF
+servingEngineSpec:
+  modelSpec:
+    - name: opt125m
+      repository: vllm/vllm-openai
+      tag: latest
+      modelURL: facebook/opt-125m
+      replicaCount: 1
+      requestCPU: 2
+      requestMemory: 2Gi
+      requestGPU: 0
+EOF
+helm upgrade --install --version "${VLLM_HELM_CHART_VERSION}" --namespace vllm --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" vllm vllm/vllm-stack
 ```
 
 ## Install Open WebUI
@@ -269,6 +306,8 @@ extraEnvVars:
     value: https://open-webui.${CLUSTER_FQDN}
   # - name: OLLAMA_BASE_URL
   #   value: http://open-webui-ollama.open-webui.svc.cluster.local:11434
+  - name: OLLAMA_BASE_URL
+    value: http://vllm.vllm.svc.cluster.local:8000/v1
 EOF
 helm upgrade --install --version "${OPEN_WEBUI_HELM_CHART_VERSION}" --namespace open-webui --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" open-webui open-webui/open-webui
 ```
