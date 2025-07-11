@@ -13,12 +13,12 @@ on:
       - renovate/**
     paths:
       - "_config.yml"
-      - "_data/"
-      - "_plugins/"
-      - "_posts/"
-      - "_tabs/"
+      - "_data/**"
+      - "_plugins/**"
+      - "_posts/**"
+      - "_tabs/**"
       - ".ruby-lint.yml"
-      - "assets/"
+      - "assets/**"
       - Gemfile
 
 permissions: read-all

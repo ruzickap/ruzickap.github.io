@@ -38,7 +38,7 @@ env:
   # Ignore default renovate config file in git repository
   RENOVATE_REQUIRE_CONFIG: "ignored"
   # Set the base branch
-  RENOVATE_BASE_BRANCHES: ${{ github.ref_name }}
+  RENOVATE_BASE_BRANCHES: ${{ github.head_ref }}
   # Renovate Automerge
   RENOVATE_AUTOMERGE_TYPE: "branch"
   RENOVATE_AUTOMERGE: "true"
@@ -69,7 +69,6 @@ jobs:
       - name: 💡 Self-hosted Renovate
         uses: renovatebot/github-action@f5c3383cb7cbf7711d8b66b809375b2d5f4e2d1d # v42.0.2
         env:
-          RENOVATE_BASE_BRANCHES: ${{ github.ref_name }}
           RENOVATE_INCLUDE_PATHS: ${{ steps.changed-files.outputs.all_changed_files }}
         with:
           token: ${{ steps.app-token.outputs.token }}
