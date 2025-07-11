@@ -1195,6 +1195,14 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
 fi
 ```
 
+Remove the CloudFormation stack:
+
+```sh
+aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
+aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-route53-kms"
+aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
+```
+
 Clean up AWS Route 53 Resolver query log configurations:
 
 ```sh
@@ -1202,14 +1210,6 @@ aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogCon
   while read -r AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID; do
     aws route53resolver delete-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
   done
-```
-
-Remove the CloudFormation stack:
-
-```sh
-aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
-aws cloudformation wait stack-delete-complete --stack-name "${CLUSTER_NAME}-route53-kms"
-aws cloudformation wait stack-delete-complete --stack-name "eksctl-${CLUSTER_NAME}-cluster"
 ```
 
 Remove volumes and snapshots related to the cluster (as a precaution):

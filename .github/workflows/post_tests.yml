@@ -73,7 +73,7 @@ jobs:
       - name: Install mise and dependencies
         run: |
           set -euxo pipefail
-          curl https://mise.run | sh
+          curl --silent https://mise.run | sh
           echo "$HOME/.local/share/mise/bin" >> "${GITHUB_PATH}"
           echo "$HOME/.local/share/mise/shims" >> "${GITHUB_PATH}"
           mise install
