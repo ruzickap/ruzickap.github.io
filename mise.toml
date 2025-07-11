@@ -211,6 +211,18 @@ description = 'Delete: Amazon EKS Auto Mode with cert-manager and Velero'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
+# Exploiting old Ollama in Kubernetes
+#------------------------------------------------------------------------------
+[tasks."create:2025-07-10-ollama-k8s-exploitation|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Create: Exploiting old Ollama in Kubernetes'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2025-07-10-ollama-k8s-exploitation|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Delete: Exploiting old Ollama in Kubernetes'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+
+#------------------------------------------------------------------------------
 # Create and delete all posts
 #------------------------------------------------------------------------------
 [tasks."create-delete:posts:all"]
