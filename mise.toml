@@ -221,7 +221,6 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 description = 'Delete: Exploiting old Ollama in Kubernetes'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
-
 #------------------------------------------------------------------------------
 # Create and delete all posts
 #------------------------------------------------------------------------------
