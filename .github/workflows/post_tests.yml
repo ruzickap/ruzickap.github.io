@@ -73,7 +73,7 @@ jobs:
       - name: Install mise and dependencies
         env:
           # renovate: datasource=github-releases depName=jdx/mise
-          MISE_VERSION: v2025.7.3
+          MISE_VERSION: 2025.7.4
         run: |
           set -euxo pipefail
           curl --silent https://mise.run | sh
