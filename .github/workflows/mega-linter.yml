@@ -10,15 +10,6 @@ on:
 permissions: read-all
 
 jobs:
-  github-context:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "${GITHUB_CONTEXT}"
-
   mega-linter:
     runs-on: ubuntu-latest
     if: ${{ (!startsWith(github.ref_name, 'renovate/') && !startsWith(github.ref_name, 'release-please--')) || github.event_name == 'workflow_dispatch' }}
@@ -35,21 +26,17 @@ jobs:
           readarray -d '' MD_FILES < <(find . -type f -name "*.md" -print0)
           for MD_FILE in "${MD_FILES[@]}"; do
             echo "💡 *** ${MD_FILE}"
-            for MDQ_CODE_BLOCK in bash sh shell; do
-              if mdq '```/^'"${MDQ_CODE_BLOCK}"'$/' --br -o plain "$MD_FILE" > "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"; then
-                sed -i '1i#!/usr/bin/env bash' "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"
-                chmod a+x "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"
-              else
-                echo "No code block found in \"${MD_FILE}\" with language \"${MDQ_CODE_BLOCK}\""
-                rm "${MD_FILE%.md}-${MDQ_CODE_BLOCK}.sh"
-              fi
-            done
+            if mdq '```/^bash|sh|shell$/' --br -o plain "$MD_FILE" > "${MD_FILE%.md}.sh"; then
+              sed -i '1i#!/usr/bin/env bash' "${MD_FILE%.md}.sh"
+              chmod a+x "${MD_FILE%.md}.sh"
+            else
+              echo "No code block found in \"${MD_FILE}\" with language \"bash|sh|shell\""
+              rm "${MD_FILE%.md}.sh"
+            fi
           done
 
       - name: 💡 MegaLinter
         uses: oxsecurity/megalinter@e08c2b05e3dbc40af4c23f41172ef1e068a7d651 # v8.8.0
         env:
           GITHUB_COMMENT_REPORTER: false
-          # Disabled due to error: [GitHub Status Reporter] Error posting Status for REPOSITORY with ...: 403
-          GITHUB_STATUS_REPORTER: false
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
