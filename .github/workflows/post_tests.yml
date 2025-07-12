@@ -71,6 +71,9 @@ jobs:
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
 
       - name: Install mise and dependencies
+        env:
+          # renovate: datasource=github-releases depName=jdx/mise
+          MISE_VERSION: v2025.7.3
         run: |
           set -euxo pipefail
           curl --silent https://mise.run | sh
@@ -84,6 +87,4 @@ jobs:
           POSTS: ${{ inputs.posts }}
         run: |
           set -euxo pipefail
-
-
           mise run "${ACTION}:${POSTS}"
