@@ -154,7 +154,7 @@ and modify the [default values](https://github.com/danny-avila/LibreChat/blob/ma
 
 ```bash
 # renovate: datasource=helm depName=librechat registryUrl=https://charts.blue-atlas.de
-LIBRECHAT_HELM_CHART_VERSION="1.8.9"
+LIBRECHAT_HELM_CHART_VERSION="1.8.10"
 
 helm repo add librechat https://charts.blue-atlas.de
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-librechat.yml" << EOF
