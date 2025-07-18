@@ -464,7 +464,7 @@ metadata:
 spec:
 $(kubectl get nodeclasses default -o yaml | yq '.spec | pick(["role", "securityGroupSelectorTerms", "subnetSelectorTerms"])' | sed 's/\(.*\)/  \1/')
   ephemeralStorage:
-    size: 20Gi
+    size: 30Gi
   # https://github.com/eksctl-io/eksctl/issues/8136
   # tags:
   #   Name: ${CLUSTER_NAME}

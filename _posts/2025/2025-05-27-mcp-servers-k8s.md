@@ -232,7 +232,7 @@ servingEngineSpec:
       replicaCount: 1
       requestCPU: 2
       requestMemory: 8Gi
-      requestGPU: 1
+      requestGPU: 0
       limitCPU: 8
       limitMemory: 32Gi
       nodeSelectorTerms:
@@ -310,12 +310,6 @@ librechat:
           models:
             default: ['TinyLlama/TinyLlama-1.1B-Chat-v1.0']
             fetch: true
-          titleConvo: true
-          titleModel: "current_model"
-          titleMessageRole: "user"
-          summarize: false
-          summaryModel: "current_model"
-          forcePrompt: false
     mcpServers:
       fetch:
         type: streamable-http
@@ -375,8 +369,7 @@ OPEN_WEBUI_HELM_CHART_VERSION="6.24.0"
 helm repo add open-webui https://helm.openwebui.com/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" << EOF
 ollama:
-  persistentVolume:
-    enabled: true
+  enabled: false
 pipelines:
   enabled: false
 ingress:
@@ -397,8 +390,14 @@ extraEnvVars:
     value: dev
   - name: WEBUI_URL
     value: https://open-webui.${CLUSTER_FQDN}
-  - name: OLLAMA_BASE_URL
+  - name: OPENAI_API_BASE_URL
     value: http://vllm-router-service.vllm.svc.cluster.local/v1
+  - name: DEFAULT_MODELS
+    value: TinyLlama/TinyLlama-1.1B-Chat-v1.0
+  - name: ENABLE_EVALUATION_ARENA_MODELS
+    value: "False"
+  - name: ENABLE_CODE_INTERPRETER
+    value: "False"
 EOF
 helm upgrade --install --version "${OPEN_WEBUI_HELM_CHART_VERSION}" --namespace open-webui --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" open-webui open-webui/open-webui
 ```
