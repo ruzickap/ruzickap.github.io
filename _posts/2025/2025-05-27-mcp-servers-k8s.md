@@ -370,7 +370,7 @@ and modify the [default values](https://github.com/open-webui/helm-charts/blob/m
 
 ```bash
 # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com
-OPEN_WEBUI_HELM_CHART_VERSION="6.22.0"
+OPEN_WEBUI_HELM_CHART_VERSION="6.24.0"
 
 helm repo add open-webui https://helm.openwebui.com/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" << EOF
