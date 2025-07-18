@@ -15,9 +15,6 @@ on:
           - info
           - debug
           - trace
-  push:
-    paths:
-      - "_posts/**"
   pull_request:
     types: [labeled]
 
