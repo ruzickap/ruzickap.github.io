@@ -137,6 +137,15 @@ resource as shown below:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-nodepool-amd64.yml" << EOF | kubectl apply -f -
+apiVersion: eks.amazonaws.com/v1
+kind: NodeClass
+metadata:
+  name: my-default-gpu
+spec:
+$(kubectl get nodeclasses default -o yaml | yq '.spec | pick(["role", "securityGroupSelectorTerms", "subnetSelectorTerms"])' | sed 's/\(.*\)/  \1/')
+  ephemeralStorage:
+    size: 40Gi
+---
 apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
@@ -147,7 +156,7 @@ spec:
       nodeClassRef:
         group: eks.amazonaws.com
         kind: NodeClass
-        name: my-default
+        name: my-default-gpu
       requirements:
         - key: karpenter.sh/capacity-type
           operator: In
@@ -232,7 +241,7 @@ servingEngineSpec:
       replicaCount: 1
       requestCPU: 2
       requestMemory: 8Gi
-      requestGPU: 0
+      requestGPU: 1
       limitCPU: 8
       limitMemory: 32Gi
       nodeSelectorTerms:
