@@ -87,7 +87,7 @@ Install the `toolhive-operator-crds` and `toolhive-operator` Helm charts:
 TOOLHIVE_OPERATOR_CRDS_HELM_CHART_VERSION="0.0.11"
 helm upgrade --install --version="${TOOLHIVE_OPERATOR_CRDS_HELM_CHART_VERSION}" toolhive-operator-crds oci://ghcr.io/stacklok/toolhive/toolhive-operator-crds
 # renovate: datasource=github-tags depName=stacklok/toolhive extractVersion=^toolhive-operator-(?<version>.*)$
-TOOLHIVE_OPERATOR_HELM_CHART_VERSION="0.1.5"
+TOOLHIVE_OPERATOR_HELM_CHART_VERSION="0.1.8"
 helm upgrade --install --version="${TOOLHIVE_OPERATOR_HELM_CHART_VERSION}" --namespace toolhive-system --create-namespace toolhive-operator oci://ghcr.io/stacklok/toolhive/toolhive-operator
 ```
 
@@ -98,7 +98,7 @@ and `mkp` MCP servers:
 
 ```bash
 # renovate: datasource=github-tags depName=stacklok/toolhive
-TOOLHIVE_VERSION="0.1.7"
+TOOLHIVE_VERSION="0.1.9"
 kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_fetch.yaml
 kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
 ```
