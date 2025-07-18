@@ -54,17 +54,6 @@ powered by MCP servers and local LLM inference running on your EKS cluster.
 You will need the following environment variables. Replace the placeholder
 values with your actual credentials:
 
-```shell
-LIBRECHAT_CREDS_KEY="$(openssl rand -hex 32)"
-LIBRECHAT_CREDS_IV="$(openssl rand -hex 16)"
-LIBRECHAT_JWT_SECRET="$(openssl rand -hex 32)"
-LIBRECHAT_JWT_REFRESH_SECRET="$(openssl rand -hex 32)"
-LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN="github_pat_11AAxxxxxxxxxxxxxxxDW"
-LIBRECHAT_OPENAI_API_KEY="eyJ...TqQ"
-LIBRECHAT_OPENAI_BASE_URL="https://openai....com/b8...82/v1"
-export LIBRECHAT_CREDS_KEY LIBRECHAT_CREDS_IV LIBRECHAT_JWT_SECRET LIBRECHAT_JWT_REFRESH_SECRET
-```
-
 Variables used in the following steps:
 
 ```bash
@@ -76,18 +65,6 @@ export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-```
-
-Verify if all the necessary variables were set:
-
-```bash
-: "${LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN?}"
-: "${LIBRECHAT_CREDS_KEY?}"
-: "${LIBRECHAT_CREDS_IV?}"
-: "${LIBRECHAT_JWT_SECRET?}"
-: "${LIBRECHAT_JWT_REFRESH_SECRET?}"
-: "${LIBRECHAT_OPENAI_API_KEY?}"
-: "${LIBRECHAT_OPENAI_BASE_URL?}"
 ```
 
 ## Install ToolHive
@@ -116,16 +93,168 @@ helm upgrade --install --version="${TOOLHIVE_OPERATOR_HELM_CHART_VERSION}" --nam
 
 ### Deploy MCP Servers
 
-Create a secret with your GitHub token and deploy the `fetch`, `github`,
+Create a secret with your GitHub token and deploy the `fetch`, `osv`,
 and `mkp` MCP servers:
 
 ```bash
-kubectl create secret generic github-token --namespace=toolhive-system --from-literal=token="${LIBRECHAT_GITHUB_PERSONAL_ACCESS_TOKEN}"
 # renovate: datasource=github-tags depName=stacklok/toolhive
 TOOLHIVE_VERSION="0.1.7"
 kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_fetch.yaml
-kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_github.yaml
 kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
+```
+
+Create the Prometheus and [OSV](https://osv.dev/) MCP Servers:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-toolhive-mcpserver-osv.yml" << EOF | kubectl apply -f -
+apiVersion: toolhive.stacklok.dev/v1alpha1
+kind: MCPServer
+metadata:
+  name: osv
+  namespace: toolhive-system
+spec:
+  image: ghcr.io/stackloklabs/osv-mcp/server
+  transport: sse
+  port: 8080
+  permissionProfile:
+    type: builtin
+    name: network
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+EOF
+```
+
+## Enabling Karpenter to Provision amd64 Node Pools
+
+vLLM only works with Nvidia GPU + amd64 based CPU instances.
+To enable Karpenter to provision an amd64 node pool, create a new NodePool
+resource as shown below:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-nodepool-amd64.yml" << EOF | kubectl apply -f -
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: my-default-amd64-gpu
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        name: my-default
+      requirements:
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: topology.kubernetes.io/zone
+          operator: In
+          values: ["${AWS_REGION}a"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: node.kubernetes.io/instance-type
+          operator: In
+          values: ["g4dn.xlarge"] # g4dn.xlarge: NVIDIA T4 GPU, 4 vCPUs, 16 GiB RAM, x86_64 architecture
+      taints:
+        - key: nvidia.com/gpu
+          value: "true"
+          effect: NoSchedule
+  limits:
+    cpu: 8
+    memory: 32Gi
+    nvidia.com/gpu: 2
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: my-default-amd64
+spec:
+  template:
+    spec:
+      nodeClassRef:
+        group: eks.amazonaws.com
+        kind: NodeClass
+        name: my-default
+      requirements:
+        - key: eks.amazonaws.com/instance-category
+          operator: In
+          values: ["t"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: topology.kubernetes.io/zone
+          operator: In
+          values: ["${AWS_REGION}a"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+  limits:
+    cpu: 8
+    memory: 32Gi
+EOF
+```
+
+## Install vLLM
+
+[vLLM](https://github.com/vllm-project/vllm) is a high-throughput and memory-efficient
+inference engine for Large Language Models (LLMs). It provides fast and scalable
+LLM serving with features like continuous batching, PagedAttention, and support
+for various model architectures.
+
+![vLLM](https://raw.githubusercontent.com/vllm-project/vllm/a1fe24d961d85089c8a254032d35e4bdbca278d6/docs/assets/logos/vllm-logo-text-dark.png){:width="300"}
+
+Install `vllm` [helm chart](https://github.com/vllm-project/production-stack/tree/vllm-stack-0.1.5/helm)
+and modify the [default values](https://github.com/vllm-project/production-stack/blob/vllm-stack-0.1.5/helm/values.yaml).
+
+```bash
+# renovate: datasource=helm depName=vllm registryUrl=https://vllm-project.github.io/production-stack
+VLLM_HELM_CHART_VERSION="0.1.5"
+
+helm repo add vllm https://vllm-project.github.io/production-stack
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" << EOF
+servingEngineSpec:
+  runtimeClassName: ""
+  modelSpec:
+    - name: tinyllama-1-1b-chat-v1-0
+      annotations:
+        model: tinyllama-1-1b-chat-v1-0
+      podAnnotations:
+        model: tinyllama-1-1b-chat-v1-0
+      repository: vllm/vllm-openai
+      tag: latest
+      modelURL: TinyLlama/TinyLlama-1.1B-Chat-v1.0
+      replicaCount: 1
+      requestCPU: 2
+      requestMemory: 8Gi
+      requestGPU: 1
+      limitCPU: 8
+      limitMemory: 32Gi
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+routerSpec:
+  resources:
+    requests:
+      cpu: 1
+      memory: 2Gi
+    limits:
+      cpu: 2
+      memory: 4Gi
+  nodeSelectorTerms:
+    - matchExpressions:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+EOF
+helm upgrade --install --version "${VLLM_HELM_CHART_VERSION}" --namespace vllm --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" vllm vllm/vllm-stack
 ```
 
 ## Install Librechat
@@ -142,11 +271,14 @@ Create `librechat` namespace and secrets with environment variables:
 
 ```bash
 kubectl create namespace librechat
-kubectl create secret generic --namespace librechat librechat-credentials-env \
-  --from-literal=CREDS_KEY="${LIBRECHAT_CREDS_KEY}" \
-  --from-literal=CREDS_IV="${LIBRECHAT_CREDS_IV}" \
-  --from-literal=JWT_SECRET="${LIBRECHAT_JWT_SECRET}" \
-  --from-literal=JWT_REFRESH_SECRET="${LIBRECHAT_JWT_REFRESH_SECRET}"
+(
+  set +x
+  kubectl create secret generic --namespace librechat librechat-credentials-env \
+    --from-literal=CREDS_KEY="$(openssl rand -hex 32)" \
+    --from-literal=CREDS_IV="$(openssl rand -hex 16)" \
+    --from-literal=JWT_SECRET="$(openssl rand -hex 32)" \
+    --from-literal=JWT_REFRESH_SECRET="$(openssl rand -hex 32)"
+)
 ```
 
 Install `librechat` [helm chart](https://github.com/danny-avila/LibreChat/tree/main/helm/librechat)
@@ -172,21 +304,29 @@ librechat:
     cache: true
     endpoints:
       custom:
-        - name: My OpenAI Gateway
-          apiKey: ${LIBRECHAT_OPENAI_API_KEY}
-          baseURL: https://api.openai.com/v1
-          # baseURL: ${LIBRECHAT_OPENAI_BASE_URL}
+        - name: vLLM
+          apiKey: vllm
+          baseURL: http://vllm-router-service.vllm.svc.cluster.local/v1
           models:
-            default: ["gpt-4"]
+            default: ['TinyLlama/TinyLlama-1.1B-Chat-v1.0']
+            fetch: true
+          titleConvo: true
+          titleModel: "current_model"
+          titleMessageRole: "user"
+          summarize: false
+          summaryModel: "current_model"
+          forcePrompt: false
     mcpServers:
       fetch:
-        url: http://mcp-fetch-proxy.toolhive-system.svc.cluster.local:8080/sse
-      github:
-        url: http://mcp-github-proxy.toolhive-system.svc.cluster.local:8080/sse
+        type: streamable-http
+        url: http://mcp-fetch-proxy.toolhive-system.svc.cluster.local:8080/mcp
       mkp:
         url: http://mcp-mkp-proxy.toolhive-system.svc.cluster.local:8080/sse
+      osv:
+        url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/sse
   imageVolume:
     enabled: false
+# Use RC version temporarily ###################################################
 image:
   tag: v0.7.9-rc1
 ingress:
@@ -210,6 +350,7 @@ ingress:
 mongodb:
   image:
     repository: dlavrenuek/bitnami-mongodb-arm
+    # renovate: datasource=docker depName=dlavrenuek/bitnami-mongodb-arm
     tag: 8.0.4
   containerSecurityContext:
     seLinuxOptions:
@@ -220,38 +361,6 @@ EOF
 helm upgrade --install --version "${LIBRECHAT_HELM_CHART_VERSION}" --namespace librechat --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-librechat.yml" librechat librechat/librechat
 ```
 
-## Install vLLM
-
-[vLLM](https://github.com/vllm-project/vllm) is a high-throughput and memory-efficient
-inference engine for Large Language Models (LLMs). It provides fast and scalable
-LLM serving with features like continuous batching, PagedAttention, and support
-for various model architectures.
-
-![vLLM](https://raw.githubusercontent.com/vllm-project/vllm/a1fe24d961d85089c8a254032d35e4bdbca278d6/docs/assets/logos/vllm-logo-text-dark.png){:width="300"}
-
-Install `vllm` [helm chart](https://github.com/vllm-project/production-stack/tree/vllm-stack-0.1.5/helm)
-and modify the [default values](https://github.com/vllm-project/production-stack/blob/vllm-stack-0.1.5/helm/values.yaml).
-
-```bash
-# renovate: datasource=helm depName=vllm registryUrl=https://vllm-project.github.io/production-stack
-VLLM_HELM_CHART_VERSION="0.1.5"
-
-helm repo add vllm https://vllm-project.github.io/production-stack
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" << EOF
-servingEngineSpec:
-  modelSpec:
-    - name: opt125m
-      repository: vllm/vllm-openai
-      tag: latest
-      modelURL: facebook/opt-125m
-      replicaCount: 1
-      requestCPU: 2
-      requestMemory: 2Gi
-      requestGPU: 0
-EOF
-helm upgrade --install --version "${VLLM_HELM_CHART_VERSION}" --namespace vllm --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" vllm vllm/vllm-stack
-```
-
 ## Install Open WebUI
 
 [Open WebUI](https://openwebui.com/) is a user-friendly web interface for chat interactions.
@@ -260,11 +369,6 @@ Install `open-webui` [helm chart](https://github.com/open-webui/helm-charts/tree
 and modify the [default values](https://github.com/open-webui/helm-charts/blob/main/charts/open-webui/values.yaml).
 
 ```bash
-kubectl create namespace open-webui
-# kubectl create secret generic --namespace open-webui open-webui-env-vars \
-#   --from-literal="openai_api_key=${LIBRECHAT_OPENAI_API_KEY}" \
-#   --from-literal="openai_api_base_url=${LIBRECHAT_OPENAI_BASE_URL}"
-
 # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com
 OPEN_WEBUI_HELM_CHART_VERSION="6.22.0"
 
@@ -286,30 +390,17 @@ ingress:
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
   host: open-webui.${CLUSTER_FQDN}
-# openaiBaseApiUrl: ${LIBRECHAT_OPENAI_BASE_URL}
 extraEnvVars:
-  # - name: OPENAI_API_BASE_URL
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: open-webui-env-vars
-  #       key: openai_api_base_url
-  # - name: OPENAI_API_KEY
-  #   valueFrom:
-  #     secretKeyRef:
-  #       name: open-webui-env-vars
-  #       key: openai_api_key
   - name: ADMIN_EMAIL
     value: ${MY_EMAIL}
   - name: ENV
     value: dev
   - name: WEBUI_URL
     value: https://open-webui.${CLUSTER_FQDN}
-  # - name: OLLAMA_BASE_URL
-  #   value: http://open-webui-ollama.open-webui.svc.cluster.local:11434
   - name: OLLAMA_BASE_URL
-    value: http://vllm.vllm.svc.cluster.local:8000/v1
+    value: http://vllm-router-service.vllm.svc.cluster.local/v1
 EOF
-helm upgrade --install --version "${OPEN_WEBUI_HELM_CHART_VERSION}" --namespace open-webui --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" open-webui open-webui/open-webui
+helm upgrade --install --version "${OPEN_WEBUI_HELM_CHART_VERSION}" --namespace open-webui --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" open-webui open-webui/open-webui
 ```
 
 Enjoy ... 😉
