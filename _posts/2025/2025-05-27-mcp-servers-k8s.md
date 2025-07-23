@@ -114,7 +114,7 @@ metadata:
   namespace: toolhive-system
 spec:
   image: ghcr.io/stackloklabs/osv-mcp/server
-  transport: sse
+  transport: streamable-http
   port: 8080
   permissionProfile:
     type: builtin
@@ -326,7 +326,7 @@ librechat:
       mkp:
         url: http://mcp-mkp-proxy.toolhive-system.svc.cluster.local:8080/sse
       osv:
-        url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/sse
+        url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/mcp
   imageVolume:
     enabled: false
 # Use RC version temporarily ###################################################
