@@ -303,7 +303,6 @@ librechat:
   configEnv:
     ALLOW_EMAIL_LOGIN: "true"
     ALLOW_REGISTRATION: "true"
-    # DEBUG_CONSOLE: "true"
     ENDPOINTS: agents,custom
     existingSecretName: librechat-credentials-env
   # https://github.com/danny-avila/LibreChat/blob/main/librechat.example.yaml
@@ -327,7 +326,6 @@ librechat:
         url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/mcp
   imageVolume:
     enabled: false
-# Use RC version temporarily ###################################################
 image:
   tag: v0.7.9-rc1
 ingress:
