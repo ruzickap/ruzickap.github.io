@@ -29,7 +29,7 @@ This post will guide you through the following steps:
 
 - **ToolHive Installation**: Setting up ToolHive, a secure manager for MCP
   servers in Kubernetes.
-- **MCP Server Deployment**: Deploying `fetch`, `github`, and `mkp` MCP servers.
+- **MCP Server Deployment**: Deploying `fetch` and `osv` MCP servers.
 - **LibreChat Installation**: Installing and configuring LibreChat,
   a self-hosted web chat application.
 - **vLLM Installation**: Setting up vLLM, a high-throughput inference engine
@@ -93,17 +93,16 @@ helm upgrade --install --version="${TOOLHIVE_OPERATOR_HELM_CHART_VERSION}" --nam
 
 ### Deploy MCP Servers
 
-Create a secret with your GitHub token and deploy the `fetch`, `osv`,
-and `mkp` MCP servers:
+Create a secret with your GitHub token and deploy the `fetch` and `osv` MCP
+servers:
 
 ```bash
 # renovate: datasource=github-tags depName=stacklok/toolhive
 TOOLHIVE_VERSION="0.2.0"
 kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_fetch.yaml
-kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
 ```
 
-Create the Prometheus and [OSV](https://osv.dev/) MCP Servers:
+Create the [OSV](https://osv.dev/) MCP Servers:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-toolhive-mcpserver-osv.yml" << EOF | kubectl apply -f -
@@ -304,7 +303,7 @@ librechat:
   configEnv:
     ALLOW_EMAIL_LOGIN: "true"
     ALLOW_REGISTRATION: "true"
-    DEBUG_CONSOLE: "true"
+    # DEBUG_CONSOLE: "true"
     ENDPOINTS: agents,custom
     existingSecretName: librechat-credentials-env
   # https://github.com/danny-avila/LibreChat/blob/main/librechat.example.yaml
@@ -323,9 +322,8 @@ librechat:
       fetch:
         type: streamable-http
         url: http://mcp-fetch-proxy.toolhive-system.svc.cluster.local:8080/mcp
-      mkp:
-        url: http://mcp-mkp-proxy.toolhive-system.svc.cluster.local:8080/sse
       osv:
+        type: streamable-http
         url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/mcp
   imageVolume:
     enabled: false
@@ -351,13 +349,8 @@ ingress:
         - librechat.${CLUSTER_FQDN}
 # https://github.com/bitnami/charts/blob/main/bitnami/mongodb/values.yaml
 mongodb:
-  image:
-    repository: dlavrenuek/bitnami-mongodb-arm
-    # renovate: datasource=docker depName=dlavrenuek/bitnami-mongodb-arm
-    tag: 8.0.4
-  containerSecurityContext:
-    seLinuxOptions:
-      type: "container_t"
+  nodeSelector:
+    kubernetes.io/arch: amd64
 meilisearch:
   enabled: false
 EOF
