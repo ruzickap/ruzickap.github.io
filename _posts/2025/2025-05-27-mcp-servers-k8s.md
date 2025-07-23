@@ -98,7 +98,7 @@ and `mkp` MCP servers:
 
 ```bash
 # renovate: datasource=github-tags depName=stacklok/toolhive
-TOOLHIVE_VERSION="0.1.9"
+TOOLHIVE_VERSION="0.2.0"
 kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_fetch.yaml
 kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
 ```
