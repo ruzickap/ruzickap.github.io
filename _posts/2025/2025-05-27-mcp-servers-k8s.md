@@ -74,7 +74,7 @@ and secure manager for MCP (Model Context Protocol) servers, designed to
 simplify the deployment and management of AI model servers in Kubernetes
 environments.
 
-![ToolHive](https://raw.githubusercontent.com/stacklok/toolhive/c0984e2f1d31ffb9aa215e48df60477e38249aa9/docs/images/toolhive.png){:width="400"}
+![ToolHive](https://raw.githubusercontent.com/stacklok/toolhive/c0984e2f1d31ffb9aa215e48df60477e38249aa9/docs/images/toolhive.png){:width="300"}
 
 Install [toolhive-operator-crds](https://github.com/stacklok/toolhive/tree/v0.1.0/deploy/charts/operator)
 and [toolhive-operator](https://github.com/stacklok/toolhive/tree/v0.1.0/deploy/charts/operator-crds)
@@ -273,7 +273,7 @@ It supports multiple AI providers (including OpenAI, Azure, Google, and more),
 offers a user-friendly interface, conversation management, plugin support, and
 advanced features like prompt templates and file uploads.
 
-![LibreChat](https://raw.githubusercontent.com/danny-avila/LibreChat/8f20fb28e549949b05e8b164d8a504bc14c0951a/client/public/assets/logo.svg){:width="300"}
+![LibreChat](https://raw.githubusercontent.com/danny-avila/LibreChat/8f20fb28e549949b05e8b164d8a504bc14c0951a/client/public/assets/logo.svg){:width="200"}
 
 Create `librechat` namespace and secrets with environment variables:
 
@@ -362,7 +362,7 @@ _LibreChat_
 
 [Open WebUI](https://openwebui.com/) is a user-friendly web interface for chat interactions.
 
-![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="300"}
+![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="200"}
 
 Install `open-webui` [helm chart](https://github.com/open-webui/helm-charts/tree/main/charts/open-webui)
 and modify the [default values](https://github.com/open-webui/helm-charts/blob/main/charts/open-webui/values.yaml).
