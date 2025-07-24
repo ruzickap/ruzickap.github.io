@@ -326,8 +326,6 @@ librechat:
         url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/mcp
   imageVolume:
     enabled: false
-image:
-  tag: v0.7.9-rc1
 ingress:
   annotations:
     gethomepage.dev/enabled: "true"
@@ -369,7 +367,7 @@ and modify the [default values](https://github.com/open-webui/helm-charts/blob/m
 
 ```bash
 # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com
-OPEN_WEBUI_HELM_CHART_VERSION="6.28.0"
+OPEN_WEBUI_HELM_CHART_VERSION="6.29.0"
 
 helm repo add open-webui https://helm.openwebui.com/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" << EOF
