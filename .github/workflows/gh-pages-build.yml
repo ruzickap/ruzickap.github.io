@@ -106,9 +106,8 @@ jobs:
         if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/gh-pages' }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          environment: production
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./public --project-name=${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
+          command: pages deploy ./public --branch=main --project-name=${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore lychee cache
