@@ -44,6 +44,9 @@ esac
 mdq "${MDQ_CODE_BLOCK}" --br -o plain "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
 
 if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
+  if [[ "${1%:*}" = "delete" ]]; then
+    aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
+  fi
   (
     echo "😇 <https://${CLUSTER_FQDN}>"
     echo '```'
