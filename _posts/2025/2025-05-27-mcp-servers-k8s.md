@@ -130,7 +130,7 @@ EOF
 
 ## Enabling Karpenter to Provision amd64 Node Pools
 
-vLLM only works with Nvidia GPU + amd64 based CPU instances.
+vLLM only works with Nvidia GPU and amd64-based CPU instances.
 To enable Karpenter to provision an amd64 node pool, create a new NodePool
 resource as shown below:
 
@@ -265,7 +265,7 @@ EOF
 helm upgrade --install --version "${VLLM_HELM_CHART_VERSION}" --namespace vllm --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" vllm vllm/vllm-stack
 ```
 
-## Install Librechat
+## Install LibreChat
 
 [LibreChat](https://github.com/danny-avila/LibreChat) is an open-source,
 self-hosted web chat application designed as an enhanced alternative to ChatGPT.
@@ -334,7 +334,7 @@ ingress:
     gethomepage.dev/description: LibreChat is an open-source, self-hosted web chat application designed as an enhanced alternative to ChatGPT
     gethomepage.dev/group: Apps
     gethomepage.dev/icon: https://raw.githubusercontent.com/danny-avila/LibreChat/8f20fb28e549949b05e8b164d8a504bc14c0951a/client/public/assets/logo.svg
-    gethomepage.dev/name: Librechat
+    gethomepage.dev/name: LibreChat
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
   hosts:
@@ -355,9 +355,14 @@ EOF
 helm upgrade --install --version "${LIBRECHAT_HELM_CHART_VERSION}" --namespace librechat --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-librechat.yml" librechat librechat/librechat
 ```
 
+![LibreChat](/assets/img/posts/2025/2025-05-27-mcp-servers-k8s/librechat.avif)
+_LibreChat_
+
 ## Install Open WebUI
 
 [Open WebUI](https://openwebui.com/) is a user-friendly web interface for chat interactions.
+
+![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="300"}
 
 Install `open-webui` [helm chart](https://github.com/open-webui/helm-charts/tree/main/charts/open-webui)
 and modify the [default values](https://github.com/open-webui/helm-charts/blob/main/charts/open-webui/values.yaml).
@@ -401,5 +406,8 @@ extraEnvVars:
 EOF
 helm upgrade --install --version "${OPEN_WEBUI_HELM_CHART_VERSION}" --namespace open-webui --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" open-webui open-webui/open-webui
 ```
+
+![Open WebUI](/assets/img/posts/2025/2025-05-27-mcp-servers-k8s/openwebui.avif)
+_Open WebUI_
 
 Enjoy ... 😉
