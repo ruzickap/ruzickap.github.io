@@ -326,8 +326,6 @@ librechat:
         url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/mcp
   imageVolume:
     enabled: false
-image:
-  tag: v0.7.9-rc1
 ingress:
   annotations:
     gethomepage.dev/enabled: "true"
