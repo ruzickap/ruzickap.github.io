@@ -12,7 +12,7 @@ tags:
     kubernetes,
     mcp,
   ]
-image: https://raw.githubusercontent.com/lobehub/lobe-icons/2889d303d4d0a3a7082fd9ff56e3df80b0b0c7d3/packages/static-png/light/mcp.png
+image: https://raw.githubusercontent.com/lobehub/lobe-icons/2889d303d4d0a3a7082fd9ff56e3df80b0b0c7d3/packages/static-png/dark/mcp.png
 ---
 
 <!-- markdownlint-disable MD013 -->
@@ -74,7 +74,7 @@ and secure manager for MCP (Model Context Protocol) servers, designed to
 simplify the deployment and management of AI model servers in Kubernetes
 environments.
 
-![ToolHive](https://raw.githubusercontent.com/stacklok/toolhive/c0984e2f1d31ffb9aa215e48df60477e38249aa9/docs/images/toolhive.png){:width="300"}
+![ToolHive](https://raw.githubusercontent.com/stacklok/toolhive/c0984e2f1d31ffb9aa215e48df60477e38249aa9/docs/images/toolhive.png){:width="200"}
 
 Install [toolhive-operator-crds](https://github.com/stacklok/toolhive/tree/v0.1.0/deploy/charts/operator)
 and [toolhive-operator](https://github.com/stacklok/toolhive/tree/v0.1.0/deploy/charts/operator-crds)
