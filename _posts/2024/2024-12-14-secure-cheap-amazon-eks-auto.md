@@ -1158,14 +1158,6 @@ helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace ho
 
 ![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="300"}
 
-Remove the EKS cluster and its created components:
-
-```sh
-if eksctl get cluster --name="${CLUSTER_NAME}"; then
-  eksctl delete cluster --name="${CLUSTER_NAME}" --force
-fi
-```
-
 Disassociate a Route 53 Resolver query log configuration from an Amazon VPC:
 
 ```sh
@@ -1177,6 +1169,24 @@ if [[ -n "${AWS_VPC_ID}" ]]; then
   if [[ -n "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" ]]; then
     aws route53resolver disassociate-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" --resource-id "${AWS_VPC_ID}"
   fi
+fi
+sleep 5
+```
+
+Clean up AWS Route 53 Resolver query log configurations:
+
+```sh
+aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" | jq -r '.[]' |
+  while read -r AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID; do
+    aws route53resolver delete-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
+  done
+```
+
+Remove the EKS cluster and its created components:
+
+```sh
+if eksctl get cluster --name="${CLUSTER_NAME}"; then
+  eksctl delete cluster --name="${CLUSTER_NAME}" --force
 fi
 ```
 
@@ -1193,15 +1203,6 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
         --output text --query 'ChangeInfo.Id'
     done
 fi
-```
-
-Clean up AWS Route 53 Resolver query log configurations:
-
-```sh
-aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" | jq -r '.[]' |
-  while read -r AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID; do
-    aws route53resolver delete-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
-  done
 ```
 
 Remove the CloudFormation stack:
