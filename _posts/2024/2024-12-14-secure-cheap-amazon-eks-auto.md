@@ -1180,15 +1180,6 @@ if [[ -n "${AWS_VPC_ID}" ]]; then
 fi
 ```
 
-Clean up AWS Route 53 Resolver query log configurations:
-
-```sh
-aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" | jq -r '.[]' |
-  while read -r AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID; do
-    aws route53resolver delete-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
-  done
-```
-
 Remove the Route 53 DNS records from the DNS Zone:
 
 ```sh
@@ -1202,6 +1193,15 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
         --output text --query 'ChangeInfo.Id'
     done
 fi
+```
+
+Clean up AWS Route 53 Resolver query log configurations:
+
+```sh
+aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" | jq -r '.[]' |
+  while read -r AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID; do
+    aws route53resolver delete-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
+  done
 ```
 
 Remove the CloudFormation stack:
