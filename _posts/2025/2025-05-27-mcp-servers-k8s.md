@@ -276,7 +276,7 @@ and modify the [default values](https://github.com/vllm-project/production-stack
 VLLM_HELM_CHART_VERSION="0.1.5"
 
 helm repo add vllm https://vllm-project.github.io/production-stack
-cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" << \EOF
+cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" << EOF
 servingEngineSpec:
   runtimeClassName: ""
   modelSpec:
