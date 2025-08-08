@@ -232,7 +232,6 @@ Set up PersistentVolume (PV) and PersistentVolumeClaim (PVC) to
 
 ```bash
 kubectl create namespace vllm
-
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-vllm-vllm-chat-templates.yml" << EOF | kubectl apply -f -
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -265,7 +264,8 @@ spec:
         claimName: vllm-templates-pvc
   restartPolicy: Never
 EOF
-kubectl delete pod vllm-templates-downloader
+kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/vllm-templates-downloader -n vllm
+kubectl delete pod vllm-templates-downloader -n vllm
 ```
 
 Install `vllm` [helm chart](https://github.com/vllm-project/production-stack/tree/vllm-stack-0.1.5/helm)
@@ -326,13 +326,6 @@ servingEngineSpec:
               operator: In
               values: ["amd64"]
       pvcStorage: 20Gi
-      # extraVolumes:
-      #   - name: vllm-chat-templates
-      #     persistentVolumeClaim:
-      #       claimName: vllm-chat-templates
-      # extraVolumeMounts:
-      #   - name: vllm-chat-templates
-      #     mountPath: /chat-templates
       env:
         - name: VLLM_CPU_KVCACHE_SPACE
           value: "2"

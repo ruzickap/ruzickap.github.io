@@ -440,9 +440,9 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
     --destination-arn "${AWS_CLUSTER_LOG_GROUP_ARN}" \
     --creator-request-id "$(uuidgen)" --query 'ResolverQueryLogConfig.Id' --output text)
 
-  aws route53resolver associate-resolver-query-log-config \
-    --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
-    --resource-id "${AWS_VPC_ID}"
+  # aws route53resolver associate-resolver-query-log-config \
+  #   --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
+  #   --resource-id "${AWS_VPC_ID}"
   ```
 
 I was not able to get NetworkPolicy working correctly with
