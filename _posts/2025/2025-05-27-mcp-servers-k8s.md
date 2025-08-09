@@ -301,9 +301,6 @@ servingEngineSpec:
               operator: In
               values: ["amd64"]
       pvcStorage: 5Gi
-      env:
-        - name: VLLM_CPU_KVCACHE_SPACE
-          value: "2"
     # https://huggingface.co/microsoft/phi-2/resolve/main/config.json (license: apache-2.0)
     - name: phi-2
       annotations:
@@ -326,9 +323,6 @@ servingEngineSpec:
               operator: In
               values: ["amd64"]
       pvcStorage: 20Gi
-      env:
-        - name: VLLM_CPU_KVCACHE_SPACE
-          value: "2"
     - name: granite-3-1-3b-a800m-instruct
       annotations:
         model: granite-3-1-3b-a800m-instruct
@@ -349,9 +343,6 @@ servingEngineSpec:
               operator: In
               values: ["amd64"]
       pvcStorage: 20Gi
-      env:
-        - name: VLLM_CPU_KVCACHE_SPACE
-          value: "2"
 routerSpec:
   resources:
     requests:
