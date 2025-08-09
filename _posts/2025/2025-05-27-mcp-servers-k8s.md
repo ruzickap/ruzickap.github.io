@@ -29,7 +29,7 @@ This post will guide you through the following steps:
 
 - **ToolHive Installation**: Setting up ToolHive, a secure manager for MCP
   servers in Kubernetes.
-- **MCP Server Deployment**: Deploying `fetch` and `osv` MCP servers.
+- **MCP Server Deployment**: Deploying `mkp` and `osv` MCP servers.
 - **LibreChat Installation**: Installing and configuring LibreChat,
   a self-hosted web chat application.
 - **vLLM Installation**: Setting up vLLM, a high-throughput inference engine
@@ -84,22 +84,22 @@ Install the `toolhive-operator-crds` and `toolhive-operator` Helm charts:
 
 ```bash
 # renovate: datasource=github-tags depName=stacklok/toolhive extractVersion=^toolhive-operator-crds-(?<version>.*)$
-TOOLHIVE_OPERATOR_CRDS_HELM_CHART_VERSION="0.0.11"
+TOOLHIVE_OPERATOR_CRDS_HELM_CHART_VERSION="0.0.13"
 helm upgrade --install --version="${TOOLHIVE_OPERATOR_CRDS_HELM_CHART_VERSION}" toolhive-operator-crds oci://ghcr.io/stacklok/toolhive/toolhive-operator-crds
 # renovate: datasource=github-tags depName=stacklok/toolhive extractVersion=^toolhive-operator-(?<version>.*)$
-TOOLHIVE_OPERATOR_HELM_CHART_VERSION="0.1.8"
+TOOLHIVE_OPERATOR_HELM_CHART_VERSION="0.2.1"
 helm upgrade --install --version="${TOOLHIVE_OPERATOR_HELM_CHART_VERSION}" --namespace toolhive-system --create-namespace toolhive-operator oci://ghcr.io/stacklok/toolhive/toolhive-operator
 ```
 
 ### Deploy MCP Servers
 
-Create a secret with your GitHub token and deploy the `fetch` and `osv` MCP
+Create a secret with your GitHub token and deploy the `mkp` and `osv` MCP
 servers:
 
 ```bash
 # renovate: datasource=github-tags depName=stacklok/toolhive
-TOOLHIVE_VERSION="0.2.0"
-kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_fetch.yaml
+TOOLHIVE_VERSION="0.2.3"
+kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
 ```
 
 Create the [OSV](https://osv.dev/) MCP Servers:
@@ -168,15 +168,25 @@ spec:
           values: ["amd64"]
         - key: node.kubernetes.io/instance-type
           operator: In
-          values: ["g4dn.xlarge"] # g4dn.xlarge: NVIDIA T4 GPU, 4 vCPUs, 16 GiB RAM, x86_64 architecture
+          # g6.xlarge: NVIDIA L4 GPU, 4 vCPUs, 16 GiB RAM, x86_64 architecture
+          values: ["g6.xlarge"]
       taints:
         - key: nvidia.com/gpu
           value: "true"
           effect: NoSchedule
   limits:
-    cpu: 8
-    memory: 32Gi
-    nvidia.com/gpu: 2
+    cpu: 16
+    memory: 64Gi
+    nvidia.com/gpu: 4
+---
+apiVersion: eks.amazonaws.com/v1
+kind: NodeClass
+metadata:
+  name: my-default-amd64
+spec:
+$(kubectl get nodeclasses default -o yaml | yq '.spec | pick(["role", "securityGroupSelectorTerms", "subnetSelectorTerms"])' | sed 's/\(.*\)/  \1/')
+  ephemeralStorage:
+    size: 40Gi
 ---
 apiVersion: karpenter.sh/v1
 kind: NodePool
@@ -188,7 +198,7 @@ spec:
       nodeClassRef:
         group: eks.amazonaws.com
         kind: NodeClass
-        name: my-default
+        name: my-default-amd64
       requirements:
         - key: eks.amazonaws.com/instance-category
           operator: In
@@ -217,6 +227,47 @@ for various model architectures.
 
 ![vLLM](https://raw.githubusercontent.com/vllm-project/vllm/a1fe24d961d85089c8a254032d35e4bdbca278d6/docs/assets/logos/vllm-logo-text-dark.png){:width="300"}
 
+Set up PersistentVolume (PV) and PersistentVolumeClaim (PVC) to
+[store vLLM chat templates](https://github.com/vllm-project/production-stack/blob/2468dc484e9f4b6775a905fe17b477623de8e6fd/docs/source/use_cases/tool-enabled-installation.rst#1-set-up-vllm-templates-and-storage):
+
+```bash
+kubectl create namespace vllm
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-vllm-vllm-chat-templates.yml" << EOF | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vllm-templates-pvc
+  namespace: vllm
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vllm-templates-downloader
+  namespace: vllm
+spec:
+  containers:
+  - name: vllm-templates-downloader
+    image: busybox:latest
+    command: ["wget", "-P", "/data/", "https://raw.githubusercontent.com/vllm-project/vllm/66785cc05c05c7f19f319533c23d1998b9d80bf9/examples/template_chatml.jinja"]
+    volumeMounts:
+      - mountPath: /data
+        name: vllm-templates
+  volumes:
+    - name: vllm-templates
+      persistentVolumeClaim:
+        claimName: vllm-templates-pvc
+  restartPolicy: Never
+EOF
+kubectl wait --for=jsonpath='{.status.phase}'=Succeeded pod/vllm-templates-downloader -n vllm
+kubectl delete pod vllm-templates-downloader -n vllm
+```
+
 Install `vllm` [helm chart](https://github.com/vllm-project/production-stack/tree/vllm-stack-0.1.5/helm)
 and modify the [default values](https://github.com/vllm-project/production-stack/blob/vllm-stack-0.1.5/helm/values.yaml).
 
@@ -229,6 +280,7 @@ cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" << EOF
 servingEngineSpec:
   runtimeClassName: ""
   modelSpec:
+    # https://huggingface.co/TinyLlama/TinyLlama-1.1B-Chat-v1.0/resolve/main/config.json (license: apache-2.0)
     - name: tinyllama-1-1b-chat-v1-0
       annotations:
         model: tinyllama-1-1b-chat-v1-0
@@ -240,6 +292,48 @@ servingEngineSpec:
       replicaCount: 1
       requestCPU: 2
       requestMemory: 8Gi
+      requestGPU: 0
+      limitCPU: 8
+      limitMemory: 32Gi
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+      pvcStorage: 5Gi
+    # https://huggingface.co/microsoft/phi-2/resolve/main/config.json (license: apache-2.0)
+    - name: phi-2
+      annotations:
+        model: phi-2
+      podAnnotations:
+        model: phi-2
+      repository: vllm/vllm-openai
+      tag: latest
+      modelURL: microsoft/phi-2
+      replicaCount: 1
+      requestCPU: 2
+      requestMemory: 8Gi
+      requestGPU: 1
+      limitCPU: 8
+      limitMemory: 32Gi
+      chatTemplate: "/templates/template_chatml.jinja"
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/arch
+              operator: In
+              values: ["amd64"]
+      pvcStorage: 20Gi
+    - name: granite-3-1-3b-a800m-instruct
+      annotations:
+        model: granite-3-1-3b-a800m-instruct
+      podAnnotations:
+        model: granite-3-1-3b-a800m-instruct
+      repository: vllm/vllm-openai
+      tag: latest
+      modelURL: ibm-granite/granite-3.1-3b-a800m-instruct
+      replicaCount: 1
+      requestCPU: 2
+      requestMemory: 8Gi
       requestGPU: 1
       limitCPU: 8
       limitMemory: 32Gi
@@ -248,6 +342,7 @@ servingEngineSpec:
             - key: kubernetes.io/arch
               operator: In
               values: ["amd64"]
+      pvcStorage: 20Gi
 routerSpec:
   resources:
     requests:
@@ -262,7 +357,7 @@ routerSpec:
           operator: In
           values: ["amd64"]
 EOF
-helm upgrade --install --version "${VLLM_HELM_CHART_VERSION}" --namespace vllm --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" vllm vllm/vllm-stack
+helm upgrade --install --version "${VLLM_HELM_CHART_VERSION}" --namespace vllm --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-vllm.yml" vllm vllm/vllm-stack
 ```
 
 ## Install LibreChat
@@ -318,14 +413,16 @@ librechat:
             default: ['TinyLlama/TinyLlama-1.1B-Chat-v1.0']
             fetch: true
     mcpServers:
-      fetch:
-        type: streamable-http
-        url: http://mcp-fetch-proxy.toolhive-system.svc.cluster.local:8080/mcp
+      mkp:
+        type: sse
+        url: http://mcp-mkp-proxy.toolhive-system.svc.cluster.local:8080/sse
       osv:
-        type: streamable-http
-        url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/mcp
+        type: sse
+        url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/sse
   imageVolume:
     enabled: false
+image:
+  tag: "v0.8.0-rc1"
 ingress:
   annotations:
     gethomepage.dev/enabled: "true"
@@ -367,7 +464,7 @@ and modify the [default values](https://github.com/open-webui/helm-charts/blob/m
 
 ```bash
 # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com
-OPEN_WEBUI_HELM_CHART_VERSION="6.29.0"
+OPEN_WEBUI_HELM_CHART_VERSION="7.0.1"
 
 helm repo add open-webui https://helm.openwebui.com/
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-open-webui.yml" << EOF
@@ -386,6 +483,8 @@ ingress:
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
   host: open-webui.${CLUSTER_FQDN}
+persistence:
+  size: 3Gi
 extraEnvVars:
   - name: ADMIN_EMAIL
     value: ${MY_EMAIL}
