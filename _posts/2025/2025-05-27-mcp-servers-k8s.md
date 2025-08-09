@@ -414,11 +414,9 @@ librechat:
             fetch: true
     mcpServers:
       mkp:
-        # Mandatory
         type: sse
         url: http://mcp-mkp-proxy.toolhive-system.svc.cluster.local:8080/sse
       osv:
-        # Mandatory
         type: sse
         url: http://mcp-osv-proxy.toolhive-system.svc.cluster.local:8080/sse
   imageVolume:
