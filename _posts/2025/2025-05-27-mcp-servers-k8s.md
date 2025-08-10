@@ -514,7 +514,7 @@ _Open WebUI_
 Remove files from the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
-for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{k8s-toolhive-mcpserver-osv,helm_values-{vllm,librechat,open-webui}.yml; do
+for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{k8s-toolhive-mcpserver-osv,helm_values-{vllm,librechat,open-webui}}.yml; do
   if [[ -f "${FILE}" ]]; then
     rm -v "${FILE}"
   else
