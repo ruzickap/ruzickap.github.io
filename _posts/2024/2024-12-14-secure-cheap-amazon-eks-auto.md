@@ -1168,9 +1168,9 @@ if [[ -n "${AWS_VPC_ID}" ]]; then
     --query "ResolverQueryLogConfigAssociations[?ResourceId=='${AWS_VPC_ID}'].ResolverQueryLogConfigId" --output text)
   if [[ -n "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" ]]; then
     aws route53resolver disassociate-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" --resource-id "${AWS_VPC_ID}"
+    sleep 5
   fi
 fi
-sleep 5
 ```
 
 Clean up AWS Route 53 Resolver query log configurations:
