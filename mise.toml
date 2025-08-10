@@ -7,7 +7,7 @@
 [tools]
 # keep-sorted start
 "ubi:aws-cloudformation/rain" = "1.23.1"
-"ubi:yshavit/mdq" = "0.7.2"
+"ubi:yshavit/mdq" = "0.8.0"
 aws = "2.26.2"
 aws-copilot = "1.34.1"
 cilium-cli = "0.18.3"
