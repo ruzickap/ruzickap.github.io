@@ -507,4 +507,20 @@ helm upgrade --install --version "${OPEN_WEBUI_HELM_CHART_VERSION}" --namespace 
 ![Open WebUI](/assets/img/posts/2025/2025-05-27-mcp-servers-k8s/openwebui.avif)
 _Open WebUI_
 
+## Clean-up
+
+![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="300"}
+
+Remove files from the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
+
+```sh
+for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{k8s-toolhive-mcpserver-osv,k8s-karpenter-nodepool-amd64,k8s-vllm-vllm-chat-templates,helm_values-{vllm,librechat,open-webui}}.yml; do
+  if [[ -f "${FILE}" ]]; then
+    rm -v "${FILE}"
+  else
+    echo "*** File not found: ${FILE}"
+  fi
+done
+```
+
 Enjoy ... 😉
