@@ -1,6 +1,7 @@
 # keep-sorted start
+/assets/
 \.local
-# cdn\.com
+cdn\.com
 # fonts\.(googleapis|gstatic)\.com
 # github\.com/.*//.*/?ref=.*
 # kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
@@ -11,7 +12,7 @@ mylabs\.dev
 # stackoverflow\.com
 # stefanprodan\.github\.io/podinfo
 # username\.github\.io
-# www\.cvedetails\.com
+www\.cvedetails\.com
 # www\.dell\.com
 # www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
 # www\.googletagmanager\.com
