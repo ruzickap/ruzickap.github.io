@@ -21,18 +21,6 @@ accept = [200, 429, 999]
 
 #############################  Exclusions  ##########################
 
-# Exclude URLs and mail addresses from checking (supports regex)
-exclude = [
-  # keep-sorted start
-  # Ignore URLs with encoded braces - template variables in URLs
-  '%7B.*%7D',
-  # Ignore URLs with dollar signs - shell/environment variables
-  '\$',
-  # Ignore file:// protocol URLs - local filesystem links
-  'file://',
-  # keep-sorted end
-]
-
 # Exclude these filesystem paths from link checking
 exclude_path = [
   "CHANGELOG.md",

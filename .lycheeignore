@@ -1,22 +1,12 @@
 # keep-sorted start
-%7B.*%7D
-\$
-# www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
-# www\.googletagmanager\.com
-# www\.threads\.net/intent/post
 \.elb\.amazonaws\.com
 \.local
-\{\{.*\}\}
 cdn\.com
 github\.com/ruzickap
-# github\.com/.*//.*/?ref=.*
+https://(grafana|oauth2-proxy|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
 kubernetes-sigs\.github\.io/aws-ebs-csi-driver
-# linkedin\.com
 mylabs\.dev
-# stackexchange\.com
-# stackoverflow\.com
 stefanprodan\.github\.io/podinfo
-# username\.github\.io
 www\.cvedetails\.com
 # keep-sorted end
