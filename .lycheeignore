@@ -2,6 +2,7 @@
 \.local
 cdn\.com
 # fonts\.(googleapis|gstatic)\.com
+github\.com/ruzickap
 # github\.com/.*//.*/?ref=.*
 # kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
 # kubernetes-sigs\.github\.io/aws-ebs-csi-driver
@@ -12,7 +13,6 @@ mylabs\.dev
 # stefanprodan\.github\.io/podinfo
 # username\.github\.io
 www\.cvedetails\.com
-# www\.dell\.com
 # www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
 # www\.googletagmanager\.com
 # www\.threads\.net/intent/post
