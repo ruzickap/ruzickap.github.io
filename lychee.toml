@@ -31,9 +31,9 @@ exclude = [
   # Ignore file:// protocol URLs - local filesystem links
   'file://',
   # Stack Exchange sites return 403 when accessed from GitHub Actions
-  'stackexchange\.com',
+  # 'stackexchange\.com',
   # Stack Overflow returns 403 when accessed from GitHub Actions
-  'stackoverflow\.com',
+  # 'stackoverflow\.com',
   # keep-sorted end
 ]
 
@@ -48,4 +48,4 @@ exclude_path = [
 exclude_all_private = true
 
 # User agent to use for requests
-user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+#user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
