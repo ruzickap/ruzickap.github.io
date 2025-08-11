@@ -1,9 +1,12 @@
 # keep-sorted start
+%7B.*%7D
+\$
 # www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
 # www\.googletagmanager\.com
 # www\.threads\.net/intent/post
 \.elb\.amazonaws\.com
 \.local
+\{\{.*\}\}
 cdn\.com
 github\.com/ruzickap
 # github\.com/.*//.*/?ref=.*
