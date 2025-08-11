@@ -1,9 +1,10 @@
 # keep-sorted start
+/\.github/workflows/post_tests.yml
 \.elb\.amazonaws\.com
 \.local
 cdn\.com
 github\.com/ruzickap
-https://(grafana|oauth2-proxy|prometheus|ollama-vulnerable|open-webui)/
+https://(grafana|oauth2-proxy|ollama-vulnerable|open-webui|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
 kubernetes-sigs\.github\.io/aws-ebs-csi-driver
 mylabs\.dev
