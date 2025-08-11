@@ -16,7 +16,7 @@ max_concurrency = 128
 
 #############################  Requests  ############################
 
-# Accept these status codes as valid (200 = OK, 429 = rate limited, 999 = non-standard but valid)
+# Accept these status codes as valid (200 = OK, 429 = rate limited)
 accept = [200, 429]
 
 #############################  Exclusions  ##########################
