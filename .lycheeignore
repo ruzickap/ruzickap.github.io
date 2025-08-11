@@ -1,11 +1,9 @@
 # keep-sorted start
 \.local
 cdn\.com
-# fonts\.(googleapis|gstatic)\.com
 github\.com/ruzickap
 # github\.com/.*//.*/?ref=.*
-# kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
-# kubernetes-sigs\.github\.io/aws-ebs-csi-driver
+kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
 # linkedin\.com
 mylabs\.dev
 # stackexchange\.com
