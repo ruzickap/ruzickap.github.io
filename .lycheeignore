@@ -3,7 +3,7 @@
 \.local
 cdn\.com
 github\.com/ruzickap
-https://(grafana|oauth2-proxy|prometheus)/
+https://(grafana|oauth2-proxy|prometheus|ollama-vulnerable|open-webui)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
 kubernetes-sigs\.github\.io/aws-ebs-csi-driver
 mylabs\.dev
