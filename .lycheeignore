@@ -1,5 +1,4 @@
 # keep-sorted start
-/assets/
 \.local
 cdn\.com
 # fonts\.(googleapis|gstatic)\.com

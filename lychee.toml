@@ -4,7 +4,7 @@
 #############################  Cache  ###############################
 
 # Enable link caching to avoid checking the same links on multiple runs
-cache = true
+cache = false
 
 # Discard cached requests older than this duration
 max_cache_age = "1d"
