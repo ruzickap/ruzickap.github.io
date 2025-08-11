@@ -46,3 +46,6 @@ exclude_path = [
 # Exclude all private IP addresses from checking
 # (includes private networks, link-local, and loopback addresses)
 exclude_all_private = true
+
+# User agent to use for requests
+user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
