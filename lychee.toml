@@ -4,7 +4,7 @@
 #############################  Cache  ###############################
 
 # Enable link caching to avoid checking the same links on multiple runs
-cache = false
+cache = true
 
 # Discard cached requests older than this duration
 max_cache_age = "1d"
@@ -30,10 +30,6 @@ exclude = [
   '\$',
   # Ignore file:// protocol URLs - local filesystem links
   'file://',
-  # Stack Exchange sites return 403 when accessed from GitHub Actions
-  # 'stackexchange\.com',
-  # Stack Overflow returns 403 when accessed from GitHub Actions
-  # 'stackoverflow\.com',
   # keep-sorted end
 ]
 
@@ -46,6 +42,3 @@ exclude_path = [
 # Exclude all private IP addresses from checking
 # (includes private networks, link-local, and loopback addresses)
 exclude_all_private = true
-
-# User agent to use for requests
-#user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
