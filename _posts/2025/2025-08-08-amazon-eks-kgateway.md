@@ -910,7 +910,7 @@ high availability and cost efficiency. It enables you to centralize metrics from
 multiple clusters or environments, and integrates seamlessly with [Grafana](https://grafana.com/)
 dashboards for visualization and alerting.
 
-![Grafana Mimir](https://github.com/grafana/mimir/blob/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.pnghttps://raw.githubusercontent.com/grafana/mimir/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.png){:width="400"}
+![Grafana Mimir](https://raw.githubusercontent.com/grafana/mimir/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.png){:width="400"}
 
 Install the `mimir-distributed` [Helm chart](https://github.com/grafana/mimir/tree/main/operations/helm/charts/mimir-distributed)
 and customize its [default values](https://github.com/grafana/mimir/blob/mimir-distributed-5.7.0/operations/helm/charts/mimir-distributed/values.yaml)
