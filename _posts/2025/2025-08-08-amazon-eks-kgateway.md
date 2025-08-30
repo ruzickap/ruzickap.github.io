@@ -672,7 +672,7 @@ and modify its [default values](https://github.com/kubernetes-sigs/aws-ebs-csi-d
 
 ```bash
 # renovate: datasource=helm depName=aws-ebs-csi-driver registryUrl=https://kubernetes-sigs.github.io/aws-ebs-csi-driver
-AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.47.0"
+AWS_EBS_CSI_DRIVER_HELM_CHART_VERSION="2.48.0"
 
 helm repo add --force-update aws-ebs-csi-driver https://kubernetes-sigs.github.io/aws-ebs-csi-driver
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-ebs-csi-driver.yml" << EOF
