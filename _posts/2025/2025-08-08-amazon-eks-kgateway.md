@@ -358,7 +358,7 @@ Use CloudFormation to set up the infrastructure needed by the EKS cluster.
 See [CloudFormation](https://karpenter.sh/docs/reference/cloudformation/) for
 a complete description of what `cloudformation.yaml` does for Karpenter.
 
-![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="500"}
+![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="400"}
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/7370b5fd22eb6bec88f7799562b6cb24ac8fbb46/website/content/en/v1.6/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
@@ -549,7 +549,7 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
 [Karpenter](https://karpenter.sh/) is a Kubernetes node autoscaler built for
 flexibility, performance, and simplicity.
 
-![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="500"}
+![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
 
 Install the `karpenter` [Helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
 and customize its [default values](https://github.com/aws/karpenter-provider-aws/blob/v1.6.2/charts/karpenter/values.yaml)
@@ -719,6 +719,8 @@ kubectl delete storageclass gp2 || true
 
 The [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
 is a controller that manages Elastic Load Balancers for a Kubernetes cluster.
+
+![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="400"}
 
 Install the `aws-load-balancer-controller` [Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
 and modify its [default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.13.4/helm/aws-load-balancer-controller/values.yaml):
