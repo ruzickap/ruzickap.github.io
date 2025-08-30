@@ -31,5 +31,3 @@ jobs:
         uses: lycheeverse/lychee-action@01a5c94d8e012550040658854b90a7a7301e75ca # v2.6.0
         with:
           args: "--include-verbatim --no-progress --base-url ${{ steps.pages.outputs.base_url }} ."
-          fail: true
-          debug: true
