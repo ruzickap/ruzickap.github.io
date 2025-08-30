@@ -7,6 +7,7 @@
 [tools]
 # keep-sorted start
 "ubi:aws-cloudformation/rain" = "1.23.1"
+"ubi:wait4x/wait4x" = "3.5.1"
 "ubi:yshavit/mdq" = "0.9.0"
 aws = "2.26.2"
 aws-copilot = "1.34.1"
@@ -230,6 +231,17 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2025-07-10-ollama-k8s-exploitation|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
 description = 'Delete: Exploiting RCE Vulnerabilities in Ollama on Kubernetes'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS and kgateway
+#------------------------------------------------------------------------------
+[tasks."create:2025-08-08-amazon-eks-kgateway"]
+description = 'Create: Amazon EKS and kgateway'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2025-08-08-amazon-eks-kgateway"]
+description = 'Delete: Amazon EKS and kgateway'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
