@@ -720,7 +720,7 @@ kubectl delete storageclass gp2 || true
 The [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
 is a controller that manages Elastic Load Balancers for a Kubernetes cluster.
 
-![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="400"}
+![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
 
 Install the `aws-load-balancer-controller` [Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
 and modify its [default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.13.4/helm/aws-load-balancer-controller/values.yaml):
@@ -910,7 +910,7 @@ high availability and cost efficiency. It enables you to centralize metrics from
 multiple clusters or environments, and integrates seamlessly with [Grafana](https://grafana.com/)
 dashboards for visualization and alerting.
 
-![Grafana Mimir](https://github.com/grafana/mimir/blob/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.png){:width="400"}
+![Grafana Mimir](https://github.com/grafana/mimir/blob/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.pnghttps://raw.githubusercontent.com/grafana/mimir/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.png){:width="400"}
 
 Install the `mimir-distributed` [Helm chart](https://github.com/grafana/mimir/tree/main/operations/helm/charts/mimir-distributed)
 and customize its [default values](https://github.com/grafana/mimir/blob/mimir-distributed-5.7.0/operations/helm/charts/mimir-distributed/values.yaml)
@@ -968,7 +968,7 @@ and observability features out of the box. By deploying kgateway, you can centra
 traffic management, enforce security policies, and gain deep visibility into
 your cluster's ingress traffic—all with minimal configuration.
 
-![kgateway](https://raw.githubusercontent.com/cncf/landscape/625ec24fac5ca9b9c47e3bf818273668e04bb434/hosted_logos/kgateway.svg){:width="300"}
+![kgateway](https://raw.githubusercontent.com/cncf/landscape/625ec24fac5ca9b9c47e3bf818273668e04bb434/hosted_logos/kgateway.svg){:width="200"}
 
 Deploy the Kubernetes Gateway API CRDs:
 
@@ -1006,7 +1006,7 @@ helm upgrade --install --version "${KGATEWAY_HELM_CHART_VERSION}" --namespace kg
 ```
 
 ```bash
-kubectl apply -f- <<EOF
+kubectl apply -f- << EOF
 apiVersion: gateway.kgateway.dev/v1
 kind: GatewayParameters
 metadata:
@@ -1128,7 +1128,7 @@ query, visualize, alert on, and understand your metrics, logs, and traces. It
 provides a powerful and flexible way to create dashboards and visualizations for
 monitoring your Kubernetes cluster and applications.
 
-![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="150"}
+![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="300"}
 
 Install the `grafana` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
 and modify its [default values](https://github.com/grafana/helm-charts/blob/grafana-9.4.3/charts/grafana/values.yaml):
