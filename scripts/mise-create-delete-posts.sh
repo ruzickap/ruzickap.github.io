@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 : "${AWS_ACCESS_KEY_ID:?Error: AWS_ACCESS_KEY_ID environment variable is not set!}"
 : "${AWS_DEFAULT_REGION:?Error: AWS_DEFAULT_REGION environment variable is not set!}"
@@ -44,7 +44,7 @@ esac
 mdq "${MDQ_CODE_BLOCK}" --br -o plain "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
 
 if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
-  if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null && [[ "${1%:*}" = "delete" ]]; then
+  if eksctl get clusters --name="${CLUSTER_NAME}" && [[ "${1%:*}" = "delete" ]]; then
     aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
   fi
   (

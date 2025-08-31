@@ -234,14 +234,14 @@ description = 'Delete: Exploiting RCE Vulnerabilities in Ollama on Kubernetes'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
-# Amazon EKS and kgateway
+# Amazon EKS and Grafana Mimir
 #------------------------------------------------------------------------------
-[tasks."create:2025-08-08-amazon-eks-kgateway"]
-description = 'Create: Amazon EKS and kgateway'
+[tasks."create:2025-08-08-amazon-eks-mimir"]
+description = 'Create: Amazon EKS and Grafana Mimir'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
-[tasks."delete:2025-08-08-amazon-eks-kgateway"]
-description = 'Delete: Amazon EKS and kgateway'
+[tasks."delete:2025-08-08-amazon-eks-mimir"]
+description = 'Delete: Amazon EKS and Grafana Mimir'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
