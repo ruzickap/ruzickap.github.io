@@ -61,7 +61,6 @@ export TMP_DIR="${TMP_DIR:-${PWD}}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 # Tags applied to identify AWS resources
 export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
-
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
@@ -400,10 +399,12 @@ schedules:
     schedule: "@monthly"
     template:
       ttl: 2160h
+      includeClusterResources: true
       includedNamespaces:
         - cert-manager
       includedResources:
         - certificates.cert-manager.io
+        - clusterissuers.cert-manager.io
         - secrets
       labelSelector:
         matchLabels:
@@ -518,12 +519,17 @@ Completed:  2025-02-06 06:25:08 +0100 CET
 
 Expiration:  2025-05-07 07:25:06 +0200 CEST
 
-Total items to be backed up:  3
-Items backed up:              3
+Total items to be backed up:  6
+Items backed up:              6
 
 Resource List:
+  apiextensions.k8s.io/v1/CustomResourceDefinition:
+    - certificates.cert-manager.io
+    - clusterissuers.cert-manager.io
   cert-manager.io/v1/Certificate:
     - cert-manager/ingress-cert-production
+  cert-manager.io/v1/ClusterIssuer:
+    - letsencrypt-production-dns
   v1/Secret:
     - cert-manager/ingress-cert-production
     - cert-manager/letsencrypt-production-dns
@@ -584,8 +590,8 @@ Labels:       letsencrypt=production
 Annotations:  <none>
 
 Phase:                       Completed
-Total items to be restored:  3
-Items restored:              3
+Total items to be restored:  6
+Items restored:              6
 
 Started:    2025-02-06 06:59:12 +0100 CET
 Completed:  2025-02-06 06:59:13 +0100 CET
@@ -623,8 +629,13 @@ HooksAttempted:   0
 HooksFailed:      0
 
 Resource List:
+  apiextensions.k8s.io/v1/CustomResourceDefinition:
+    - certificates.cert-manager.io(updated)
+    - clusterissuers.cert-manager.io(updated)
   cert-manager.io/v1/Certificate:
     - cert-manager/ingress-cert-production(created)
+  cert-manager.io/v1/ClusterIssuer:
+    - letsencrypt-production-dns(updated)
   v1/Secret:
     - cert-manager/ingress-cert-production(created)
     - cert-manager/letsencrypt-production-dns(updated)
