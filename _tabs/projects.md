@@ -573,40 +573,6 @@ List of my GitHub projects:
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes)
 
-## [darktable_video_tutorials_list](https://github.com/ruzickap/darktable_video_tutorials_list)
-
-- Description: Links to Darktable Video Tutorials with screenshots
-- Topics: darktable-tutorial, screenshots, darktable, tutorial, public
-
-[![GitHub release](https://img.shields.io/github/v/release/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/releases/latest)
-[![GitHub license](https://img.shields.io/github/license/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/ruzickap/darktable_video_tutorials_list.svg?style=social)](https://github.com/ruzickap/darktable_video_tutorials_list/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/ruzickap/darktable_video_tutorials_list.svg?style=social)](https://github.com/ruzickap/darktable_video_tutorials_list/network/members)
-[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/darktable_video_tutorials_list.svg?style=social)](https://github.com/ruzickap/darktable_video_tutorials_list)
-
-- CI/CD status:
-
-  [![GitHub Actions status - checks](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/checks/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/checks.yml)
-  [![GitHub Actions status - markdown-check](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/markdown-check.yml)
-  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/mega-linter.yml)
-  [![GitHub Actions status - release-please](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/release-please/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/renovate/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/renovate.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/semantic-pull-request.yml)
-  [![GitHub Actions status - stale](https://github.com/ruzickap/darktable_video_tutorials_list/workflows/stale/badge.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/actions/workflows/stale.yml)
-
-- Issue tracking:
-
-  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/issues)
-  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/pulls)
-
-- Repository:
-
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/releases)
-  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/commits/)
-  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/darktable_video_tutorials_list/latest)](https://github.com/ruzickap/darktable_video_tutorials_list/commits/)
-  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list/commits/)
-  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/darktable_video_tutorials_list.svg)](https://github.com/ruzickap/darktable_video_tutorials_list)
-
 ## [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
 - Description: Notes from Amazon EKS Bottlerocket and Fargate testing
