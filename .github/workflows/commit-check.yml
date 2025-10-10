@@ -21,5 +21,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - uses: commit-check/commit-check-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
         with:
           merge-base: true
