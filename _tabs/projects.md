@@ -1151,6 +1151,7 @@ List of my GitHub projects:
 - CI/CD status:
 
   [![GitHub Actions status - codeql](https://github.com/ruzickap/ruzickap.github.io/workflows/codeql/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/codeql.yml)
+  [![GitHub Actions status - commit-check](https://github.com/ruzickap/ruzickap.github.io/workflows/commit-check/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/commit-check.yml)
   [![GitHub Actions status - dependency-review](https://github.com/ruzickap/ruzickap.github.io/workflows/dependency-review/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/dependency-review.yml)
   [![GitHub Actions status - generate-projects](https://github.com/ruzickap/ruzickap.github.io/workflows/generate-projects/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/generate-projects.yml)
   [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/ruzickap.github.io/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)
@@ -1162,7 +1163,6 @@ List of my GitHub projects:
   [![GitHub Actions status - renovate-pr](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate-pr/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate-pr.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/ruzickap.github.io/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/scorecards.yml)
-  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ruzickap.github.io/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ruzickap.github.io/workflows/stale/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/stale.yml)
 
 - Issue tracking:
