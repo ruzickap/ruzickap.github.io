@@ -728,7 +728,7 @@ List of my GitHub projects:
 
 - Description: Harbor in Kubernetes
 - Website: <https://ruzickap.github.io/k8s-harbor/>
-- Topics: harbor, kuberntes, demo, presentation, eks, vulnerability-scanners,
+- Topics: harbor, kubernetes, demo, presentation, eks, vulnerability-scanners,
   public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/releases/latest)
