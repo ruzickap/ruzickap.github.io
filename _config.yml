@@ -8,7 +8,7 @@ theme: jekyll-theme-chirpy
 # otherwise, the layout language will use the default value of 'en'.
 lang: en
 
-# Change to your timezone
+# Change to your timezone › https://zones.arilyn.cc
 timezone: Europe/Prague
 
 # jekyll-seo-tag settings › https://github.com/jekyll/jekyll-seo-tag/blob/master/docs/usage.md
@@ -16,10 +16,10 @@ timezone: Europe/Prague
 
 title: Petr's Blog # the main title
 
-tagline: DevOps • GitOps • K8s # it will display as the sub-title
+tagline: DevOps • GitOps • K8s # it will display as the subtitle
 
 description: >- # used by seo meta and the atom feed
-  Blogging about DevOps, Kubernets, RPi, tips, ...
+  Blogging about DevOps, Kubernetes, RPi, tips, ...
 
 # Fill in the protocol & hostname for your site.
 # E.g. 'https://username.github.io', note that it does not end with a '/'.
@@ -214,7 +214,7 @@ exclude:
   - CHANGELOG.md
   - LICENSE
   - purgecss.js
-  - rollup.config.js
+  - "*.config.js"
   - "package*.json"
 
 jekyll-archives:
