@@ -26,6 +26,7 @@ jobs:
           cat > commit-check.toml << EOF
           [commit]
           subject_capitalized = false
+          subject_imperative = false
           subject_max_length = 72
           EOF
 
