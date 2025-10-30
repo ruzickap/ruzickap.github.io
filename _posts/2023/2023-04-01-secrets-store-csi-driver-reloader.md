@@ -30,7 +30,7 @@ or others, and then use them in Kubernetes.
 
 In this post, I would like to explore how to store secrets in
 [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/), retrieve them
-using the [Kubernetes Secrets Store CSI Driver](https://secrets-store-csi-driver.sigs.k8s.io)
+using the [Kubernetes Secrets Store CSI Driver](https://github.com/kubernetes-sigs/secrets-store-csi-driver)
 with the [AWS Secrets and Configuration Provider (ASCP)](https://github.com/aws/secrets-store-csi-driver-provider-aws),
 and then use them both as Kubernetes Secrets and as files mounted directly
 into pods.
