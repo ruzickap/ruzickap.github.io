@@ -1533,7 +1533,7 @@ and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.2
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
-MAILPIT_HELM_CHART_VERSION="0.28.0"
+MAILPIT_HELM_CHART_VERSION="0.29.1"
 
 helm repo add --force-update jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
