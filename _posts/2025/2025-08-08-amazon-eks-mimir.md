@@ -788,7 +788,7 @@ and modify its [default values](https://github.com/cert-manager/cert-manager/blo
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-CERT_MANAGER_HELM_CHART_VERSION="1.19.0"
+CERT_MANAGER_HELM_CHART_VERSION="1.19.1"
 
 helm repo add --force-update jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
