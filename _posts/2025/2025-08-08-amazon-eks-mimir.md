@@ -3,7 +3,7 @@ title: Amazon EKS and Grafana Mimir
 author: Petr Ruzicka
 date: 2025-08-08
 description: Build secure Amazon EKS cluster with Grafana Mimir
-categories: [Kubernetes, Amazon EKS, Security, Mimir]
+categories: [Kubernetes, Amazon EKS, Security, Mimir, Loki, Tempo]
 tags:
   [
     amazon eks,
@@ -17,6 +17,8 @@ tags:
     sso,
     oauth2-proxy,
     mimir,
+    loki,
+    tempo,
   ]
 image: https://raw.githubusercontent.com/grafana/mimir/843897414dba909dfd44f5b93dad35a8a6694d06/images/logo.png
 ---
@@ -313,6 +315,26 @@ Resources:
               StringEquals:
                 kms:ViaService: !Sub "ec2.${AWS::Region}.amazonaws.com"
                 kms:CallerAccount: !Sub "${AWS::AccountId}"
+  S3AccessPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "eksctl-${ClusterName}-s3-access-policy"
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - s3:GetObject
+              - s3:DeleteObject
+              - s3:PutObject
+              - s3:PutObjectTagging
+              - s3:AbortMultipartUpload
+              - s3:ListMultipartUploadParts
+            Resource: !Sub "arn:aws:s3:::${ClusterFQDN}/*"
+          - Effect: Allow
+            Action:
+              - s3:ListBucket
+            Resource: !Sub "arn:aws:s3:::${ClusterFQDN}"
 Outputs:
   KMSKeyArn:
     Description: The ARN of the created KMS Key to encrypt EKS related services
@@ -326,6 +348,12 @@ Outputs:
     Export:
       Name:
         Fn::Sub: "${AWS::StackName}-KMSKeyId"
+  S3AccessPolicyArn:
+    Description: IAM policy ARN for S3 access by EKS workloads
+    Value: !Ref S3AccessPolicy
+    Export:
+      Name:
+        Fn::Sub: "${AWS::StackName}-S3AccessPolicy"
 EOF
 
 # shellcheck disable=SC2001
@@ -333,9 +361,10 @@ eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
   --parameter-overrides "BaseDomain=${BASE_DOMAIN} ClusterFQDN=${CLUSTER_FQDN} ClusterName=${CLUSTER_NAME}" \
   --stack-name "${CLUSTER_NAME}-route53-kms" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" --tags "${TAGS//,/ }"
 
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query "Stacks[0].Outputs[? OutputKey==\`KMSKeyArn\` || OutputKey==\`KMSKeyId\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query "Stacks[0].Outputs[? OutputKey==\`KMSKeyArn\` || OutputKey==\`KMSKeyId\` || OutputKey==\`S3AccessPolicyArn\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
+AWS_S3_ACCESS_POLICY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"S3AccessPolicyArn\") .OutputValue")
 ```
 
 After running the CloudFormation stack, you should see the following Route53
@@ -361,7 +390,7 @@ a complete description of what `cloudformation.yaml` does for Karpenter.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="400"}
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/7370b5fd22eb6bec88f7799562b6cb24ac8fbb46/website/content/en/v1.6/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
+curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.8/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
 eval aws cloudformation deploy \
   --stack-name "${CLUSTER_NAME}-karpenter" \
   --template-file "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml" \
@@ -399,11 +428,6 @@ accessConfig:
 iam:
   withOIDC: true
   podIdentityAssociations:
-    # - namespace: aws-ebs-csi-driver
-    #   serviceAccountName: ebs-csi-controller-sa
-    #   roleName: eksctl-${CLUSTER_NAME}-aws-ebs-csi-driver
-    #   wellKnownPolicies:
-    #     ebsCSIController: true
     - namespace: aws-load-balancer-controller
       serviceAccountName: aws-load-balancer-controller
       roleName: eksctl-${CLUSTER_NAME}-aws-load-balancer-controller
@@ -424,42 +448,26 @@ iam:
       roleName: eksctl-${CLUSTER_NAME}-karpenter
       permissionPolicyARNs:
         - arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerPolicy-${CLUSTER_NAME}
+    - namespace: loki
+      serviceAccountName: loki
+      roleName: eksctl-${CLUSTER_NAME}-loki
+      permissionPolicyARNs:
+        - ${AWS_S3_ACCESS_POLICY_ARN}
     - namespace: mimir
       serviceAccountName: mimir
       roleName: eksctl-${CLUSTER_NAME}-mimir
-      permissionPolicy:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action: [
-              "ec2:DescribeVolumes",
-              "ec2:DescribeSnapshots",
-              "ec2:CreateTags",
-              "ec2:CreateSnapshot",
-              "ec2:DeleteSnapshots"
-            ]
-            Resource:
-              - "*"
-          - Effect: Allow
-            Action: [
-              "s3:GetObject",
-              "s3:DeleteObject",
-              "s3:PutObject",
-              "s3:PutObjectTagging",
-              "s3:AbortMultipartUpload",
-              "s3:ListMultipartUploadParts"
-            ]
-            Resource:
-              - "arn:aws:s3:::${CLUSTER_FQDN}/*"
-          - Effect: Allow
-            Action: [
-              "s3:ListBucket",
-            ]
-            Resource:
-              - "arn:aws:s3:::${CLUSTER_FQDN}"
+      permissionPolicyARNs:
+        - ${AWS_S3_ACCESS_POLICY_ARN}
+    - namespace: tempo
+      serviceAccountName: tempo
+      roleName: eksctl-${CLUSTER_NAME}-tempo
+      permissionPolicyARNs:
+        - ${AWS_S3_ACCESS_POLICY_ARN}
     - namespace: velero
       serviceAccountName: velero
       roleName: eksctl-${CLUSTER_NAME}-velero
+      permissionPolicyARNs:
+        - ${AWS_S3_ACCESS_POLICY_ARN}
       permissionPolicy:
         Version: "2012-10-17"
         Statement:
@@ -473,23 +481,6 @@ iam:
             ]
             Resource:
               - "*"
-          - Effect: Allow
-            Action: [
-              "s3:GetObject",
-              "s3:DeleteObject",
-              "s3:PutObject",
-              "s3:PutObjectTagging",
-              "s3:AbortMultipartUpload",
-              "s3:ListMultipartUploadParts"
-            ]
-            Resource:
-              - "arn:aws:s3:::${CLUSTER_FQDN}/*"
-          - Effect: Allow
-            Action: [
-              "s3:ListBucket",
-            ]
-            Resource:
-              - "arn:aws:s3:::${CLUSTER_FQDN}"
 iamIdentityMappings:
   - arn: "arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/KarpenterNodeRole-${CLUSTER_NAME}"
     username: system:node:{{EC2PrivateDNSName}}
@@ -498,18 +489,6 @@ iamIdentityMappings:
       - system:nodes
 addons:
   - name: coredns
-    # configurationValues: |
-    #   replicaCount: 2
-    #   affinity:
-    #     podAntiAffinity:
-    #       requiredDuringSchedulingIgnoredDuringExecution:
-    #         - labelSelector:
-    #             matchExpressions:
-    #               - key: eks.amazonaws.com/component
-    #                 operator: In
-    #                 values:
-    #                   - coredns
-    #           topologyKey: "topology.kubernetes.io/zone"
   - name: eks-pod-identity-agent
   - name: kube-proxy
   - name: snapshot-controller
@@ -522,7 +501,6 @@ addons:
           $(echo "${TAGS}" | sed "s/,/\\n          /g; s/=/: /g")
         loggingFormat: json
   - name: vpc-cni
-    version: latest
     configurationValues: |-
       enableNetworkPolicy: "true"
       env:
@@ -530,10 +508,7 @@ addons:
 managedNodeGroups:
   - name: mng01-ng
     amiFamily: Bottlerocket
-    # Minimal instance type for running add-ons + karpenter - ARM t4g.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
-    # Minimal instance type for running add-ons + karpenter - X86 t3a.medium: 4.0 GiB, 2 vCPUs - 0.0336 hourly
     instanceType: t4g.medium
-    # Due to karpenter we need 2 instances
     desiredCapacity: 2
     availabilityZones:
       - ${AWS_REGION}a
@@ -596,6 +571,75 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
     --resource-id "${AWS_VPC_ID}"
   ```
 
+### Prometheus Operator CRDs
+
+[Prometheus Operator CRDs](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-operator-crds)
+provides the Custom Resource Definitions (CRDs) that define the Prometheus operator
+resources. These CRDs are required before installing ServiceMonitor resources.
+
+Install the `prometheus-operator-crds` [Helm chart](https://github.com/prometheus-community/helm-charts/tree/prometheus-operator-crds-23.0.0/charts/prometheus-operator-crds)
+to set up the necessary CRDs:
+
+```bash
+helm install prometheus-operator-crds oci://ghcr.io/prometheus-community/charts/prometheus-operator-crds
+```
+
+### AWS Load Balancer Controller
+
+The [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
+is a controller that manages Elastic Load Balancers for a Kubernetes cluster.
+
+![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
+
+Install the `aws-load-balancer-controller` [Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
+and modify its [default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.13.4/helm/aws-load-balancer-controller/values.yaml):
+
+```bash
+# renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
+AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.14.0"
+
+helm repo add --force-update eks https://aws.github.io/eks-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" << EOF
+serviceAccount:
+  name: aws-load-balancer-controller
+clusterName: ${CLUSTER_NAME}
+serviceMonitor:
+  enabled: true
+EOF
+helm upgrade --install --version "${AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION}" --namespace aws-load-balancer-controller --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" aws-load-balancer-controller eks/aws-load-balancer-controller
+```
+
+### Pod Scheduling PriorityClasses
+
+Configure [PriorityClasses](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+to control the scheduling priority of pods in your cluster. PriorityClasses allow
+you to influence which pods are scheduled or evicted first when resources are
+constrained. These classes help ensure that critical workloads receive scheduling
+priority over less important workloads.
+
+Create custom PriorityClass resources to define priority levels for different
+workload types:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-scheduling-priorityclass.yml" << EOF | kubectl apply -f -
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: critical-priority
+value: 100001000
+globalDefault: false
+description: "This priority class should be used for critical workloads only"
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 100000000
+globalDefault: false
+description: "This priority class should be used for high priority workloads"
+EOF
+```
+
 ### Add Storage Classes and Volume Snapshots
 
 Configure persistent storage for your EKS cluster by setting up GP3 storage
@@ -603,7 +647,7 @@ classes and volume snapshot capabilities. This ensures encrypted, expandable
 storage with proper backup functionality.
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-storageclass-volumesnapshotclass.yml" << EOF | kubectl apply -f -
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-storage-snapshot-storageclass-volumesnapshotclass.yml" << EOF | kubectl apply -f -
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -644,13 +688,16 @@ flexibility, performance, and simplicity.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
 
 Install the `karpenter` [Helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
-and customize its [default values](https://github.com/aws/karpenter-provider-aws/blob/v1.6.2/charts/karpenter/values.yaml)
+and customize its [default values](https://github.com/aws/karpenter-provider-aws/blob/v1.8.2/charts/karpenter/values.yaml)
 to fit your environment and storage backend:
 
 ```bash
-KARPENTER_HELM_CHART_VERSION="1.6.1"
+# renovate: datasource=github-tags depName=aws/karpenter-provider-aws
+KARPENTER_HELM_CHART_VERSION="1.8.2"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
+serviceMonitor:
+  enabled: true
 settings:
   clusterName: ${CLUSTER_NAME}
   eksControlPlane: true
@@ -727,29 +774,6 @@ spec:
 EOF
 ```
 
-### AWS Load Balancer Controller
-
-The [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
-is a controller that manages Elastic Load Balancers for a Kubernetes cluster.
-
-![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
-
-Install the `aws-load-balancer-controller` [Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
-and modify its [default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.13.4/helm/aws-load-balancer-controller/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
-AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.13.4"
-
-helm repo add --force-update eks https://aws.github.io/eks-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" << EOF
-serviceAccount:
-  name: aws-load-balancer-controller
-clusterName: ${CLUSTER_NAME}
-EOF
-helm upgrade --install --version "${AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION}" --namespace aws-load-balancer-controller --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" aws-load-balancer-controller eks/aws-load-balancer-controller
-```
-
 ### cert-manager
 
 [cert-manager](https://cert-manager.io/) adds certificates and certificate
@@ -760,52 +784,28 @@ obtaining, renewing, and using those certificates.
 
 The `cert-manager` ServiceAccount was created by `eksctl`.
 Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.18.2/deploy/charts/cert-manager/values.yaml):
+and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.19.0/deploy/charts/cert-manager/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-CERT_MANAGER_HELM_CHART_VERSION="1.18.2"
+CERT_MANAGER_HELM_CHART_VERSION="1.19.0"
 
 helm repo add --force-update jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
+global:
+  priorityClassName: high-priority
 crds:
   enabled: true
+extraArgs:
+  - --enable-certificate-owner-ref=true
 serviceAccount:
   name: cert-manager
 enableCertificateOwnerRef: true
-# prometheus:
-#   servicemonitor:
-#     enabled: true
+prometheus:
+  servicemonitor:
+    enabled: true
 EOF
-helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
-```
-
-Create a Let's Encrypt production `ClusterIssuer`:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-production.yml" << EOF | kubectl apply -f -
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-production-dns
-  namespace: cert-manager
-  labels:
-    letsencrypt: production
-spec:
-  acme:
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: ${MY_EMAIL}
-    privateKeySecretRef:
-      name: letsencrypt-production-dns
-    solvers:
-      - selector:
-          dnsZones:
-            - ${CLUSTER_FQDN}
-        dns01:
-          route53: {}
-EOF
-kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
-kubectl label secret --namespace cert-manager letsencrypt-production-dns letsencrypt=production
+helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
 
 ## Install Velero
@@ -817,26 +817,27 @@ and scheduled backups by integrating with cloud storage providers such as AWS S3
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
 
 Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
-and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-8.3.0/charts/velero/values.yaml):
+and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.1.1/charts/velero/values.yaml):
 
 {% raw %}
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="8.3.0"
+VELERO_HELM_CHART_VERSION="11.1.1"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
 initContainers:
   - name: velero-plugin-for-aws
     # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?<version>.+)$
-    image: velero/velero-plugin-for-aws:v1.11.1
+    image: velero/velero-plugin-for-aws:v1.13.0
     volumeMounts:
       - mountPath: /target
         name: plugins
-# metrics:
-#   serviceMonitor:
-#     enabled: true
+priorityClassName: high-priority
+metrics:
+  serviceMonitor:
+    enabled: true
 #   prometheusRule:
 #     enabled: true
 #     spec:
@@ -923,6 +924,7 @@ certificate, previously backed up by Velero to S3, onto a new cluster.
 Initiate the restore process for the cert-manager objects.
 
 ```bash
+while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
 velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 ```
 
@@ -933,6 +935,56 @@ velero restore describe --selector letsencrypt=production --details
 ```
 
 ```console
+Name:         velero-monthly-backup-cert-manager-production-20251030075321
+Namespace:    velero
+Labels:       letsencrypt=production
+Annotations:  <none>
+
+Phase:                       Completed
+Total items to be restored:  3
+Items restored:              3
+
+Started:    2025-10-30 07:53:22 +0100 CET
+Completed:  2025-10-30 07:53:24 +0100 CET
+
+Backup:  velero-monthly-backup-cert-manager-production-20250921155028
+
+Namespaces:
+  Included:  all namespaces found in the backup
+  Excluded:  <none>
+
+Resources:
+  Included:        *
+  Excluded:        nodes, events, events.events.k8s.io, backups.velero.io, restores.velero.io, resticrepositories.velero.io, csinodes.storage.k8s.io, volumeattachments.storage.k8s.io, backuprepositories.velero.io
+  Cluster-scoped:  auto
+
+Namespace mappings:  <none>
+
+Label selector:  <none>
+
+Or label selector:  <none>
+
+Restore PVs:  auto
+
+CSI Snapshot Restores: <none included>
+
+Existing Resource Policy:   update
+ItemOperationTimeout:       4h0m0s
+
+Preserve Service NodePorts:  auto
+
+Uploader config:
+
+
+HooksAttempted:   0
+HooksFailed:      0
+
+Resource List:
+  cert-manager.io/v1/Certificate:
+    - cert-manager/ingress-cert-production(created)
+  v1/Secret:
+    - cert-manager/ingress-cert-production(created)
+    - cert-manager/letsencrypt-production-dns(created)
 ```
 
 Verify that the certificate was restored properly:
@@ -942,6 +994,44 @@ kubectl describe certificates -n cert-manager ingress-cert-production
 ```
 
 ```console
+Name:         ingress-cert-production
+Namespace:    cert-manager
+Labels:       letsencrypt=production
+              velero.io/backup-name=velero-monthly-backup-cert-manager-production-20250921155028
+              velero.io/restore-name=velero-monthly-backup-cert-manager-production-20251030075321
+Annotations:  <none>
+API Version:  cert-manager.io/v1
+Kind:         Certificate
+Metadata:
+  Creation Timestamp:  2025-10-30T06:53:23Z
+  Generation:          1
+  Resource Version:    5521
+  UID:                 33422558-3105-4936-87d8-468befb5dc2b
+Spec:
+  Common Name:  *.k01.k8s.mylabs.dev
+  Dns Names:
+    *.k01.k8s.mylabs.dev
+    k01.k8s.mylabs.dev
+  Issuer Ref:
+    Group:      cert-manager.io
+    Kind:       ClusterIssuer
+    Name:       letsencrypt-production-dns
+  Secret Name:  ingress-cert-production
+  Secret Template:
+    Labels:
+      Letsencrypt:  production
+Status:
+  Conditions:
+    Last Transition Time:  2025-10-30T06:53:23Z
+    Message:               Certificate is up to date and has not expired
+    Observed Generation:   1
+    Reason:                Ready
+    Status:                True
+    Type:                  Ready
+  Not After:               2025-12-20T10:53:07Z
+  Not Before:              2025-09-21T10:53:08Z
+  Renewal Time:            2025-11-20T10:53:07Z
+Events:                    <none>
 ```
 
 ### ExternalDNS
@@ -954,24 +1044,117 @@ exposed Kubernetes Services and Ingresses with DNS providers.
 ExternalDNS will manage the DNS records. The `external-dns` ServiceAccount was
 created by `eksctl`.
 Install the `external-dns` [Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
-and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.18.0/charts/external-dns/values.yaml):
+and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.19.0/charts/external-dns/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
-EXTERNAL_DNS_HELM_CHART_VERSION="1.18.0"
+EXTERNAL_DNS_HELM_CHART_VERSION="1.19.0"
 
 helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
 serviceAccount:
   name: external-dns
-# serviceMonitor:
-#   enabled: true
+priorityClassName: high-priority
+serviceMonitor:
+  enabled: true
 interval: 20s
 policy: sync
 domainFilters:
   - ${CLUSTER_FQDN}
 EOF
 helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
+```
+
+## Loki
+
+[Grafana Loki](https://grafana.com/oss/loki/) is a horizontally-scalable,
+highly-available, multi-tenant log aggregation system inspired by Prometheus. It
+is designed to be very cost-effective and easy to operate, as it does not index
+the contents of the logs, but rather a set of labels for each log stream.
+
+![Grafana Loki](https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo_and_name.png){:width="400"}
+
+Install the `loki` [Helm chart](https://github.com/grafana/loki/tree/helm-loki-6.42.0/production/helm/loki)
+and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.42.0/production/helm/loki/values.yaml)
+to fit your environment and storage requirements:
+
+```bash
+# renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
+LOKI_HELM_CHART_VERSION="6.42.0"
+
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" << EOF
+global:
+  priorityClassName: high-priority
+deploymentMode: SingleBinary
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 2
+  storage:
+    bucketNames:
+      chunks: ${CLUSTER_FQDN}
+      ruler: ${CLUSTER_FQDN}
+      admin: ${CLUSTER_FQDN}
+    s3:
+      region: ${AWS_REGION}
+      endpoint: s3.${AWS_REGION}.amazonaws.com
+    object_store:
+      storage_prefix: ruzickap
+      s3:
+        endpoint: s3.${AWS_REGION}.amazonaws.com
+        region: ${AWS_REGION}
+  schemaConfig:
+    configs:
+      - from: 2024-04-01
+        store: tsdb
+        object_store: s3
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+  storage_config:
+    aws:
+      region: ${AWS_REGION}
+      # bucketnames: loki-chunk
+      # bucketnames: loki-chunk
+      # s3forcepathstyle: false
+      # s3: s3://s3.${AWS_REGION}.amazonaws.com/loki-storage
+      # endpoint: s3.${AWS_REGION}.amazonaws.com
+  limits_config:
+    retention_period: 1w
+  # Log retention in Loki is achieved through the Compactor (https://grafana.com/docs/loki/latest/get-started/components/#compactor)
+  # compactor:
+  #   delete_request_store: s3
+  #   retention_enabled: true
+ingress:
+  enabled: true
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: A horizontally-scalable, highly-available log aggregation system
+    gethomepage.dev/group: Apps
+    gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo.png
+    gethomepage.dev/name: Loki
+    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+  hosts:
+    - loki.${CLUSTER_FQDN}
+  tls:
+    - hosts:
+        - loki.${CLUSTER_FQDN}
+singleBinary:
+  replicas: 2
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+# https://blog.devgenius.io/install-loki-in-distributed-mode-on-azure-aks-with-terraform-0918803f2ed0
+ruler:
+  enabled: false
+EOF
+helm upgrade --install --version "${LOKI_HELM_CHART_VERSION}" --namespace loki --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" loki grafana/loki
 ```
 
 ### Grafana Mimir
@@ -985,12 +1168,12 @@ dashboards for visualization and alerting.
 ![Grafana Mimir](https://raw.githubusercontent.com/grafana/mimir/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.png){:width="400"}
 
 Install the `mimir-distributed` [Helm chart](https://github.com/grafana/mimir/tree/main/operations/helm/charts/mimir-distributed)
-and customize its [default values](https://github.com/grafana/mimir/blob/mimir-distributed-5.7.0/operations/helm/charts/mimir-distributed/values.yaml)
+and customize its [default values](https://github.com/grafana/mimir/blob/mimir-distributed-6.0.0-rc.0/operations/helm/charts/mimir-distributed/values.yaml)
 to fit your environment and storage backend:
 
 ```bash
 # renovate: datasource=helm depName=mimir-distributed registryUrl=https://grafana.github.io/helm-charts
-MIMIR_DISTRIBUTED_HELM_CHART_VERSION="5.7.0"
+MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.0.0-rc.0"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" << EOF
@@ -1005,30 +1188,258 @@ mimir:
       storage:
         backend: s3
         s3:
-          # bucket_name: "${CLUSTER_FQDN}"
-          endpoint: "s3.${AWS_REGION}.amazonaws.com"
+          endpoint: s3.${AWS_REGION}.amazonaws.com
           region: ${AWS_REGION}
           storage_class: ONEZONE_IA
     alertmanager_storage:
       s3:
-        bucket_name: "${CLUSTER_FQDN}"
+        bucket_name: ${CLUSTER_FQDN}
       storage_prefix: mimiralertmanager
     blocks_storage:
       s3:
-        bucket_name: "${CLUSTER_FQDN}"
+        bucket_name: ${CLUSTER_FQDN}
       storage_prefix: mimirblocks
     ruler_storage:
       s3:
-        bucket_name: "${CLUSTER_FQDN}"
+        bucket_name: ${CLUSTER_FQDN}
       storage_prefix: mimirruler
 ingester:
   replicas: 2
+# https://github.com/grafana/helm-charts/blob/main/charts/rollout-operator/values.yaml
+rollout_operator:
+  serviceMonitor:
+    enabled: true
 minio:
-  enabled: false
-nginx:
   enabled: false
 EOF
 helm upgrade --install --version "${MIMIR_DISTRIBUTED_HELM_CHART_VERSION}" --namespace mimir --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" mimir grafana/mimir-distributed
+```
+
+## Grafana Tempo
+
+[Grafana Tempo](https://grafana.com/oss/tempo/) is an open source, easy-to-use, and
+high-scale distributed tracing backend. It is designed to be cost-effective and
+simple to operate, as it only requires object storage to operate its backend and
+does not index the trace data.
+
+![Grafana Tempo](https://raw.githubusercontent.com/grafana/tempo/8dd75d18773d77149de8588f9dccbd680a03b00e/docs/sources/tempo/logo_and_name.png)
+
+Install the `tempo` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/tempo-distributed)
+and customize its [default values](https://github.com/grafana/helm-charts/blob/tempo-1.23.3/charts/tempo-distributed/values.yaml)
+to fit your environment and storage requirements:
+
+```bash
+# renovate: datasource=helm depName=tempo registryUrl=https://grafana.github.io/helm-charts
+TEMPO_HELM_CHART_VERSION="1.23.3"
+
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" << EOF
+global:
+  priorityClassName: high-priority
+# https://youtu.be/PmE9mgYaoQA?t=817
+metricsGenerator:
+  enabled: true
+storage:
+  trace:
+    backend: s3
+    s3:
+      bucket: ${CLUSTER_FQDN}
+      endpoint: s3.${AWS_REGION}.amazonaws.com
+  admin:
+    backend: s3
+    s3:
+      bucket_name: ${CLUSTER_FQDN}
+      endpoint: s3.${AWS_REGION}.amazonaws.com
+traces:
+  otlp:
+    http:
+      enabled: true
+    grpc:
+      enabled: true
+EOF
+helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" tempo grafana/tempo
+```
+
+## Grafana Alloy
+
+[Grafana Alloy](https://grafana.com/oss/alloy/) is an open source, vendor-neutral
+distribution of OpenTelemetry that provides a unified way to collect, process, and
+export telemetry data (traces, metrics, and logs) from your infrastructure and
+applications.
+
+![Grafana Alloy](https://raw.githubusercontent.com/grafana/alloy/9b878da08fec0467a88637fd26e5be6da2037574/docs/sources/assets/logo_alloy_light.svg){:width="400"}
+
+Install the `alloy` [Helm chart](https://github.com/grafana/alloy/tree/main/operations/helm/charts/alloy)
+and customize its [default values](https://github.com/grafana/alloy/blob/v1.3.0/operations/helm/charts/alloy/values.yaml)
+to fit your environment and monitoring needs:
+
+```bash
+# renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
+ALLOY_HELM_CHART_VERSION="1.3.0"
+
+# https://github.com/ai-cfia/howard-on-prem/blob/main/monitoring/grafana-alloy/helm/values.yaml
+# https://github.com/hongbo-miao/hongbomiao.com/blob/main/kubernetes/argo-cd/projects/production-hm/alloy/manifests/hm-alloy-application.yaml
+# https://github.com/RS-PYTHON/rs-infra-monitoring/blob/0cc043e9398edd80b91b3ac8768f5a8ab7fce26e/apps/alloy/values.yaml#L47
+# https://stackoverflow.com/questions/79695474/grafana-alloy-no-prefect-pod-logs-on-bottlerocket
+# https://developer-friendly.blog/blog/2025/03/17/migration-from-promtail-to-alloy-the-what-the-why-and-the-how/#collect-prometheus-metrics
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" << \EOF
+alloy:
+  configMap:
+    content: |-
+      // https://grafana.com/docs/alloy/latest/configure/kubernetes/
+      // https://grafana.com/docs/alloy/latest/collect/logs-in-kubernetes/
+      logging {
+        level = "info"
+        format = "json"
+      }
+
+      // https://grafana.com/docs/alloy/latest/reference/config-blocks/livedebugging/
+      livedebugging {
+        enabled = true
+      }
+
+      // discovery.kubernetes allows you to find scrape targets from Kubernetes resources.
+      // It watches cluster state and ensures targets are continually synced with what is currently running in your cluster.
+      discovery.kubernetes "pod" {
+        role = "pod"
+      }
+
+      // discovery.relabel rewrites the label set of the input targets by applying one or more relabeling rules.
+      // If no rules are defined, then the input targets are exported as-is.
+      discovery.relabel "pod_logs" {
+        targets = discovery.kubernetes.pod.targets
+
+        // Label creation - "namespace" field from "__meta_kubernetes_namespace"
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          action = "replace"
+          target_label = "namespace"
+        }
+
+        // Label creation - "pod" field from "__meta_kubernetes_pod_name"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          action = "replace"
+          target_label = "pod"
+        }
+
+        // Label creation - "container" field from "__meta_kubernetes_pod_container_name"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          action = "replace"
+          target_label = "container"
+        }
+
+        // Label creation -  "app" field from "__meta_kubernetes_pod_label_app_kubernetes_io_name"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+          action = "replace"
+          target_label = "app"
+        }
+
+        // Label creation -  "job" field from "__meta_kubernetes_namespace" and "__meta_kubernetes_pod_container_name"
+        // Concatenate values __meta_kubernetes_namespace/__meta_kubernetes_pod_container_name
+        rule {
+          source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_container_name"]
+          action = "replace"
+          target_label = "job"
+          separator = "/"
+          replacement = "$1"
+        }
+
+        // Label creation - "container" field from "__meta_kubernetes_pod_uid" and "__meta_kubernetes_pod_container_name"
+        // Concatenate values __meta_kubernetes_pod_uid/__meta_kubernetes_pod_container_name.log
+        rule {
+          source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+          action = "replace"
+          target_label = "__path__"
+          separator = "/"
+          replacement = "/var/log/pods/*$1/*.log"
+        }
+
+        // Label creation -  "container_runtime" field from "__meta_kubernetes_pod_container_id"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_id"]
+          action = "replace"
+          target_label = "container_runtime"
+          regex = "^(\\S+):\\/\\/.+$"
+          replacement = "$1"
+        }
+      }
+
+      prometheus.exporter.unix "default" {
+        // https://github.com/aws/karpenter-provider-aws/issues/5406
+        // https://github.com/prometheus/node_exporter/issues/2692
+        // udev_data_path = "/rootfs/run/udev/data"
+      }
+
+      prometheus.scrape "scrape_metrics" {
+        targets         = prometheus.exporter.unix.default.targets
+        forward_to      = [prometheus.remote_write.default.receiver]
+        scrape_interval = "10s"
+      }
+
+      prometheus.remote_write "default" {
+        endpoint {
+          url = "http://mimir-nginx.mimir.svc.cluster.local/api/v1/push"
+          headers = {
+            "X-Scope-OrgID" = "1",
+          }
+        }
+      }
+
+      otelcol.receiver.otlp "default" {
+        http {
+          include_metadata = true
+        }
+        grpc {
+          include_metadata = true
+        }
+
+        output {
+          metrics = [otelcol.processor.batch.default.input]
+          logs    = [otelcol.processor.batch.default.input]
+          traces  = [otelcol.processor.batch.default.input]
+        }
+      }
+
+      otelcol.processor.batch "default" {
+        output {
+          metrics = [otelcol.exporter.otlp.mimir.input]
+          logs    = [otelcol.exporter.otlp.loki.input]
+          traces  = [otelcol.exporter.otlp.tempo.input]
+        }
+      }
+
+      otelcol.exporter.otlp "mimir" {
+        client {
+          endpoint = "http://mimir-nginx.mimir.svc.cluster.local/api/v1/push"
+        }
+      }
+
+      otelcol.exporter.otlp "loki" {
+        client {
+          endpoint = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
+        }
+      }
+
+      otelcol.exporter.otlp "tempo" {
+        client {
+          endpoint = "tempo-distributed-distributor.tempo.svc.cluster.local:4317"
+          tls {
+            insecure = true
+          }
+        }
+      }
+  mounts:
+    varlog: true
+controller:
+  priorityClassName: system-node-critical
+serviceMonitor:
+  enabled: true
+EOF
+helm upgrade --install --version "${ALLOY_HELM_CHART_VERSION}" --namespace alloy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" alloy grafana/alloy
 ```
 
 ## Ingress NGINX Controller
@@ -1038,11 +1449,11 @@ controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 
 Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
-and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.13.2/charts/ingress-nginx/values.yaml):
+and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.13.3/charts/ingress-nginx/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.13.2"
+INGRESS_NGINX_HELM_CHART_VERSION="4.13.3"
 
 helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
@@ -1066,10 +1477,10 @@ controller:
       service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: proxy_protocol_v2.enabled=true
       service.beta.kubernetes.io/aws-load-balancer-type: external
     # loadBalancerClass: eks.amazonaws.com/nlb
-  # metrics:
-  #   enabled: true
-  #   serviceMonitor:
-  #     enabled: true
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
   #   prometheusRule:
   #     enabled: true
   #     rules:
@@ -1105,6 +1516,7 @@ controller:
   #         annotations:
   #           description: Too many 4XXs
   #           summary: More than 5% of all requests returned 4XX, this requires your attention
+  priorityClassName: critical-priority
 EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
 ```
@@ -1116,7 +1528,7 @@ Mailpit will be used to receive email alerts from Prometheus.
 ![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="150"}
 
 Install the `mailpit` [Helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
-and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.27.0/charts/mailpit/values.yaml):
+and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.28.0/charts/mailpit/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
@@ -1166,14 +1578,16 @@ monitoring your Kubernetes cluster and applications.
 ![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="300"}
 
 Install the `grafana` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
-and modify its [default values](https://github.com/grafana/helm-charts/blob/grafana-9.4.3/charts/grafana/values.yaml):
+and modify its [default values](https://github.com/grafana/helm-charts/blob/grafana-10.0.0/charts/grafana/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=grafana registryUrl=https://grafana.github.io/helm-charts
-GRAFANA_HELM_CHART_VERSION="9.4.3"
+GRAFANA_HELM_CHART_VERSION="10.0.0"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-grafana.yml" << EOF
+serviceMonitor:
+  enabled: true
 ingress:
   enabled: true
   ingressClassName: nginx
@@ -1206,6 +1620,22 @@ datasources:
         url: http://mimir-nginx.mimir.svc.cluster.local:80/prometheus
         access: proxy
         isDefault: true
+        jsonData:
+          httpHeaderName1: X-Scope-OrgID
+        secureJsonData:
+          httpHeaderValue1: "1"
+      - name: Loki
+        type: loki
+        url: http://loki-gateway.loki.svc.cluster.local/
+        access: proxy
+        jsonData:
+          httpHeaderName1: X-Scope-OrgID
+        secureJsonData:
+          httpHeaderValue1: "1"
+      - name: Tempo
+        type: tempo
+        url: http://tempo-query-frontend.tempo.svc.cluster.local:3200
+        access: proxy
 notifiers:
   notifiers.yaml:
     notifiers:
@@ -1333,11 +1763,11 @@ application endpoints with Google Authentication.
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="300"}
 
 Install the `oauth2-proxy` [Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
-and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-7.8.2/helm/oauth2-proxy/values.yaml):
+and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-8.3.1/helm/oauth2-proxy/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="7.9.2"
+OAUTH2_PROXY_HELM_CHART_VERSION="8.3.1"
 
 helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
@@ -1369,6 +1799,7 @@ ingress:
   tls:
     - hosts:
         - oauth2-proxy.${CLUSTER_FQDN}
+priorityClassName: critical-priority
 metrics:
   servicemonitor:
     enabled: true
@@ -1382,12 +1813,12 @@ Install [Homepage](https://gethomepage.dev/) to provide a nice dashboard.
 
 ![Homepage](https://raw.githubusercontent.com/gethomepage/homepage/e56dccc7f17144a53b97a315c2e4f622fa07e58d/images/banner_light%402x.png){:width="300"}
 
-Install the `homepage` [Helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.0.1/charts/homepage)
-and modify its [default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.0.1/charts/homepage/values.yaml):
+Install the `homepage` [Helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.1.0/charts/homepage)
+and modify its [default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.1.0/charts/homepage/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=homepage registryUrl=http://jameswynn.github.io/helm-charts
-HOMEPAGE_HELM_CHART_VERSION="2.0.1"
+HOMEPAGE_HELM_CHART_VERSION="2.1.0"
 
 helm repo add --force-update jameswynn http://jameswynn.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" << EOF
@@ -1486,15 +1917,12 @@ done
 Disassociate a Route 53 Resolver query log configuration from an Amazon VPC:
 
 ```sh
-AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:alpha.eksctl.io/cluster-name,Values=${CLUSTER_NAME}" --query 'Vpcs[*].VpcId' --output text)
-
-if [[ -n "${AWS_VPC_ID}" ]]; then
-  AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver list-resolver-query-log-config-associations \
-    --query "ResolverQueryLogConfigAssociations[?ResourceId=='${AWS_VPC_ID}'].ResolverQueryLogConfigId" --output text)
-  if [[ -n "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" ]]; then
-    aws route53resolver disassociate-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOLVER_QUERY_LOG_CONFIG_ID}" --resource-id "${AWS_VPC_ID}"
+RESOLVER_QUERY_LOG_CONFIGS_ID=$(aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?contains(DestinationArn, '/aws/eks/${CLUSTER_NAME}/cluster')].Id" --output text)
+if [[ -n "${RESOLVER_QUERY_LOG_CONFIGS_ID}" ]]; then
+  RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOURCEID=$(aws route53resolver list-resolver-query-log-config-associations --filters "Name=ResolverQueryLogConfigId,Values=${RESOLVER_QUERY_LOG_CONFIGS_ID}" --query 'ResolverQueryLogConfigAssociations[].ResourceId' --output text)
+  if [[ -n "${RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOURCEID}" ]]; then
+    aws route53resolver disassociate-resolver-query-log-config --resolver-query-log-config-id "${RESOLVER_QUERY_LOG_CONFIGS_ID}" --resource-id "${RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOURCEID}"
     sleep 5
-    # wait4x exec "test "$(aws route53resolver list-resolver-query-log-config-associations --filters Name=ResolverQueryLogConfigId,Values="${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" --query "ResolverQueryLogConfigAssociations[?ResourceId=='${AWS_VPC_ID}'].Status" --output text)" = """
   fi
 fi
 ```
@@ -1579,7 +2007,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,karpenter,mailpit,mimir-distributed,oauth2-proxy,velero},k8s-{cert-manager-clusterissuer-production,karpenter-nodepool,storageclass-volumesnapshotclass}}.yml}; do
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{alloy,aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,tempo,velero},k8s-{karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else
