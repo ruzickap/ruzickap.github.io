@@ -48,6 +48,12 @@ jobs:
     if: ${{ contains(github.event.pull_request.labels.*.name, 'renovate-pr') }}
     permissions: write-all
     steps:
+      - name: Remove label
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: gh api "/repos/{owner}/{repo}/issues/${PR_NUMBER}/labels/renovate-pr" --method DELETE
+
       - name: Checkout
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
@@ -69,9 +75,3 @@ jobs:
           RENOVATE_INCLUDE_PATHS: ${{ steps.changed-files.outputs.all_changed_files }}
         with:
           token: ${{ steps.app-token.outputs.token }}
-
-      - name: Remove label
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.number }}
-        run: gh api "/repos/{owner}/{repo}/issues/${PR_NUMBER}/labels/renovate-pr" --method DELETE
