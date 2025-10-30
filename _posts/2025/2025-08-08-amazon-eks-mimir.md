@@ -1275,7 +1275,7 @@ to fit your environment and monitoring needs:
 
 ```bash
 # renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
-ALLOY_HELM_CHART_VERSION="1.3.0"
+ALLOY_HELM_CHART_VERSION="1.4.0"
 
 # https://github.com/ai-cfia/howard-on-prem/blob/main/monitoring/grafana-alloy/helm/values.yaml
 # https://github.com/hongbo-miao/hongbomiao.com/blob/main/kubernetes/argo-cd/projects/production-hm/alloy/manifests/hm-alloy-application.yaml
