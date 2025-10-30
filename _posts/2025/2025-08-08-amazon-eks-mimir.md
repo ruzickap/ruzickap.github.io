@@ -1129,6 +1129,7 @@ loki:
   #   retention_enabled: true
 ingress:
   enabled: true
+  ingressClassName: nginx
   annotations:
     gethomepage.dev/enabled: "true"
     gethomepage.dev/description: A horizontally-scalable, highly-available log aggregation system
