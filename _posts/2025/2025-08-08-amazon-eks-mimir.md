@@ -596,7 +596,7 @@ and modify its [default values](https://github.com/kubernetes-sigs/aws-load-bala
 
 ```bash
 # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
-AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.14.0"
+AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.14.1"
 
 helm repo add --force-update eks https://aws.github.io/eks-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" << EOF
