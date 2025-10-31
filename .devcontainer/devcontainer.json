@@ -58,7 +58,7 @@
     }
   },
 
-  "postStartCommand": "wget https://raw.githubusercontent.com/ruzickap/ansible-my_workstation/refs/heads/main/ansible/files/home/myusername/.config/Code/User/settings.json -O ~/.vscode-remote/data/Machine/settings.json",
+  "postStartCommand": "wget https://raw.githubusercontent.com/ruzickap/ansible-my_workstation/4c3d7b2c602d27ca1a446732002ad6766567ae19/ansible/files/home/myusername/.config/Cursor/User/settings.json -O ~/.vscode-remote/data/Machine/settings.json",
 
   "remoteUser": "vscode"
   // keep-sorted end

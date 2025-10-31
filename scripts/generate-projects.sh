@@ -11,7 +11,8 @@ icon: fas fa-project-diagram
 order: 4
 ---
 
-List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ruzickap/)
+- Legacy Blog: [linux.xvx.cz](https://linux.xvx.cz/)
+- List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ruzickap/)
 EOF
 
 while read -r GITHUB_REPOSITORY_TITLE_TMP; do
