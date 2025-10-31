@@ -6,10 +6,9 @@ cdn\.com
 github\.com/ruzickap
 https://(grafana|oauth2-proxy|ollama-vulnerable|open-webui|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
-kubernetes-sigs\.github\.io/aws-ebs-csi-driver
 mylabs\.dev
-stefanprodan\.github\.io/podinfo
 username\.github\.io/
 www\.cvedetails\.com
 www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
+www\.reddit\.com/submit\?url=
 # keep-sorted end
