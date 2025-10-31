@@ -1065,384 +1065,6 @@ EOF
 helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
 ```
 
-## Loki
-
-[Grafana Loki](https://grafana.com/oss/loki/) is a horizontally-scalable,
-highly-available, multi-tenant log aggregation system inspired by Prometheus. It
-is designed to be very cost-effective and easy to operate, as it does not index
-the contents of the logs, but rather a set of labels for each log stream.
-
-![Grafana Loki](https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo_and_name.png){:width="400"}
-
-Install the `loki` [Helm chart](https://github.com/grafana/loki/tree/helm-loki-6.42.0/production/helm/loki)
-and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.42.0/production/helm/loki/values.yaml)
-to fit your environment and storage requirements:
-
-```bash
-# renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
-LOKI_HELM_CHART_VERSION="6.44.0"
-
-helm repo add --force-update grafana https://grafana.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" << EOF
-global:
-  priorityClassName: high-priority
-deploymentMode: SingleBinary
-loki:
-  auth_enabled: false
-  commonConfig:
-    replication_factor: 2
-  storage:
-    bucketNames:
-      chunks: ${CLUSTER_FQDN}
-      ruler: ${CLUSTER_FQDN}
-      admin: ${CLUSTER_FQDN}
-    s3:
-      region: ${AWS_REGION}
-      endpoint: s3.${AWS_REGION}.amazonaws.com
-    object_store:
-      storage_prefix: ruzickap
-      s3:
-        endpoint: s3.${AWS_REGION}.amazonaws.com
-        region: ${AWS_REGION}
-  schemaConfig:
-    configs:
-      - from: 2024-04-01
-        store: tsdb
-        object_store: s3
-        schema: v13
-        index:
-          prefix: loki_index_
-          period: 24h
-  storage_config:
-    aws:
-      region: ${AWS_REGION}
-      # bucketnames: loki-chunk
-      # bucketnames: loki-chunk
-      # s3forcepathstyle: false
-      # s3: s3://s3.${AWS_REGION}.amazonaws.com/loki-storage
-      # endpoint: s3.${AWS_REGION}.amazonaws.com
-  limits_config:
-    retention_period: 1w
-  # Log retention in Loki is achieved through the Compactor (https://grafana.com/docs/loki/latest/get-started/components/#compactor)
-  # compactor:
-  #   delete_request_store: s3
-  #   retention_enabled: true
-ingress:
-  enabled: true
-  ingressClassName: nginx
-  annotations:
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/description: A horizontally-scalable, highly-available log aggregation system
-    gethomepage.dev/group: Apps
-    gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo.png
-    gethomepage.dev/name: Loki
-    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
-    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
-  hosts:
-    - loki.${CLUSTER_FQDN}
-  tls:
-    - hosts:
-        - loki.${CLUSTER_FQDN}
-singleBinary:
-  replicas: 2
-backend:
-  replicas: 0
-read:
-  replicas: 0
-write:
-  replicas: 0
-# https://blog.devgenius.io/install-loki-in-distributed-mode-on-azure-aks-with-terraform-0918803f2ed0
-ruler:
-  enabled: false
-EOF
-helm upgrade --install --version "${LOKI_HELM_CHART_VERSION}" --namespace loki --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" loki grafana/loki
-```
-
-### Grafana Mimir
-
-[Grafana Mimir](https://grafana.com/oss/mimir/) is an open source, horizontally
-scalable, multi-tenant time series database for Prometheus metrics, designed for
-high availability and cost efficiency. It enables you to centralize metrics from
-multiple clusters or environments, and integrates seamlessly with [Grafana](https://grafana.com/)
-dashboards for visualization and alerting.
-
-![Grafana Mimir](https://raw.githubusercontent.com/grafana/mimir/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.png){:width="400"}
-
-Install the `mimir-distributed` [Helm chart](https://github.com/grafana/mimir/tree/main/operations/helm/charts/mimir-distributed)
-and customize its [default values](https://github.com/grafana/mimir/blob/mimir-distributed-6.0.0-rc.0/operations/helm/charts/mimir-distributed/values.yaml)
-to fit your environment and storage backend:
-
-```bash
-# renovate: datasource=helm depName=mimir-distributed registryUrl=https://grafana.github.io/helm-charts
-MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.0.0-rc.0"
-
-helm repo add --force-update grafana https://grafana.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" << EOF
-serviceAccount:
-  name: mimir
-mimir:
-  structuredConfig:
-    limits:
-      compactor_blocks_retention_period: 30d
-    common:
-      # https://grafana.com/docs/mimir/latest/configure/configuration-parameters/
-      storage:
-        backend: s3
-        s3:
-          endpoint: s3.${AWS_REGION}.amazonaws.com
-          region: ${AWS_REGION}
-          storage_class: ONEZONE_IA
-    alertmanager_storage:
-      s3:
-        bucket_name: ${CLUSTER_FQDN}
-      storage_prefix: mimiralertmanager
-    blocks_storage:
-      s3:
-        bucket_name: ${CLUSTER_FQDN}
-      storage_prefix: mimirblocks
-    ruler_storage:
-      s3:
-        bucket_name: ${CLUSTER_FQDN}
-      storage_prefix: mimirruler
-ingester:
-  replicas: 2
-# https://github.com/grafana/helm-charts/blob/main/charts/rollout-operator/values.yaml
-rollout_operator:
-  serviceMonitor:
-    enabled: true
-minio:
-  enabled: false
-EOF
-helm upgrade --install --version "${MIMIR_DISTRIBUTED_HELM_CHART_VERSION}" --namespace mimir --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" mimir grafana/mimir-distributed
-```
-
-## Grafana Tempo
-
-[Grafana Tempo](https://grafana.com/oss/tempo/) is an open source, easy-to-use, and
-high-scale distributed tracing backend. It is designed to be cost-effective and
-simple to operate, as it only requires object storage to operate its backend and
-does not index the trace data.
-
-![Grafana Tempo](https://raw.githubusercontent.com/grafana/tempo/8dd75d18773d77149de8588f9dccbd680a03b00e/docs/sources/tempo/logo_and_name.png)
-
-Install the `tempo` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/tempo-distributed)
-and customize its [default values](https://github.com/grafana/helm-charts/blob/tempo-1.23.3/charts/tempo-distributed/values.yaml)
-to fit your environment and storage requirements:
-
-```bash
-# renovate: datasource=helm depName=tempo registryUrl=https://grafana.github.io/helm-charts
-TEMPO_HELM_CHART_VERSION="1.23.3"
-
-helm repo add --force-update grafana https://grafana.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" << EOF
-global:
-  priorityClassName: high-priority
-# https://youtu.be/PmE9mgYaoQA?t=817
-metricsGenerator:
-  enabled: true
-storage:
-  trace:
-    backend: s3
-    s3:
-      bucket: ${CLUSTER_FQDN}
-      endpoint: s3.${AWS_REGION}.amazonaws.com
-  admin:
-    backend: s3
-    s3:
-      bucket_name: ${CLUSTER_FQDN}
-      endpoint: s3.${AWS_REGION}.amazonaws.com
-traces:
-  otlp:
-    http:
-      enabled: true
-    grpc:
-      enabled: true
-EOF
-helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" tempo grafana/tempo
-```
-
-## Grafana Alloy
-
-[Grafana Alloy](https://grafana.com/oss/alloy/) is an open source, vendor-neutral
-distribution of OpenTelemetry that provides a unified way to collect, process, and
-export telemetry data (traces, metrics, and logs) from your infrastructure and
-applications.
-
-![Grafana Alloy](https://raw.githubusercontent.com/grafana/alloy/9b878da08fec0467a88637fd26e5be6da2037574/docs/sources/assets/logo_alloy_light.svg){:width="400"}
-
-Install the `alloy` [Helm chart](https://github.com/grafana/alloy/tree/main/operations/helm/charts/alloy)
-and customize its [default values](https://github.com/grafana/alloy/blob/v1.3.0/operations/helm/charts/alloy/values.yaml)
-to fit your environment and monitoring needs:
-
-```bash
-# renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
-ALLOY_HELM_CHART_VERSION="1.4.0"
-
-# https://github.com/ai-cfia/howard-on-prem/blob/main/monitoring/grafana-alloy/helm/values.yaml
-# https://github.com/hongbo-miao/hongbomiao.com/blob/main/kubernetes/argo-cd/projects/production-hm/alloy/manifests/hm-alloy-application.yaml
-# https://github.com/RS-PYTHON/rs-infra-monitoring/blob/0cc043e9398edd80b91b3ac8768f5a8ab7fce26e/apps/alloy/values.yaml#L47
-# https://stackoverflow.com/questions/79695474/grafana-alloy-no-prefect-pod-logs-on-bottlerocket
-# https://developer-friendly.blog/blog/2025/03/17/migration-from-promtail-to-alloy-the-what-the-why-and-the-how/#collect-prometheus-metrics
-helm repo add --force-update grafana https://grafana.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" << \EOF
-alloy:
-  configMap:
-    content: |-
-      // https://grafana.com/docs/alloy/latest/configure/kubernetes/
-      // https://grafana.com/docs/alloy/latest/collect/logs-in-kubernetes/
-      logging {
-        level = "info"
-        format = "json"
-      }
-
-      // https://grafana.com/docs/alloy/latest/reference/config-blocks/livedebugging/
-      livedebugging {
-        enabled = true
-      }
-
-      // discovery.kubernetes allows you to find scrape targets from Kubernetes resources.
-      // It watches cluster state and ensures targets are continually synced with what is currently running in your cluster.
-      discovery.kubernetes "pod" {
-        role = "pod"
-      }
-
-      // discovery.relabel rewrites the label set of the input targets by applying one or more relabeling rules.
-      // If no rules are defined, then the input targets are exported as-is.
-      discovery.relabel "pod_logs" {
-        targets = discovery.kubernetes.pod.targets
-
-        // Label creation - "namespace" field from "__meta_kubernetes_namespace"
-        rule {
-          source_labels = ["__meta_kubernetes_namespace"]
-          action = "replace"
-          target_label = "namespace"
-        }
-
-        // Label creation - "pod" field from "__meta_kubernetes_pod_name"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_name"]
-          action = "replace"
-          target_label = "pod"
-        }
-
-        // Label creation - "container" field from "__meta_kubernetes_pod_container_name"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_container_name"]
-          action = "replace"
-          target_label = "container"
-        }
-
-        // Label creation -  "app" field from "__meta_kubernetes_pod_label_app_kubernetes_io_name"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
-          action = "replace"
-          target_label = "app"
-        }
-
-        // Label creation -  "job" field from "__meta_kubernetes_namespace" and "__meta_kubernetes_pod_container_name"
-        // Concatenate values __meta_kubernetes_namespace/__meta_kubernetes_pod_container_name
-        rule {
-          source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_container_name"]
-          action = "replace"
-          target_label = "job"
-          separator = "/"
-          replacement = "$1"
-        }
-
-        // Label creation - "container" field from "__meta_kubernetes_pod_uid" and "__meta_kubernetes_pod_container_name"
-        // Concatenate values __meta_kubernetes_pod_uid/__meta_kubernetes_pod_container_name.log
-        rule {
-          source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
-          action = "replace"
-          target_label = "__path__"
-          separator = "/"
-          replacement = "/var/log/pods/*$1/*.log"
-        }
-
-        // Label creation -  "container_runtime" field from "__meta_kubernetes_pod_container_id"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_container_id"]
-          action = "replace"
-          target_label = "container_runtime"
-          regex = "^(\\S+):\\/\\/.+$"
-          replacement = "$1"
-        }
-      }
-
-      prometheus.exporter.unix "default" {
-        // https://github.com/aws/karpenter-provider-aws/issues/5406
-        // https://github.com/prometheus/node_exporter/issues/2692
-        // udev_data_path = "/rootfs/run/udev/data"
-      }
-
-      prometheus.scrape "scrape_metrics" {
-        targets         = prometheus.exporter.unix.default.targets
-        forward_to      = [prometheus.remote_write.default.receiver]
-        scrape_interval = "10s"
-      }
-
-      prometheus.remote_write "default" {
-        endpoint {
-          url = "http://mimir-nginx.mimir.svc.cluster.local/api/v1/push"
-          headers = {
-            "X-Scope-OrgID" = "1",
-          }
-        }
-      }
-
-      otelcol.receiver.otlp "default" {
-        http {
-          include_metadata = true
-        }
-        grpc {
-          include_metadata = true
-        }
-
-        output {
-          metrics = [otelcol.processor.batch.default.input]
-          logs    = [otelcol.processor.batch.default.input]
-          traces  = [otelcol.processor.batch.default.input]
-        }
-      }
-
-      otelcol.processor.batch "default" {
-        output {
-          metrics = [otelcol.exporter.otlp.mimir.input]
-          logs    = [otelcol.exporter.otlp.loki.input]
-          traces  = [otelcol.exporter.otlp.tempo.input]
-        }
-      }
-
-      otelcol.exporter.otlp "mimir" {
-        client {
-          endpoint = "http://mimir-nginx.mimir.svc.cluster.local/api/v1/push"
-        }
-      }
-
-      otelcol.exporter.otlp "loki" {
-        client {
-          endpoint = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
-        }
-      }
-
-      otelcol.exporter.otlp "tempo" {
-        client {
-          endpoint = "tempo-distributed-distributor.tempo.svc.cluster.local:4317"
-          tls {
-            insecure = true
-          }
-        }
-      }
-  mounts:
-    varlog: true
-controller:
-  priorityClassName: system-node-critical
-serviceMonitor:
-  enabled: true
-EOF
-helm upgrade --install --version "${ALLOY_HELM_CHART_VERSION}" --namespace alloy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" alloy grafana/alloy
-```
-
 ## Ingress NGINX Controller
 
 [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
@@ -1520,6 +1142,363 @@ controller:
   priorityClassName: critical-priority
 EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
+```
+
+## Loki
+
+[Grafana Loki](https://grafana.com/oss/loki/) is a horizontally-scalable,
+highly-available, multi-tenant log aggregation system inspired by Prometheus. It
+is designed to be very cost-effective and easy to operate, as it does not index
+the contents of the logs, but rather a set of labels for each log stream.
+
+![Grafana Loki](https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo_and_name.png){:width="400"}
+
+Install the `loki` [Helm chart](https://github.com/grafana/loki/tree/helm-loki-6.42.0/production/helm/loki)
+and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.42.0/production/helm/loki/values.yaml)
+to fit your environment and storage requirements:
+
+```bash
+# renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
+LOKI_HELM_CHART_VERSION="6.44.0"
+
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" << EOF
+global:
+  priorityClassName: high-priority
+deploymentMode: SingleBinary
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 2
+  storage:
+    bucketNames:
+      chunks: ${CLUSTER_FQDN}
+      ruler: ${CLUSTER_FQDN}
+      admin: ${CLUSTER_FQDN}
+    s3:
+      region: ${AWS_REGION}
+      endpoint: s3.${AWS_REGION}.amazonaws.com
+    object_store:
+      storage_prefix: ruzickap
+      s3:
+        endpoint: s3.${AWS_REGION}.amazonaws.com
+        region: ${AWS_REGION}
+  schemaConfig:
+    configs:
+      - from: 2024-04-01
+        store: tsdb
+        object_store: s3
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+  storage_config:
+    aws:
+      region: ${AWS_REGION}
+      # bucketnames: loki-chunk
+      # bucketnames: loki-chunk
+      # s3forcepathstyle: false
+      # s3: s3://s3.${AWS_REGION}.amazonaws.com/loki-storage
+      # endpoint: s3.${AWS_REGION}.amazonaws.com
+  limits_config:
+    retention_period: 1w
+  # Log retention in Loki is achieved through the Compactor (https://grafana.com/docs/loki/v3.5.x/get-started/components/#compactor)
+  # compactor:
+  #   delete_request_store: s3
+  #   retention_enabled: true
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: A horizontally-scalable, highly-available log aggregation system
+    gethomepage.dev/group: Apps
+    gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo.png
+    gethomepage.dev/name: Loki
+    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+  hosts:
+    - loki.${CLUSTER_FQDN}
+  tls:
+    - hosts:
+        - loki.${CLUSTER_FQDN}
+singleBinary:
+  replicas: 2
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+# https://blog.devgenius.io/install-loki-in-distributed-mode-on-azure-aks-with-terraform-0918803f2ed0
+ruler:
+  enabled: false
+EOF
+helm upgrade --install --version "${LOKI_HELM_CHART_VERSION}" --namespace loki --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" loki grafana/loki
+```
+
+## Mimir
+
+[Grafana Mimir](https://grafana.com/oss/mimir/) is an open source, horizontally
+scalable, multi-tenant time series database for Prometheus metrics, designed for
+high availability and cost efficiency. It enables you to centralize metrics from
+multiple clusters or environments, and integrates seamlessly with [Grafana](https://grafana.com/)
+dashboards for visualization and alerting.
+
+![Grafana Mimir](https://raw.githubusercontent.com/grafana/mimir/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.png){:width="400"}
+
+Install the `mimir-distributed` [Helm chart](https://github.com/grafana/mimir/tree/main/operations/helm/charts/mimir-distributed)
+and customize its [default values](https://github.com/grafana/mimir/blob/mimir-distributed-6.0.0-rc.0/operations/helm/charts/mimir-distributed/values.yaml)
+to fit your environment and storage backend:
+
+```bash
+# renovate: datasource=helm depName=mimir-distributed registryUrl=https://grafana.github.io/helm-charts
+MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.0.0-rc.0"
+
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" << EOF
+serviceAccount:
+  name: mimir
+mimir:
+  structuredConfig:
+    limits:
+      compactor_blocks_retention_period: 30d
+    common:
+      # https://grafana.com/docs/mimir/v2.17.x/configure/configuration-parameters/
+      storage:
+        backend: s3
+        s3:
+          endpoint: s3.${AWS_REGION}.amazonaws.com
+          region: ${AWS_REGION}
+          storage_class: ONEZONE_IA
+    alertmanager_storage:
+      s3:
+        bucket_name: ${CLUSTER_FQDN}
+      storage_prefix: mimiralertmanager
+    blocks_storage:
+      s3:
+        bucket_name: ${CLUSTER_FQDN}
+      storage_prefix: mimirblocks
+    ruler_storage:
+      s3:
+        bucket_name: ${CLUSTER_FQDN}
+      storage_prefix: mimirruler
+ingester:
+  replicas: 2
+# https://github.com/grafana/helm-charts/blob/main/charts/rollout-operator/values.yaml
+rollout_operator:
+  serviceMonitor:
+    enabled: true
+minio:
+  enabled: false
+EOF
+helm upgrade --install --version "${MIMIR_DISTRIBUTED_HELM_CHART_VERSION}" --namespace mimir --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" mimir grafana/mimir-distributed
+```
+
+## Grafana Tempo
+
+[Grafana Tempo](https://grafana.com/oss/tempo/) is an open source, easy-to-use, and
+high-scale distributed tracing backend. It is designed to be cost-effective and
+simple to operate, as it only requires object storage to operate its backend and
+does not index the trace data.
+
+![Grafana Tempo](https://raw.githubusercontent.com/grafana/tempo/8dd75d18773d77149de8588f9dccbd680a03b00e/docs/sources/tempo/logo_and_name.png)
+
+Install the `tempo` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/tempo-distributed)
+and customize its [default values](https://github.com/grafana/helm-charts/blob/tempo-1.23.3/charts/tempo-distributed/values.yaml)
+to fit your environment and storage requirements:
+
+```bash
+# renovate: datasource=helm depName=tempo registryUrl=https://grafana.github.io/helm-charts
+TEMPO_HELM_CHART_VERSION="1.23.3"
+
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" << EOF
+global:
+  priorityClassName: high-priority
+# https://youtu.be/PmE9mgYaoQA?t=817
+metricsGenerator:
+  enabled: true
+storage:
+  trace:
+    backend: s3
+    s3:
+      bucket: ${CLUSTER_FQDN}
+      endpoint: s3.${AWS_REGION}.amazonaws.com
+  admin:
+    backend: s3
+    s3:
+      bucket_name: ${CLUSTER_FQDN}
+      endpoint: s3.${AWS_REGION}.amazonaws.com
+traces:
+  otlp:
+    http:
+      enabled: true
+    grpc:
+      enabled: true
+EOF
+helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" tempo grafana/tempo
+```
+
+## Alloy
+
+[Grafana Alloy](https://grafana.com/oss/alloy/) is an open source, vendor-neutral
+distribution of OpenTelemetry that provides a unified way to collect, process, and
+export telemetry data (traces, metrics, and logs) from your infrastructure and
+applications.
+
+![Grafana Alloy](https://raw.githubusercontent.com/grafana/alloy/9b878da08fec0467a88637fd26e5be6da2037574/docs/sources/assets/logo_alloy_light.svg){:width="400"}
+
+Install the `alloy` [Helm chart](https://github.com/grafana/alloy/tree/main/operations/helm/charts/alloy)
+and customize its [default values](https://github.com/grafana/alloy/blob/v1.3.0/operations/helm/charts/alloy/values.yaml)
+to fit your environment and monitoring needs:
+
+```bash
+# renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
+ALLOY_HELM_CHART_VERSION="1.4.0"
+
+# https://github.com/ai-cfia/howard-on-prem/blob/main/monitoring/grafana-alloy/helm/values.yaml
+# https://github.com/hongbo-miao/hongbomiao.com/blob/main/kubernetes/argo-cd/projects/production-hm/alloy/manifests/hm-alloy-application.yaml
+# https://github.com/RS-PYTHON/rs-infra-monitoring/blob/0cc043e9398edd80b91b3ac8768f5a8ab7fce26e/apps/alloy/values.yaml#L47
+# https://stackoverflow.com/questions/79695474/grafana-alloy-no-prefect-pod-logs-on-bottlerocket
+# https://developer-friendly.blog/blog/2025/03/17/migration-from-promtail-to-alloy-the-what-the-why-and-the-how/#collect-prometheus-metrics
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" << \EOF
+alloy:
+  configMap:
+    content: |-
+      // https://grafana.com/docs/alloy/v1.11/collect/logs-in-kubernetes/
+      logging {
+        level = "info"
+        format = "json"
+      }
+
+      // https://grafana.com/docs/alloy/v1.11/reference/config-blocks/livedebugging/
+      livedebugging {
+        enabled = true
+      }
+
+      // #####################
+      // # Loki
+      // #####################
+
+      // discovery.kubernetes allows you to find scrape targets from Kubernetes resources.
+      // It watches cluster state and ensures targets are continually synced with what is currently running in your cluster.
+      // https://grafana.com/docs/alloy/v1.11/reference/components/discovery/discovery.kubernetes/
+      discovery.kubernetes "pod" {
+        role = "pod"
+        // Restrict to pods on the node to reduce cpu & memory usage
+        // https://grafana.com/docs/alloy/v1.11/reference/components/discovery/discovery.kubernetes/#limit-to-only-pods-on-the-same-node
+        selectors {
+          role = "pod"
+          field = "spec.nodeName=" + coalesce(sys.env("HOSTNAME"), constants.hostname)
+        }
+      }
+
+      // discovery.relabel rewrites the label set of the input targets by applying one or more relabeling rules.
+      // If no rules are defined, then the input targets are exported as-is.
+      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.relabel/
+      discovery.relabel "pod_logs" {
+        targets = discovery.kubernetes.pod.targets
+
+        //* Label creation - "namespace" field from "__meta_kubernetes_namespace"
+        rule {
+          source_labels = ["__meta_kubernetes_namespace"]
+          target_label = "namespace"
+        }
+        //* Label creation - "pod" field from "__meta_kubernetes_pod_name"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_name"]
+          target_label = "pod"
+        }
+        //* Label creation - "container" field from "__meta_kubernetes_pod_container_name"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_name"]
+          target_label = "container"
+        }
+        //* Label creation -  "app" field from "__meta_kubernetes_pod_label_app_kubernetes_io_name"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
+          target_label = "app"
+        }
+        //* Label creation -  "job" field from "__meta_kubernetes_namespace" and "__meta_kubernetes_pod_container_name"
+        // Concatenate values __meta_kubernetes_namespace/__meta_kubernetes_pod_container_name
+        rule {
+          source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_container_name"]
+          target_label = "job"
+          separator = "/"
+        }
+        //* Label creation - "container" field from "__meta_kubernetes_pod_uid" and "__meta_kubernetes_pod_container_name"
+        // Concatenate values __meta_kubernetes_pod_uid/__meta_kubernetes_pod_container_name.log
+        rule {
+          source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+          target_label = "__path__"
+          separator = "/"
+          replacement = "/var/log/pods/*$1/*.log"
+        }
+        //* Label creation -  "container_runtime" field from "__meta_kubernetes_pod_container_id"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_container_id"]
+          target_label = "container_runtime"
+          regex = "^(\\S+):\\/\\/.+$"
+        }
+
+        // // Label creation - "node_name" field from "__meta_kubernetes_pod_node_name"
+        // rule {
+        //   source_labels = ["__meta_kubernetes_pod_node_name"]
+        //   target_label = "node_name"
+        // }
+        // // Label creation -  "component" field from "__meta_kubernetes_pod_label_app_kubernetes_io_component" and "__meta_kubernetes_pod_label_component"
+        // rule {
+        //   source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_component", "__meta_kubernetes_pod_label_component"]
+        //   target_label = "component"
+        //   regex = "^;*([^;]+)(;.*)?$"
+        // }
+        // // Label creation -  "instance" field from "__meta_kubernetes_pod_label_app_kubernetes_io_instance" and "__meta_kubernetes_pod_label_instance"
+        // rule {
+        //   source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_instance", "__meta_kubernetes_pod_label_instance"]
+        //   target_label = "instance"
+        //   regex = "^;*([^;]+)(;.*)?$"
+        // }
+      }
+
+
+      // loki.process receives log entries from other Loki components, applies one or more processing stages,
+      // and forwards the results to the list of receivers in the component's arguments.
+      loki.process "pod_logs" {
+        stage.cri { }
+        stage.decolorize { }
+        forward_to = [loki.write.default.receiver]
+      }
+
+      // loki.source.kubernetes tails logs from Kubernetes containers using the Kubernetes API.
+      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.source.kubernetes/
+      loki.source.kubernetes "pod_logs" {
+        targets    = discovery.relabel.pod_logs.output
+        forward_to = [loki.process.pod_logs.receiver]
+      }
+
+      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.write/
+      loki.write "default" {
+          endpoint {
+            url = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
+            tenant_id = "1"
+          }
+      }
+
+  # extraPorts:
+  #   - name: otlp-grpc
+  #     port: 4317
+  #     targetPort: 4317
+  #     protocol: TCP
+  # mounts:
+  #   varlog: true
+controller:
+  priorityClassName: system-node-critical
+serviceMonitor:
+  enabled: true
+EOF
+helm upgrade --install --version "${ALLOY_HELM_CHART_VERSION}" --namespace alloy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" alloy grafana/alloy
 ```
 
 ### Mailpit
@@ -1618,25 +1597,30 @@ datasources:
     datasources:
       - name: Mimir
         type: prometheus
-        url: http://mimir-nginx.mimir.svc.cluster.local:80/prometheus
+        url: http://mimir-gateway.mimir.svc.cluster.local/prometheus
         access: proxy
+        editable: true
         isDefault: true
         jsonData:
+          prometheusType: Mimir
+          prometheusVersion: 2.9.1
           httpHeaderName1: X-Scope-OrgID
         secureJsonData:
-          httpHeaderValue1: "1"
+          httpHeaderValue1: 1
       - name: Loki
         type: loki
         url: http://loki-gateway.loki.svc.cluster.local/
         access: proxy
+        editable: true
         jsonData:
           httpHeaderName1: X-Scope-OrgID
         secureJsonData:
           httpHeaderValue1: "1"
       - name: Tempo
         type: tempo
-        url: http://tempo-query-frontend.tempo.svc.cluster.local:3200
+        url: http://tempo.tempo.svc.cluster.local:3200
         access: proxy
+        editable: true
 notifiers:
   notifiers.yaml:
     notifiers:
@@ -1837,7 +1821,7 @@ ingress:
       gethomepage.dev/icon: homepage.png
       nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
       nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
-    ingressClassName: "nginx"
+    ingressClassName: nginx
     hosts:
       - host: ${CLUSTER_FQDN}
         paths:
