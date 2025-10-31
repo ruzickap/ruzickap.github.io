@@ -1752,7 +1752,7 @@ and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/o
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="8.3.1"
+OAUTH2_PROXY_HELM_CHART_VERSION="8.3.2"
 
 helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
