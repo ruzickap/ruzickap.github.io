@@ -1374,6 +1374,37 @@ alloy:
       }
 
       // #####################
+      // # Mimir / Prometheus
+      // #####################
+      prometheus.exporter.self "default" { }
+
+      prometheus.exporter.unix "default" {
+        // {"ts":"2025-11-01T09:38:50.508290124Z","level":"error","msg":"Failed to open directory, disabling udev device properties","component_path":"/","component_id":"prometheus.exporter.unix.default","collector":"diskstats","path":"/run/udev/data"}
+        udev_data_path = "/rootfs/run/udev/data"
+      }
+
+      mimir.rules.kubernetes "local" {
+        address ="http://mimir-ruler.mimir.svc.cluster.local:8080"
+        tenant_id = "1"
+      }
+
+      prometheus.scrape "scrape_metrics" {
+        targets         = prometheus.exporter.unix.default.targets
+        forward_to      = [prometheus.remote_write.default.receiver]
+        scrape_interval = "30s"
+      }
+
+      prometheus.remote_write "default" {
+        endpoint {
+          url = "http://mimir-gateway.mimir.svc.cluster.local/api/v1/push"
+          // protobuf_message = "io.prometheus.write.v2.Request"
+          headers = {
+            "X-Scope-OrgID" = "1",
+          }
+        }
+      }
+
+      // #####################
       // # Loki
       // #####################
 
