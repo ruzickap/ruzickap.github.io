@@ -1159,7 +1159,7 @@ to fit your environment and storage requirements:
 
 ```bash
 # renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
-LOKI_HELM_CHART_VERSION="6.44.0"
+LOKI_HELM_CHART_VERSION="6.45.2"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" << EOF
