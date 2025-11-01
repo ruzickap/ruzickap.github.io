@@ -1363,7 +1363,7 @@ ALLOY_HELM_CHART_VERSION="1.4.0"
 # https://stackoverflow.com/questions/79695474/grafana-alloy-no-prefect-pod-logs-on-bottlerocket
 # https://developer-friendly.blog/blog/2025/03/17/migration-from-promtail-to-alloy-the-what-the-why-and-the-how/#collect-prometheus-metrics
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" << \EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" << EOF
 alloy:
   configMap:
     content: |-
@@ -1373,14 +1373,11 @@ alloy:
         format = "json"
       }
 
-      // https://grafana.com/docs/alloy/v1.11/reference/config-blocks/livedebugging/
-      livedebugging {
-        enabled = true
-      }
-
       // #####################
       // # Loki
       // #####################
+
+      // ========= Pod logs (via K8s API) =========
 
       // discovery.kubernetes allows you to find scrape targets from Kubernetes resources.
       // It watches cluster state and ensures targets are continually synced with what is currently running in your cluster.
@@ -1434,40 +1431,32 @@ alloy:
           source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
           target_label = "__path__"
           separator = "/"
-          replacement = "/var/log/pods/*$1/*.log"
+          replacement = "/var/log/pods/*\$1/*.log"
         }
         //* Label creation -  "container_runtime" field from "__meta_kubernetes_pod_container_id"
         rule {
           source_labels = ["__meta_kubernetes_pod_container_id"]
           target_label = "container_runtime"
-          regex = "^(\\S+):\\/\\/.+$"
+          regex = "^(\\\S+):\\\/\\\/.+$"
         }
-
-        // // Label creation - "node_name" field from "__meta_kubernetes_pod_node_name"
-        // rule {
-        //   source_labels = ["__meta_kubernetes_pod_node_name"]
-        //   target_label = "node_name"
-        // }
-        // // Label creation -  "component" field from "__meta_kubernetes_pod_label_app_kubernetes_io_component" and "__meta_kubernetes_pod_label_component"
-        // rule {
-        //   source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_component", "__meta_kubernetes_pod_label_component"]
-        //   target_label = "component"
-        //   regex = "^;*([^;]+)(;.*)?$"
-        // }
-        // // Label creation -  "instance" field from "__meta_kubernetes_pod_label_app_kubernetes_io_instance" and "__meta_kubernetes_pod_label_instance"
-        // rule {
-        //   source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_instance", "__meta_kubernetes_pod_label_instance"]
-        //   target_label = "instance"
-        //   regex = "^;*([^;]+)(;.*)?$"
-        // }
+        // Label creation - "node_name" field from "__meta_kubernetes_pod_node_name"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_node_name"]
+          target_label = "node_name"
+        }
+        // Label creation -  "component" field from "__meta_kubernetes_pod_label_app_kubernetes_io_component" and "__meta_kubernetes_pod_label_component"
+        rule {
+          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_component", "__meta_kubernetes_pod_label_component"]
+          target_label = "component"
+          regex = "^;*([^;]+)(;.*)?$"
+        }
       }
-
 
       // loki.process receives log entries from other Loki components, applies one or more processing stages,
       // and forwards the results to the list of receivers in the component's arguments.
       loki.process "pod_logs" {
-        stage.cri { }
-        stage.decolorize { }
+        stage.cri {}
+        stage.decolorize {}
         forward_to = [loki.write.default.receiver]
       }
 
@@ -1478,25 +1467,65 @@ alloy:
         forward_to = [loki.process.pod_logs.receiver]
       }
 
-      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.write/
-      loki.write "default" {
-          endpoint {
-            url = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
-            tenant_id = "1"
-          }
+      // ========= Kubernetes Events =========
+
+      // loki.source.kubernetes_events tails events from the Kubernetes API and converts them
+      // into log lines to forward to other Loki components.
+      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.source.kubernetes_events/
+      loki.source.kubernetes_events "cluster_events" {
+        job_name   = "integrations/kubernetes/eventhandler"
+        log_format = "json"
+        forward_to = [
+          loki.process.cluster_events.receiver,
+        ]
       }
 
-  # extraPorts:
-  #   - name: otlp-grpc
-  #     port: 4317
-  #     targetPort: 4317
-  #     protocol: TCP
-  # mounts:
-  #   varlog: true
+      // loki.process receives log entries from other loki components, applies one or more processing stages,
+      // and forwards the results to the list of receivers in the component's arguments.
+      loki.process "cluster_events" {
+        forward_to = [loki.write.default.receiver]
+        stage.static_labels {
+          values = {
+            cluster = "${CLUSTER_NAME}",
+          }
+        }
+        stage.labels {
+          values = {
+            kubernetes_cluster_events = "job",
+          }
+        }
+      }
+
+      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.write/
+      loki.write "default" {
+        endpoint {
+          url = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
+          tenant_id = "1"
+        }
+      }
+  mounts:
+    varlog: true
 controller:
   priorityClassName: system-node-critical
 serviceMonitor:
   enabled: true
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: OpenTelemetry Collector distribution with programmable pipelines
+    gethomepage.dev/group: Apps
+    gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/alloy/513175e2add3957310a445a7b683100b703a9b49/docs/sources/assets/alloy_icon_orange.svg
+    gethomepage.dev/name: Alloy
+    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+  faroPort: 12345
+  hosts:
+    - alloy.${CLUSTER_FQDN}
+  tls:
+    - hosts:
+        - alloy.${CLUSTER_FQDN}
 EOF
 helm upgrade --install --version "${ALLOY_HELM_CHART_VERSION}" --namespace alloy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" alloy grafana/alloy
 ```
@@ -1862,7 +1891,10 @@ config:
       Cluster Management:
         icon: mdi-tools
 env:
-  LOG_TARGETS: "stdout"
+  - name: HOMEPAGE_ALLOWED_HOSTS
+    value: ${CLUSTER_FQDN}
+  - name: LOG_TARGETS
+    value: stdout
 EOF
 helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace homepage --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" homepage jameswynn/homepage
 ```
