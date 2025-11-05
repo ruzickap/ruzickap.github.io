@@ -1,9 +1,9 @@
 ---
-title: Amazon EKS and Grafana Mimir
+title: Amazon EKS and Grafana stack
 author: Petr Ruzicka
 date: 2025-08-08
-description: Build secure Amazon EKS cluster with Grafana Mimir
-categories: [Kubernetes, Amazon EKS, Security, Mimir, Loki, Tempo]
+description: Build secure Amazon EKS cluster with Grafana stack
+categories: [Kubernetes, Amazon EKS, Security, Grafana stack]
 tags:
   [
     amazon eks,
@@ -16,11 +16,9 @@ tags:
     prometheus,
     sso,
     oauth2-proxy,
-    mimir,
-    loki,
-    tempo,
+    grafana stack,
   ]
-image: https://raw.githubusercontent.com/grafana/mimir/843897414dba909dfd44f5b93dad35a8a6694d06/images/logo.png
+image: https://raw.githubusercontent.com/grafana/.github/12fb002302b5efad6251075f45ce5ac22db69a3f/LGTM_wallpaper_1920x1080.png
 ---
 
 I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)
@@ -1263,6 +1261,8 @@ mimir:
   structuredConfig:
     limits:
       compactor_blocks_retention_period: 30d
+      # {"ts":"2025-11-04T19:30:40.472926117Z","level":"error","msg":"non-recoverable error","component_path":"/","component_id":"prometheus.remote_write.mimir","subcomponent":"rw","remote_name":"5b0906","url":"http://mimir-gateway.mimir.svc.cluster.local/api/v1/push","failedSampleCount":2000,"failedHistogramCount":0,"failedExemplarCount":0,"err":"server returned HTTP status 400 Bad Request: received a series whose number of labels exceeds the limit (actual: 31, limit: 30) series: 'karpenter_nodes_allocatable{arch=\"amd64\", capacity_type=\"spot\", container=\"controller\", endpoint=\"http-metrics\", instance=\"192.168.92.152:8080\", instance_capability_flex=\"false\", instance_category=\"t\"…' (err-mimir-max-label-names-per-series). To adjust the related per-tenant limit, configure -validation.max-label-names-per-series, or contact your service administrator.\n"}
+      max_label_names_per_series: 50
     common:
       # https://grafana.com/docs/mimir/v2.17.x/configure/configuration-parameters/
       storage:
@@ -1295,7 +1295,7 @@ EOF
 helm upgrade --install --version "${MIMIR_DISTRIBUTED_HELM_CHART_VERSION}" --namespace mimir --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" mimir grafana/mimir-distributed
 ```
 
-## Grafana Tempo
+## Tempo
 
 [Grafana Tempo](https://grafana.com/oss/tempo/) is an open source, easy-to-use, and
 high-scale distributed tracing backend. It is designed to be cost-effective and
@@ -1305,12 +1305,12 @@ does not index the trace data.
 ![Grafana Tempo](https://raw.githubusercontent.com/grafana/tempo/8dd75d18773d77149de8588f9dccbd680a03b00e/docs/sources/tempo/logo_and_name.png)
 
 Install the `tempo` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/tempo-distributed)
-and customize its [default values](https://github.com/grafana/helm-charts/blob/tempo-1.23.3/charts/tempo-distributed/values.yaml)
+and customize its [default values](https://github.com/grafana/helm-charts/blob/tempo-distributed-1.52.7/charts/tempo-distributed/values.yaml)
 to fit your environment and storage requirements:
 
 ```bash
 # renovate: datasource=helm depName=tempo registryUrl=https://grafana.github.io/helm-charts
-TEMPO_HELM_CHART_VERSION="1.23.3"
+TEMPO_HELM_CHART_VERSION="1.52.7"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" << EOF
@@ -1336,8 +1336,19 @@ traces:
       enabled: true
     grpc:
       enabled: true
+metricsGenerator:
+  enabled: true
+  config:
+    # processor:
+    #   # https://grafana.com/docs/tempo/latest/operations/traceql-metrics/
+    #   local_blocks:
+    #     filter_server_spans: false
+    storage:
+      remote_write:
+        - url: http://mimir-gateway.mimir.svc.cluster.local/api/v1/push
+
 EOF
-helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" tempo grafana/tempo
+helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" tempo grafana/tempo-distributed
 ```
 
 ## Alloy
@@ -1367,46 +1378,147 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" << EOF
 alloy:
   configMap:
     content: |-
-      // https://grafana.com/docs/alloy/v1.11/collect/logs-in-kubernetes/
       logging {
         level = "info"
         format = "json"
       }
 
-      // #####################
-      // # Mimir / Prometheus
-      // #####################
-      prometheus.exporter.self "default" { }
+      // ##########################################
+      // # Beyla
+      // ##########################################
 
-      prometheus.exporter.unix "default" {
-        // {"ts":"2025-11-01T09:38:50.508290124Z","level":"error","msg":"Failed to open directory, disabling udev device properties","component_path":"/","component_id":"prometheus.exporter.unix.default","collector":"diskstats","path":"/run/udev/data"}
-        udev_data_path = "/rootfs/run/udev/data"
+      beyla.ebpf "default" {
+        attributes {
+          kubernetes {
+            enable = "true"
+            cluster_name = "${CLUSTER_NAME}"
+          }
+        }
+
+        discovery {
+          instrument {
+            open_ports = "80,443"
+          }
+          instrument {
+            kubernetes {
+              namespace = "ingress-nginx"
+            }
+          }
+        }
+
+        metrics {
+          features = [
+            "application",
+            "application_process",
+            "application_service_graph",
+            "application_span",
+            "network",
+          ]
+        }
+
+        output {
+          traces = [otelcol.exporter.otlp.tempo.input]
+        }
       }
 
-      mimir.rules.kubernetes "local" {
-        address ="http://mimir-ruler.mimir.svc.cluster.local:8080"
-        tenant_id = "1"
+      prometheus.scrape "beyla" {
+        targets      = beyla.ebpf.default.targets
+        honor_labels = true
+        forward_to   = [prometheus.remote_write.mimir.receiver]
       }
 
-      prometheus.scrape "scrape_metrics" {
-        targets         = prometheus.exporter.unix.default.targets
-        forward_to      = [prometheus.remote_write.default.receiver]
-        scrape_interval = "30s"
+      // ##########################################
+      // # Tempo
+      // ##########################################
+
+      otelcol.processor.batch "default" {
+        output {
+          metrics = [otelcol.exporter.prometheus.default.input]
+          logs    = [otelcol.exporter.loki.default.input]
+          traces  = [otelcol.exporter.otlp.tempo.input]
+        }
       }
 
-      prometheus.remote_write "default" {
-        endpoint {
-          url = "http://mimir-gateway.mimir.svc.cluster.local/api/v1/push"
-          // protobuf_message = "io.prometheus.write.v2.Request"
-          headers = {
-            "X-Scope-OrgID" = "1",
+      otelcol.connector.spanmetrics "default" {
+        dimension {
+          name = "http.status_code"
+        }
+        dimension {
+          name = "http.method"
+          default = "GET"
+        }
+        aggregation_temporality = "DELTA"
+        histogram {
+          unit = "s"
+          explicit {
+            buckets = ["333ms", "777s", "999h"]
+          }
+        }
+        metrics_flush_interval = "33s"
+        namespace = "default"
+        output {
+          metrics = [otelcol.processor.batch.default.input]
+        }
+      }
+
+      otelcol.connector.spanlogs "default" {
+        roots = true
+        output {
+          logs = [otelcol.processor.batch.default.input]
+        }
+      }
+
+      otelcol.connector.servicegraph "default" {
+        dimensions = ["http.method", "http.target"]
+        output {
+          metrics = [otelcol.processor.batch.default.input]
+        }
+      }
+
+      otelcol.receiver.otlp "default" {
+        // configures the default grpc endpoint "0.0.0.0:4317"
+        grpc { endpoint = "0.0.0.0:4317" }
+        // configures the default http/protobuf endpoint "0.0.0.0:4318"
+        http { endpoint = "0.0.0.0:4318" }
+
+        output {
+          metrics = [otelcol.processor.batch.default.input]
+          logs    = [otelcol.processor.batch.default.input]
+          traces = [
+            otelcol.connector.servicegraph.default.input,
+            otelcol.connector.spanlogs.default.input,
+            otelcol.connector.spanmetrics.default.input,
+          ]
+        }
+      }
+
+      otelcol.auth.headers "tempo" {
+        header {
+          key   = "X-Scope-OrgID"
+          value = "1"
+        }
+      }
+      otelcol.exporter.otlp "tempo" {
+        client {
+          endpoint = "tempo-distributor.tempo.svc.cluster.local:4317"
+          auth = otelcol.auth.headers.tempo.handler
+          tls {
+            insecure = true
           }
         }
       }
 
-      // #####################
+      otelcol.exporter.loki "default" {
+        forward_to = [loki.write.default.receiver]
+      }
+
+      otelcol.exporter.prometheus "default" {
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
+
+      // ##########################################
       // # Loki
-      // #####################
+      // ##########################################
 
       // ========= Pod logs (via K8s API) =========
 
@@ -1505,7 +1617,7 @@ alloy:
       // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.source.kubernetes_events/
       loki.source.kubernetes_events "cluster_events" {
         job_name   = "integrations/kubernetes/eventhandler"
-        log_format = "json"
+        // log_format = "json"
         forward_to = [
           loki.process.cluster_events.receiver,
         ]
@@ -1534,8 +1646,108 @@ alloy:
           tenant_id = "1"
         }
       }
+
+      // #####################
+      // # Mimir / Prometheus
+      // #####################
+
+
+      // prometheus.exporter.cadvisor "cadvisor" {
+      //   allowlisted_container_labels = ["io.kubernetes.container.name", "io.kubernetes.pod.namespace", "io.kubernetes.pod.name"]
+      //   enabled_metrics = ["cpu", "memory"]
+      // }
+
+      prometheus.exporter.unix "default" {
+        // https://github.com/aws/karpenter-provider-aws/issues/5406
+        // https://github.com/prometheus/node_exporter/issues/2692
+        // udev_data_path = "/rootfs/run/udev/data"
+      }
+
+
+      prometheus.scrape "scrape_metrics" {
+        targets         = prometheus.exporter.unix.default.targets
+        forward_to      = [prometheus.remote_write.mimir.receiver]
+        scrape_interval = "10s"
+      }
+
+      // Scrape service monitors (clustered to avoid duplicates)
+      prometheus.operator.servicemonitors "default" {
+        clustering {
+          enabled = true
+        }
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
+
+      // Scrape pod monitors (clustered to avoid duplicates)
+      prometheus.operator.podmonitors "pods" {
+        clustering {
+          enabled = true
+        }
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
+
+      // Scrape every probe (clustered to avoid duplicates)
+      prometheus.operator.probes "probes" {
+        clustering {
+          enabled = true
+        }
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
+
+      // Expose a blackbox exporter locally so that probes can use the local exporter as a target
+      prometheus.exporter.blackbox "blackbox" {
+        config = "{ modules: { http_2xx: { prober: http, timeout: 5s } } }"
+        targets = [
+          {
+            name    = "oauth2-proxy",
+            address = "https://oauth2-proxy.${CLUSTER_FQDN}",
+            module  = "http_2xx",
+          },
+        ]
+      }
+
+
+
+      // ##########################################
+      // # Common configuration
+      // ##########################################
+
+      prometheus.remote_write "mimir" {
+        endpoint {
+          url = "http://mimir-gateway.mimir.svc.cluster.local/api/v1/push"
+          headers = {
+            "X-Scope-OrgID" = "1",
+          }
+        }
+      }
+
+  extraPorts:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+      protocol: TCP
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318
+      protocol: TCP
   mounts:
     varlog: true
+  # https://stackoverflow.com/questions/79400979/cannot-see-any-traces-from-alloy-in-grafana/79446696#79446696
+  securityContext:
+    appArmorProfile:
+      type: Unconfined
+    runAsUser: 0
+    capabilities:
+      drop:
+        - ALL
+      add:
+        - BPF
+        - CHECKPOINT_RESTORE
+        - DAC_READ_SEARCH
+        - NET_RAW
+        - PERFMON
+        - SYS_ADMIN
+        - SYS_PTRACE
 controller:
   priorityClassName: system-node-critical
 serviceMonitor:
@@ -1559,6 +1771,48 @@ ingress:
         - alloy.${CLUSTER_FQDN}
 EOF
 helm upgrade --install --version "${ALLOY_HELM_CHART_VERSION}" --namespace alloy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" alloy grafana/alloy
+```
+
+## Beyla
+
+[Grafana Beyla](https://github.com/grafana/beyla)
+
+```bash
+# renovate: datasource=helm depName=beyla registryUrl=https://grafana.github.io/helm-charts
+BEYLA_HELM_CHART_VERSION="1.4.0"
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-beyla.yml" << EOF
+priorityClassName: system-node-critical
+config:
+  data:
+    discovery:
+      instrument:
+        - open_ports: 443
+    otel_metrics_export:
+      endpoint: http://alloy.alloy.svc.cluster.local:4317
+      protocol: grpc
+    otel_traces_export:
+      endpoint: http://alloy.alloy.svc.cluster.local:4317
+      protocol: grpc
+    attributes:
+      select:
+        beyla_network_flow_bytes:
+          include:
+            - k8s.src.owner.name
+            - k8s.src.namespace
+            - k8s.dst.owner.name
+            - k8s.dst.namespace
+            - k8s.cluster.name
+            - src.zone
+            - dst.zone
+    network:
+      enable: true
+env:
+  BEYLA_KUBE_CLUSTER_NAME: ${CLUSTER_NAME}
+serviceMonitor:
+  enabled: true
+EOF
+helm upgrade --install --version "${BEYLA_HELM_CHART_VERSION}" --namespace beyla --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-beyla.yml" beyla grafana/beyla
 ```
 
 ### Mailpit
@@ -1610,10 +1864,10 @@ Screenshot:
 
 ## Grafana
 
-Grafana is an open-source analytics and monitoring platform that allows you to
-query, visualize, alert on, and understand your metrics, logs, and traces. It
-provides a powerful and flexible way to create dashboards and visualizations for
-monitoring your Kubernetes cluster and applications.
+[Grafana](https://github.com/grafana/grafana) is an open-source analytics and
+monitoring platform that allows you to query, visualize, alert on, and understand
+your metrics, logs, and traces. It provides a powerful and flexible way to create
+dashboards and visualizations for monitoring your Kubernetes cluster and applications.
 
 ![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="300"}
 
@@ -1678,7 +1932,7 @@ datasources:
           httpHeaderValue1: "1"
       - name: Tempo
         type: tempo
-        url: http://tempo.tempo.svc.cluster.local:3200
+        url: http://tempo-query-frontend.tempo.svc.cluster.local:3200
         access: proxy
         editable: true
 notifiers:
@@ -1706,10 +1960,36 @@ dashboardProviders:
 dashboards:
   default:
     # keep-sorted start numeric=yes
+
     1860-node-exporter-full:
       # renovate: depName="Node Exporter Full"
       gnetId: 1860
       revision: 37
+      datasource: Prometheus
+    # 19105-prometheus:
+    #   # renovate: depName="Prometheus"
+    #   gnetId: 19105
+    #   revision: 6
+    #   datasource: Prometheus
+    # 19268-prometheus:
+    #   # renovate: depName="Prometheus All Metrics"
+    #   gnetId: 19268
+    #   revision: 1
+    #   datasource: Prometheus
+    # 20340-cert-manager:
+    #   # renovate: depName="cert-manager"
+    #   gnetId: 20340
+    #   revision: 1
+    #   datasource: Prometheus
+    # 20842-cert-manager-kubernetes:
+    #   # renovate: depName="Cert-manager-Kubernetes"
+    #   gnetId: 20842
+    #   revision: 1
+    #   datasource: Prometheus
+    9923-beyla-red-metrics:
+      # renovate: depName="Beyla RED Metrics"
+      gnetId: 9923
+      revision: 3
       datasource: Prometheus
     # 3662-prometheus-2-0-overview:
     #   # renovate: depName="Prometheus 2.0 Overview"
@@ -1747,37 +2027,147 @@ dashboards:
       gnetId: 15758
       revision: 41
       datasource: Prometheus
+    15759-kubernetes-views-nodes:
+      # renovate: depName="Kubernetes / Views / Nodes"
+      gnetId: 15759
+      revision: 40
+      datasource: Prometheus
     # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
     15760-kubernetes-views-pods:
       # renovate: depName="Kubernetes / Views / Pods"
       gnetId: 15760
-      revision: 34
+      revision: 37
       datasource: Prometheus
     15761-kubernetes-system-api-server:
       # renovate: depName="Kubernetes / System / API Server"
       gnetId: 15761
       revision: 18
       datasource: Prometheus
-    # 19105-prometheus:
-    #   # renovate: depName="Prometheus"
-    #   gnetId: 19105
-    #   revision: 6
-    #   datasource: Prometheus
-    # 19268-prometheus:
-    #   # renovate: depName="Prometheus All Metrics"
-    #   gnetId: 19268
-    #   revision: 1
-    #   datasource: Prometheus
-    # 20340-cert-manager:
-    #   # renovate: depName="cert-manager"
-    #   gnetId: 20340
-    #   revision: 1
-    #   datasource: Prometheus
-    # 20842-cert-manager-kubernetes:
-    #   # renovate: depName="Cert-manager-Kubernetes"
-    #   gnetId: 20842
-    #   revision: 1
-    #   datasource: Prometheus
+    16006-mimir-alertmanager-resources:
+      # renovate: depName="Mimir / Alertmanager resources"
+      gnetId: 16006
+      revision: 17
+      datasource: Prometheus
+    16007-mimir-alertmanager:
+      # renovate: depName="Mimir / Alertmanager"
+      gnetId: 16007
+      revision: 17
+      datasource: Prometheus
+    16008-mimir-compactor-resources:
+      # renovate: depName="Mimir / Compactor resources"
+      gnetId: 16008
+      revision: 17
+      datasource: Prometheus
+    16009-mimir-compactor:
+      # renovate: depName="Mimir / Compactor"
+      gnetId: 16009
+      revision: 17
+      datasource: Prometheus
+    16010-mimir-config:
+      # renovate: depName="Mimir / Config"
+      gnetId: 16010
+      revision: 17
+      datasource: Prometheus
+    16011-mimir-object-store:
+      # renovate: depName="Mimir / Object Store"
+      gnetId: 16011
+      revision: 17
+      datasource: Prometheus
+    16012-mimir-overrides:
+      # renovate: depName="Mimir / Overrides"
+      gnetId: 16012
+      revision: 17
+      datasource: Prometheus
+    16013-mimir-queries:
+      # renovate: depName="Mimir / Queries"
+      gnetId: 16013
+      revision: 17
+      datasource: Prometheus
+    16014-mimir-reads-networking:
+      # renovate: depName="Mimir / Reads networking"
+      gnetId: 16014
+      revision: 17
+      datasource: Prometheus
+    16015-mimir-reads-resources:
+      # renovate: depName="Mimir / Reads resources"
+      gnetId: 16015
+      revision: 17
+      datasource: Prometheus
+    16016-mimir-reads:
+      # renovate: depName="Mimir / Reads"
+      gnetId: 16016
+      revision: 17
+      datasource: Prometheus
+    16017-mimir-rollout-progress:
+      # renovate: depName="Mimir / Rollout progress"
+      gnetId: 16017
+      revision: 17
+      datasource: Prometheus
+    16018-mimir-ruler:
+      # renovate: depName="Mimir / Ruler"
+      gnetId: 16018
+      revision: 17
+      datasource: Prometheus
+    16019-mimir-scaling:
+      # renovate: depName="Mimir / Scaling"
+      gnetId: 16019
+      revision: 17
+      datasource: Prometheus
+    16020-mimir-slow-queries:
+      # renovate: depName="Mimir / Slow queries"
+      gnetId: 16020
+      revision: 17
+      datasource: Prometheus
+    16021-mimir-tenants:
+      # renovate: depName="Mimir / Tenants"
+      gnetId: 16021
+      revision: 17
+      datasource: Prometheus
+    16022-mimir-top-tenants:
+      # renovate: depName="Mimir / Top tenants"
+      gnetId: 16022
+      revision: 16
+      datasource: Prometheus
+    16023-mimir-writes-networking:
+      # renovate: depName="Mimir / Writes networking"
+      gnetId: 16023
+      revision: 16
+      datasource: Prometheus
+    16024-mimir-writes-resources:
+      # renovate: depName="Mimir / Writes resources"
+      gnetId: 16024
+      revision: 17
+      datasource: Prometheus
+    16026-mimir-writes:
+      # renovate: depName="Mimir / Writes"
+      gnetId: 16022
+      revision: 17
+      datasource: Prometheus
+    17605-mimir-overview-networking:
+      # renovate: depName="Mimir / Overview networking"
+      gnetId: 17605
+      revision: 13
+      datasource: Prometheus
+    17606-mimir-overview-resources:
+      # renovate: depName="Mimir / Overview resources"
+      gnetId: 17606
+      revision: 13
+      datasource: Prometheus
+    17607-mimir-overview:
+      # renovate: depName="Mimir / Overview"
+      gnetId: 17607
+      revision: 13
+      datasource: Prometheus
+    17608-mimir-remote-ruler-reads:
+      # renovate: depName="Mimir / Remote ruler reads"
+      gnetId: 17608
+      revision: 13
+      datasource: Prometheus
+    17609-mimir-remote-ruler-reads-resources:
+      # renovate: depName="Mimir / Remote ruler reads resources"
+      gnetId: 17609
+      revision: 13
+      datasource: Prometheus
     # keep-sorted end
 grafana.ini:
   analytics:
@@ -2055,7 +2445,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{alloy,aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,tempo,velero},k8s-{karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{alloy,aws-load-balancer-controller,beyla,cert-manager,external-dns,grafana,homepage,ingress-nginx,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,tempo,velero},k8s-{karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else

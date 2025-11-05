@@ -27,7 +27,7 @@ on:
           - 2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto
           - 2025-05-27-mcp-servers-k8s|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto
           - 2025-07-10-ollama-k8s-exploitation|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto
-          - 2025-08-08-amazon-eks-mimir
+          - 2025-08-08-amazon-eks-grafana-stack
       action:
         type: choice
         description: Select action
