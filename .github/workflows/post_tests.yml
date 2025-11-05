@@ -75,7 +75,7 @@ jobs:
       - name: Install mise and dependencies
         env:
           # renovate: datasource=github-releases depName=jdx/mise
-          MISE_VERSION: 2025.10.21
+          MISE_VERSION: 2025.11.1
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euxo pipefail
