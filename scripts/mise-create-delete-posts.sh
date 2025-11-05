@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euxo pipefail
+set -euo pipefail
 
 : "${AWS_ACCESS_KEY_ID:?Error: AWS_ACCESS_KEY_ID environment variable is not set!}"
 : "${AWS_DEFAULT_REGION:?Error: AWS_DEFAULT_REGION environment variable is not set!}"
