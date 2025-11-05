@@ -252,7 +252,7 @@ description = 'Delete: Exploiting RCE Vulnerabilities in Ollama on Kubernetes'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
-# Amazon EKS and Grafana Mimir
+# Amazon EKS and Grafana stack
 #------------------------------------------------------------------------------
 [tasks."create:2025-08-08-amazon-eks-grafana-stack"]
 description = 'Create: Amazon EKS and Grafana stack'
