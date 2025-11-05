@@ -30,7 +30,7 @@ jobs:
         uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c1cb33d45e # v7.0.8
         with:
           add-paths: _tabs/projects.md
-          branch: generate-projects
+          branch: chore/generate-projects
           commit-message: "docs: update _tabs/projects.md"
           delete-branch: true
           labels: generate-projects
