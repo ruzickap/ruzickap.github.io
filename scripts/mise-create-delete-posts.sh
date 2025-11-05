@@ -44,17 +44,15 @@ esac
 mdq "${MDQ_CODE_BLOCK}" --br -o plain "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
 
 if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
-  if ! eksctl get clusters --name="${CLUSTER_NAME}" &> /dev/null && [[ "${1%:*}" = "delete" ]]; then
+  if eksctl get clusters --name="${CLUSTER_NAME}" && [[ "${1%:*}" = "delete" ]]; then
     aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
   fi
   (
     echo "😇 <https://${CLUSTER_FQDN}>"
     echo '```'
+    echo "export CLUSTER_NAME=\"${CLUSTER_NAME}\""
     echo "export AWS_DEFAULT_REGION=\"${AWS_DEFAULT_REGION}\""
-    # shellcheck disable=SC2028
-    echo "eval \"\$(aws sts assume-role --role-arn \"\${AWS_ROLE_TO_ASSUME}\" --role-session-name \"\$USER@\$(hostname -f)-\$(date +%s)\" --duration-seconds 36000 | jq -r '.Credentials | \"export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\\nexport AWS_SESSION_TOKEN=\(.SessionToken)\\n\"')\""
-    echo "export KUBECONFIG=\"/tmp/kubeconfig-${CLUSTER_NAME}-\$\$.conf\""
-    echo "aws eks update-kubeconfig --region \"${AWS_DEFAULT_REGION}\" --name \"${CLUSTER_NAME}\" --kubeconfig \"\${KUBECONFIG}\""
+    echo "eval \"\$(mise run a)\""
     echo '```'
   ) | tee "${GITHUB_STEP_SUMMARY}"
 fi
