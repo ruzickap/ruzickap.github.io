@@ -1383,6 +1383,10 @@ alloy:
         format = "json"
       }
 
+      livedebugging {
+        enabled = true
+      }
+
       // ##########################################
       // # Beyla
       // ##########################################
@@ -1651,26 +1655,25 @@ alloy:
       // # Mimir / Prometheus
       // #####################
 
+      mimir.rules.kubernetes "default" {
+        address = "http://mimir-ruler.mimir.svc.cluster.local:8080"
+        tenant_id = "1"
+      }
 
       // prometheus.exporter.cadvisor "cadvisor" {
       //   allowlisted_container_labels = ["io.kubernetes.container.name", "io.kubernetes.pod.namespace", "io.kubernetes.pod.name"]
       //   enabled_metrics = ["cpu", "memory"]
       // }
 
-      prometheus.exporter.unix "default" {
-        // https://github.com/aws/karpenter-provider-aws/issues/5406
-        // https://github.com/prometheus/node_exporter/issues/2692
-        // udev_data_path = "/rootfs/run/udev/data"
-      }
+      prometheus.exporter.unix "default" { }
 
-
-      prometheus.scrape "scrape_metrics" {
+      prometheus.scrape "unix" {
         targets         = prometheus.exporter.unix.default.targets
         forward_to      = [prometheus.remote_write.mimir.receiver]
         scrape_interval = "10s"
       }
 
-      // Scrape service monitors (clustered to avoid duplicates)
+      // Scrape service monitors
       prometheus.operator.servicemonitors "default" {
         clustering {
           enabled = true
@@ -1678,7 +1681,7 @@ alloy:
         forward_to = [prometheus.remote_write.mimir.receiver]
       }
 
-      // Scrape pod monitors (clustered to avoid duplicates)
+      // Scrape pod monitors
       prometheus.operator.podmonitors "pods" {
         clustering {
           enabled = true
@@ -1695,7 +1698,7 @@ alloy:
       }
 
       // Expose a blackbox exporter locally so that probes can use the local exporter as a target
-      prometheus.exporter.blackbox "blackbox" {
+      prometheus.exporter.blackbox "default" {
         config = "{ modules: { http_2xx: { prober: http, timeout: 5s } } }"
         targets = [
           {
@@ -1706,6 +1709,10 @@ alloy:
         ]
       }
 
+      prometheus.scrape "blackbox" {
+        targets    = prometheus.exporter.blackbox.default.targets
+        forward_to = [prometheus.remote_write.mimir.receiver]
+      }
 
 
       // ##########################################
