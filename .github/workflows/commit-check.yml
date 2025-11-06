@@ -14,16 +14,20 @@ permissions: read-all
 
 jobs:
   commit-check:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
 
-      - uses: commit-check/commit-check-action@v1
+      - name: Create commit-check.toml file
+        run: |
+          cat > commit-check.toml << EOF
+          [commit]
+          subject_capitalized = false
+          subject_max_length = 72
+          EOF
+
+      - uses: commit-check/commit-check-action@a0193b1ca486178b85d7a1db145af34cd227f81f # v2.1.1
         env:
           GH_TOKEN: ${{ github.token }}
-        with:
-          commit-signoff: false
-          merge-base: true
