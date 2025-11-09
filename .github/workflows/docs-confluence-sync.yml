@@ -71,9 +71,8 @@ jobs:
             sed -i '/^---$/,/^---$/d' "${FILE}"
 
             mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
-              --changes-only --title-from-h1 \
+              --changes-only --title-from-filename \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
-            echo "💡 *** Synced: ${FILE}"
           done <<< "${FILES_TO_PROCESS}"
