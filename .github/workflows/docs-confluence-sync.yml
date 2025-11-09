@@ -63,8 +63,8 @@ jobs:
             {
               TITLE=$(echo "${FRONT_MATTER}" | yq '.title')
               echo "<!-- Title: ${TITLE} -->"
-              echo "<!-- Parent: ${FILE:8:11} -->"
-              echo "<!-- Label: ${FILE:8:11} -->"
+              echo "<!-- Parent: /${FILE:7:4} -->"
+              echo "<!-- Label: ${FILE:7:4} -->"
 
               echo "${FRONT_MATTER}" | yq -r '[.categories[], .tags[]] | unique | .[]' |
                 while IFS= read -r TAG; do
