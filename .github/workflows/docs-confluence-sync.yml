@@ -58,7 +58,7 @@ jobs:
             echo "💡 *** Processing: ${FILE}"
 
             FRONT_MATTER=$(sed -n '/^---$/,/^---$/ { /^---$/d; p }' "${FILE}")
-            echo "💡 *** FRONT_MATTER: ${FRONT_MATTER}"
+            echo -e "💡 *** FRONT_MATTER:\n${FRONT_MATTER}"
 
             TITLE=$(echo "${FRONT_MATTER}" | yq '.title')
             echo "<!-- Title: ${TITLE} -->" | tee -a "${FILE}"
@@ -75,4 +75,5 @@ jobs:
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
+            echo "💡 *** Synced: ${FILE}"
           done <<< "${FILES_TO_PROCESS}"
