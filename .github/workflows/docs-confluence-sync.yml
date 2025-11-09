@@ -55,7 +55,7 @@ jobs:
 
           # Process markdown files
           while IFS= read -r FILE; do
-            echo "💡 *** Processing: ${FILE}"
+            echo -e "\n💡 *** Processing: ${FILE}"
 
             FRONT_MATTER=$(awk '/^---$/ { if (++n == 1) next; if (n == 2) exit } n == 1' "${FILE}")
             echo -e "💡 *** FRONT_MATTER:\n${FRONT_MATTER}"
@@ -63,6 +63,7 @@ jobs:
             {
               TITLE=$(echo "${FRONT_MATTER}" | yq '.title')
               echo "<!-- Title: ${TITLE} -->"
+              echo "<!-- Parent: ${FILE:0:4} -->"
 
               echo "${FRONT_MATTER}" | yq -r '[.categories[], .tags[]] | unique | .[]' |
                 while IFS= read -r TAG; do
@@ -73,9 +74,10 @@ jobs:
 
             mv "${FILE}-2" "${FILE}"
 
-            mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
+            mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "/${CONFLUENCE_PARENTS}" \
               --changes-only --title-from-filename \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
+            exit 0
           done <<< "${FILES_TO_PROCESS}"
