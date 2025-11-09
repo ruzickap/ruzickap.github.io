@@ -57,7 +57,7 @@ jobs:
           while IFS= read -r FILE; do
             echo "💡 *** Processing: ${FILE}"
 
-            FRONT_MATTER=$(sed -n '/^---$/,/^---$/ { /^---$/d; p }' "${FILE}")
+            FRONT_MATTER=$(awk '/^---$/ { if (++n == 1) next; if (n == 2) exit } n == 1' "${FILE}")
             echo -e "💡 *** FRONT_MATTER:\n${FRONT_MATTER}"
 
             TITLE=$(echo "${FRONT_MATTER}" | yq '.title')
