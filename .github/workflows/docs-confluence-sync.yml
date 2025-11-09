@@ -71,7 +71,7 @@ jobs:
                   echo "<!-- Label: ${TAG} -->"
                 done
               cat "${FILE}"
-            } | sed -e '/^---$/,/^---$/d' -e 's@/assets/img/posts/@../..&@' -E 's/\{:[^}]*\}//' -e 's/\{%.+?%\}//' > "${FILE}-2"
+            } | sed -e '/^---$/,/^---$/d' -e 's@/assets/img/posts/@../..&@' -e 's/\{:[^}]*\}//' -e 's/\{%.+?%\}//' > "${FILE}-2"
 
             mv "${FILE}-2" "${FILE}"
 
