@@ -47,7 +47,7 @@ jobs:
           # Determine which files to process
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             # For workflow_dispatch, process all markdown files
-            FILES_TO_PROCESS=$(find _posts -type f -name '*.md')
+            FILES_TO_PROCESS=$(find _posts -type f -name '*.md' | sort)
           else
             # For push events, process only changed files
             FILES_TO_PROCESS="${CHANGED_FILES}"
@@ -71,7 +71,7 @@ jobs:
                   echo "<!-- Label: ${TAG} -->"
                 done
               cat "${FILE}"
-            } | sed '/^---$/,/^---$/d' > "${FILE}-2"
+            } | sed -e '/^---$/,/^---$/d' -e 's@/assets/img/posts/@../..&@' > "${FILE}-2"
 
             mv "${FILE}-2" "${FILE}"
 
@@ -80,5 +80,4 @@ jobs:
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
-            exit 0
           done <<< "${FILES_TO_PROCESS}"
