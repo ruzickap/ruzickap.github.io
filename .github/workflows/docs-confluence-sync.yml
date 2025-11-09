@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 env:
-  CONFLUENCE_BASE_URL: https://mylabsdev.atlassian.net
+  CONFLUENCE_BASE_URL: https://mylabsdev.atlassian.net/wiki/
   CONFLUENCE_PARENTS: "Petr's Blog"
   CONFLUENCE_PASSWORD: "${{ secrets.MY_ATLASSIAN_PERSONAL_TOKEN }}"
   CONFLUENCE_SPACE: myspace
@@ -24,7 +24,7 @@ env:
 
 jobs:
   docs-confluence-sync:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
@@ -41,15 +41,13 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
-          set -euxo pipefail
-
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install mark
 
           # Determine which files to process
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             # For workflow_dispatch, process all markdown files
-            FILES_TO_PROCESS=$(find _posts -type f -name '*.md')
+            FILES_TO_PROCESS=$(find _posts -type f -name '*.md' | sort)
           else
             # For push events, process only changed files
             FILES_TO_PROCESS="${CHANGED_FILES}"
@@ -57,8 +55,28 @@ jobs:
 
           # Process markdown files
           while IFS= read -r FILE; do
+            echo -e "\n💡 *** Processing: ${FILE}"
+
+            FRONT_MATTER=$(awk '/^---$/ { if (++n == 1) next; if (n == 2) exit } n == 1' "${FILE}")
+            echo -e "💡 *** FRONT_MATTER:\n${FRONT_MATTER}"
+
+            {
+              TITLE=$(echo "${FRONT_MATTER}" | yq '.title')
+              echo "<!-- Title: ${TITLE} -->"
+              echo "<!-- Parent: ${FILE:7:4} -->"
+              echo "<!-- Label: ${FILE:7:4} -->"
+
+              echo "${FRONT_MATTER}" | yq -r '[.categories[], .tags[]] | unique | .[]' |
+                while IFS= read -r TAG; do
+                  echo "<!-- Label: ${TAG} -->"
+                done
+              perl -0777 -pe 's/^---\n.*?\n---\n//s' "${FILE}"
+            } | sed -e 's@/assets/img/posts/@../..&@' -e 's|{%[[:space:]]*post_url[^%]*%}|http://ruzickap.github.io|g' -e 's/{:[^}]*}//' -e 's/{%[^%]*%}//' > "${FILE}-2"
+
+            mv "${FILE}-2" "${FILE}"
+
             mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
-              --title-from-h1 --changes-only \
+              --changes-only --title-from-filename \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
