@@ -4,8 +4,9 @@ icon: fas fa-project-diagram
 order: 4
 ---
 
-List of my GitHub projects:
-[https://github.com/ruzickap/](https://github.com/ruzickap/)
+- Legacy Blog: [linux.xvx.cz](https://linux.xvx.cz/)
+- List of my GitHub projects:
+  [https://github.com/ruzickap/](https://github.com/ruzickap/)
 
 ## [awsug.cz](https://github.com/awsugcz/awsug.cz)
 
@@ -728,8 +729,8 @@ List of my GitHub projects:
 
 - Description: Harbor in Kubernetes
 - Website: <https://ruzickap.github.io/k8s-harbor/>
-- Topics: harbor, kubernetes, demo, presentation, eks, vulnerability-scanners,
-  public
+- Topics: harbor, demo, presentation, eks, vulnerability-scanners, public,
+  kubernetes
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/blob/main/LICENSE)
@@ -1151,6 +1152,7 @@ List of my GitHub projects:
 - CI/CD status:
 
   [![GitHub Actions status - codeql](https://github.com/ruzickap/ruzickap.github.io/workflows/codeql/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/codeql.yml)
+  [![GitHub Actions status - commit-check](https://github.com/ruzickap/ruzickap.github.io/workflows/commit-check/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/commit-check.yml)
   [![GitHub Actions status - dependency-review](https://github.com/ruzickap/ruzickap.github.io/workflows/dependency-review/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/dependency-review.yml)
   [![GitHub Actions status - generate-projects](https://github.com/ruzickap/ruzickap.github.io/workflows/generate-projects/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/generate-projects.yml)
   [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/ruzickap.github.io/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)
