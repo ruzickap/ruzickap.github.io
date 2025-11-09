@@ -70,7 +70,6 @@ jobs:
                 while IFS= read -r TAG; do
                   echo "<!-- Label: ${TAG} -->"
                 done
-              cat "${FILE}"
               perl -0777 -pe 's/^---\n.*?\n---\n//s' "${FILE}"
             } | sed -e 's@/assets/img/posts/@../..&@' -e 's/{:[^}]*}//' -e 's/{%[^%]*%}//' > "${FILE}-2"
 
