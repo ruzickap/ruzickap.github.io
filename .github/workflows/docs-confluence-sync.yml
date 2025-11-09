@@ -75,6 +75,12 @@ jobs:
 
             mv "${FILE}-2" "${FILE}"
 
+            echo mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
+              --changes-only --title-from-filename \
+              --base-url "${CONFLUENCE_BASE_URL}" \
+              --username "${CONFLUENCE_USERNAME}" \
+              --password "${CONFLUENCE_PASSWORD}"
+
             mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
               --changes-only --title-from-filename \
               --base-url "${CONFLUENCE_BASE_URL}" \
