@@ -56,10 +56,10 @@ jobs:
           fi
 
           # Process markdown files
-          for FILE in ${FILES_TO_PROCESS}; do
+          while IFS= read -r FILE; do
             mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
               --title-from-h1 --changes-only \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
-          done
+          done <<< "${FILES_TO_PROCESS}"
