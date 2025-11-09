@@ -71,7 +71,7 @@ jobs:
             sed -i '/^---$/,/^---$/d' "${FILE}"
 
             mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
-              --changes-only \
+              --changes-only --title-from-h1 \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
