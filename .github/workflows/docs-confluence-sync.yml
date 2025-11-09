@@ -63,7 +63,7 @@ jobs:
             {
               TITLE=$(echo "${FRONT_MATTER}" | yq '.title')
               echo "<!-- Title: ${TITLE} -->"
-              echo "<!-- Parent: /${FILE:7:4} -->"
+              echo "<!-- Parent: ${FILE:7:4} -->"
               echo "<!-- Label: ${FILE:7:4} -->"
 
               echo "${FRONT_MATTER}" | yq -r '[.categories[], .tags[]] | unique | .[]' |
@@ -75,7 +75,7 @@ jobs:
 
             mv "${FILE}-2" "${FILE}"
 
-            mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "/${CONFLUENCE_PARENTS}" \
+            mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
               --changes-only --title-from-filename \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
