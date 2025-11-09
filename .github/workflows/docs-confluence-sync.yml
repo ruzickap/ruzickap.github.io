@@ -57,8 +57,20 @@ jobs:
 
           # Process markdown files
           while IFS= read -r FILE; do
+            echo "💡 *** Processing: ${FILE}"
+
+            TITLE=$(sed -n '/^---$/,/^---$/ { /^---$/d; p }' "${FILE}" | yq '.title')
+            echo "<!-- Title: ${TITLE} -->" >> "${FILE}"
+
+            yq -r '[.categories[], .tags[]] | unique | .[]' "${FILE}" |
+              while read -r TAG; do
+                echo "<!-- Label: ${TAG} -->" >> "${FILE}"
+              done
+
+            sed -i '/^---$/,/^---$/d' "${FILE}"
+
             mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
-              --title-from-h1 --changes-only \
+              --changes-only \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
