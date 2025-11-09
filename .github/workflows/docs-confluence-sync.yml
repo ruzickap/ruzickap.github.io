@@ -75,16 +75,9 @@ jobs:
 
             mv "${FILE}-2" "${FILE}"
 
-            # mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
-            #   --changes-only --title-from-filename \
-            #   --base-url "${CONFLUENCE_BASE_URL}" \
-            #   --username "${CONFLUENCE_USERNAME}" \
-            #   --password "${CONFLUENCE_PASSWORD}"
+            mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
+              --changes-only --title-from-filename \
+              --base-url "${CONFLUENCE_BASE_URL}" \
+              --username "${CONFLUENCE_USERNAME}" \
+              --password "${CONFLUENCE_PASSWORD}"
           done <<< "${FILES_TO_PROCESS}"
-
-      - name: Upload files to GitHub
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: posts
-          path: _posts
-          retention-days: 1
