@@ -71,9 +71,8 @@ jobs:
                   echo "<!-- Label: ${TAG} -->"
                 done
               cat "${FILE}"
+              perl -0777 -pe 's/^---\n.*?\n---\n//s' "${FILE}"
             } | sed -e 's@/assets/img/posts/@../..&@' -e 's/{:[^}]*}//' -e 's/{%[^%]*%}//' > "${FILE}-2"
-
-            perl -0777 -pe 's/^---\n.*?\n---\n//s' "${FILE}-2" > "${FILE}"
 
             # mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
             #   --changes-only --title-from-filename \
