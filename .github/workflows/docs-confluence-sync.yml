@@ -58,12 +58,14 @@ jobs:
             echo "💡 *** Processing: ${FILE}"
 
             FRONT_MATTER=$(sed -n '/^---$/,/^---$/ { /^---$/d; p }' "${FILE}")
+            echo "💡 *** FRONT_MATTER: ${FRONT_MATTER}"
+
             TITLE=$(echo "${FRONT_MATTER}" | yq '.title')
-            echo "<!-- Title: ${TITLE} -->" >> "${FILE}"
+            echo "<!-- Title: ${TITLE} -->" | tee -a "${FILE}"
 
             echo "${FRONT_MATTER}" | yq -r '[.categories[], .tags[]] | unique | .[]' |
               while read -r TAG; do
-                echo "<!-- Label: ${TAG} -->" >> "${FILE}"
+                echo "<!-- Label: ${TAG} -->" | tee -a "${FILE}"
               done
 
             sed -i '/^---$/,/^---$/d' "${FILE}"
