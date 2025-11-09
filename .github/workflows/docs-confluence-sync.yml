@@ -73,6 +73,8 @@ jobs:
               cat "${FILE}"
             } | sed -e '1,/^---$/ { /^---$/!d; /^---$/d; }' -e 's@/assets/img/posts/@../..&@' -e 's/{:[^}]*}//' -e 's/{%[^%]*%}//' > "${FILE}-2"
 
+            mv "${FILE}-2" "${FILE}"
+
             # mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
             #   --changes-only --title-from-filename \
             #   --base-url "${CONFLUENCE_BASE_URL}" \
