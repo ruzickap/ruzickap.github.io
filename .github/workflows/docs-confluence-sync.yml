@@ -41,8 +41,6 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
-          set -euxo pipefail
-
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install mark
 
@@ -70,7 +68,7 @@ jobs:
 
             sed -i '/^---$/,/^---$/d' "${FILE}"
 
-            mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "Petr's Blog" \
+            mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
               --changes-only --title-from-h1 \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \
