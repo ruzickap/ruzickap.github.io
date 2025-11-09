@@ -59,10 +59,11 @@ jobs:
           while IFS= read -r FILE; do
             echo "💡 *** Processing: ${FILE}"
 
-            TITLE=$(sed -n '/^---$/,/^---$/ { /^---$/d; p }' "${FILE}" | yq '.title')
+            FRONT_MATTER=$(sed -n '/^---$/,/^---$/ { /^---$/d; p }' "${FILE}")
+            TITLE=$(echo "${FRONT_MATTER}" | yq '.title')
             echo "<!-- Title: ${TITLE} -->" >> "${FILE}"
 
-            yq -r '[.categories[], .tags[]] | unique | .[]' "${FILE}" |
+            echo "${FRONT_MATTER}" | yq -r '[.categories[], .tags[]] | unique | .[]' |
               while read -r TAG; do
                 echo "<!-- Label: ${TAG} -->" >> "${FILE}"
               done
