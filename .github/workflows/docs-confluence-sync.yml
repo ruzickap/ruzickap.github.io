@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 env:
-  CONFLUENCE_BASE_URL: https://mylabsdev.atlassian.net
+  CONFLUENCE_BASE_URL: https://mylabsdev.atlassian.net/wiki/
   CONFLUENCE_PARENTS: "Petr's Blog"
   CONFLUENCE_PASSWORD: "${{ secrets.MY_ATLASSIAN_PERSONAL_TOKEN }}"
   CONFLUENCE_SPACE: myspace
