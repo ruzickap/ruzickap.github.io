@@ -175,7 +175,7 @@ Resources:
                 StorageClass: STANDARD_IA
           - Id: DeleteOldObjects
             Status: Enabled
-            ExpirationInDays: 60
+            ExpirationInDays: 120
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
