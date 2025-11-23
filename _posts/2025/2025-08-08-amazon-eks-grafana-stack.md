@@ -322,12 +322,13 @@ Resources:
         Statement:
           - Effect: Allow
             Action:
-              - s3:GetObject
+              - s3:AbortMultipartUpload
               - s3:DeleteObject
+              - s3:GetObject
+              - s3:ListMultipartUploadParts
+              - s3:ListObjects
               - s3:PutObject
               - s3:PutObjectTagging
-              - s3:AbortMultipartUpload
-              - s3:ListMultipartUploadParts
             Resource: !Sub "arn:aws:s3:::${ClusterFQDN}/*"
           - Effect: Allow
             Action:
@@ -516,6 +517,8 @@ managedNodeGroups:
     volumeEncrypted: true
     volumeKmsKeyID: ${AWS_KMS_KEY_ID}
     privateNetworking: true
+    nodeRepairConfig:
+      enabled: true
     bottlerocket:
       settings:
         kubernetes:
@@ -752,6 +755,9 @@ spec:
     spec:
       requirements:
         # keep-sorted start
+        - key: "karpenter.k8s.aws/instance-memory"
+          operator: Gt
+          values: ["4095"]
         - key: "topology.kubernetes.io/zone"
           operator: In
           values: ["${AWS_DEFAULT_REGION}a"]
@@ -794,11 +800,40 @@ global:
   priorityClassName: high-priority
 crds:
   enabled: true
+replicaCount: 2
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/instance: cert-manager
+          app.kubernetes.io/component: controller
+      topologyKey: kubernetes.io/hostname
 extraArgs:
   - --enable-certificate-owner-ref=true
 serviceAccount:
   name: cert-manager
 enableCertificateOwnerRef: true
+webhook:
+  replicaCount: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: cert-manager
+            app.kubernetes.io/component: webhook
+        topologyKey: kubernetes.io/hostname
+cainjector:
+  replicaCount: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: cert-manager
+            app.kubernetes.io/component: cainjector
+        topologyKey: kubernetes.io/hostname
 prometheus:
   servicemonitor:
     enabled: true
@@ -1087,6 +1122,15 @@ controller:
     default: true
   extraArgs:
     default-ssl-certificate: cert-manager/ingress-cert-production
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: ingress-nginx
+            app.kubernetes.io/component: controller
+        topologyKey: kubernetes.io/hostname
+  replicaCount: 2
   service:
     annotations:
       # https://www.qovery.com/blog/our-migration-from-kubernetes-built-in-nlb-to-alb-controller/
@@ -1204,6 +1248,8 @@ loki:
   # compactor:
   #   delete_request_store: s3
   #   retention_enabled: true
+lokiCanary:
+  kind: Deployment
 ingress:
   enabled: true
   ingressClassName: nginx
@@ -1222,15 +1268,12 @@ ingress:
         - loki.${CLUSTER_FQDN}
 singleBinary:
   replicas: 2
-backend:
+write:
   replicas: 0
 read:
   replicas: 0
-write:
+backend:
   replicas: 0
-# https://blog.devgenius.io/install-loki-in-distributed-mode-on-azure-aks-with-terraform-0918803f2ed0
-ruler:
-  enabled: false
 EOF
 helm upgrade --install --version "${LOKI_HELM_CHART_VERSION}" --namespace loki --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" loki grafana/loki
 ```
@@ -1246,12 +1289,12 @@ dashboards for visualization and alerting.
 ![Grafana Mimir](https://raw.githubusercontent.com/grafana/mimir/38563275a149baaf659e566990fe66a13db9e3c6/docs/sources/mimir/mimir-logo.png){:width="400"}
 
 Install the `mimir-distributed` [Helm chart](https://github.com/grafana/mimir/tree/main/operations/helm/charts/mimir-distributed)
-and customize its [default values](https://github.com/grafana/mimir/blob/mimir-distributed-6.0.0-rc.0/operations/helm/charts/mimir-distributed/values.yaml)
+and customize its [default values](https://github.com/grafana/mimir/blob/mimir-distributed-6.0.0/operations/helm/charts/mimir-distributed/values.yaml)
 to fit your environment and storage backend:
 
 ```bash
 # renovate: datasource=helm depName=mimir-distributed registryUrl=https://grafana.github.io/helm-charts
-MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.0.0"
+MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.1.0-weekly.368"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" << EOF
@@ -1283,14 +1326,171 @@ mimir:
       s3:
         bucket_name: ${CLUSTER_FQDN}
       storage_prefix: mimirruler
-ingester:
+alertmanager:
+  priorityClassName: high-priority
   replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: alertmanager
+        topologyKey: kubernetes.io/hostname
+distributor:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: distributor
+        topologyKey: kubernetes.io/hostname
+ingester:
+  zoneAwareReplication:
+    enabled: false
+  replicas: 2
+  priorityClassName: high-priority
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: ingester
+        topologyKey: kubernetes.io/hostname
+overrides_exporter:
+  priorityClassName: high-priority
+ruler:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: ruler
+        topologyKey: kubernetes.io/hostname
+ruler_querier:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: ruler-querier
+        topologyKey: kubernetes.io/hostname
+ruler_query_frontend:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: ruler-query-frontend
+        topologyKey: kubernetes.io/hostname
+ruler_query_scheduler:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: ruler-query-scheduler
+        topologyKey: kubernetes.io/hostname
+querier:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: querier
+        topologyKey: kubernetes.io/hostname
+query_frontend:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: query-frontend
+        topologyKey: kubernetes.io/hostname
+query_scheduler:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: query-scheduler
+        topologyKey: kubernetes.io/hostname
+store_gateway:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: store-gateway
+        topologyKey: kubernetes.io/hostname
+compactor:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: compactor
+        topologyKey: kubernetes.io/hostname
 # https://github.com/grafana/helm-charts/blob/main/charts/rollout-operator/values.yaml
 rollout_operator:
   serviceMonitor:
     enabled: true
+  priorityClassName: high-priority
 minio:
   enabled: false
+kafka:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: gateway
+        topologyKey: kubernetes.io/hostname
+gateway:
+  priorityClassName: high-priority
+  replicas: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mimir
+            app.kubernetes.io/component: gateway
+        topologyKey: kubernetes.io/hostname
 EOF
 helm upgrade --install --version "${MIMIR_DISTRIBUTED_HELM_CHART_VERSION}" --namespace mimir --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" mimir grafana/mimir-distributed
 ```
@@ -1304,570 +1504,183 @@ does not index the trace data.
 
 ![Grafana Tempo](https://raw.githubusercontent.com/grafana/tempo/8dd75d18773d77149de8588f9dccbd680a03b00e/docs/sources/tempo/logo_and_name.png)
 
-Install the `tempo` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/tempo-distributed)
-and customize its [default values](https://github.com/grafana/helm-charts/blob/tempo-distributed-1.52.7/charts/tempo-distributed/values.yaml)
+Install the `tempo` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/tempo)
+and customize its [default values](https://github.com/grafana/helm-charts/blob/main/charts/tempo/values.yaml)
 to fit your environment and storage requirements:
 
 ```bash
 # renovate: datasource=helm depName=tempo registryUrl=https://grafana.github.io/helm-charts
-TEMPO_HELM_CHART_VERSION="1.52.7"
+TEMPO_HELM_CHART_VERSION="1.24.0"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" << EOF
-global:
-  priorityClassName: high-priority
-# https://youtu.be/PmE9mgYaoQA?t=817
-metricsGenerator:
-  enabled: true
-storage:
-  trace:
-    backend: s3
-    s3:
-      bucket: ${CLUSTER_FQDN}
-      endpoint: s3.${AWS_REGION}.amazonaws.com
-  admin:
-    backend: s3
-    s3:
-      bucket_name: ${CLUSTER_FQDN}
-      endpoint: s3.${AWS_REGION}.amazonaws.com
-traces:
-  otlp:
-    http:
-      enabled: true
-    grpc:
-      enabled: true
-metricsGenerator:
-  enabled: true
-  config:
-    # processor:
-    #   # https://grafana.com/docs/tempo/latest/operations/traceql-metrics/
-    #   local_blocks:
-    #     filter_server_spans: false
-    storage:
-      remote_write:
-        - url: http://mimir-gateway.mimir.svc.cluster.local/api/v1/push
-
-EOF
-helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" tempo grafana/tempo-distributed
-```
-
-## Alloy
-
-[Grafana Alloy](https://grafana.com/oss/alloy/) is an open source, vendor-neutral
-distribution of OpenTelemetry that provides a unified way to collect, process, and
-export telemetry data (traces, metrics, and logs) from your infrastructure and
-applications.
-
-![Grafana Alloy](https://raw.githubusercontent.com/grafana/alloy/9b878da08fec0467a88637fd26e5be6da2037574/docs/sources/assets/logo_alloy_light.svg){:width="400"}
-
-Install the `alloy` [Helm chart](https://github.com/grafana/alloy/tree/main/operations/helm/charts/alloy)
-and customize its [default values](https://github.com/grafana/alloy/blob/v1.3.0/operations/helm/charts/alloy/values.yaml)
-to fit your environment and monitoring needs:
-
-```bash
-# renovate: datasource=helm depName=alloy registryUrl=https://grafana.github.io/helm-charts
-ALLOY_HELM_CHART_VERSION="1.4.0"
-
-# https://github.com/ai-cfia/howard-on-prem/blob/main/monitoring/grafana-alloy/helm/values.yaml
-# https://github.com/hongbo-miao/hongbomiao.com/blob/main/kubernetes/argo-cd/projects/production-hm/alloy/manifests/hm-alloy-application.yaml
-# https://github.com/RS-PYTHON/rs-infra-monitoring/blob/0cc043e9398edd80b91b3ac8768f5a8ab7fce26e/apps/alloy/values.yaml#L47
-# https://stackoverflow.com/questions/79695474/grafana-alloy-no-prefect-pod-logs-on-bottlerocket
-# https://developer-friendly.blog/blog/2025/03/17/migration-from-promtail-to-alloy-the-what-the-why-and-the-how/#collect-prometheus-metrics
-helm repo add --force-update grafana https://grafana.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" << EOF
-alloy:
-  configMap:
-    content: |-
-      logging {
-        level = "info"
-        format = "json"
-      }
-
-      livedebugging {
-        enabled = true
-      }
-
-      // ##########################################
-      // # Beyla
-      // ##########################################
-
-      beyla.ebpf "default" {
-        attributes {
-          kubernetes {
-            enable = "true"
-            cluster_name = "${CLUSTER_NAME}"
-          }
-        }
-
-        discovery {
-          instrument {
-            open_ports = "80,443"
-          }
-          instrument {
-            kubernetes {
-              namespace = "ingress-nginx"
-            }
-          }
-        }
-
-        metrics {
-          features = [
-            "application",
-            "application_process",
-            "application_service_graph",
-            "application_span",
-            "network",
-          ]
-        }
-
-        output {
-          traces = [otelcol.exporter.otlp.tempo.input]
-        }
-      }
-
-      prometheus.scrape "beyla" {
-        targets      = beyla.ebpf.default.targets
-        honor_labels = true
-        forward_to   = [prometheus.remote_write.mimir.receiver]
-      }
-
-      // ##########################################
-      // # Tempo
-      // ##########################################
-
-      otelcol.processor.batch "default" {
-        output {
-          metrics = [otelcol.exporter.prometheus.default.input]
-          logs    = [otelcol.exporter.loki.default.input]
-          traces  = [otelcol.exporter.otlp.tempo.input]
-        }
-      }
-
-      otelcol.connector.spanmetrics "default" {
-        dimension {
-          name = "http.status_code"
-        }
-        dimension {
-          name = "http.method"
-          default = "GET"
-        }
-        aggregation_temporality = "DELTA"
-        histogram {
-          unit = "s"
-          explicit {
-            buckets = ["333ms", "777s", "999h"]
-          }
-        }
-        metrics_flush_interval = "33s"
-        namespace = "default"
-        output {
-          metrics = [otelcol.processor.batch.default.input]
-        }
-      }
-
-      otelcol.connector.spanlogs "default" {
-        roots = true
-        output {
-          logs = [otelcol.processor.batch.default.input]
-        }
-      }
-
-      otelcol.connector.servicegraph "default" {
-        dimensions = ["http.method", "http.target"]
-        output {
-          metrics = [otelcol.processor.batch.default.input]
-        }
-      }
-
-      otelcol.receiver.otlp "default" {
-        // configures the default grpc endpoint "0.0.0.0:4317"
-        grpc { endpoint = "0.0.0.0:4317" }
-        // configures the default http/protobuf endpoint "0.0.0.0:4318"
-        http { endpoint = "0.0.0.0:4318" }
-
-        output {
-          metrics = [otelcol.processor.batch.default.input]
-          logs    = [otelcol.processor.batch.default.input]
-          traces = [
-            otelcol.connector.servicegraph.default.input,
-            otelcol.connector.spanlogs.default.input,
-            otelcol.connector.spanmetrics.default.input,
-          ]
-        }
-      }
-
-      otelcol.auth.headers "tempo" {
-        header {
-          key   = "X-Scope-OrgID"
-          value = "1"
-        }
-      }
-      otelcol.exporter.otlp "tempo" {
-        client {
-          endpoint = "tempo-distributor.tempo.svc.cluster.local:4317"
-          auth = otelcol.auth.headers.tempo.handler
-          tls {
-            insecure = true
-          }
-        }
-      }
-
-      otelcol.exporter.loki "default" {
-        forward_to = [loki.write.default.receiver]
-      }
-
-      otelcol.exporter.prometheus "default" {
-        forward_to = [prometheus.remote_write.mimir.receiver]
-      }
-
-      // ##########################################
-      // # Loki
-      // ##########################################
-
-      // ========= Pod logs (via K8s API) =========
-
-      // discovery.kubernetes allows you to find scrape targets from Kubernetes resources.
-      // It watches cluster state and ensures targets are continually synced with what is currently running in your cluster.
-      // https://grafana.com/docs/alloy/v1.11/reference/components/discovery/discovery.kubernetes/
-      discovery.kubernetes "pod" {
-        role = "pod"
-        // Restrict to pods on the node to reduce cpu & memory usage
-        // https://grafana.com/docs/alloy/v1.11/reference/components/discovery/discovery.kubernetes/#limit-to-only-pods-on-the-same-node
-        selectors {
-          role = "pod"
-          field = "spec.nodeName=" + coalesce(sys.env("HOSTNAME"), constants.hostname)
-        }
-      }
-
-      // discovery.relabel rewrites the label set of the input targets by applying one or more relabeling rules.
-      // If no rules are defined, then the input targets are exported as-is.
-      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.relabel/
-      discovery.relabel "pod_logs" {
-        targets = discovery.kubernetes.pod.targets
-
-        //* Label creation - "namespace" field from "__meta_kubernetes_namespace"
-        rule {
-          source_labels = ["__meta_kubernetes_namespace"]
-          target_label = "namespace"
-        }
-        //* Label creation - "pod" field from "__meta_kubernetes_pod_name"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_name"]
-          target_label = "pod"
-        }
-        //* Label creation - "container" field from "__meta_kubernetes_pod_container_name"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_container_name"]
-          target_label = "container"
-        }
-        //* Label creation -  "app" field from "__meta_kubernetes_pod_label_app_kubernetes_io_name"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_name"]
-          target_label = "app"
-        }
-        //* Label creation -  "job" field from "__meta_kubernetes_namespace" and "__meta_kubernetes_pod_container_name"
-        // Concatenate values __meta_kubernetes_namespace/__meta_kubernetes_pod_container_name
-        rule {
-          source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_container_name"]
-          target_label = "job"
-          separator = "/"
-        }
-        //* Label creation - "container" field from "__meta_kubernetes_pod_uid" and "__meta_kubernetes_pod_container_name"
-        // Concatenate values __meta_kubernetes_pod_uid/__meta_kubernetes_pod_container_name.log
-        rule {
-          source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
-          target_label = "__path__"
-          separator = "/"
-          replacement = "/var/log/pods/*\$1/*.log"
-        }
-        //* Label creation -  "container_runtime" field from "__meta_kubernetes_pod_container_id"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_container_id"]
-          target_label = "container_runtime"
-          regex = "^(\\\S+):\\\/\\\/.+$"
-        }
-        // Label creation - "node_name" field from "__meta_kubernetes_pod_node_name"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_node_name"]
-          target_label = "node_name"
-        }
-        // Label creation -  "component" field from "__meta_kubernetes_pod_label_app_kubernetes_io_component" and "__meta_kubernetes_pod_label_component"
-        rule {
-          source_labels = ["__meta_kubernetes_pod_label_app_kubernetes_io_component", "__meta_kubernetes_pod_label_component"]
-          target_label = "component"
-          regex = "^;*([^;]+)(;.*)?$"
-        }
-      }
-
-      // loki.process receives log entries from other Loki components, applies one or more processing stages,
-      // and forwards the results to the list of receivers in the component's arguments.
-      loki.process "pod_logs" {
-        stage.cri {}
-        stage.decolorize {}
-        forward_to = [loki.write.default.receiver]
-      }
-
-      // loki.source.kubernetes tails logs from Kubernetes containers using the Kubernetes API.
-      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.source.kubernetes/
-      loki.source.kubernetes "pod_logs" {
-        targets    = discovery.relabel.pod_logs.output
-        forward_to = [loki.process.pod_logs.receiver]
-      }
-
-      // ========= Kubernetes Events =========
-
-      // loki.source.kubernetes_events tails events from the Kubernetes API and converts them
-      // into log lines to forward to other Loki components.
-      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.source.kubernetes_events/
-      loki.source.kubernetes_events "cluster_events" {
-        job_name   = "integrations/kubernetes/eventhandler"
-        // log_format = "json"
-        forward_to = [
-          loki.process.cluster_events.receiver,
-        ]
-      }
-
-      // loki.process receives log entries from other loki components, applies one or more processing stages,
-      // and forwards the results to the list of receivers in the component's arguments.
-      loki.process "cluster_events" {
-        forward_to = [loki.write.default.receiver]
-        stage.static_labels {
-          values = {
-            cluster = "${CLUSTER_NAME}",
-          }
-        }
-        stage.labels {
-          values = {
-            kubernetes_cluster_events = "job",
-          }
-        }
-      }
-
-      // https://grafana.com/docs/alloy/v1.11/reference/components/loki/loki.write/
-      loki.write "default" {
-        endpoint {
-          url = "http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push"
-          tenant_id = "1"
-        }
-      }
-
-      // #####################
-      // # Mimir / Prometheus
-      // #####################
-
-      mimir.rules.kubernetes "default" {
-        address = "http://mimir-ruler.mimir.svc.cluster.local:8080"
-        tenant_id = "1"
-      }
-
-      // prometheus.exporter.cadvisor "cadvisor" {
-      //   allowlisted_container_labels = ["io.kubernetes.container.name", "io.kubernetes.pod.namespace", "io.kubernetes.pod.name"]
-      //   enabled_metrics = ["cpu", "memory"]
-      // }
-
-      prometheus.exporter.unix "default" { }
-
-      prometheus.scrape "unix" {
-        targets         = prometheus.exporter.unix.default.targets
-        forward_to      = [prometheus.remote_write.mimir.receiver]
-        scrape_interval = "10s"
-      }
-
-      // Scrape service monitors
-      prometheus.operator.servicemonitors "default" {
-        clustering {
-          enabled = true
-        }
-        forward_to = [prometheus.remote_write.mimir.receiver]
-      }
-
-      // Scrape pod monitors
-      prometheus.operator.podmonitors "pods" {
-        clustering {
-          enabled = true
-        }
-        forward_to = [prometheus.remote_write.mimir.receiver]
-      }
-
-      // Scrape every probe (clustered to avoid duplicates)
-      prometheus.operator.probes "probes" {
-        clustering {
-          enabled = true
-        }
-        forward_to = [prometheus.remote_write.mimir.receiver]
-      }
-
-      // Expose a blackbox exporter locally so that probes can use the local exporter as a target
-      prometheus.exporter.blackbox "default" {
-        config = "{ modules: { http_2xx: { prober: http, timeout: 5s } } }"
-        targets = [
-          {
-            name    = "oauth2-proxy",
-            address = "https://oauth2-proxy.${CLUSTER_FQDN}",
-            module  = "http_2xx",
-          },
-        ]
-      }
-
-      prometheus.scrape "blackbox" {
-        targets    = prometheus.exporter.blackbox.default.targets
-        forward_to = [prometheus.remote_write.mimir.receiver]
-      }
-
-
-      // ##########################################
-      // # Common configuration
-      // ##########################################
-
-      prometheus.remote_write "mimir" {
-        endpoint {
-          url = "http://mimir-gateway.mimir.svc.cluster.local/api/v1/push"
-          headers = {
-            "X-Scope-OrgID" = "1",
-          }
-        }
-      }
-
-  extraPorts:
-    - name: otlp-grpc
-      port: 4317
-      targetPort: 4317
-      protocol: TCP
-    - name: otlp-http
-      port: 4318
-      targetPort: 4318
-      protocol: TCP
-  mounts:
-    varlog: true
-  # https://stackoverflow.com/questions/79400979/cannot-see-any-traces-from-alloy-in-grafana/79446696#79446696
-  securityContext:
-    appArmorProfile:
-      type: Unconfined
-    runAsUser: 0
-    capabilities:
-      drop:
-        - ALL
-      add:
-        - BPF
-        - CHECKPOINT_RESTORE
-        - DAC_READ_SEARCH
-        - NET_RAW
-        - PERFMON
-        - SYS_ADMIN
-        - SYS_PTRACE
-controller:
-  priorityClassName: system-node-critical
+replicas: 2
+tempo:
+  # https://youtu.be/PmE9mgYaoQA?t=817
+  metricsGenerator:
+    enabled: true
+    remoteWriteUrl: http://mimir-gateway.mimir.svc.cluster.local/api/v1/push
+  storage:
+    trace:
+      backend: s3
+      s3:
+        bucket: ${CLUSTER_FQDN}
+        endpoint: s3.${AWS_REGION}.amazonaws.com
 serviceMonitor:
   enabled: true
-ingress:
-  enabled: true
-  ingressClassName: nginx
-  annotations:
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/description: OpenTelemetry Collector distribution with programmable pipelines
-    gethomepage.dev/group: Apps
-    gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/alloy/513175e2add3957310a445a7b683100b703a9b49/docs/sources/assets/alloy_icon_orange.svg
-    gethomepage.dev/name: Alloy
-    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
-    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
-  faroPort: 12345
-  hosts:
-    - alloy.${CLUSTER_FQDN}
-  tls:
-    - hosts:
-        - alloy.${CLUSTER_FQDN}
-EOF
-helm upgrade --install --version "${ALLOY_HELM_CHART_VERSION}" --namespace alloy --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-alloy.yml" alloy grafana/alloy
-```
-
-## Beyla
-
-[Grafana Beyla](https://github.com/grafana/beyla)
-
-```bash
-# renovate: datasource=helm depName=beyla registryUrl=https://grafana.github.io/helm-charts
-BEYLA_HELM_CHART_VERSION="1.4.0"
-helm repo add --force-update grafana https://grafana.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-beyla.yml" << EOF
-priorityClassName: system-node-critical
-config:
-  data:
-    discovery:
-      instrument:
-        - open_ports: 443
-    otel_metrics_export:
-      endpoint: http://alloy.alloy.svc.cluster.local:4317
-      protocol: grpc
-    otel_traces_export:
-      endpoint: http://alloy.alloy.svc.cluster.local:4317
-      protocol: grpc
-    attributes:
-      select:
-        beyla_network_flow_bytes:
-          include:
-            - k8s.src.owner.name
-            - k8s.src.namespace
-            - k8s.dst.owner.name
-            - k8s.dst.namespace
-            - k8s.cluster.name
-            - src.zone
-            - dst.zone
-    network:
-      enable: true
-env:
-  BEYLA_KUBE_CLUSTER_NAME: ${CLUSTER_NAME}
-serviceMonitor:
-  enabled: true
-EOF
-helm upgrade --install --version "${BEYLA_HELM_CHART_VERSION}" --namespace beyla --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-beyla.yml" beyla grafana/beyla
-```
-
-### Mailpit
-
-Mailpit will be used to receive email alerts from Prometheus.
-
-![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="150"}
-
-Install the `mailpit` [Helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
-and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.28.0/charts/mailpit/values.yaml):
-
-```bash
-# renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
-MAILPIT_HELM_CHART_VERSION="0.29.1"
-
-helm repo add --force-update jouve https://jouve.github.io/charts/
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
-replicaCount: 2
 affinity:
   podAntiAffinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
-          matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-                - mailpit
+          matchLabels:
+            app.kubernetes.io/instance: tempo
+            app.kubernetes.io/name: tempo
         topologyKey: kubernetes.io/hostname
-ingress:
-  enabled: true
-  ingressClassName: nginx
-  annotations:
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/description: An email and SMTP testing tool with API for developers
-    gethomepage.dev/group: Apps
-    gethomepage.dev/icon: https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg
-    gethomepage.dev/name: Mailpit
-    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
-    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
-  hostname: mailpit.${CLUSTER_FQDN}
+priorityClassName: high-priority
 EOF
-helm upgrade --install --version "${MAILPIT_HELM_CHART_VERSION}" --namespace mailpit --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" mailpit jouve/mailpit
-kubectl label namespace mailpit pod-security.kubernetes.io/enforce=baseline
+helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" tempo grafana/tempo
 ```
 
-Screenshot:
+## Pyroscope
 
-![Mailpit](/assets/img/posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities/mailpit.avif){:width="700"}
+[Grafana Pyroscope](https://github.com/grafana/pyroscope) is a Continuous Profiling
+Platform.
+
+![Grafana Pyroscope](https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png){:width="300"}
+
+Install the `pyroscope` [Helm chart](https://github.com/grafana/pyroscope/tree/main/operations/pyroscope/helm/pyroscope)
+and customize its [default values](https://github.com/grafana/pyroscope/blob/v1.16.0/operations/pyroscope/helm/pyroscope/values.yaml)
+to fit your environment and storage requirements:
+
+```bash
+# renovate: datasource=helm depName=pyroscope registryUrl=https://grafana.github.io/helm-charts
+PYROSCOPE_HELM_CHART_VERSION="1.16.0"
+
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-pyroscope.yml" << EOF
+pyroscope:
+  replicaCount: 2
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app.kubernetes.io/instance: pyroscope
+          topologyKey: kubernetes.io/hostname
+  priorityClassName: high-priority
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: Continuous Profiling Platform
+    gethomepage.dev/group: Apps
+    gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png
+    gethomepage.dev/name: Pyroscope
+    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+  hosts:
+    - pyroscope.${CLUSTER_FQDN}
+  tls:
+    - hosts:
+        - pyroscope.${CLUSTER_FQDN}
+serviceMonitor:
+  enabled: true
+EOF
+helm upgrade --install --version "${PYROSCOPE_HELM_CHART_VERSION}" --namespace pyroscope --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-pyroscope.yml" pyroscope grafana/pyroscope
+```
+
+### Grafana Kubernetes Monitoring Helm chart
+
+The [Grafana Kubernetes Monitoring Helm chart](https://github.com/grafana/k8s-monitoring-helm/)
+offers a complete solution for configuring infrastructure, zero-code instrumentation,
+and gathering telemetry.
+
+Install the `k8s-monitoring` [Helm chart](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring)
+and customize its [default values](https://github.com/grafana/k8s-monitoring-helm/blob/v2.1.4/charts/k8s-monitoring/values.yaml)
+to fit your environment and storage requirements:
+
+```bash
+# renovate: datasource=helm depName=k8s-monitoring registryUrl=https://grafana.github.io/helm-charts
+K8S_MONITORING_HELM_CHART_VERSION="3.5.6"
+
+# https://github.com/suxess-it/kubriX/blob/main/platform-apps/charts/k8s-monitoring/values-kubrix-default.yaml
+# https://github.com/ar2pi/potato-cluster/blob/main/kubernetes/helm/grafana-k8s-monitoring/values.yaml
+# https://github.com/valesordev/valesor.dev/blob/main/infra/alloy/k8s-monitoring-values.yaml
+
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-k8s-monitoring.yml" << EOF
+cluster:
+  name: "${CLUSTER_NAME}"
+destinations:
+  - name: prometheus
+    type: prometheus
+    url: http://mimir-gateway.mimir.svc.cluster.local/api/v1/push
+    # tenantId: "1"
+  - name: loki
+    type: loki
+    url: http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push
+    # tenantId: "1"
+  - name: otlpgateway
+    type: otlp
+    url: http://tempo.tempo.svc.cluster.local:4317
+    tls:
+      insecure: true
+      insecureSkipVerify: true
+  - name: pyroscope
+    type: pyroscope
+    url: http://pyroscope.pyroscope.svc.cluster.local:4040
+    tls:
+      insecure_skip_verify: true
+# VVV disable ???
+clusterMetrics:
+  enabled: true
+# clusterEvents:
+#   enabled: true
+# nodeLogs:
+#   enabled: true
+# podLogs:
+#   enabled: true
+# applicationObservability:
+#   enabled: true
+#   receivers:
+#     otlp:
+#       grpc:
+#         enabled: true
+#       http:
+#         enabled: true
+autoInstrumentation:
+  enabled: true
+annotationAutodiscovery:
+  enabled: true
+prometheusOperatorObjects:
+  enabled: true
+# profiling:
+#   enabled: true
+# # vvv enabled ????
+# profilesReceiver:
+#   enabled: false
+alloy-metrics:
+  enabled: true
+# alloy-singleton:
+#   enabled: true
+# alloy-logs:
+#   enabled: true
+#   alloy:
+#     clustering:
+#       enabled: true
+# alloy-receiver:
+#   enabled: true
+# alloy-profiles:
+#   enabled: true
+collectorCommon:
+  alloy:
+    priorityClassName: system-node-critical
+    controller:
+      priorityClassName: system-node-critical
+EOF
+helm upgrade --install --version "${K8S_MONITORING_HELM_CHART_VERSION}" --namespace k8s-monitoring --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-k8s-monitoring.yml" k8s-monitoring grafana/k8s-monitoring
+```
 
 ## Grafana
 
@@ -1920,28 +1733,28 @@ datasources:
         type: prometheus
         url: http://mimir-gateway.mimir.svc.cluster.local/prometheus
         access: proxy
-        editable: true
         isDefault: true
         jsonData:
           prometheusType: Mimir
           prometheusVersion: 2.9.1
-          httpHeaderName1: X-Scope-OrgID
-        secureJsonData:
-          httpHeaderValue1: 1
+        #   httpHeaderName1: X-Scope-OrgID
+        # secureJsonData:
+        #   httpHeaderValue1: 1
       - name: Loki
         type: loki
         url: http://loki-gateway.loki.svc.cluster.local/
         access: proxy
-        editable: true
-        jsonData:
-          httpHeaderName1: X-Scope-OrgID
-        secureJsonData:
-          httpHeaderValue1: "1"
+        # jsonData:
+        #   httpHeaderName1: X-Scope-OrgID
+        # secureJsonData:
+        #   httpHeaderValue1: "1"
       - name: Tempo
         type: tempo
-        url: http://tempo-query-frontend.tempo.svc.cluster.local:3200
+        url: http://tempo.tempo.svc.cluster.local:3200
         access: proxy
-        editable: true
+      - name: Pyroscope
+        type: grafana-pyroscope-datasource
+        url: http://pyroscope.pyroscope.svc.cluster.local:4040
 notifiers:
   notifiers.yaml:
     notifiers:
@@ -1967,36 +1780,10 @@ dashboardProviders:
 dashboards:
   default:
     # keep-sorted start numeric=yes
-
     1860-node-exporter-full:
       # renovate: depName="Node Exporter Full"
       gnetId: 1860
       revision: 37
-      datasource: Prometheus
-    # 19105-prometheus:
-    #   # renovate: depName="Prometheus"
-    #   gnetId: 19105
-    #   revision: 6
-    #   datasource: Prometheus
-    # 19268-prometheus:
-    #   # renovate: depName="Prometheus All Metrics"
-    #   gnetId: 19268
-    #   revision: 1
-    #   datasource: Prometheus
-    # 20340-cert-manager:
-    #   # renovate: depName="cert-manager"
-    #   gnetId: 20340
-    #   revision: 1
-    #   datasource: Prometheus
-    # 20842-cert-manager-kubernetes:
-    #   # renovate: depName="Cert-manager-Kubernetes"
-    #   gnetId: 20842
-    #   revision: 1
-    #   datasource: Prometheus
-    9923-beyla-red-metrics:
-      # renovate: depName="Beyla RED Metrics"
-      gnetId: 9923
-      revision: 3
       datasource: Prometheus
     # 3662-prometheus-2-0-overview:
     #   # renovate: depName="Prometheus 2.0 Overview"
@@ -2028,152 +1815,147 @@ dashboards:
       # renovate: depName="Kubernetes / Views / Global"
       gnetId: 15757
       revision: 42
-      datasource: Prometheus
     15758-kubernetes-views-namespaces:
       # renovate: depName="Kubernetes / Views / Namespaces"
       gnetId: 15758
       revision: 41
-      datasource: Prometheus
     15759-kubernetes-views-nodes:
       # renovate: depName="Kubernetes / Views / Nodes"
       gnetId: 15759
       revision: 40
-      datasource: Prometheus
     # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
     15760-kubernetes-views-pods:
       # renovate: depName="Kubernetes / Views / Pods"
       gnetId: 15760
       revision: 37
-      datasource: Prometheus
     15761-kubernetes-system-api-server:
       # renovate: depName="Kubernetes / System / API Server"
       gnetId: 15761
       revision: 18
-      datasource: Prometheus
     16006-mimir-alertmanager-resources:
       # renovate: depName="Mimir / Alertmanager resources"
       gnetId: 16006
       revision: 17
-      datasource: Prometheus
     16007-mimir-alertmanager:
       # renovate: depName="Mimir / Alertmanager"
       gnetId: 16007
       revision: 17
-      datasource: Prometheus
     16008-mimir-compactor-resources:
       # renovate: depName="Mimir / Compactor resources"
       gnetId: 16008
       revision: 17
-      datasource: Prometheus
     16009-mimir-compactor:
       # renovate: depName="Mimir / Compactor"
       gnetId: 16009
       revision: 17
-      datasource: Prometheus
     16010-mimir-config:
       # renovate: depName="Mimir / Config"
       gnetId: 16010
       revision: 17
-      datasource: Prometheus
     16011-mimir-object-store:
       # renovate: depName="Mimir / Object Store"
       gnetId: 16011
       revision: 17
-      datasource: Prometheus
     16012-mimir-overrides:
       # renovate: depName="Mimir / Overrides"
       gnetId: 16012
       revision: 17
-      datasource: Prometheus
     16013-mimir-queries:
       # renovate: depName="Mimir / Queries"
       gnetId: 16013
       revision: 17
-      datasource: Prometheus
     16014-mimir-reads-networking:
       # renovate: depName="Mimir / Reads networking"
       gnetId: 16014
       revision: 17
-      datasource: Prometheus
     16015-mimir-reads-resources:
       # renovate: depName="Mimir / Reads resources"
       gnetId: 16015
       revision: 17
-      datasource: Prometheus
     16016-mimir-reads:
       # renovate: depName="Mimir / Reads"
       gnetId: 16016
       revision: 17
-      datasource: Prometheus
     16017-mimir-rollout-progress:
       # renovate: depName="Mimir / Rollout progress"
       gnetId: 16017
       revision: 17
-      datasource: Prometheus
     16018-mimir-ruler:
       # renovate: depName="Mimir / Ruler"
       gnetId: 16018
       revision: 17
-      datasource: Prometheus
     16019-mimir-scaling:
       # renovate: depName="Mimir / Scaling"
       gnetId: 16019
       revision: 17
-      datasource: Prometheus
     16020-mimir-slow-queries:
       # renovate: depName="Mimir / Slow queries"
       gnetId: 16020
       revision: 17
-      datasource: Prometheus
     16021-mimir-tenants:
       # renovate: depName="Mimir / Tenants"
       gnetId: 16021
       revision: 17
-      datasource: Prometheus
     16022-mimir-top-tenants:
       # renovate: depName="Mimir / Top tenants"
       gnetId: 16022
       revision: 16
-      datasource: Prometheus
     16023-mimir-writes-networking:
       # renovate: depName="Mimir / Writes networking"
       gnetId: 16023
       revision: 16
-      datasource: Prometheus
     16024-mimir-writes-resources:
       # renovate: depName="Mimir / Writes resources"
       gnetId: 16024
       revision: 17
-      datasource: Prometheus
     16026-mimir-writes:
       # renovate: depName="Mimir / Writes"
-      gnetId: 16022
+      gnetId: 16026
       revision: 17
-      datasource: Prometheus
     17605-mimir-overview-networking:
       # renovate: depName="Mimir / Overview networking"
       gnetId: 17605
       revision: 13
-      datasource: Prometheus
     17606-mimir-overview-resources:
       # renovate: depName="Mimir / Overview resources"
       gnetId: 17606
       revision: 13
-      datasource: Prometheus
     17607-mimir-overview:
       # renovate: depName="Mimir / Overview"
       gnetId: 17607
       revision: 13
-      datasource: Prometheus
     17608-mimir-remote-ruler-reads:
       # renovate: depName="Mimir / Remote ruler reads"
       gnetId: 17608
       revision: 13
-      datasource: Prometheus
     17609-mimir-remote-ruler-reads-resources:
       # renovate: depName="Mimir / Remote ruler reads resources"
       gnetId: 17609
       revision: 13
+    # 19105-prometheus:
+    #   # renovate: depName="Prometheus"
+    #   gnetId: 19105
+    #   revision: 6
+    #   datasource: Prometheus
+    # 19268-prometheus:
+    #   # renovate: depName="Prometheus All Metrics"
+    #   gnetId: 19268
+    #   revision: 1
+    #   datasource: Prometheus
+    # 20340-cert-manager:
+    #   # renovate: depName="cert-manager"
+    #   gnetId: 20340
+    #   revision: 1
+    #   datasource: Prometheus
+    # 20842-cert-manager-kubernetes:
+    #   # renovate: depName="Cert-manager-Kubernetes"
+    #   gnetId: 20842
+    #   revision: 1
+    #   datasource: Prometheus
+    19923-beyla-red-metrics:
+      # renovate: depName="Beyla RED Metrics"
+      gnetId: 19923
+      revision: 3
       datasource: Prometheus
     # keep-sorted end
 grafana.ini:
@@ -2196,6 +1978,50 @@ networkPolicy:
 EOF
 helm upgrade --install --version "${GRAFANA_HELM_CHART_VERSION}" --namespace grafana --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-grafana.yml" grafana grafana/grafana
 ```
+
+### Mailpit
+
+Mailpit will be used to receive email alerts from Prometheus.
+
+![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="150"}
+
+Install the `mailpit` [Helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
+and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.28.0/charts/mailpit/values.yaml):
+
+```bash
+# renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
+MAILPIT_HELM_CHART_VERSION="0.29.1"
+
+helm repo add --force-update jouve https://jouve.github.io/charts/
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
+replicaCount: 2
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: mailpit
+        topologyKey: kubernetes.io/hostname
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: An email and SMTP testing tool with API for developers
+    gethomepage.dev/group: Apps
+    gethomepage.dev/icon: https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg
+    gethomepage.dev/name: Mailpit
+    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+  hostname: mailpit.${CLUSTER_FQDN}
+EOF
+helm upgrade --install --version "${MAILPIT_HELM_CHART_VERSION}" --namespace mailpit --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" mailpit jouve/mailpit
+kubectl label namespace mailpit pod-security.kubernetes.io/enforce=baseline
+```
+
+Screenshot:
+
+![Mailpit](/assets/img/posts/2024/2024-05-03-secure-cheap-amazon-eks-with-pod-identities/mailpit.avif){:width="700"}
 
 ### OAuth2 Proxy
 
@@ -2242,6 +2068,15 @@ ingress:
     - hosts:
         - oauth2-proxy.${CLUSTER_FQDN}
 priorityClassName: critical-priority
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchLabels:
+          app.kubernetes.io/component: authentication-proxy
+          app.kubernetes.io/instance: oauth2-proxy
+      topologyKey: kubernetes.io/hostname
+replicaCount: 2
 metrics:
   servicemonitor:
     enabled: true
@@ -2452,7 +2287,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{alloy,aws-load-balancer-controller,beyla,cert-manager,external-dns,grafana,homepage,ingress-nginx,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,tempo,velero},k8s-{karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,k8s-monitoring,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,pyroscope,tempo,velero},k8s-{karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else
