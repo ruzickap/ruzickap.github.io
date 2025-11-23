@@ -154,7 +154,7 @@ Resources:
                 StorageClass: ONEZONE_IA
           - Id: DeleteOldObjects
             Status: Enabled
-            ExpirationInDays: 90
+            ExpirationInDays: 120
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
