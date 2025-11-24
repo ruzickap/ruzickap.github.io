@@ -17,7 +17,6 @@ Links:
 
 - [Suman Chakraborty's Post](https://www.linkedin.com/posts/schakraborty007_opensource-kubernetes-k8s-activity-7038698712470089728-ADeV)
 - [Top 15 Kubectl plugins for security engineers](https://sysdig.com/blog/top-15-kubectl-plugins-for-security-engineers)
-- [Kubernetes: Krew plugins manager, and useful kubectl plugins list](https://devpress.csdn.net/cicd/62ec6d5c89d9027116a10eb0.html)
 - [Making Kubernetes Operations Easy with kubectl Plugins](https://martinheinz.dev/blog/58)
 
 ## Requirements

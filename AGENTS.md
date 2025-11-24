@@ -21,6 +21,7 @@ and maintainability across all contributions.
         - [Example](#example)
     - [Branching](#branching)
     - [Pull Requests](#pull-requests)
+  - [EKS Cluster Access](#eks-cluster-access)
   - [Quality \& Best Practices](#quality--best-practices)
 
 ## Markdown Files
@@ -96,6 +97,19 @@ Resolves: #123
 - **Title format** - Use conventional commit format (e.g., `feat: add new feature`)
 - **Description** - Include clear explanation of changes and motivation
 - **Link issues** - Reference related issues using keywords (Fixes, Closes, Resolves)
+
+## EKS Cluster Access
+
+When accessing the Kubernetes cluster, execute the following command **once**
+at the beginning of the session:
+
+```bash
+eval "$(mise run a)"
+```
+
+This command sets up the necessary environment variables and configuration
+for Kubernetes cluster access. It should be run only once per session before
+any Kubernetes-related operations.
 
 ## Quality & Best Practices
 
