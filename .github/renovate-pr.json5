@@ -1,6 +1,16 @@
 {
+  /**
+   * Renovate Configuration
+   *
+   * This configuration file defines how Renovate handles dependency updates for repositories.
+   * Renovate is a bot that automatically creates pull requests to update dependencies.
+   *
+   * Documentation: https://docs.renovatebot.com/configuration-options/
+   */
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
-  branchPrefix: "renovate-pr/",
+
+  // # keep-sorted start block=yes
+  branchPrefix: "chore/renovate-pr/",
   customDatasources: {
     "grafana-dashboards": {
       defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
@@ -8,19 +18,52 @@
       transformTemplates: ['{"releases":[{"version": $string(revision)}]}'],
     },
   },
-  customManagers: [
+  // Keep the extends started with ":" at the end of the list to allow overriding
+  extends: [
+    "config:recommended", // Renovate's recommended configuration preset
+    "docker:pinDigests", // Pin Docker image digests for security
+    "helpers:pinGitHubActionDigestsToSemver", // Pin GitHub Actions to specific versions with semantic versioning
+    "security:openssf-scorecard", // Add OpenSSF Scorecard security insights
+    ":disableDependencyDashboard", // Don't create dependency dashboard issues
+    ":disableRateLimiting", // Disable rate limiting for faster updates
+    ":docker", // Enable Docker container updates
+    ":enableVulnerabilityAlertsWithLabel(security)", // Add security label to vulnerability alerts
+    ":pinSkipCi", // Pin dependencies and skip CI for pin-only updates
+  ],
+  packageRules: [
     {
-      customType: "regex",
+      automerge: true,
+      commitBody: "[skip ci]",
+      description: "Automerge all without running any tests",
+      ignoreTests: true,
+      matchPackagePatterns: ["*"],
+    },
+  ],
+  prCommitsPerRunLimit: 500,
+  prConcurrentLimit: 500,
+  prHourlyLimit: 500,
+  // This allows Renovate to detect and update dependencies that aren't in standard package files
+  regexManagers: [
+    {
+      // Template for extracting version numbers from custom patterns
       extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.+)${{/if}}",
+
+      // File types to scan for custom dependency patterns
       fileMatch: ["\\.ya?ml$", "\\.md$", "^Dockerfile$", "^entrypoint\\.sh$"],
+
+      // Regex pattern to match custom dependency declarations
+      // Format: # renovate: datasource=<source> depName=<name> [versioning=<type>] [extractVersion=<regex>] [registryUrl=<url>]
+      // Example: # renovate: datasource=github-releases depName=helm/helm versioning=semver
       matchStrings: [
         '# renovate: datasource=(?<datasource>.+?) depName=(?<depName>.+?)( versioning=(?<versioning>.+?))?( extractVersion=(?<extractVersion>.+?))?( registryUrl=(?<registryUrl>.+?))?\\s.*[=:]\\s*"?(?<currentValue>.+?)"?\\s',
       ],
+
+      // Default to semantic versioning unless specified otherwise
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
     },
     {
-      customType: "regex",
       datasourceTemplate: "custom.grafana-dashboards",
+      customType: "regex",
       fileMatch: ["\\.md$"],
       matchStrings: [
         '# renovate: depName="(?<depName>.*)"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)',
@@ -38,29 +81,5 @@
       ],
     },
   ],
-  // Keep the extends started with ":" at the end of the list to allow overriding
-  extends: [
-    "config:recommended",
-    "docker:pinDigests",
-    "helpers:pinGitHubActionDigestsToSemver",
-    "security:openssf-scorecard",
-    ":disableDependencyDashboard",
-    ":disableRateLimiting",
-    ":docker",
-    ":enableVulnerabilityAlertsWithLabel(security)",
-    ":pinSkipCi",
-  ],
-  packageRules: [
-    {
-      automerge: true,
-      commitBody: "[skip ci]",
-      description: "Automerge all without running any tests",
-      ignoreTests: true,
-      matchPackagePatterns: ["*"],
-    },
-  ],
-  prConcurrentLimit: 500,
-  prHourlyLimit: 500,
-  prCommitsPerRunLimit: 500,
-  branchConcurrentLimit: 500,
+  // # keep-sorted end
 }
