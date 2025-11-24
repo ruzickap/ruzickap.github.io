@@ -22,6 +22,7 @@ and maintainability across all contributions.
     - [Branching](#branching)
     - [Pull Requests](#pull-requests)
   - [EKS Cluster Access](#eks-cluster-access)
+  - [Quality \& Best Practices](#quality--best-practices)
 
 ## Markdown Files
 
@@ -109,6 +110,8 @@ eval "$(mise run a)"
 This command sets up the necessary environment variables and configuration
 for Kubernetes cluster access. It should be run only once per session before
 any Kubernetes-related operations.
+
+## Quality & Best Practices
 
 - Pass pre-commit hooks
 - Follow project coding standards
