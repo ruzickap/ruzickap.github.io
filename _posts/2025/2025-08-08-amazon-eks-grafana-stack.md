@@ -1306,6 +1306,8 @@ mimir:
       compactor_blocks_retention_period: 30d
       # {"ts":"2025-11-04T19:30:40.472926117Z","level":"error","msg":"non-recoverable error","component_path":"/","component_id":"prometheus.remote_write.mimir","subcomponent":"rw","remote_name":"5b0906","url":"http://mimir-gateway.mimir.svc.cluster.local/api/v1/push","failedSampleCount":2000,"failedHistogramCount":0,"failedExemplarCount":0,"err":"server returned HTTP status 400 Bad Request: received a series whose number of labels exceeds the limit (actual: 31, limit: 30) series: 'karpenter_nodes_allocatable{arch=\"amd64\", capacity_type=\"spot\", container=\"controller\", endpoint=\"http-metrics\", instance=\"192.168.92.152:8080\", instance_capability_flex=\"false\", instance_category=\"t\"…' (err-mimir-max-label-names-per-series). To adjust the related per-tenant limit, configure -validation.max-label-names-per-series, or contact your service administrator.\n"}
       max_label_names_per_series: 50
+      # Default is 150000
+      max_global_series_per_user: 300000
     common:
       # https://grafana.com/docs/mimir/v2.17.x/configure/configuration-parameters/
       storage:
@@ -1471,15 +1473,6 @@ minio:
   enabled: false
 kafka:
   priorityClassName: high-priority
-  replicas: 2
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchLabels:
-            app.kubernetes.io/instance: mimir
-            app.kubernetes.io/component: gateway
-        topologyKey: kubernetes.io/hostname
 gateway:
   priorityClassName: high-priority
   replicas: 2
@@ -1602,7 +1595,7 @@ to fit your environment and storage requirements:
 
 ```bash
 # renovate: datasource=helm depName=k8s-monitoring registryUrl=https://grafana.github.io/helm-charts
-K8S_MONITORING_HELM_CHART_VERSION="3.5.6"
+K8S_MONITORING_HELM_CHART_VERSION="3.6.0"
 
 # https://github.com/suxess-it/kubriX/blob/main/platform-apps/charts/k8s-monitoring/values-kubrix-default.yaml
 # https://github.com/ar2pi/potato-cluster/blob/main/kubernetes/helm/grafana-k8s-monitoring/values.yaml
