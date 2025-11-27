@@ -101,3 +101,7 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
   ### <some clean-up/destroy commands...>
   ```
   ````
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ruzickap/ruzickap.github.io&type=date&legend=top-left)](https://www.star-history.com/#ruzickap/ruzickap.github.io&type=date&legend=top-left)
