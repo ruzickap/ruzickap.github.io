@@ -24,7 +24,7 @@ while read -r GITHUB_REPOSITORY_TITLE_TMP; do
   GITHUB_REPOSITORY_HOMEPAGEURL=$(jq -r '.homepageUrl' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
   GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.defaultBranchRef.name' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
   # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
-  GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY_NAME}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "[![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case | tr '\n' ' ')
+  GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY_NAME}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGEURL}" ]]; then echo -e "\n- Website: <${GITHUB_REPOSITORY_HOMEPAGEURL}>"; fi)
   cat << EOF >> "${DESTINATION_FILE}"
 
@@ -39,11 +39,22 @@ while read -r GITHUB_REPOSITORY_TITLE_TMP; do
 [![GitHub forks](https://img.shields.io/github/forks/${GITHUB_REPOSITORY_NAME}.svg?style=social)](https://github.com/${GITHUB_REPOSITORY_NAME}/network/members)
 [![GitHub watchers](https://img.shields.io/github/watchers/${GITHUB_REPOSITORY_NAME}.svg?style=social)](https://github.com/${GITHUB_REPOSITORY_NAME})
 
-| <!-- -->     | <!-- -->     |
-|--------------|--------------|
-| CI/CD status | ${GITHUB_REPOSITORY_CI_CD_STATUS} |
-| Issues / PRs | [![GitHub issues](https://img.shields.io/github/issues/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/issues) [![GitHub pull requests](https://img.shields.io/github/issues-pr/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/pulls) |
-| Repository   | [![GitHub release date](https://img.shields.io/github/release-date/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/releases) [![GitHub last commit](https://img.shields.io/github/last-commit/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/) [![GitHub commits since latest release](https://img.shields.io/github/commits-since/${GITHUB_REPOSITORY_NAME}/latest)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/) [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/) [![GitHub repo size](https://img.shields.io/github/repo-size/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}) |
+- CI/CD status:
+
+${GITHUB_REPOSITORY_CI_CD_STATUS}
+
+- Issue tracking:
+
+  [![GitHub issues](https://img.shields.io/github/issues/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/pulls)
+
+- Repository:
+
+  [![GitHub release date](https://img.shields.io/github/release-date/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/${GITHUB_REPOSITORY_NAME}/latest)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME})
 EOF
 done <<< "$(gh repo list --visibility public --json defaultBranchRef,description,homepageUrl,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' awsugcz | jq -c && gh repo list --visibility public --topic public --limit 100 --json defaultBranchRef,description,homepageUrl,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' ruzickap | jq -c)"
 
