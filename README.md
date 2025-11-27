@@ -104,4 +104,12 @@ docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ruzickap/ruzickap.github.io&type=date&legend=top-left)](https://www.star-history.com/#ruzickap/ruzickap.github.io&type=date&legend=top-left)
+<!-- markdownlint-disable -->
+<a href="https://www.star-history.com/#ruzickap/ruzickap.github.io&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=ruzickap/ruzickap.github.io&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=ruzickap/ruzickap.github.io&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=ruzickap/ruzickap.github.io&type=date&legend=top-left" />
+ </picture>
+</a>
+<!-- markdownlint-restore -->
