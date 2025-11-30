@@ -1520,7 +1520,7 @@ to fit your environment and storage requirements:
 
 ```bash
 # renovate: datasource=helm depName=tempo registryUrl=https://grafana.github.io/helm-charts
-TEMPO_HELM_CHART_VERSION="1.24.0"
+TEMPO_HELM_CHART_VERSION="1.24.1"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" << EOF
