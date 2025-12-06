@@ -30,13 +30,12 @@
     ":enableVulnerabilityAlertsWithLabel(security)", // Add security label to vulnerability alerts
     ":pinSkipCi", // Pin dependencies and skip CI for pin-only updates
   ],
+  ignoreTests: true,
   packageRules: [
     {
-      automerge: true,
       commitBody: "[skip ci]",
-      description: "Automerge all without running any tests",
-      ignoreTests: true,
-      matchPackagePatterns: ["*"],
+      description: "Group all dependencies including into a single commit",
+      groupName: "all dependencies",
     },
   ],
   prCommitsPerRunLimit: 500,
@@ -81,5 +80,7 @@
       ],
     },
   ],
+  separateMajorMinor: false,
+  separateMinorPatch: false,
   // # keep-sorted end
 }

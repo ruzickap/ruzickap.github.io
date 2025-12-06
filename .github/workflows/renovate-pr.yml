@@ -19,37 +19,41 @@ on:
     types: [labeled]
 
 env:
-  # https://docs.renovatebot.com/troubleshooting/#log-debug-levels
-  LOG_LEVEL: "${{ inputs.logLevel || 'debug' }}"
-  # https://docs.renovatebot.com/self-hosted-configuration/#repositories
-  RENOVATE_REPOSITORIES: ${{ github.repository }}
-  # https://docs.renovatebot.com/self-hosted-configuration/#username
-  RENOVATE_USERNAME: ${{ github.repository_owner }}
-  # https://docs.renovatebot.com/configuration-options/#platformcommit
-  RENOVATE_PLATFORM_COMMIT: "true"
-  # https://docs.renovatebot.com/self-hosted-configuration/#dryrun
-  # Run renovate in dry-run mode if executed in branches other than main - prevents versions in PRs/branches from being updated
-  RENOVATE_DRY_RUN: "${{ inputs.dryRun }}"
-  # Revovate Config File
-  RENOVATE_CONFIG_FILE: ".github/renovate-pr.json5"
-  # Ignore default renovate config file in git repository
-  RENOVATE_REQUIRE_CONFIG: "ignored"
-  # Set the base branch
-  RENOVATE_BASE_BRANCHES: ${{ github.head_ref }}
+  # keep-sorted start
+  # Set log level for debugging (info, debug, or trace) https://docs.renovatebot.com/troubleshooting/#log-debug-levels
+  LOG_LEVEL: ${{ inputs.logLevel || 'debug' }}
+  RENOVATE_AUTOMERGE: "true"
   # Renovate Automerge
   RENOVATE_AUTOMERGE_TYPE: "branch"
-  RENOVATE_AUTOMERGE: "true"
+  # Set the base branch
+  RENOVATE_BASE_BRANCHES: ${{ github.head_ref }}
+  # Revovate Config File
+  RENOVATE_CONFIG_FILE: ".github/renovate-pr.json5"
+  # Enable dry-run mode for non-main branches to preview changes (https://docs.renovatebot.com/self-hosted-configuration/#dryrun)
+  # Run renovate in dry-run mode if executed in branches other than main to prevent updating versions in PRs/branches
+  RENOVATE_DRY_RUN: ${{ inputs.dryRun }}
+  # https://docs.renovatebot.com/configuration-options/#platformcommit
+  RENOVATE_PLATFORM_COMMIT: "true"
+  # Target repository for Renovate to update
+  # https://docs.renovatebot.com/self-hosted-configuration/#repositories
+  RENOVATE_REPOSITORIES: ${{ github.repository }}
+  # Ignore default renovate config file in git repository
+  RENOVATE_REQUIRE_CONFIG: "ignored"
+  # Username for Renovate commits
+  # https://docs.renovatebot.com/self-hosted-configuration/#username
+  RENOVATE_USERNAME: ${{ github.repository_owner }}
+  # keep-sorted end
 
 permissions: read-all
 
 jobs:
   renovate-pr:
-    runs-on: ubuntu-latest
-    if: ${{ contains(github.event.pull_request.labels.*.name, 'renovate-pr') }}
+    runs-on: ubuntu-24.04-arm
+    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'renovate-pr') }}
     permissions: write-all
     steps:
       - name: Checkout
-        uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
 
       - name: Remove label
         env:
@@ -57,7 +61,7 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
         run: gh api "/repos/{owner}/{repo}/issues/${PR_NUMBER}/labels/renovate-pr" --method DELETE
 
-      - uses: actions/create-github-app-token@7e473efe3cb98aa54f8d4bac15400b15fad77d94 # v2.2.0
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         id: app-token
         with:
           app-id: ${{ secrets.MY_RENOVATE_GITHUB_APP_ID }}
