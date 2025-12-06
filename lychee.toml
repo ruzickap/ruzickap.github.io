@@ -11,6 +11,9 @@ cache = true
 # Accept these status codes as valid (200 = OK, 429 = rate limited)
 accept = [200, 429]
 
+# Custom user agent to avoid bot detection
+user_agent = "curl/7.83.1"
+
 #############################  Exclusions  ##########################
 
 # Exclude URLs and mail addresses from checking (supports regex)
