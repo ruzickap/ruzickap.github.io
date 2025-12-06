@@ -1325,7 +1325,7 @@ to fit your environment and storage backend:
 
 ```bash
 # renovate: datasource=helm depName=mimir-distributed registryUrl=https://grafana.github.io/helm-charts
-MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.1.0-weekly.368"
+MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.1.0-weekly.371"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" << EOF
