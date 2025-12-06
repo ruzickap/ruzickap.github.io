@@ -1626,7 +1626,7 @@ to fit your environment and storage requirements:
 
 ```bash
 # renovate: datasource=helm depName=k8s-monitoring registryUrl=https://grafana.github.io/helm-charts
-K8S_MONITORING_HELM_CHART_VERSION="3.6.1"
+K8S_MONITORING_HELM_CHART_VERSION="3.6.2"
 
 # https://github.com/suxess-it/kubriX/blob/main/platform-apps/charts/k8s-monitoring/values-kubrix-default.yaml
 # https://github.com/ar2pi/potato-cluster/blob/main/kubernetes/helm/grafana-k8s-monitoring/values.yaml
