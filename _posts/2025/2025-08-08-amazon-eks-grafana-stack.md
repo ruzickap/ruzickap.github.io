@@ -628,7 +628,7 @@ and modify its [default values](https://github.com/kubernetes-sigs/aws-load-bala
 
 ```bash
 # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
-AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.14.1"
+AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.16.0"
 
 helm repo add --force-update eks https://aws.github.io/eks-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" << EOF
@@ -887,14 +887,14 @@ and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="11.1.1"
+VELERO_HELM_CHART_VERSION="11.2.0"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
 initContainers:
   - name: velero-plugin-for-aws
     # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?<version>.+)$
-    image: velero/velero-plugin-for-aws:v1.13.0
+    image: velero/velero-plugin-for-aws:v1.13.1
     volumeMounts:
       - mountPath: /target
         name: plugins
@@ -1140,7 +1140,7 @@ and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
-INGRESS_NGINX_HELM_CHART_VERSION="4.13.3"
+INGRESS_NGINX_HELM_CHART_VERSION="4.14.1"
 
 helm repo add --force-update ingress-nginx https://kubernetes.github.io/ingress-nginx
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" << EOF
@@ -1232,7 +1232,7 @@ to fit your environment and storage requirements:
 
 ```bash
 # renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
-LOKI_HELM_CHART_VERSION="6.45.2"
+LOKI_HELM_CHART_VERSION="6.46.0"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" << EOF
@@ -1807,7 +1807,7 @@ dashboards:
     1860-node-exporter-full:
       # renovate: depName="Node Exporter Full"
       gnetId: 1860
-      revision: 37
+      revision: 42
       datasource: Prometheus
     # 3662-prometheus-2-0-overview:
     #   # renovate: depName="Prometheus 2.0 Overview"
@@ -1838,11 +1838,11 @@ dashboards:
     15757-kubernetes-views-global:
       # renovate: depName="Kubernetes / Views / Global"
       gnetId: 15757
-      revision: 42
+      revision: 43
     15758-kubernetes-views-namespaces:
       # renovate: depName="Kubernetes / Views / Namespaces"
       gnetId: 15758
-      revision: 41
+      revision: 44
     15759-kubernetes-views-nodes:
       # renovate: depName="Kubernetes / Views / Nodes"
       gnetId: 15759
@@ -1855,7 +1855,7 @@ dashboards:
     15761-kubernetes-system-api-server:
       # renovate: depName="Kubernetes / System / API Server"
       gnetId: 15761
-      revision: 18
+      revision: 20
     16006-mimir-alertmanager-resources:
       # renovate: depName="Mimir / Alertmanager resources"
       gnetId: 16006
@@ -2014,7 +2014,7 @@ and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.2
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
-MAILPIT_HELM_CHART_VERSION="0.29.1"
+MAILPIT_HELM_CHART_VERSION="0.31.0"
 
 helm repo add --force-update jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
