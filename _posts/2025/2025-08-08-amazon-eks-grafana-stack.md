@@ -570,9 +570,9 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
   ```bash
   # Delete the overly permissive inbound rule
   aws ec2 delete-network-acl-entry \
-      --network-acl-id "${AWS_NACL_ID}" \
-      --rule-number 100 \
-      --ingress
+    --network-acl-id "${AWS_NACL_ID}" \
+    --rule-number 100 \
+    --ingress
 
   # Create restrictive inbound TCP rules
   NACL_RULES=(
