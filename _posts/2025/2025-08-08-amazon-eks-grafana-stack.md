@@ -550,31 +550,6 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
   aws ec2 revoke-security-group-ingress --group-id "${AWS_SECURITY_GROUP_ID}" --protocol all --port all --source-group "${AWS_SECURITY_GROUP_ID}" | jq || true
   ```
 
-- The VPC NACL allows unrestricted SSH access, and the VPC NACL allows
-  unrestricted RDP access. Additionally, remove the default overly permissive
-  rule (Rule 100) that allows all traffic, and replace it with specific rules
-  for only required services:
-
-  ```bash
-  # Add deny rules for SSH and RDP to prevent unauthorized access
-  aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 1 --protocol tcp --port-range "From=22,To=22" --cidr-block 0.0.0.0/0 --rule-action Deny
-  aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --ingress --rule-number 2 --protocol tcp --port-range "From=3389,To=3389" --cidr-block 0.0.0.0/0 --rule-action Deny
-
-  # Delete the overly permissive default rule (Rule 100) that allows all traffic from 0.0.0.0/0
-  # This addresses: "Network ACL should not allow unrestricted inbound traffic"
-  aws ec2 delete-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --rule-number 100 --ingress || true
-
-  # Create specific allow rules for only required services (following Principle of Least Privilege)
-  # Allow HTTP traffic (for ALB/NLB health checks and HTTP services)
-  aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --rule-number 100 --protocol tcp --port-range "From=80,To=80" --cidr-block 0.0.0.0/0 --rule-action allow --ingress
-
-  # Allow HTTPS traffic (for secure web services)
-  aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --rule-number 110 --protocol tcp --port-range "From=443,To=443" --cidr-block 0.0.0.0/0 --rule-action allow --ingress
-
-  # Allow ephemeral ports for return traffic (required for responses to outbound connections)
-  aws ec2 create-network-acl-entry --network-acl-id "${AWS_NACL_ID}" --rule-number 120 --protocol tcp --port-range "From=1024,To=65535" --cidr-block 0.0.0.0/0 --rule-action allow --ingress
-  ```
-
 - The VPC should have Route 53 DNS resolver with logging enabled:
 
   ```bash
@@ -587,6 +562,45 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
   aws route53resolver associate-resolver-query-log-config \
     --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
     --resource-id "${AWS_VPC_ID}"
+  ```
+
+- Remove overly permissive NACL rules to follow the principle of least
+  privilege:
+
+  ```bash
+  # Delete the overly permissive inbound rule
+  aws ec2 delete-network-acl-entry \
+      --network-acl-id "${AWS_NACL_ID}" \
+      --rule-number 100 \
+      --ingress
+
+  # Create restrictive inbound TCP rules
+  NACL_RULES=(
+    "100 443 443 0.0.0.0/0"
+    "110 80 80 0.0.0.0/0"
+    "120 1024 65535 0.0.0.0/0"
+  )
+
+  for RULE in "${NACL_RULES[@]}"; do
+    read -r RULE_NUM PORT_FROM PORT_TO CIDR <<< "${RULE}"
+    aws ec2 create-network-acl-entry \
+      --network-acl-id "${AWS_NACL_ID}" \
+      --rule-number "${RULE_NUM}" \
+      --protocol "tcp" \
+      --port-range "From=${PORT_FROM},To=${PORT_TO}" \
+      --cidr-block "${CIDR}" \
+      --rule-action allow \
+      --ingress
+  done
+
+  # Allow all traffic from VPC CIDR
+  aws ec2 create-network-acl-entry \
+    --network-acl-id "${AWS_NACL_ID}" \
+    --rule-number 130 \
+    --protocol "all" \
+    --cidr-block "192.168.0.0/16" \
+    --rule-action allow \
+    --ingress
   ```
 
 ### Prometheus Operator CRDs
@@ -808,8 +822,8 @@ Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cer
 and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.19.0/deploy/charts/cert-manager/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-CERT_MANAGER_HELM_CHART_VERSION="1.19.1"
+# renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io extractVersion=^(?<version>.+)$
+CERT_MANAGER_HELM_CHART_VERSION="v1.19.1"
 
 helm repo add --force-update jetstack https://charts.jetstack.io
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" << EOF
@@ -1706,7 +1720,7 @@ and modify its [default values](https://github.com/grafana/helm-charts/blob/graf
 
 ```bash
 # renovate: datasource=helm depName=grafana registryUrl=https://grafana.github.io/helm-charts
-GRAFANA_HELM_CHART_VERSION="10.1.4"
+GRAFANA_HELM_CHART_VERSION="10.3.0"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-grafana.yml" << EOF
@@ -2041,11 +2055,11 @@ application endpoints with Google Authentication.
 ![OAuth2 Proxy](https://raw.githubusercontent.com/oauth2-proxy/oauth2-proxy/899c743afc71e695964165deb11f50b9a0703c97/docs/static/img/logos/OAuth2_Proxy_horizontal.svg){:width="300"}
 
 Install the `oauth2-proxy` [Helm chart](https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy)
-and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-8.3.1/helm/oauth2-proxy/values.yaml):
+and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/oauth2-proxy-9.0.0/helm/oauth2-proxy/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
-OAUTH2_PROXY_HELM_CHART_VERSION="8.3.2"
+OAUTH2_PROXY_HELM_CHART_VERSION="9.0.0"
 
 helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
