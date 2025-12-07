@@ -624,7 +624,7 @@ is a controller that manages Elastic Load Balancers for a Kubernetes cluster.
 ![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
 
 Install the `aws-load-balancer-controller` [Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
-and modify its [default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.13.4/helm/aws-load-balancer-controller/values.yaml):
+and modify its [default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.16.0/helm/aws-load-balancer-controller/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
@@ -819,7 +819,7 @@ obtaining, renewing, and using those certificates.
 
 The `cert-manager` ServiceAccount was created by `eksctl`.
 Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
-and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.19.0/deploy/charts/cert-manager/values.yaml):
+and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.19.1/deploy/charts/cert-manager/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io extractVersion=^(?<version>.+)$
@@ -881,7 +881,7 @@ and scheduled backups by integrating with cloud storage providers such as AWS S3
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
 
 Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
-and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.1.1/charts/velero/values.yaml):
+and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.2.0/charts/velero/values.yaml):
 
 {% raw %}
 
@@ -1136,7 +1136,7 @@ controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
 reverse proxy and load balancer.
 
 Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)
-and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.13.3/charts/ingress-nginx/values.yaml):
+and modify its [default values](https://github.com/kubernetes/ingress-nginx/blob/helm-chart-4.14.1/charts/ingress-nginx/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=ingress-nginx registryUrl=https://kubernetes.github.io/ingress-nginx
@@ -1227,7 +1227,7 @@ the contents of the logs, but rather a set of labels for each log stream.
 ![Grafana Loki](https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo_and_name.png){:width="400"}
 
 Install the `loki` [Helm chart](https://github.com/grafana/loki/tree/helm-loki-6.42.0/production/helm/loki)
-and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.42.0/production/helm/loki/values.yaml)
+and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.46.0/production/helm/loki/values.yaml)
 to fit your environment and storage requirements:
 
 ```bash
@@ -1716,7 +1716,7 @@ dashboards and visualizations for monitoring your Kubernetes cluster and applica
 ![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="300"}
 
 Install the `grafana` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
-and modify its [default values](https://github.com/grafana/helm-charts/blob/grafana-10.0.0/charts/grafana/values.yaml):
+and modify its [default values](https://github.com/grafana/helm-charts/blob/grafana-10.3.0/charts/grafana/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=grafana registryUrl=https://grafana.github.io/helm-charts
@@ -2010,7 +2010,7 @@ Mailpit will be used to receive email alerts from Prometheus.
 ![mailpit](https://raw.githubusercontent.com/axllent/mailpit/61241f11ac94eb33bd84e399129992250eff56ce/server/ui/favicon.svg){:width="150"}
 
 Install the `mailpit` [Helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
-and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.28.0/charts/mailpit/values.yaml):
+and modify its [default values](https://github.com/jouve/charts/blob/mailpit-0.31.0/charts/mailpit/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=mailpit registryUrl=https://jouve.github.io/charts/
