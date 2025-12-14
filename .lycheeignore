@@ -4,10 +4,12 @@
 \.local
 cdn\.com
 github\.com/ruzickap
+helm\.sh
 https://(grafana|oauth2-proxy|ollama-vulnerable|open-webui|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
 mylabs\.dev
 username\.github\.io/
+velero\.io
 www\.conventionalcommits\.org
 www\.cvedetails\.com
 www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
