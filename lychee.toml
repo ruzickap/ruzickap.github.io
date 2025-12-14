@@ -6,13 +6,15 @@
 # Enable link caching to avoid checking the same links on multiple runs
 cache = true
 
+# Exclude certain status codes from cache (temporary failures may succeed later):
+#   403 = Forbidden (bot blocking can be intermittent)
+#   429 = Too Many Requests (rate limiting is temporary)
+cache_exclude_status = [403, 429]
+
 #############################  Requests  ############################
 
 # Accept these status codes as valid (200 = OK, 429 = rate limited)
 accept = [200, 429]
-
-# Accept invalid SSL certificates
-insecure = true
 
 #############################  Exclusions  ##########################
 
