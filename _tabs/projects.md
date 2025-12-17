@@ -551,7 +551,7 @@ order: 4
 
 - Description: CKS Notes
 - Topics: cks, cks-exam, cks-exam-preparation, k8s, security, k8s-security,
-  kubernetes, public
+  kubernetes, public, notes
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/releases/latest)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/blob/main/LICENSE)
