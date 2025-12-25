@@ -22,9 +22,6 @@ env:
   # keep-sorted start
   # Set log level for debugging (info, debug, or trace) https://docs.renovatebot.com/troubleshooting/#log-debug-levels
   LOG_LEVEL: ${{ inputs.logLevel || 'debug' }}
-  RENOVATE_AUTOMERGE: "true"
-  # Renovate Automerge
-  RENOVATE_AUTOMERGE_TYPE: "branch"
   # Set the base branch
   RENOVATE_BASE_BRANCHES: ${{ github.head_ref }}
   # Revovate Config File
@@ -32,13 +29,9 @@ env:
   # Enable dry-run mode for non-main branches to preview changes (https://docs.renovatebot.com/self-hosted-configuration/#dryrun)
   # Run renovate in dry-run mode if executed in branches other than main to prevent updating versions in PRs/branches
   RENOVATE_DRY_RUN: ${{ inputs.dryRun }}
-  # https://docs.renovatebot.com/configuration-options/#platformcommit
-  RENOVATE_PLATFORM_COMMIT: "true"
   # Target repository for Renovate to update
   # https://docs.renovatebot.com/self-hosted-configuration/#repositories
   RENOVATE_REPOSITORIES: ${{ github.repository }}
-  # Ignore default renovate config file in git repository
-  RENOVATE_REQUIRE_CONFIG: "ignored"
   # Username for Renovate commits
   # https://docs.renovatebot.com/self-hosted-configuration/#username
   RENOVATE_USERNAME: ${{ github.repository_owner }}
