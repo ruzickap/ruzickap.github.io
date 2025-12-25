@@ -1,49 +1,36 @@
 {
   /**
-   * Renovate Configuration
+   * Renovate Configuration for PR-specific updates
    *
-   * This configuration file defines how Renovate handles dependency updates for repositories.
-   * Renovate is a bot that automatically creates pull requests to update dependencies.
+   * This configuration file defines how Renovate handles dependency updates for PRs.
    *
    * Documentation: https://docs.renovatebot.com/configuration-options/
    */
   $schema: "https://docs.renovatebot.com/renovate-schema.json",
 
   // # keep-sorted start block=yes
+  // Automatically merge dependency updates once all checks pass
+  automerge: true,
+  // Merge directly to the branch without creating a separate PR
+  automergeType: "branch",
+  // Prefix for branches created by Renovate (chore/renovate-pr/dependency-1.x)
   branchPrefix: "chore/renovate-pr/",
+  // Custom datasources for fetching version info from non-standard sources
   customDatasources: {
+    // Datasource for tracking Grafana dashboard revisions from grafana.com
     "grafana-dashboards": {
+      // API endpoint template to fetch dashboard metadata by ID
       defaultRegistryUrlTemplate: "https://grafana.com/api/dashboards/{{packageName}}",
+      // Response format from the Grafana API
       format: "json",
+      // JSONata expression to extract revision number as the version
       transformTemplates: ['{"releases":[{"version": $string(revision)}]}'],
     },
   },
-  // Keep the extends started with ":" at the end of the list to allow overriding
-  extends: [
-    "config:recommended", // Renovate's recommended configuration preset
-    "docker:pinDigests", // Pin Docker image digests for security
-    "helpers:pinGitHubActionDigestsToSemver", // Pin GitHub Actions to specific versions with semantic versioning
-    "security:openssf-scorecard", // Add OpenSSF Scorecard security insights
-    ":disableDependencyDashboard", // Don't create dependency dashboard issues
-    ":disableRateLimiting", // Disable rate limiting for faster updates
-    ":docker", // Enable Docker container updates
-    ":enableVulnerabilityAlertsWithLabel(security)", // Add security label to vulnerability alerts
-    ":pinSkipCi", // Pin dependencies and skip CI for pin-only updates
-  ],
-  ignoreTests: true,
-  packageRules: [
-    {
-      commitBody: "[skip ci]",
-      description: "Group all dependencies including into a single commit",
-      groupName: "all dependencies",
-    },
-  ],
-  prCommitsPerRunLimit: 500,
-  prConcurrentLimit: 500,
-  prHourlyLimit: 500,
   // This allows Renovate to detect and update dependencies that aren't in standard package files
-  regexManagers: [
+  customManagers: [
     {
+      customType: "regex",
       // Template for extracting version numbers from custom patterns
       extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.+)${{/if}}",
 
@@ -60,27 +47,70 @@
       // Default to semantic versioning unless specified otherwise
       versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
     },
+    // Custom manager for Grafana dashboard revisions from grafana.com
+    // Example: # renovate: depName="My Dashboard"
+    //          gnetId: 12345
+    //          revision: 3
     {
+      // Use the custom Grafana dashboards datasource defined above
       datasourceTemplate: "custom.grafana-dashboards",
       customType: "regex",
+      // Only scan markdown files for dashboard definitions
       fileMatch: ["\\.md$"],
+      // Match renovate comments followed by gnetId and revision fields
       matchStrings: [
         '# renovate: depName="(?<depName>.*)"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)',
       ],
+      // Treat revision as a major-only version number
       versioningTemplate: "regex:^(?<major>\\d+)$",
     },
+    // Custom manager for raw GitHub content URLs (raw.githubusercontent.com)
+    // Tracks and updates commit digests in raw file URLs
     {
+      // Default to "main" branch if no version is specified in the comment
       currentValueTemplate: "{{#if currentValue}}{{{currentValue}}}{{else}}main{{/if}}",
       customType: "regex",
+      // Use git-refs to track branch/tag/commit references
       datasourceTemplate: "git-refs",
+      // Construct GitHub repo URL from the extracted dependency name
       packageNameTemplate: "https://github.com/{{depName}}",
+      // Only scan markdown files
       fileMatch: ["\\.md$"],
+      // Match raw.githubusercontent.com URLs and extract repo and commit digest
       matchStrings: [
         "# renovate:( currentValue=(?<currentValue>.+?))?\\n.*https:\\/\\/raw.githubusercontent.com\\/(?<depName>[^\\/]+\\/[^\\/]+)\\/(?<currentDigest>[^\\/]+)\\/",
       ],
     },
   ],
+  // Keep the extends started with ":" at the end of the list to allow overriding
+  extends: [
+    "config:recommended", // Renovate's recommended configuration preset
+    "docker:pinDigests", // Pin Docker image digests for security
+    "helpers:pinGitHubActionDigestsToSemver", // Pin GitHub Actions to specific versions with semantic versioning
+    "security:openssf-scorecard", // Add OpenSSF Scorecard security insights
+    ":disableDependencyDashboard", // Don't create dependency dashboard issues
+    ":disableRateLimiting", // Disable rate limiting for faster updates
+    ":docker", // Enable Docker container updates
+    ":enableVulnerabilityAlertsWithLabel(security)", // Add security label to vulnerability alerts
+    ":pinSkipCi", // Pin dependencies and skip CI for pin-only updates
+  ],
+  // Skip waiting for tests to pass before automerging
+  ignoreTests: true,
+  // Custom rules to control how dependencies are updated
+  packageRules: [
+    {
+      // Add [skip ci] to commit body to avoid triggering CI on dependency updates
+      commitBody: "[skip ci]",
+      description: "Group all dependencies including into a single commit",
+      // Combine all updates into a single "all dependencies" group
+      groupName: "all dependencies",
+      // Apply this rule to all packages
+      matchPackageNames: ["*"],
+    },
+  ],
+  // Use platform's native API for commits (enables signed commits on GitHub)
+  platformCommit: "enabled",
+  // Combine major and minor updates into a single PR instead of separate ones
   separateMajorMinor: false,
-  separateMinorPatch: false,
   // # keep-sorted end
 }
