@@ -24,13 +24,13 @@ echo "set -euxo pipefail" > "${RUN_FILE}"
 
 case "${1%:*}" in
   create)
-    MDQ_CODE_BLOCK='```^bash$'
+    MQ_CODE_BLOCK='```^bash$'
     for ((idx = ${#POSTS[@]} - 1; idx >= 0; idx--)); do
       POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POSTS[idx]}*.md")")
     done
     ;;
   delete)
-    MDQ_CODE_BLOCK='```^sh$'
+    MQ_CODE_BLOCK='```^sh$'
     for POST_FILE in "${POSTS[@]}"; do
       POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
     done
@@ -41,7 +41,7 @@ case "${1%:*}" in
     ;;
 esac
 
-mdq "${MDQ_CODE_BLOCK}" --br -o plain "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
+mq "select(.code.lang == \"${MQ_CODE_BLOCK}\") | to_text()" "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
 
 if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
   if eksctl get clusters --name="${CLUSTER_NAME}" && [[ "${1%:*}" = "delete" ]]; then

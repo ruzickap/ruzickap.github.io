@@ -1281,22 +1281,6 @@ loki:
   #   retention_enabled: true
 lokiCanary:
   kind: Deployment
-ingress:
-  enabled: true
-  ingressClassName: nginx
-  annotations:
-    gethomepage.dev/enabled: "true"
-    gethomepage.dev/description: A horizontally-scalable, highly-available log aggregation system
-    gethomepage.dev/group: Apps
-    gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo.png
-    gethomepage.dev/name: Loki
-    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
-    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
-  hosts:
-    - loki.${CLUSTER_FQDN}
-  tls:
-    - hosts:
-        - loki.${CLUSTER_FQDN}
 singleBinary:
   replicas: 2
 write:
@@ -1634,71 +1618,93 @@ K8S_MONITORING_HELM_CHART_VERSION="3.6.2"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-k8s-monitoring.yml" << EOF
+# Cluster identification used in metrics labels
 cluster:
   name: "${CLUSTER_NAME}"
+# Backend destinations where telemetry data will be sent
 destinations:
+  # Metrics destination - sends to Mimir for long-term storage
   - name: prometheus
     type: prometheus
     url: http://mimir-gateway.mimir.svc.cluster.local/api/v1/push
     # tenantId: "1"
+  # Logs destination - sends to Loki for log aggregation
   - name: loki
     type: loki
     url: http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push
     # tenantId: "1"
+  # Traces destination - sends to Tempo via OTLP protocol
   - name: otlpgateway
     type: otlp
     url: http://tempo.tempo.svc.cluster.local:4317
     tls:
       insecure: true
       insecureSkipVerify: true
+  # Profiling destination - sends to Pyroscope for continuous profiling
   - name: pyroscope
     type: pyroscope
     url: http://pyroscope.pyroscope.svc.cluster.local:4040
     tls:
       insecure_skip_verify: true
-# VVV disable ???
+# Collect K8s cluster-level metrics (nodes, pods, deployments, etc.)
 clusterMetrics:
   enabled: true
-# clusterEvents:
-#   enabled: true
-# nodeLogs:
-#   enabled: true
-# podLogs:
-#   enabled: true
-# applicationObservability:
-#   enabled: true
-#   receivers:
-#     otlp:
-#       grpc:
-#         enabled: true
-#       http:
-#         enabled: true
+  # Scrape metrics from the Kubernetes API server
+  apiServer:
+    enabled: true
+# Collect Kubernetes events (pod scheduling, failures, etc.)
+clusterEvents:
+  enabled: true
+# Collect logs from node-level services (kubelet, containerd)
+nodeLogs:
+  enabled: true
+# Collect logs from all pods in the cluster
+podLogs:
+  enabled: true
+# Enable application-level observability (traces and spans)
+applicationObservability:
+  enabled: true
+  # Configure OTLP receivers for ingesting traces from applications
+  receivers:
+    otlp:
+      grpc:
+        enabled: true
+      http:
+        enabled: true
+# Automatic instrumentation for supported languages (Java, Python, etc.)
 autoInstrumentation:
   enabled: true
+# Discover and scrape metrics from pods with Prometheus annotations
 annotationAutodiscovery:
   enabled: true
+# Support for ServiceMonitor and PodMonitor CRDs from Prometheus Operator
 prometheusOperatorObjects:
   enabled: true
-# profiling:
-#   enabled: true
-# # vvv enabled ????
-# profilesReceiver:
-#   enabled: false
+# Enable continuous profiling data collection
+profiling:
+  enabled: true
+# Alloy collector for scraping and forwarding metrics
 alloy-metrics:
   enabled: true
-# alloy-singleton:
-#   enabled: true
-# alloy-logs:
-#   enabled: true
-#   alloy:
-#     clustering:
-#       enabled: true
-# alloy-receiver:
-#   enabled: true
-# alloy-profiles:
-#   enabled: true
+# Single-instance Alloy for cluster-wide tasks (e.g., kube-state-metrics)
+alloy-singleton:
+  enabled: true
+# Alloy DaemonSet for collecting logs from each node
+alloy-logs:
+  enabled: true
+  # alloy:
+  #   clustering:
+  #     enabled: true
+# Alloy deployment for receiving OTLP data from applications
+alloy-receiver:
+  enabled: true
+# Alloy for collecting profiling data via eBPF
+alloy-profiles:
+  enabled: true
+# Common settings for all Alloy collector instances
 collectorCommon:
   alloy:
+    # Ensure collectors are scheduled even under resource pressure
     priorityClassName: system-node-critical
     controller:
       priorityClassName: system-node-critical
@@ -1824,17 +1830,17 @@ dashboards:
     #   gnetId: 12006
     #   revision: 1
     #   datasource: Prometheus
-    # # https://github.com/DevOps-Nirvana/Grafana-Dashboards
-    # 14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
-    #   # renovate: depName="Kubernetes Nginx Ingress Prometheus NextGen"
-    #   gnetId: 14314
-    #   revision: 2
-    #   datasource: Prometheus
-    # 15038-external-dns:
-    #   # renovate: depName="External-dns"
-    #   gnetId: 15038
-    #   revision: 3
-    #   datasource: Prometheus
+    # https://github.com/DevOps-Nirvana/Grafana-Dashboards
+    14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
+      # renovate: depName="Kubernetes Nginx Ingress Prometheus NextGen"
+      gnetId: 14314
+      revision: 2
+      datasource: Prometheus
+    15038-external-dns:
+      # renovate: depName="External-dns"
+      gnetId: 15038
+      revision: 3
+      datasource: Prometheus
     15757-kubernetes-views-global:
       # renovate: depName="Kubernetes / Views / Global"
       gnetId: 15757
@@ -1956,6 +1962,11 @@ dashboards:
       # renovate: depName="Mimir / Remote ruler reads resources"
       gnetId: 17609
       revision: 13
+    19923-beyla-red-metrics:
+      # renovate: depName="Beyla RED Metrics"
+      gnetId: 19923
+      revision: 3
+      datasource: Prometheus
     # 19105-prometheus:
     #   # renovate: depName="Prometheus"
     #   gnetId: 19105
@@ -1966,20 +1977,15 @@ dashboards:
     #   gnetId: 19268
     #   revision: 1
     #   datasource: Prometheus
-    # 20340-cert-manager:
-    #   # renovate: depName="cert-manager"
-    #   gnetId: 20340
-    #   revision: 1
-    #   datasource: Prometheus
-    # 20842-cert-manager-kubernetes:
-    #   # renovate: depName="Cert-manager-Kubernetes"
-    #   gnetId: 20842
-    #   revision: 1
-    #   datasource: Prometheus
-    19923-beyla-red-metrics:
-      # renovate: depName="Beyla RED Metrics"
-      gnetId: 19923
-      revision: 3
+    20340-cert-manager:
+      # renovate: depName="cert-manager"
+      gnetId: 20340
+      revision: 1
+      datasource: Prometheus
+    20842-cert-manager-kubernetes:
+      # renovate: depName="Cert-manager-Kubernetes"
+      gnetId: 20842
+      revision: 1
       datasource: Prometheus
     # keep-sorted end
 grafana.ini:
