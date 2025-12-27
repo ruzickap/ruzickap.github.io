@@ -5,19 +5,6 @@
 name: renovate-pr
 
 on:
-  workflow_dispatch:
-    inputs:
-      dryRun:
-        type: boolean
-        description: "Dry-Run"
-      logLevel:
-        type: choice
-        description: "Log-Level"
-        default: debug
-        options:
-          - info
-          - debug
-          - trace
   pull_request:
     types: [labeled]
 
@@ -45,7 +32,7 @@ permissions: read-all
 jobs:
   renovate-pr:
     runs-on: ubuntu-24.04-arm
-    if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'renovate-pr') }}
+    if: ${{ contains(github.event.pull_request.labels.*.name, 'renovate-pr') }}
     permissions:
       contents: write
       pull-requests: write
