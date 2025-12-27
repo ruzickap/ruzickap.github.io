@@ -32,7 +32,6 @@
     "security:openssf-scorecard", // Add OpenSSF Scorecard security insights
     ":disableDependencyDashboard", // Don't create dependency dashboard issues
     ":disableRateLimiting", // Disable rate limiting for faster updates
-    ":docker", // Enable Docker container updates
     ":enableVulnerabilityAlertsWithLabel(security)", // Add security label to vulnerability alerts
     ":pinSkipCi", // Pin dependencies and skip CI for pin-only updates
   ],
