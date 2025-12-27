@@ -1,4 +1,7 @@
 ---
+# GitHub Actions workflow for Renovate PR dependency management
+# Runs Renovate on pull requests when triggered manually or via label
+# Updates dependencies only for files changed in the PR
 name: renovate-pr
 
 on:
@@ -43,7 +46,9 @@ jobs:
   renovate-pr:
     runs-on: ubuntu-24.04-arm
     if: ${{ github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'renovate-pr') }}
-    permissions: write-all
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
@@ -54,20 +59,22 @@ jobs:
           PR_NUMBER: ${{ github.event.number }}
         run: gh api "/repos/{owner}/{repo}/issues/${PR_NUMBER}/labels/renovate-pr" --method DELETE
 
-      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
-        id: app-token
-        with:
-          app-id: ${{ secrets.MY_RENOVATE_GITHUB_APP_ID }}
-          private-key: ${{ secrets.MY_RENOVATE_GITHUB_PRIVATE_KEY }}
-
       - name: Get changed files
         id: changed-files
         uses: tj-actions/changed-files@e0021407031f5be11a464abee9a0776171c79891 # v47.0.1
         with:
           files: "_posts/**"
 
+      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        if: steps.changed-files.outputs.any_changed == 'true'
+        id: app-token
+        with:
+          app-id: ${{ secrets.MY_RENOVATE_GITHUB_APP_ID }}
+          private-key: ${{ secrets.MY_RENOVATE_GITHUB_PRIVATE_KEY }}
+
       - name: 💡 Self-hosted Renovate
-        uses: renovatebot/github-action@822441559e94f98b67b82d97ab89fe3003b0a247 # v44.2.0
+        if: steps.changed-files.outputs.any_changed == 'true'
+        uses: renovatebot/github-action@f7fad228a053c69a98e24f8e4f6cf40db8f61e08 # v44.2.1
         env:
           RENOVATE_INCLUDE_PATHS: ${{ steps.changed-files.outputs.all_changed_files }}
         with:
