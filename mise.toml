@@ -66,7 +66,7 @@ quiet = true
 env.EKS_POST_FILE = "./_posts/2025/2025-08-08-amazon-eks-grafana-stack.md"
 run = '''
 cat <<EOF
-$(mq 'select(.code.lang == "bash") | to_text()' "${EKS_POST_FILE}")
+$(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
 
 eval "\$(aws sts assume-role --role-arn "\${AWS_ROLE_TO_ASSUME}" --role-session-name "\${USER}@\$(hostname -f)-\$(date +%s)" --duration-seconds 36000 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
 export KUBECONFIG="/tmp/kubeconfig-\${CLUSTER_NAME}-\$\$.conf"

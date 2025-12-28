@@ -24,13 +24,13 @@ echo "set -euxo pipefail" > "${RUN_FILE}"
 
 case "${1%:*}" in
   create)
-    MQ_CODE_BLOCK='```^bash$'
+    MQ_CODE_BLOCK="bash"
     for ((idx = ${#POSTS[@]} - 1; idx >= 0; idx--)); do
       POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POSTS[idx]}*.md")")
     done
     ;;
   delete)
-    MQ_CODE_BLOCK='```^sh$'
+    MQ_CODE_BLOCK="sh"
     for POST_FILE in "${POSTS[@]}"; do
       POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
     done
