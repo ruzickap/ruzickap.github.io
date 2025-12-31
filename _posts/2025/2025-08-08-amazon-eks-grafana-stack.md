@@ -1177,41 +1177,41 @@ controller:
     enabled: true
     serviceMonitor:
       enabled: true
-  #   prometheusRule:
-  #     enabled: true
-  #     rules:
-  #       - alert: NGINXConfigFailed
-  #         expr: count(nginx_ingress_controller_config_last_reload_successful == 0) > 0
-  #         for: 1s
-  #         labels:
-  #           severity: critical
-  #         annotations:
-  #           description: bad ingress config - nginx config test failed
-  #           summary: uninstall the latest ingress changes to allow config reloads to resume
-  #       - alert: NGINXCertificateExpiry
-  #         expr: (avg(nginx_ingress_controller_ssl_expire_time_seconds{host!="_"}) by (host) - time()) < 604800
-  #         for: 1s
-  #         labels:
-  #           severity: critical
-  #         annotations:
-  #           description: ssl certificate(s) will expire in less then a week
-  #           summary: renew expiring certificates to avoid downtime
-  #       - alert: NGINXTooMany500s
-  #         expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"5.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
-  #         for: 1m
-  #         labels:
-  #           severity: warning
-  #         annotations:
-  #           description: Too many 5XXs
-  #           summary: More than 5% of all requests returned 5XX, this requires your attention
-  #       - alert: NGINXTooMany400s
-  #         expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"4.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
-  #         for: 1m
-  #         labels:
-  #           severity: warning
-  #         annotations:
-  #           description: Too many 4XXs
-  #           summary: More than 5% of all requests returned 4XX, this requires your attention
+    prometheusRule:
+      enabled: true
+      rules:
+        - alert: NGINXConfigFailed
+          expr: count(nginx_ingress_controller_config_last_reload_successful == 0) > 0
+          for: 1s
+          labels:
+            severity: critical
+          annotations:
+            description: bad ingress config - nginx config test failed
+            summary: uninstall the latest ingress changes to allow config reloads to resume
+        - alert: NGINXCertificateExpiry
+          expr: (avg(nginx_ingress_controller_ssl_expire_time_seconds{host!="_"}) by (host) - time()) < 604800
+          for: 1s
+          labels:
+            severity: critical
+          annotations:
+            description: ssl certificate(s) will expire in less then a week
+            summary: renew expiring certificates to avoid downtime
+        - alert: NGINXTooMany500s
+          expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"5.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            description: Too many 5XXs
+            summary: More than 5% of all requests returned 5XX, this requires your attention
+        - alert: NGINXTooMany400s
+          expr: 100 * ( sum( nginx_ingress_controller_requests{status=~"4.+"} ) / sum(nginx_ingress_controller_requests) ) > 5
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            description: Too many 4XXs
+            summary: More than 5% of all requests returned 4XX, this requires your attention
   priorityClassName: critical-priority
 EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
@@ -1317,6 +1317,7 @@ serviceAccount:
   name: mimir
 mimir:
   structuredConfig:
+    multitenancy_enabled: false
     limits:
       compactor_blocks_retention_period: 30d
       # {"ts":"2025-11-04T19:30:40.472926117Z","level":"error","msg":"non-recoverable error","component_path":"/","component_id":"prometheus.remote_write.mimir","subcomponent":"rw","remote_name":"5b0906","url":"http://mimir-gateway.mimir.svc.cluster.local/api/v1/push","failedSampleCount":2000,"failedHistogramCount":0,"failedExemplarCount":0,"err":"server returned HTTP status 400 Bad Request: received a series whose number of labels exceeds the limit (actual: 31, limit: 30) series: 'karpenter_nodes_allocatable{arch=\"amd64\", capacity_type=\"spot\", container=\"controller\", endpoint=\"http-metrics\", instance=\"192.168.92.152:8080\", instance_capability_flex=\"false\", instance_category=\"t\"…' (err-mimir-max-label-names-per-series). To adjust the related per-tenant limit, configure -validation.max-label-names-per-series, or contact your service administrator.\n"}
@@ -1488,6 +1489,22 @@ minio:
   enabled: false
 kafka:
   priorityClassName: high-priority
+ingress:
+  enabled: true
+  ingressClassName: nginx
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/description: Grafana Mimir provides horizontally scalable, highly available, multi-tenant, long-term storage for Prometheus
+    gethomepage.dev/group: Apps
+    gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/mimir/843897414dba909dfd44f5b93dad35a8a6694d06/images/logo.png
+    gethomepage.dev/name: Mimir
+    nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
+  hosts:
+    - mimir.${CLUSTER_FQDN}
+  tls:
+    - hosts:
+        - mimir.${CLUSTER_FQDN}
 gateway:
   priorityClassName: high-priority
   replicas: 2
@@ -1499,6 +1516,13 @@ gateway:
             app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: gateway
         topologyKey: kubernetes.io/hostname
+metaMonitoring:
+  serviceMonitor:
+    enabled: true
+  prometheusRule:
+    enabled: true
+    mimirAlerts: true
+    mimirRules: true
 EOF
 helm upgrade --install --version "${MIMIR_DISTRIBUTED_HELM_CHART_VERSION}" --namespace mimir --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" mimir grafana/mimir-distributed
 ```
@@ -1585,6 +1609,7 @@ ingress:
     gethomepage.dev/group: Apps
     gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png
     gethomepage.dev/name: Pyroscope
+    gethomepage.dev/pod-selector: app.kubernetes.io/instance=pyroscope
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
   hosts:
@@ -1612,10 +1637,6 @@ to fit your environment and storage requirements:
 # renovate: datasource=helm depName=k8s-monitoring registryUrl=https://grafana.github.io/helm-charts
 K8S_MONITORING_HELM_CHART_VERSION="3.7.1"
 
-# https://github.com/suxess-it/kubriX/blob/main/platform-apps/charts/k8s-monitoring/values-kubrix-default.yaml
-# https://github.com/ar2pi/potato-cluster/blob/main/kubernetes/helm/grafana-k8s-monitoring/values.yaml
-# https://github.com/valesordev/valesor.dev/blob/main/infra/alloy/k8s-monitoring-values.yaml
-
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-k8s-monitoring.yml" << EOF
 # Cluster identification used in metrics labels
@@ -1627,12 +1648,10 @@ destinations:
   - name: prometheus
     type: prometheus
     url: http://mimir-gateway.mimir.svc.cluster.local/api/v1/push
-    # tenantId: "1"
   # Logs destination - sends to Loki for log aggregation
   - name: loki
     type: loki
     url: http://loki-gateway.loki.svc.cluster.local/loki/api/v1/push
-    # tenantId: "1"
   # Traces destination - sends to Tempo via OTLP protocol
   - name: otlpgateway
     type: otlp
@@ -1649,7 +1668,7 @@ destinations:
 # Collect K8s cluster-level metrics (nodes, pods, deployments, etc.)
 clusterMetrics:
   enabled: true
-  # Scrape metrics from the Kubernetes API server
+  # Scrape metrics from the Kubernetes API server (Kubernetes / System / API Server)
   apiServer:
     enabled: true
 # Collect Kubernetes events (pod scheduling, failures, etc.)
@@ -1674,9 +1693,14 @@ applicationObservability:
 # Automatic instrumentation for supported languages (Java, Python, etc.)
 autoInstrumentation:
   enabled: true
-# Discover and scrape metrics from pods with Prometheus annotations
+# Discover and scrape metrics from pods with Prometheus annotations - https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/docs/examples/features/annotation-autodiscovery/prom-annotations
 annotationAutodiscovery:
   enabled: true
+  annotations:
+    scrape: prometheus.io/scrape
+    metricsPath: prometheus.io/path
+    metricsPortNumber: prometheus.io/port
+    metricsScheme: prometheus.io/scheme
 # Support for ServiceMonitor and PodMonitor CRDs from Prometheus Operator
 prometheusOperatorObjects:
   enabled: true
@@ -1722,7 +1746,7 @@ dashboards and visualizations for monitoring your Kubernetes cluster and applica
 ![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="300"}
 
 Install the `grafana` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
-and modify its [default values](https://github.com/grafana/helm-charts/blob/grafana-10.3.0/charts/grafana/values.yaml):
+and modify its [default values](https://github.com/grafana/helm-charts/blob/grafana-10.4.0/charts/grafana/values.yaml):
 
 ```bash
 # renovate: datasource=helm depName=grafana registryUrl=https://grafana.github.io/helm-charts
@@ -1767,17 +1791,10 @@ datasources:
         jsonData:
           prometheusType: Mimir
           prometheusVersion: 2.9.1
-        #   httpHeaderName1: X-Scope-OrgID
-        # secureJsonData:
-        #   httpHeaderValue1: 1
       - name: Loki
         type: loki
         url: http://loki-gateway.loki.svc.cluster.local/
         access: proxy
-        # jsonData:
-        #   httpHeaderName1: X-Scope-OrgID
-        # secureJsonData:
-        #   httpHeaderValue1: "1"
       - name: Tempo
         type: tempo
         url: http://tempo.tempo.svc.cluster.local:3200
@@ -1785,6 +1802,13 @@ datasources:
       - name: Pyroscope
         type: grafana-pyroscope-datasource
         url: http://pyroscope.pyroscope.svc.cluster.local:4040
+      - name: Alertmanager
+        type: alertmanager
+        url: http://mimir-alertmanager.mimir.svc.cluster.local:8080
+        access: proxy
+        editable: true
+        jsonData:
+          implementation: mimir
 notifiers:
   notifiers.yaml:
     notifiers:
@@ -1977,15 +2001,15 @@ dashboards:
     #   gnetId: 19268
     #   revision: 1
     #   datasource: Prometheus
-    20340-cert-manager:
-      # renovate: depName="cert-manager"
-      gnetId: 20340
-      revision: 1
-      datasource: Prometheus
     20842-cert-manager-kubernetes:
       # renovate: depName="Cert-manager-Kubernetes"
       gnetId: 20842
       revision: 3
+      datasource: Prometheus
+    22184-cert-manager2:
+      # renovate: depName="cert-manager2"
+      gnetId: 22184
+      revision: 1
       datasource: Prometheus
     # keep-sorted end
 grafana.ini:
@@ -1997,12 +2021,12 @@ grafana.ini:
     enabled: true
     header_name: X-Email
     header_property: email
+  smtp:
+    enabled: true
+    host: mailpit-smtp.mailpit.svc.cluster.local:25
+    from_address: grafana@${CLUSTER_FQDN}
   users:
     auto_assign_org_role: Admin
-smtp:
-  enabled: true
-  host: mailpit-smtp.mailpit.svc.cluster.local:25
-  from_address: grafana@${CLUSTER_FQDN}
 networkPolicy:
   enabled: true
 EOF
