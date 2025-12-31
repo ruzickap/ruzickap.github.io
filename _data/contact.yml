@@ -18,6 +18,10 @@
   icon: "fas fa-home"
   url: "https://petr.ruzicka.dev"
 
+- type: mastodon
+  icon: "fab fa-mastodon"
+  url: "https://mastodon.social/@ruzickap"
+
 - type: rss
   icon: "fas fa-rss"
   noblank: true
