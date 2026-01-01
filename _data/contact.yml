@@ -16,7 +16,7 @@
 
 - type: mastodon
   icon: "fab fa-mastodon"
-  url: "https://mastodon.social/@ruzickap"
+  url: "https://mastodon.social/@petr_ruzicka"
 
 - type: rss
   icon: "fas fa-rss"
