@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Run action-crosspost
-        uses: tgagor/action-crosspost@v1
+        uses: tgagor/action-crosspost@9ad9d0aecc05cdb2057041365566fe51627d6ac3 # v1
         with:
           dry-run: true
           feed-url: ${{ env.MY_BLOG_FEED_URL }}
