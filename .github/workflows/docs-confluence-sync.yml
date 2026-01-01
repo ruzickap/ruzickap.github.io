@@ -21,8 +21,6 @@ env:
   CONFLUENCE_PASSWORD: "${{ secrets.MY_ATLASSIAN_PERSONAL_TOKEN }}"
   CONFLUENCE_SPACE: myspace
   CONFLUENCE_USERNAME: petr.ruzicka@gmail.com
-  MY_BLOG_FEED_URL: https://ruzickap.github.io/feed.xml
-  SLACK_CHANNEL: mylabs
 
 jobs:
   docs-confluence-sync:
