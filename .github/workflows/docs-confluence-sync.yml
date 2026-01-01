@@ -84,16 +84,3 @@ jobs:
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
           done <<< "${FILES_TO_PROCESS}"
-
-  crosspost:
-    runs-on: ubuntu-24.04-arm
-    steps:
-      - name: Run action-crosspost
-        uses: tgagor/action-crosspost@9ad9d0aecc05cdb2057041365566fe51627d6ac3 # v1
-        with:
-          since: 180
-          feed-url: ${{ env.MY_BLOG_FEED_URL }}
-          mastodon-access-token: ${{ secrets.MASTODON_ACCESS_TOKEN }}
-          mastodon-host: mastodon.social
-          slack-token: ${{ secrets.MY_SLACK_BOT_TOKEN }}
-          slack-channel: ${{ env.SLACK_CHANNEL }}
