@@ -21,6 +21,7 @@ env:
   CONFLUENCE_PASSWORD: "${{ secrets.MY_ATLASSIAN_PERSONAL_TOKEN }}"
   CONFLUENCE_SPACE: myspace
   CONFLUENCE_USERNAME: petr.ruzicka@gmail.com
+  MY_BLOG_FEED_URL: https://ruzickap.github.io/feed.xml
 
 jobs:
   docs-confluence-sync:
@@ -82,3 +83,16 @@ jobs:
               --username "${CONFLUENCE_USERNAME}" \
               --password "${CONFLUENCE_PASSWORD}"
           done <<< "${FILES_TO_PROCESS}"
+
+  crosspost:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Run action-crosspost
+        uses: tgagor/action-crosspost@v1
+        with:
+          dry-run: true
+          feed-url: ${{ env.MY_BLOG_FEED_URL }}
+          mastodon-access-token: ${{ secrets.MASTODON_ACCESS_TOKEN }}
+          mastodon-host: mastodon.social
+          slack-token: ${{ secrets.MY_SLACK_BOT_TOKEN }}
+          slack-channel: mylabs
