@@ -1210,10 +1210,12 @@ order: 4
 
   [![GitHub Actions status - codeql](https://github.com/ruzickap/xvx.cz/workflows/codeql/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/codeql.yml)
   [![GitHub Actions status - commit-check](https://github.com/ruzickap/xvx.cz/workflows/commit-check/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/commit-check.yml)
+  [![GitHub Actions status - Copilot code review](https://github.com/ruzickap/xvx.cz/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer)
   [![GitHub Actions status - hugo-build](https://github.com/ruzickap/xvx.cz/workflows/hugo-build/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/hugo-build.yml)
   [![GitHub Actions status - links](https://github.com/ruzickap/xvx.cz/workflows/links/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/links.yml)
   [![GitHub Actions status - markdown-check](https://github.com/ruzickap/xvx.cz/workflows/markdown-check/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/markdown-check.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/xvx.cz/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/xvx.cz/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/xvx.cz/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/xvx.cz/workflows/release-please/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate](https://github.com/ruzickap/xvx.cz/workflows/renovate/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/renovate.yml)
