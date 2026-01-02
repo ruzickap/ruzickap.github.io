@@ -887,7 +887,7 @@ and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="11.2.0"
+VELERO_HELM_CHART_VERSION="11.3.1"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
@@ -1309,7 +1309,7 @@ to fit your environment and storage backend:
 
 ```bash
 # renovate: datasource=helm depName=mimir-distributed registryUrl=https://grafana.github.io/helm-charts
-MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.1.0-weekly.373"
+MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.1.0-weekly.375"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" << EOF
@@ -1750,7 +1750,7 @@ and modify its [default values](https://github.com/grafana/helm-charts/blob/graf
 
 ```bash
 # renovate: datasource=helm depName=grafana registryUrl=https://grafana.github.io/helm-charts
-GRAFANA_HELM_CHART_VERSION="10.4.0"
+GRAFANA_HELM_CHART_VERSION="10.4.3"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-grafana.yml" << EOF
@@ -2008,8 +2008,8 @@ dashboards:
       datasource: Prometheus
     22184-cert-manager2:
       # renovate: depName="cert-manager2"
-      gnetId: 22184
-      revision: 1
+      gnetId: 22384
+      revision: 3
       datasource: Prometheus
     # keep-sorted end
 grafana.ini:
