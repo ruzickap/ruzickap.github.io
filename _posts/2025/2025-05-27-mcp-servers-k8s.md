@@ -94,7 +94,7 @@ servers:
 ```bash
 # renovate: datasource=github-tags depName=stacklok/toolhive
 TOOLHIVE_VERSION="0.2.3"
-kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
+kubectl apply -f "https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml"
 ```
 
 Create the [OSV](https://osv.dev/) MCP Servers:
