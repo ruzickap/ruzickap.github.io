@@ -4,20 +4,13 @@ author: Petr Ruzicka
 date: 2025-05-27
 description:
 categories: [Kubernetes, Amazon EKS Auto Mode, MCP]
-tags:
-  [
-    amazon eks auto mode,
-    amazon eks,
-    k8s,
-    kubernetes,
-    mcp,
-  ]
+tags: [amazon eks auto mode, amazon eks, k8s, kubernetes, mcp]
 image: https://raw.githubusercontent.com/lobehub/lobe-icons/2889d303d4d0a3a7082fd9ff56e3df80b0b0c7d3/packages/static-png/dark/mcp.png
 ---
 
-<!-- markdownlint-disable MD013 -->
+<!-- rumdl-disable MD013 -->
 In the previous post, [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})
-<!-- markdownlint-enable MD013 -->
+<!-- rumdl-enable MD013 -->
 I used [cert-manager](https://cert-manager.io/) to obtain a [wildcard certificate](https://en.wikipedia.org/wiki/Public_key_certificate#Wildcard_certificate)
 for the [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 This post will explore running various MCP servers in Kubernetes, aiming to
@@ -42,14 +35,16 @@ powered by MCP servers and local LLM inference running on your EKS cluster.
 
 ## Requirements
 
-<!-- markdownlint-disable MD013 -->
+<!-- rumdl-disable MD013 -->
+
 - Amazon EKS Auto Mode cluster (described in
   [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %}))
-<!-- markdownlint-enable MD013 -->
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
 - [Helm](https://helm.sh)
 - [kubectl](https://github.com/kubernetes/kubectl)
+
+<!-- rumdl-enable MD013 -->
 
 You will need the following environment variables. Replace the placeholder
 values with your actual credentials:
@@ -99,7 +94,7 @@ servers:
 ```bash
 # renovate: datasource=github-tags depName=stacklok/toolhive
 TOOLHIVE_VERSION="0.2.3"
-kubectl apply -f https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml
+kubectl apply -f "https://raw.githubusercontent.com/stacklok/toolhive/refs/tags/v${TOOLHIVE_VERSION}/examples/operator/mcp-servers/mcpserver_mkp.yaml"
 ```
 
 Create the [OSV](https://osv.dev/) MCP Servers:

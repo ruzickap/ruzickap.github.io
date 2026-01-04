@@ -117,7 +117,7 @@ can help identify security issues in a Kubernetes cluster.
 Deploy a vulnerable (old) version of [nginx:1.22.0](https://hub.docker.com/layers/library/nginx/1.22.0/images/sha256-b3a676a9145dc005062d5e79b92d90574fb3bf2396f4913dc1732f9065f55c4b?context=explore)
 to the cluster:
 
-[//]: # "https://github.com/kubernetes/kubernetes/issues/83242"
+<!-- https://github.com/kubernetes/kubernetes/issues/83242 -->
 
 {% raw %}
 
@@ -299,7 +299,8 @@ pss-restricted   15m
 
 We are currently interested in the [CIS Kubernetes Benchmark](https://www.cisecurity.org/benchmark/kubernetes)
 and specifically the control to
-"[Minimize the admission of containers wishing to share the host IPC namespace](https://github.com/aquasecurity/kube-bench/blob/7aeb6c39774763e74979a0904e374df01844bf21/cfg/cis-1.20/policies.yaml)":
+"[Minimize the admission of containers wishing to share the host IPC
+namespace](https://github.com/aquasecurity/kube-bench/blob/7aeb6c39774763e74979a0904e374df01844bf21/cfg/cis-1.20/policies.yaml)":
 
 ```bash
 kubectl get clustercompliancereports cis -o json | jq '.spec.compliance.controls[] | select(.name=="Minimize the admission of containers wishing to share the host IPC namespace")'
@@ -1115,7 +1116,8 @@ EOF
 helm upgrade --install --version "${KUBE_PROMETHEUS_STACK_HELM_CHART_VERSION}" --namespace kube-prometheus-stack --reuse-values --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-kube-prometheus-stack-trivy-operator-grafana.yml" kube-prometheus-stack prometheus-community/kube-prometheus-stack
 ```
 
-Add the following Grafana Dashboards to the existing [kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
+Add the following Grafana Dashboards to the existing
+[kube-prometheus-stack](https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack)
 Helm chart configuration:
 
 - [16652] - [Trivy Operator Dashboard](https://grafana.com/grafana/dashboards/17813-trivy-operator-dashboard/)

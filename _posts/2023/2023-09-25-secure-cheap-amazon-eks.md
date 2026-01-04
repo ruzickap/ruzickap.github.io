@@ -4,21 +4,7 @@ author: Petr Ruzicka
 date: 2023-09-25
 description: Build "cheap and secure" Amazon EKS with network policies, cluster encryption and logging
 categories: [Kubernetes, Amazon EKS, Security]
-tags:
-  [
-    Amazon EKS,
-    k8s,
-    kubernetes,
-    security,
-    eksctl,
-    cert-manager,
-    external-dns,
-    podinfo,
-    prometheus,
-    sso,
-    oauth2-proxy,
-    metrics-server,
-  ]
+tags: [Amazon EKS, k8s, kubernetes, security, eksctl, cert-manager, external-dns, podinfo, prometheus, sso, oauth2-proxy, metrics-server]
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 
@@ -157,7 +143,7 @@ ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev
 ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS2} solo=false proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
 ```
 
-<!-- markdownlint-disable blanks-around-fences -->
+<!-- rumdl-disable blanks-around-fences -->
 
 ```console
 localhost | CHANGED => {
@@ -218,7 +204,7 @@ localhost | CHANGED => {
 }
 ```
 
-<!-- markdownlint-enable blanks-around-fences -->
+<!-- rumdl-enable blanks-around-fences -->
 
 ![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
 _CloudFlare mylabs.dev zone_
@@ -1349,7 +1335,8 @@ Security Standards:
 kubectl label namespace --all pod-security.kubernetes.io/warn=baseline
 ```
 
-Details can be found in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
+Details can be found in: [Enforce Pod Security Standards with Namespace
+Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
 
 ## Clean-up
 

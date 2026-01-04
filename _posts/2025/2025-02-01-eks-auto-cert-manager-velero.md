@@ -4,28 +4,17 @@ author: Petr Ruzicka
 date: 2025-02-01
 description:
 categories: [Kubernetes, Amazon EKS Auto Mode, Velero, cert-manager]
-tags:
-  [
-    amaozn eks auto mode,
-    amazon eks,
-    cert-manager,
-    certificates,
-    eksctl,
-    k8s,
-    kubernetes,
-    security,
-    velero,
-  ]
+tags: [amaozn eks auto mode, amazon eks, cert-manager, certificates, eksctl, k8s, kubernetes, security, velero]
 image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
 ---
 
-<!-- markdownlint-disable MD013 MD033 -->
+<!-- rumdl-disable MD013 MD033 -->
 In the previous post,
 "[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})",
 I used [cert-manager](https://cert-manager.io/) to obtain a
 [wildcard certificate](https://en.wikipedia.org/wiki/Public_key_certificate#Wildcard_certificate)
 for the [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/).
-<!-- markdownlint-enable MD013 MD033 -->
+<!-- rumdl-enable MD013 MD033 -->
 
 When using Let's Encrypt [production](https://letsencrypt.org/about/)
 certificates, it is useful to back them up and restore them when recreating
@@ -41,14 +30,16 @@ Links:
 
 ## Requirements
 
-<!-- markdownlint-disable MD013 MD033 -->
+<!-- rumdl-disable MD013 MD033 -->
+
 - An Amazon EKS Auto Mode cluster (as described in
   "[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})")
 - [AWS CLI](https://aws.amazon.com/cli/)
 - [eksctl](https://eksctl.io/)
 - [Helm](https://helm.sh)
 - [kubectl](https://github.com/kubernetes/kubectl)
-<!-- markdownlint-enable MD013 MD033 -->
+
+<!-- rumdl-enable MD013 MD033 -->
 
 The following variables are used in the subsequent steps:
 
@@ -689,7 +680,8 @@ Events:                    <none>
 
 ## Reconfigure ingress-nginx
 
-The previous steps restored the Let's Encrypt production certificate (`cert-manager/ingress-cert-production`).
+The previous steps restored the Let's Encrypt production certificate
+(`cert-manager/ingress-cert-production`).
 Now, let's configure `ingress-nginx` to use this certificate.
 
 First, check the current "staging" certificate; this will be replaced by the

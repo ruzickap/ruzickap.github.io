@@ -3,23 +3,8 @@ title: Secrets Store CSI Driver and Reloader
 author: Petr Ruzicka
 date: 2023-04-01
 description: Deploy Trivy Operator and Grafana Dashboard
-categories:
-  [
-    Kubernetes,
-    Amazon EKS,
-    secrets-store-csi-driver,
-    Reloader,
-    AWS Secrets Manager,
-  ]
-tags:
-  [
-    Amazon EKS,
-    k8s,
-    kubernetes,
-    secrets-store-csi-driver,
-    reloader,
-    AWS Secrets Manager,
-  ]
+categories: [Kubernetes, Amazon EKS, secrets-store-csi-driver, Reloader, AWS Secrets Manager]
+tags: [Amazon EKS, k8s, kubernetes, secrets-store-csi-driver, reloader, AWS Secrets Manager]
 image: https://raw.githubusercontent.com/kubernetes/community/487f994c013ea61d92cf9a341af7620037abbce3/icons/svg/resources/unlabeled/secret.svg
 ---
 
@@ -46,7 +31,8 @@ _secrets-store-csi-driver architecture_
 Links:
 
 - [Use AWS Secrets Manager secrets in Amazon Elastic Kubernetes Service](https://docs.aws.amazon.com/secretsmanager/latest/userguide/integrating_csi_driver.html)
-- [How to use AWS Secrets & Configuration Provider with your Kubernetes Secrets Store CSI driver](https://aws.amazon.com/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/)
+- [How to use AWS Secrets & Configuration Provider with your Kubernetes
+  Secrets Store CSI driver](https://aws.amazon.com/blogs/security/how-to-use-aws-secrets-configuration-provider-with-kubernetes-secrets-store-csi-driver/)
 - [Stakater Reloader docs](https://github.com/stakater/Reloader/tree/master/docs)
 
 ## Requirements
@@ -354,9 +340,11 @@ Go to these URLs and check the credentials synced from AWS Secrets Manager:
   ```
 
 <!-- prettier-ignore-start -->
+
   ```json
   {"password":"rxxxxxxxxxxxxxxH","username":"admin123"}
   ```
+
 <!-- prettier-ignore-end -->
 
 - [https://kuard.k01.k8s.mylabs.dev/-/env](https://kuard.k01.k8s.mylabs.dev/-/env)
@@ -367,9 +355,11 @@ Go to these URLs and check the credentials synced from AWS Secrets Manager:
   ```
 
 <!-- prettier-ignore-start -->
+
   ```json
   {"password":"rxxxxxxxxxxxxxxH","username":"admin123"}
   ```
+
 <!-- prettier-ignore-end -->
 
 After executing the commands above, the secret from AWS Secrets Manager is
@@ -415,9 +405,11 @@ kubectl exec -i -n kuard deployments/kuard-deployment -- cat /mnt/secrets-store/
 ```
 
 <!-- prettier-ignore-start -->
+
 ```json
 {"user":"admin123","password":"EXAMPLE-PASSWORD"}
 ```
+
 <!-- prettier-ignore-end -->
 
 The environment variable inside the pod will not be changed automatically:
@@ -427,9 +419,11 @@ kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSEC
 ```
 
 <!-- prettier-ignore-start -->
+
 ```json
 {"password":"rxxxxxxxxxxxxxxH","username":"admin123"}
 ```
+
 <!-- prettier-ignore-end -->
 
 The only way to update a pre-defined environment variable inside the pod is to
@@ -507,9 +501,11 @@ kubectl exec -i -n kuard deployments/kuard-deployment -- sh -c "echo \${KUARDSEC
 ```
 
 <!-- prettier-ignore-start -->
+
 ```json
 {"user":"admin123","password":"EXAMPLE-PASSWORD-2"}
 ```
+
 <!-- prettier-ignore-end -->
 
 It is possible to use and synchronize credentials from AWS Secrets Manager to

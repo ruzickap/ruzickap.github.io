@@ -4,13 +4,7 @@ author: Petr Ruzicka
 date: 2025-01-26
 description: Use GitHub Actions for Slack notifications of your Pull Requests including the PR status updates
 categories: [GitHub, GitHub Actions, Slack, notification, Pull Request]
-tags:
-  [
-    GitHub,
-    notifications,
-    GitHub Actions,
-    Pull Request,
-  ]
+tags: [GitHub, notifications, GitHub Actions, Pull Request]
 image: https://raw.githubusercontent.com/kubevela/kube-trigger/cfa3e2e367b2886cf80735de795dbe45c94fb8bf/docs/img/overview/slack-logo.svg
 ---
 
