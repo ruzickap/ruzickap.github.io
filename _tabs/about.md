@@ -6,7 +6,8 @@ order: 5
 
 ⚡ My name is Petr Ruzicka and I am a Senior Cloud Architect with McKinsey 🚀
 
-⚡ I blog about my Architect, DevOps, GitOps, K8s experiences at [ruzickap.github.io](https://ruzickap.github.io)
+⚡ I blog about my Architect, DevOps, GitOps, K8s experiences at
+[ruzickap.github.io](https://ruzickap.github.io)
 
 ⚡ To contact me:
 

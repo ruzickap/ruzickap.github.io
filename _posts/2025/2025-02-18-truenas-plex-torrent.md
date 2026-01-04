@@ -43,7 +43,8 @@ Boot TrueNAS from the USB stick and follow these steps:
 
 Links:
 
-* [How to Install TrueNAS CORE on an SSD NVMe/SATA Partition and Reclaim Unused Boot-Pool Space](https://youtu.be/ZMSSE6FViak?si=b-sz-fPk6xwol0ea&t=50)
+* [How to Install TrueNAS CORE on an SSD NVMe/SATA Partition and Reclaim
+  Unused Boot-Pool Space](https://youtu.be/ZMSSE6FViak?si=b-sz-fPk6xwol0ea&t=50)
 * [Install TrueNAS SCALE on a partition instead of the full disk](https://gist.github.com/gangefors/2029e26501601a99c501599f5b100aa6)
 
 ## Configuration

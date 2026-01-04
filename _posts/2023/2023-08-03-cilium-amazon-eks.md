@@ -4,23 +4,7 @@ author: Petr Ruzicka
 date: 2023-08-03
 description: Build "cheap and secure" Amazon EKS with Karpenter and Cilium
 categories: [Kubernetes, Amazon EKS, Cilium, Security]
-tags:
-  [
-    Amazon EKS,
-    k8s,
-    kubernetes,
-    security,
-    karpenter,
-    eksctl,
-    cert-manager,
-    external-dns,
-    podinfo,
-    cilium,
-    prometheus,
-    sso,
-    oauth2-proxy,
-    metrics-server,
-  ]
+tags: [Amazon EKS, k8s, kubernetes, security, karpenter, eksctl, cert-manager, external-dns, podinfo, cilium, prometheus, sso, oauth2-proxy, metrics-server]
 image: https://raw.githubusercontent.com/cncf/artwork/ac38e11ed57f017a06c9dcb19013bcaed92115a9/projects/cilium/icon/color/cilium_icon-color.svg
 ---
 
@@ -170,7 +154,7 @@ ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev
 ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS2} solo=false proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
 ```
 
-<!-- markdownlint-disable blanks-around-fences -->
+<!-- rumdl-disable blanks-around-fences -->
 
 ```console
 localhost | CHANGED => {
@@ -231,7 +215,7 @@ localhost | CHANGED => {
 }
 ```
 
-<!-- markdownlint-enable blanks-around-fences -->
+<!-- rumdl-enable blanks-around-fences -->
 
 ![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
 _CloudFlare mylabs.dev zone_
@@ -762,7 +746,8 @@ Many Kubernetes services and applications can export metrics to Prometheus. For
 this reason, Prometheus should be one of the first applications installed on a
 Kubernetes cluster.
 
-Then, you will need some basic tools and integrations, such as [external-dns](https://github.com/kubernetes-sigs/external-dns),
+Then, you will need some basic tools and integrations, such as
+[external-dns](https://github.com/kubernetes-sigs/external-dns),
 [ingress-nginx](https://kubernetes.github.io/ingress-nginx/), [cert-manager](https://cert-manager.io/),
 [oauth2-proxy](https://oauth2-proxy.github.io/oauth2-proxy/), and others.
 

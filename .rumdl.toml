@@ -1,0 +1,10 @@
+# rumdl configuration file - https://github.com/rvben/rumdl
+
+[global]
+# MD041: First line in file should be a heading
+# Disabled because Jekyll files start with front matter, not headings
+disable = ["MD036", "MD041"]
+
+# MD013: Line length - https://github.com/rvben/rumdl/blob/main/docs/md013.md
+[MD013]
+code-blocks = false  # Exclude code blocks from line length check

@@ -4,23 +4,7 @@ author: Petr Ruzicka
 date: 2024-07-07
 description: Use the security tools to detect the hacker attacks on Amazon EKS and EC2 instances
 categories: [Kubernetes, Amazon EKS, Security, Exploit, Vulnerability, Kali Linux, EC2, Docker]
-tags:
-  [
-    Amazon EKS,
-    container,
-    docker,
-    EC2,
-    eksctl,
-    exploit,
-    k8s,
-    Kali Linux,
-    kubernetes,
-    plugin,
-    security,
-    SQLi,
-    vulnerability,
-    WordPress,
-  ]
+tags: [Amazon EKS, container, docker, EC2, eksctl, exploit, k8s, Kali Linux, kubernetes, plugin, security, SQLi, vulnerability, WordPress]
 image: https://user-images.githubusercontent.com/45159366/128566095-253303e2-25d8-42f1-a06d-0b38ca079a1a.png
 ---
 

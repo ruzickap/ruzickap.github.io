@@ -9,7 +9,6 @@
         "antfu.slidev",
         "bierner.markdown-mermaid",
         "bierner.markdown-preview-github-styles",
-        "davidanson.vscode-markdownlint",
         "esbenp.prettier-vscode",
         "github.copilot",
         "github.vscode-github-actions",
@@ -19,6 +18,7 @@
         "mechatroner.rainbow-csv",
         "pkief.material-icon-theme",
         "redhat.vscode-yaml",
+        "rvben.rumdl",
         "streetsidesoftware.code-spell-checker",
         "tyriar.sort-lines",
         "yzhang.markdown-all-in-one"

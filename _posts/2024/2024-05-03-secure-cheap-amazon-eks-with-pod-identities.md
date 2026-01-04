@@ -4,22 +4,7 @@ author: Petr Ruzicka
 date: 2024-05-03
 description: Build "cheap and secure" Amazon EKS with Pod Identities, network policies, cluster encryption and logging
 categories: [Kubernetes, Amazon EKS, Security, EKS Pod Identities]
-tags:
-  [
-    amazon eks,
-    k8s,
-    kubernetes,
-    security,
-    eksctl,
-    cert-manager,
-    external-dns,
-    podinfo,
-    prometheus,
-    sso,
-    oauth2-proxy,
-    metrics-server,
-    eks pod identities,
-  ]
+tags: [amazon eks, k8s, kubernetes, security, eksctl, cert-manager, external-dns, podinfo, prometheus, sso, oauth2-proxy, metrics-server, eks pod identities]
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 
@@ -161,7 +146,7 @@ ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev
 ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS2} solo=false proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
 ```
 
-<!-- markdownlint-disable blanks-around-fences -->
+<!-- rumdl-disable blanks-around-fences -->
 
 ```console
 localhost | CHANGED => {
@@ -222,7 +207,7 @@ localhost | CHANGED => {
 }
 ```
 
-<!-- markdownlint-enable blanks-around-fences -->
+<!-- rumdl-enable blanks-around-fences -->
 
 ![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
 _CloudFlare mylabs.dev zone_
@@ -248,7 +233,8 @@ Details: [Work with Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/Us
 Generate a CloudFormation template that defines an [Amazon Route 53](https://aws.amazon.com/route53/)
 zone and an [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
 
-The CloudFormation template below also includes the [Karpenter CloudFormation](https://karpenter.sh/docs/reference/cloudformation/)
+The CloudFormation template below also includes the
+[Karpenter CloudFormation](https://karpenter.sh/docs/reference/cloudformation/)
 resources.
 
 Add the new domain `CLUSTER_FQDN` to Route 53, and set up DNS delegation from
@@ -886,7 +872,8 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
   kubectl label namespace --all pod-security.kubernetes.io/warn=baseline
   ```
 
-  Details can be found in: [Enforce Pod Security Standards with Namespace Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
+  Details can be found in: [Enforce Pod Security Standards with Namespace
+  Labels](https://kubernetes.io/docs/tasks/configure-pod-container/enforce-standards-namespace-labels/)
 
 ### EKS Pod Identities
 
