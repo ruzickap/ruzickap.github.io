@@ -60,8 +60,10 @@ webmaster_verifications:
 analytics:
   google:
     id: G-64WRCWDZM8 # fill in your Google Analytics ID
+  # https://ruzickap-github-io.goatcounter.com/
   goatcounter:
     id: ruzickap-github-io # fill in your GoatCounter ID
+  # https://cloud.umami.is/analytics/eu/share/H7YyXAGjFNfbFR1b
   umami:
     id: 380ea41a-7d5f-4423-8e13-03151bde195f # fill in your Umami ID
     domain: https://cloud.umami.is # fill in your Umami domain
@@ -69,7 +71,7 @@ analytics:
     id: # fill in your Matomo ID
     domain: # fill in your Matomo domain
   cloudflare:
-    id: 3ppVAbe7E50OYFNqyhCNM1wmS_uQ1FrH5PHYn9d- # fill in your Cloudflare Web Analytics token
+    id: ad8c64404e1e41dba184019564cf11bb # fill in your Cloudflare Web Analytics token
   fathom:
     id: # fill in your Fathom Site ID
 
