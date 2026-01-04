@@ -117,7 +117,7 @@ can help identify security issues in a Kubernetes cluster.
 Deploy a vulnerable (old) version of [nginx:1.22.0](https://hub.docker.com/layers/library/nginx/1.22.0/images/sha256-b3a676a9145dc005062d5e79b92d90574fb3bf2396f4913dc1732f9065f55c4b?context=explore)
 to the cluster:
 
-[//]: # "<https://github.com/kubernetes/kubernetes/issues/83242>"
+<!-- https://github.com/kubernetes/kubernetes/issues/83242 -->
 
 {% raw %}
 
