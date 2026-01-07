@@ -7,6 +7,7 @@ github\.com/ruzickap
 helm\.sh
 https://(grafana|oauth2-proxy|ollama-vulnerable|open-webui|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
+kubernetes\.io
 kubernetes-sigs\.github\.io/aws-ebs-csi-driver
 mylabs\.dev
 stefanprodan\.github\.io
