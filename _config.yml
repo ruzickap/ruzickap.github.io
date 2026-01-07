@@ -71,7 +71,7 @@ analytics:
     id: # fill in your Matomo ID
     domain: # fill in your Matomo domain
   cloudflare:
-    id: ad8c64404e1e41dba184019564cf11bb # fill in your Cloudflare Web Analytics token
+    id: # fill in your Cloudflare Web Analytics token (it is filled when running the "gh-pages-build" GitHub Action)
   fathom:
     id: # fill in your Fathom Site ID
 
