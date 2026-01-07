@@ -45,6 +45,8 @@ jobs:
 
       - name: Set Variables
         id: variables
+        env:
+          CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN: ${{ secrets.CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN }}
         run: |
           set -euo pipefail
           CLOUDFLARE_PAGES_PROJECT=$(echo "${GITHUB_REPOSITORY#*/}" | tr . - )
@@ -58,6 +60,7 @@ jobs:
           echo "BASE_DOMAIN=${BASE_DOMAIN}" | tee -a "${GITHUB_OUTPUT}"
           echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_OUTPUT}"
           sed -i "s@^url: \"https://ruzickap.github.io\"@url: \"https://${BASE_DOMAIN}\"@" _config.yml
+          sed -i "/cloudflare:/{n;s@id:.*@id: ${CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN}@}" _config.yml
           mkdir public
 
       - name: Setup Ruby
