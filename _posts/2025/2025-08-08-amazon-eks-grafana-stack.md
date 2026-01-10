@@ -4,20 +4,7 @@ author: Petr Ruzicka
 date: 2025-08-08
 description: Build secure Amazon EKS cluster with Grafana stack
 categories: [Kubernetes, Amazon EKS, Security, Grafana stack]
-tags:
-  [
-    amazon eks,
-    k8s,
-    kubernetes,
-    security,
-    eksctl,
-    cert-manager,
-    external-dns,
-    prometheus,
-    sso,
-    oauth2-proxy,
-    grafana stack,
-  ]
+tags: [amazon eks, k8s, kubernetes, security, eksctl, cert-manager, external-dns, prometheus, sso, oauth2-proxy, grafana stack]
 image: https://raw.githubusercontent.com/grafana/.github/12fb002302b5efad6251075f45ce5ac22db69a3f/LGTM_wallpaper_1920x1080.png
 ---
 
@@ -606,8 +593,9 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
 ### Prometheus Operator CRDs
 
 [Prometheus Operator CRDs](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-operator-crds)
-provides the Custom Resource Definitions (CRDs) that define the Prometheus operator
-resources. These CRDs are required before installing ServiceMonitor resources.
+provides the Custom Resource Definitions (CRDs) that define the Prometheus
+operator resources. These CRDs are required before installing ServiceMonitor
+resources.
 
 Install the `prometheus-operator-crds` [Helm chart](https://github.com/prometheus-community/helm-charts/tree/prometheus-operator-crds-23.0.0/charts/prometheus-operator-crds)
 to set up the necessary CRDs:
@@ -644,10 +632,10 @@ helm upgrade --install --version "${AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERS
 ### Pod Scheduling PriorityClasses
 
 Configure [PriorityClasses](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
-to control the scheduling priority of pods in your cluster. PriorityClasses allow
-you to influence which pods are scheduled or evicted first when resources are
-constrained. These classes help ensure that critical workloads receive scheduling
-priority over less important workloads.
+to control the scheduling priority of pods in your cluster. PriorityClasses
+allow you to influence which pods are scheduled or evicted first when resources
+are constrained. These classes help ensure that critical workloads receive
+scheduling priority over less important workloads.
 
 Create custom PriorityClass resources to define priority levels for different
 workload types:
@@ -876,7 +864,8 @@ helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespac
 
 Velero is an open-source tool for backing up and restoring Kubernetes cluster
 resources and persistent volumes. It enables disaster recovery, data migration,
-and scheduled backups by integrating with cloud storage providers such as AWS S3.
+and scheduled backups by integrating with cloud storage providers such as AWS
+S3.
 
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
 
@@ -1283,12 +1272,17 @@ lokiCanary:
   kind: Deployment
 singleBinary:
   replicas: 2
+  priorityClassName: high-priority
+  persistence:
+    size: 1Gi
 write:
   replicas: 0
 read:
   replicas: 0
 backend:
   replicas: 0
+ruler:
+  priorityClassName: high-priority
 EOF
 helm upgrade --install --version "${LOKI_HELM_CHART_VERSION}" --namespace loki --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" loki grafana/loki
 ```
@@ -1626,8 +1620,8 @@ helm upgrade --install --version "${PYROSCOPE_HELM_CHART_VERSION}" --namespace p
 ### Grafana Kubernetes Monitoring Helm chart
 
 The [Grafana Kubernetes Monitoring Helm chart](https://github.com/grafana/k8s-monitoring-helm/)
-offers a complete solution for configuring infrastructure, zero-code instrumentation,
-and gathering telemetry.
+offers a complete solution for configuring infrastructure, zero-code
+instrumentation, and gathering telemetry.
 
 Install the `k8s-monitoring` [Helm chart](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring)
 and customize its [default values](https://github.com/grafana/k8s-monitoring-helm/blob/v2.1.4/charts/k8s-monitoring/values.yaml)
@@ -1739,9 +1733,10 @@ helm upgrade --install --version "${K8S_MONITORING_HELM_CHART_VERSION}" --namesp
 ## Grafana
 
 [Grafana](https://github.com/grafana/grafana) is an open-source analytics and
-monitoring platform that allows you to query, visualize, alert on, and understand
-your metrics, logs, and traces. It provides a powerful and flexible way to create
-dashboards and visualizations for monitoring your Kubernetes cluster and applications.
+monitoring platform that allows you to query, visualize, alert on, and
+understand your metrics, logs, and traces. It provides a powerful and flexible
+way to create dashboards and visualizations for monitoring your Kubernetes
+cluster and applications.
 
 ![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="300"}
 
@@ -2239,7 +2234,8 @@ helm uninstall -n karpenter karpenter || true
 helm uninstall -n ingress-nginx ingress-nginx || true
 ```
 
-Remove any remaining EC2 instances provisioned by Karpenter (if they still exist):
+Remove any remaining EC2 instances provisioned by Karpenter (if they still
+exist):
 
 ```sh
 for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" "Name=tag:karpenter.sh/nodepool,Values=*" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
