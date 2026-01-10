@@ -616,7 +616,7 @@ and modify its [default values](https://github.com/kubernetes-sigs/aws-load-bala
 
 ```bash
 # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
-AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.17.0"
+AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.17.1"
 
 helm repo add --force-update eks https://aws.github.io/eks-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-aws-load-balancer-controller.yml" << EOF
@@ -876,7 +876,7 @@ and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="11.3.1"
+VELERO_HELM_CHART_VERSION="11.3.2"
 
 helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" << EOF
@@ -1101,7 +1101,7 @@ and modify its [default values](https://github.com/kubernetes-sigs/external-dns/
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
-EXTERNAL_DNS_HELM_CHART_VERSION="1.19.0"
+EXTERNAL_DNS_HELM_CHART_VERSION="1.20.0"
 
 helm repo add --force-update external-dns https://kubernetes-sigs.github.io/external-dns/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" << EOF
@@ -1303,7 +1303,7 @@ to fit your environment and storage backend:
 
 ```bash
 # renovate: datasource=helm depName=mimir-distributed registryUrl=https://grafana.github.io/helm-charts
-MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.1.0-weekly.375"
+MIMIR_DISTRIBUTED_HELM_CHART_VERSION="6.1.0-weekly.376"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" << EOF
@@ -1745,7 +1745,7 @@ and modify its [default values](https://github.com/grafana/helm-charts/blob/graf
 
 ```bash
 # renovate: datasource=helm depName=grafana registryUrl=https://grafana.github.io/helm-charts
-GRAFANA_HELM_CHART_VERSION="10.4.3"
+GRAFANA_HELM_CHART_VERSION="10.5.5"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-grafana.yml" << EOF
