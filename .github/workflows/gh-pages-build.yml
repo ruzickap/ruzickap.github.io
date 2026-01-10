@@ -24,14 +24,6 @@ on:
 permissions: read-all
 
 jobs:
-  github-context:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: |
-          echo "${GITHUB_CONTEXT}"
   gh-pages-build:
     runs-on: ubuntu-latest
     permissions:
@@ -54,7 +46,7 @@ jobs:
           if [[ "${GITHUB_REF_NAME}" = "main" ]]; then
             BASE_DOMAIN="${GITHUB_REPOSITORY#*/}"
           else
-            BASE_DOMAIN="${CLOUDFLARE_PAGES_PROJECT}.pages.dev"
+            BASE_DOMAIN="dev.${CLOUDFLARE_PAGES_PROJECT}.pages.dev"
           fi
 
           echo "BASE_DOMAIN=${BASE_DOMAIN}" | tee -a "${GITHUB_OUTPUT}"
@@ -79,10 +71,6 @@ jobs:
           cp LICENSE public/
           sed -n '1,/Dev Page:/p' README.md > public/README.md
           touch public/.nojekyll
-          # echo 'google-site-verification: googleaa2cf0133141f1f4.html' > public/googleaa2cf0133141f1f4.html
-          # # https://www.bing.com/indexnow
-          # echo '0771af676e2543c3bd6577f3203aa839' > public/0771af676e2543c3bd6577f3203aa839.txt # DevSkim: ignore DS173237
-          # echo -e '<?xml version="1.0"?>\n<users>\n\t<user>592AB158E3F9EF887F8DC8E69A2FF754</user>\n</users>' > public/BingSiteAuth.xml
 
       - name: Test site
         run: |
@@ -98,19 +86,13 @@ jobs:
           publish_dir: ./public
           force_orphan: true
 
-      - name: Web Page
-        run: |
-          cat << EOF | tee -a "${GITHUB_STEP_SUMMARY}"
-          * :low_brightness: <https://${{ steps.variables.outputs.BASE_DOMAIN }}>
-          EOF
-
       - name: Publish to Cloudflare Pages
         uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
         if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/gh-pages' }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./public --branch=main --commit-dirty=true --project-name=${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
+          command: pages deploy ./public --branch=dev --commit-dirty=true --project-name=${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Restore lychee cache
@@ -125,5 +107,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          args: "--cache --max-cache-age 1d https://${{ steps.variables.outputs.BASE_DOMAIN }}"
+          args: "https://${{ steps.variables.outputs.BASE_DOMAIN }}"
           fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
