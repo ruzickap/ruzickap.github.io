@@ -1206,87 +1206,6 @@ EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
 ```
 
-## Loki
-
-[Grafana Loki](https://grafana.com/oss/loki/) is a horizontally-scalable,
-highly-available, multi-tenant log aggregation system inspired by Prometheus. It
-is designed to be very cost-effective and easy to operate, as it does not index
-the contents of the logs, but rather a set of labels for each log stream.
-
-![Grafana Loki](https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo_and_name.png){:width="400"}
-
-Install the `loki` [Helm chart](https://github.com/grafana/loki/tree/helm-loki-6.42.0/production/helm/loki)
-and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.46.0/production/helm/loki/values.yaml)
-to fit your environment and storage requirements:
-
-```bash
-# renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
-LOKI_HELM_CHART_VERSION="6.49.0"
-
-helm repo add --force-update grafana https://grafana.github.io/helm-charts
-tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" << EOF
-global:
-  priorityClassName: high-priority
-deploymentMode: SingleBinary
-loki:
-  auth_enabled: false
-  commonConfig:
-    replication_factor: 2
-  storage:
-    bucketNames:
-      chunks: ${CLUSTER_FQDN}
-      ruler: ${CLUSTER_FQDN}
-      admin: ${CLUSTER_FQDN}
-    s3:
-      region: ${AWS_REGION}
-      endpoint: s3.${AWS_REGION}.amazonaws.com
-    object_store:
-      storage_prefix: ruzickap
-      s3:
-        endpoint: s3.${AWS_REGION}.amazonaws.com
-        region: ${AWS_REGION}
-  schemaConfig:
-    configs:
-      - from: 2024-04-01
-        store: tsdb
-        object_store: s3
-        schema: v13
-        index:
-          prefix: loki_index_
-          period: 24h
-  storage_config:
-    aws:
-      region: ${AWS_REGION}
-      # bucketnames: loki-chunk
-      # bucketnames: loki-chunk
-      # s3forcepathstyle: false
-      # s3: s3://s3.${AWS_REGION}.amazonaws.com/loki-storage
-      # endpoint: s3.${AWS_REGION}.amazonaws.com
-  limits_config:
-    retention_period: 1w
-  # Log retention in Loki is achieved through the Compactor (https://grafana.com/docs/loki/v3.5.x/get-started/components/#compactor)
-  # compactor:
-  #   delete_request_store: s3
-  #   retention_enabled: true
-lokiCanary:
-  kind: Deployment
-singleBinary:
-  replicas: 2
-  priorityClassName: high-priority
-  persistence:
-    size: 1Gi
-write:
-  replicas: 0
-read:
-  replicas: 0
-backend:
-  replicas: 0
-ruler:
-  priorityClassName: high-priority
-EOF
-helm upgrade --install --version "${LOKI_HELM_CHART_VERSION}" --namespace loki --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" loki grafana/loki
-```
-
 ## Mimir
 
 [Grafana Mimir](https://grafana.com/oss/mimir/) is an open source, horizontally
@@ -1521,6 +1440,87 @@ EOF
 helm upgrade --install --version "${MIMIR_DISTRIBUTED_HELM_CHART_VERSION}" --namespace mimir --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" mimir grafana/mimir-distributed
 ```
 
+## Loki
+
+[Grafana Loki](https://grafana.com/oss/loki/) is a horizontally-scalable,
+highly-available, multi-tenant log aggregation system inspired by Prometheus. It
+is designed to be very cost-effective and easy to operate, as it does not index
+the contents of the logs, but rather a set of labels for each log stream.
+
+![Grafana Loki](https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo_and_name.png){:width="400"}
+
+Install the `loki` [Helm chart](https://github.com/grafana/loki/tree/helm-loki-6.42.0/production/helm/loki)
+and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.46.0/production/helm/loki/values.yaml)
+to fit your environment and storage requirements:
+
+```bash
+# renovate: datasource=helm depName=loki registryUrl=https://grafana.github.io/helm-charts
+LOKI_HELM_CHART_VERSION="6.49.0"
+
+helm repo add --force-update grafana https://grafana.github.io/helm-charts
+tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" << EOF
+global:
+  priorityClassName: high-priority
+deploymentMode: SingleBinary
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 2
+  storage:
+    bucketNames:
+      chunks: ${CLUSTER_FQDN}
+      ruler: ${CLUSTER_FQDN}
+      admin: ${CLUSTER_FQDN}
+    s3:
+      region: ${AWS_REGION}
+      endpoint: s3.${AWS_REGION}.amazonaws.com
+    object_store:
+      storage_prefix: ruzickap
+      s3:
+        endpoint: s3.${AWS_REGION}.amazonaws.com
+        region: ${AWS_REGION}
+  schemaConfig:
+    configs:
+      - from: 2024-04-01
+        store: tsdb
+        object_store: s3
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+  storage_config:
+    aws:
+      region: ${AWS_REGION}
+      # bucketnames: loki-chunk
+      # bucketnames: loki-chunk
+      # s3forcepathstyle: false
+      # s3: s3://s3.${AWS_REGION}.amazonaws.com/loki-storage
+      # endpoint: s3.${AWS_REGION}.amazonaws.com
+  limits_config:
+    retention_period: 1w
+  # Log retention in Loki is achieved through the Compactor (https://grafana.com/docs/loki/v3.5.x/get-started/components/#compactor)
+  # compactor:
+  #   delete_request_store: s3
+  #   retention_enabled: true
+lokiCanary:
+  kind: Deployment
+singleBinary:
+  replicas: 2
+  priorityClassName: high-priority
+  persistence:
+    size: 5Gi
+write:
+  replicas: 0
+read:
+  replicas: 0
+backend:
+  replicas: 0
+ruler:
+  priorityClassName: high-priority
+EOF
+helm upgrade --install --version "${LOKI_HELM_CHART_VERSION}" --namespace loki --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" loki grafana/loki
+```
+
 ## Tempo
 
 [Grafana Tempo](https://grafana.com/oss/tempo/) is an open source, easy-to-use, and
@@ -1600,7 +1600,7 @@ ingress:
   annotations:
     gethomepage.dev/enabled: "true"
     gethomepage.dev/description: Continuous Profiling Platform
-    gethomepage.dev/group: Apps
+    gethomepage.dev/group: Observability
     gethomepage.dev/icon: https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png
     gethomepage.dev/name: Pyroscope
     gethomepage.dev/pod-selector: app.kubernetes.io/instance=pyroscope
@@ -1622,6 +1622,9 @@ helm upgrade --install --version "${PYROSCOPE_HELM_CHART_VERSION}" --namespace p
 The [Grafana Kubernetes Monitoring Helm chart](https://github.com/grafana/k8s-monitoring-helm/)
 offers a complete solution for configuring infrastructure, zero-code
 instrumentation, and gathering telemetry.
+
+For additional configuration options, refer to the
+[Helm chart documentation](https://grafana.com/docs/grafana-cloud/monitor-infrastructure/kubernetes-monitoring/configuration/helm-chart-config/helm-chart/).
 
 Install the `k8s-monitoring` [Helm chart](https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring)
 and customize its [default values](https://github.com/grafana/k8s-monitoring-helm/blob/v2.1.4/charts/k8s-monitoring/values.yaml)
@@ -1665,6 +1668,10 @@ clusterMetrics:
   # Scrape metrics from the Kubernetes API server (Kubernetes / System / API Server)
   apiServer:
     enabled: true
+  # Disable the default allowlist to allow Node Exporter Full dashboard to work properly - all node-exporter metrics will now be collected (https://github.com/grafana/k8s-monitoring-helm/issues/1296)
+  node-exporter:
+    metricsTuning:
+      useDefaultAllowList: false
 # Collect Kubernetes events (pod scheduling, failures, etc.)
 clusterEvents:
   enabled: true
@@ -1696,6 +1703,7 @@ annotationAutodiscovery:
     metricsPortNumber: prometheus.io/port
     metricsScheme: prometheus.io/scheme
 # Support for ServiceMonitor and PodMonitor CRDs from Prometheus Operator
+# https://github.com/grafana/k8s-monitoring-helm/tree/main/charts/k8s-monitoring/charts/feature-prometheus-operator-objects
 prometheusOperatorObjects:
   enabled: true
 # Enable continuous profiling data collection
@@ -1704,7 +1712,7 @@ profiling:
 # Alloy collector for scraping and forwarding metrics
 alloy-metrics:
   enabled: true
-# Single-instance Alloy for cluster-wide tasks (e.g., kube-state-metrics)
+# Single-instance Alloy for cluster-wide tasks (kube-state-metrics), the Kubernetes Cluster events feature requires the use of the alloy-singleton collector.
 alloy-singleton:
   enabled: true
 # Alloy DaemonSet for collecting logs from each node
@@ -1781,11 +1789,12 @@ datasources:
       - name: Mimir
         type: prometheus
         url: http://mimir-gateway.mimir.svc.cluster.local/prometheus
-        access: proxy
         isDefault: true
         jsonData:
           prometheusType: Mimir
           prometheusVersion: 2.9.1
+          # Scrape interval must match Prometheus/Mimir config for accurate rate() calculations (CPU usage in Node Exporter Full dashboard)
+          timeInterval: "1m"
       - name: Loki
         type: loki
         url: http://loki-gateway.loki.svc.cluster.local/
@@ -1833,179 +1842,209 @@ dashboards:
       # renovate: depName="Node Exporter Full"
       gnetId: 1860
       revision: 42
-      datasource: Prometheus
+      datasource: Mimir
     # 3662-prometheus-2-0-overview:
     #   # renovate: depName="Prometheus 2.0 Overview"
     #   gnetId: 3662
     #   revision: 2
-    #   datasource: Prometheus
+    #   datasource: Mimir
     # 9614-nginx-ingress-controller:
     #   # renovate: depName="NGINX Ingress controller"
     #   gnetId: 9614
     #   revision: 1
-    #   datasource: Prometheus
+    #   datasource: Mimir
     # 12006-kubernetes-apiserver:
     #   # renovate: depName="Kubernetes apiserver"
     #   gnetId: 12006
     #   revision: 1
-    #   datasource: Prometheus
+    #   datasource: Mimir
     # https://github.com/DevOps-Nirvana/Grafana-Dashboards
     14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
       # renovate: depName="Kubernetes Nginx Ingress Prometheus NextGen"
       gnetId: 14314
       revision: 2
-      datasource: Prometheus
+      datasource: Mimir
     15038-external-dns:
       # renovate: depName="External-dns"
       gnetId: 15038
       revision: 3
-      datasource: Prometheus
+      datasource: Mimir
     15757-kubernetes-views-global:
       # renovate: depName="Kubernetes / Views / Global"
       gnetId: 15757
       revision: 43
+      datasource: Mimir
     15758-kubernetes-views-namespaces:
       # renovate: depName="Kubernetes / Views / Namespaces"
       gnetId: 15758
       revision: 44
+      datasource: Mimir
     15759-kubernetes-views-nodes:
       # renovate: depName="Kubernetes / Views / Nodes"
       gnetId: 15759
       revision: 40
+      datasource: Mimir
     # https://grafana.com/orgs/imrtfm/dashboards - https://github.com/dotdc/grafana-dashboards-kubernetes
     15760-kubernetes-views-pods:
       # renovate: depName="Kubernetes / Views / Pods"
       gnetId: 15760
       revision: 37
+      datasource: Mimir
     15761-kubernetes-system-api-server:
       # renovate: depName="Kubernetes / System / API Server"
       gnetId: 15761
       revision: 20
+      datasource: Mimir
     16006-mimir-alertmanager-resources:
       # renovate: depName="Mimir / Alertmanager resources"
       gnetId: 16006
       revision: 17
+      datasource: Mimir
     16007-mimir-alertmanager:
       # renovate: depName="Mimir / Alertmanager"
       gnetId: 16007
       revision: 17
+      datasource: Mimir
     16008-mimir-compactor-resources:
       # renovate: depName="Mimir / Compactor resources"
       gnetId: 16008
       revision: 17
+      datasource: Mimir
     16009-mimir-compactor:
       # renovate: depName="Mimir / Compactor"
       gnetId: 16009
       revision: 17
+      datasource: Mimir
     16010-mimir-config:
       # renovate: depName="Mimir / Config"
       gnetId: 16010
       revision: 17
+      datasource: Mimir
     16011-mimir-object-store:
       # renovate: depName="Mimir / Object Store"
       gnetId: 16011
       revision: 17
+      datasource: Mimir
     16012-mimir-overrides:
       # renovate: depName="Mimir / Overrides"
       gnetId: 16012
       revision: 17
+      datasource: Mimir
     16013-mimir-queries:
       # renovate: depName="Mimir / Queries"
       gnetId: 16013
       revision: 17
+      datasource: Mimir
     16014-mimir-reads-networking:
       # renovate: depName="Mimir / Reads networking"
       gnetId: 16014
       revision: 17
+      datasource: Mimir
     16015-mimir-reads-resources:
       # renovate: depName="Mimir / Reads resources"
       gnetId: 16015
       revision: 17
+      datasource: Mimir
     16016-mimir-reads:
       # renovate: depName="Mimir / Reads"
       gnetId: 16016
       revision: 17
+      datasource: Mimir
     16017-mimir-rollout-progress:
       # renovate: depName="Mimir / Rollout progress"
       gnetId: 16017
       revision: 17
+      datasource: Mimir
     16018-mimir-ruler:
       # renovate: depName="Mimir / Ruler"
       gnetId: 16018
       revision: 17
+      datasource: Mimir
     16019-mimir-scaling:
       # renovate: depName="Mimir / Scaling"
       gnetId: 16019
       revision: 17
+      datasource: Mimir
     16020-mimir-slow-queries:
       # renovate: depName="Mimir / Slow queries"
       gnetId: 16020
       revision: 17
+      datasource: Mimir
     16021-mimir-tenants:
       # renovate: depName="Mimir / Tenants"
       gnetId: 16021
       revision: 17
+      datasource: Mimir
     16022-mimir-top-tenants:
       # renovate: depName="Mimir / Top tenants"
       gnetId: 16022
       revision: 16
+      datasource: Mimir
     16023-mimir-writes-networking:
       # renovate: depName="Mimir / Writes networking"
       gnetId: 16023
       revision: 16
+      datasource: Mimir
     16024-mimir-writes-resources:
       # renovate: depName="Mimir / Writes resources"
       gnetId: 16024
       revision: 17
+      datasource: Mimir
     16026-mimir-writes:
       # renovate: depName="Mimir / Writes"
       gnetId: 16026
       revision: 17
+      datasource: Mimir
     17605-mimir-overview-networking:
       # renovate: depName="Mimir / Overview networking"
       gnetId: 17605
       revision: 13
+      datasource: Mimir
     17606-mimir-overview-resources:
       # renovate: depName="Mimir / Overview resources"
       gnetId: 17606
       revision: 13
+      datasource: Mimir
     17607-mimir-overview:
       # renovate: depName="Mimir / Overview"
       gnetId: 17607
       revision: 13
+      datasource: Mimir
     17608-mimir-remote-ruler-reads:
       # renovate: depName="Mimir / Remote ruler reads"
       gnetId: 17608
       revision: 13
+      datasource: Mimir
     17609-mimir-remote-ruler-reads-resources:
       # renovate: depName="Mimir / Remote ruler reads resources"
       gnetId: 17609
       revision: 13
+      datasource: Mimir
     19923-beyla-red-metrics:
       # renovate: depName="Beyla RED Metrics"
       gnetId: 19923
       revision: 3
-      datasource: Prometheus
+      datasource: Mimir
     # 19105-prometheus:
     #   # renovate: depName="Prometheus"
     #   gnetId: 19105
     #   revision: 6
-    #   datasource: Prometheus
+    #   datasource: Mimir
     # 19268-prometheus:
     #   # renovate: depName="Prometheus All Metrics"
     #   gnetId: 19268
     #   revision: 1
-    #   datasource: Prometheus
+    #   datasource: Mimir
     20842-cert-manager-kubernetes:
       # renovate: depName="Cert-manager-Kubernetes"
       gnetId: 20842
       revision: 3
-      datasource: Prometheus
+      datasource: Mimir
     22184-cert-manager2:
       # renovate: depName="cert-manager2"
-      gnetId: 22384
+      gnetId: 22184
       revision: 3
-      datasource: Prometheus
+      datasource: Mimir
     # keep-sorted end
 grafana.ini:
   analytics:
@@ -2312,13 +2351,13 @@ Remove volumes and snapshots related to the cluster (as a precaution):
 
 ```sh
 for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text); do
-  echo "💾 Removing Volume: ${VOLUME}"
+  echo "Removing Volume: ${VOLUME}"
   aws ec2 delete-volume --volume-id "${VOLUME}"
 done
 
 # Remove EBS snapshots associated with the cluster
 for SNAPSHOT in $(aws ec2 describe-snapshots --owner-ids self --filter "Name=tag:Name,Values=${CLUSTER_NAME}-dynamic-snapshot*" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Snapshots[].SnapshotId' --output text); do
-  echo "📸 Removing Snapshot: ${SNAPSHOT}"
+  echo "Removing Snapshot: ${SNAPSHOT}"
   aws ec2 delete-snapshot --snapshot-id "${SNAPSHOT}"
 done
 ```
