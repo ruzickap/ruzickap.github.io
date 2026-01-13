@@ -63,7 +63,7 @@ FORCE_COLOR = 1
 description = 'EKS Access - eval "$(mise run a)"'
 alias = "a"
 quiet = true
-env.EKS_POST_FILE = "./_posts/2025/2025-08-08-amazon-eks-grafana-stack.md"
+env.EKS_POST_FILE = "./_posts/2026/2026-01-13-amazon-eks-grafana-stack.md"
 run = '''
 cat <<EOF
 $(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
@@ -253,11 +253,11 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 #------------------------------------------------------------------------------
 # Amazon EKS and Grafana stack
 #------------------------------------------------------------------------------
-[tasks."create:2025-08-08-amazon-eks-grafana-stack"]
+[tasks."create:2026-01-13-amazon-eks-grafana-stack"]
 description = 'Create: Amazon EKS and Grafana stack'
 run = ["./scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}"]
 
-[tasks."delete:2025-08-08-amazon-eks-grafana-stack"]
+[tasks."delete:2026-01-13-amazon-eks-grafana-stack"]
 description = 'Delete: Amazon EKS and Grafana stack'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
