@@ -1672,6 +1672,10 @@ clusterMetrics:
   node-exporter:
     metricsTuning:
       useDefaultAllowList: false
+  # Disable the default allowlist for kube-state-metrics to enable all namespace metrics required by "Kubernetes / Views / Global" dashboard (https://github.com/dotdc/grafana-dashboards-kubernetes/issues/176)
+  kube-state-metrics:
+    metricsTuning:
+      useDefaultAllowList: false
 # Collect Kubernetes events (pod scheduling, failures, etc.)
 clusterEvents:
   enabled: true
@@ -1843,31 +1847,21 @@ dashboards:
       gnetId: 1860
       revision: 42
       datasource: Mimir
-    # 3662-prometheus-2-0-overview:
-    #   # renovate: depName="Prometheus 2.0 Overview"
-    #   gnetId: 3662
-    #   revision: 2
-    #   datasource: Mimir
-    # 9614-nginx-ingress-controller:
-    #   # renovate: depName="NGINX Ingress controller"
-    #   gnetId: 9614
-    #   revision: 1
-    #   datasource: Mimir
-    # 12006-kubernetes-apiserver:
-    #   # renovate: depName="Kubernetes apiserver"
-    #   gnetId: 12006
-    #   revision: 1
-    #   datasource: Mimir
+    9614-nginx-ingress-controller:
+      # renovate: depName="NGINX Ingress controller"
+      gnetId: 9614
+      revision: 1
+      datasource: Mimir
     # https://github.com/DevOps-Nirvana/Grafana-Dashboards
     14314-kubernetes-nginx-ingress-controller-nextgen-devops-nirvana:
       # renovate: depName="Kubernetes Nginx Ingress Prometheus NextGen"
       gnetId: 14314
       revision: 2
       datasource: Mimir
-    15038-external-dns:
-      # renovate: depName="External-dns"
-      gnetId: 15038
-      revision: 3
+    23969-external-dns:
+      # renovate: depName="External DNS"
+      gnetId: 23969
+      revision: 1
       datasource: Mimir
     15757-kubernetes-views-global:
       # renovate: depName="Kubernetes / Views / Global"
@@ -2025,16 +2019,6 @@ dashboards:
       gnetId: 19923
       revision: 3
       datasource: Mimir
-    # 19105-prometheus:
-    #   # renovate: depName="Prometheus"
-    #   gnetId: 19105
-    #   revision: 6
-    #   datasource: Mimir
-    # 19268-prometheus:
-    #   # renovate: depName="Prometheus All Metrics"
-    #   gnetId: 19268
-    #   revision: 1
-    #   datasource: Mimir
     20842-cert-manager-kubernetes:
       # renovate: depName="Cert-manager-Kubernetes"
       gnetId: 20842
