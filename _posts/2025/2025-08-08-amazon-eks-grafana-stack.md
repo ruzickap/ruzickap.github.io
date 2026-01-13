@@ -23,14 +23,13 @@ The Amazon EKS setup should align with the following criteria:
 - Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for a
   minimal operating system, CPU, and memory footprint
 - Leverage [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
-  for highly cost-effective and optimized load balancing, seamlessly integrated
-  with [kgateway](https://kgateway.dev/).
+  for highly cost-effective and optimized load balancing
 - [Karpenter](https://karpenter.sh/) to enable automatic node scaling that
   matches the specific resource requirements of pods
 - The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
 - Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
-- Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be
-  configured
+- [EKS cluster logging](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html)
+  to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be configured
 - [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
   should be enabled where supported
 - [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
@@ -41,7 +40,7 @@ The Amazon EKS setup should align with the following criteria:
 ### Requirements
 
 You will need to configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
-and set up other necessary secrets and variables.
+and set up other necessary secrets and variables:
 
 ```shell
 # AWS Credentials
@@ -805,7 +804,6 @@ obtaining, renewing, and using those certificates.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="150"}
 
-The `cert-manager` ServiceAccount was created by `eksctl`.
 Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 and modify its [default values](https://github.com/cert-manager/cert-manager/blob/v1.19.1/deploy/charts/cert-manager/values.yaml):
 
@@ -819,15 +817,6 @@ global:
   priorityClassName: high-priority
 crds:
   enabled: true
-replicaCount: 2
-affinity:
-  podAntiAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-    - labelSelector:
-        matchLabels:
-          app.kubernetes.io/instance: cert-manager
-          app.kubernetes.io/component: controller
-      topologyKey: kubernetes.io/hostname
 extraArgs:
   - --enable-certificate-owner-ref=true
 serviceAccount:
@@ -842,16 +831,6 @@ webhook:
           matchLabels:
             app.kubernetes.io/instance: cert-manager
             app.kubernetes.io/component: webhook
-        topologyKey: kubernetes.io/hostname
-cainjector:
-  replicaCount: 2
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchLabels:
-            app.kubernetes.io/instance: cert-manager
-            app.kubernetes.io/component: cainjector
         topologyKey: kubernetes.io/hostname
 prometheus:
   servicemonitor:
@@ -891,44 +870,44 @@ priorityClassName: high-priority
 metrics:
   serviceMonitor:
     enabled: true
-#   prometheusRule:
-#     enabled: true
-#     spec:
-#       - alert: VeleroBackupPartialFailures
-#         annotations:
-#           message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} partially failed backups.
-#         expr: velero_backup_partial_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
-#         for: 15m
-#         labels:
-#           severity: warning
-#       - alert: VeleroBackupFailures
-#         annotations:
-#           message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed backups.
-#         expr: velero_backup_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
-#         for: 15m
-#         labels:
-#           severity: warning
-#       - alert: VeleroBackupSnapshotFailures
-#         annotations:
-#           message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed snapshot backups.
-#         expr: increase(velero_volume_snapshot_failure_total{schedule!=""}[1h]) > 0
-#         for: 15m
-#         labels:
-#           severity: warning
-#       - alert: VeleroRestorePartialFailures
-#         annotations:
-#           message: Velero restore {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} partially failed restores.
-#         expr: increase(velero_restore_partial_failure_total{schedule!=""}[1h]) > 0
-#         for: 15m
-#         labels:
-#           severity: warning
-#       - alert: VeleroRestoreFailures
-#         annotations:
-#           message: Velero restore {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed restores.
-#         expr: increase(velero_restore_failure_total{schedule!=""}[1h]) > 0
-#         for: 15m
-#         labels:
-#           severity: warning
+  prometheusRule:
+    enabled: true
+    spec:
+      - alert: VeleroBackupPartialFailures
+        annotations:
+          message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} partially failed backups.
+        expr: velero_backup_partial_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
+        for: 15m
+        labels:
+          severity: warning
+      - alert: VeleroBackupFailures
+        annotations:
+          message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed backups.
+        expr: velero_backup_failure_total{schedule!=""} / velero_backup_attempt_total{schedule!=""} > 0.25
+        for: 15m
+        labels:
+          severity: warning
+      - alert: VeleroBackupSnapshotFailures
+        annotations:
+          message: Velero backup {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed snapshot backups.
+        expr: increase(velero_volume_snapshot_failure_total{schedule!=""}[1h]) > 0
+        for: 15m
+        labels:
+          severity: warning
+      - alert: VeleroRestorePartialFailures
+        annotations:
+          message: Velero restore {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} partially failed restores.
+        expr: increase(velero_restore_partial_failure_total{schedule!=""}[1h]) > 0
+        for: 15m
+        labels:
+          severity: warning
+      - alert: VeleroRestoreFailures
+        annotations:
+          message: Velero restore {{ \$labels.schedule }} has {{ \$value | humanizePercentage }} failed restores.
+        expr: increase(velero_restore_failure_total{schedule!=""}[1h]) > 0
+        for: 15m
+        labels:
+          severity: warning
 configuration:
   backupStorageLocation:
     - name:
@@ -1094,8 +1073,7 @@ exposed Kubernetes Services and Ingresses with DNS providers.
 
 ![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="200"}
 
-ExternalDNS will manage the DNS records. The `external-dns` ServiceAccount was
-created by `eksctl`.
+ExternalDNS will manage the DNS records.
 Install the `external-dns` [Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
 and modify its [default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.19.0/charts/external-dns/values.yaml):
 
@@ -1161,7 +1139,6 @@ controller:
       service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
       service.beta.kubernetes.io/aws-load-balancer-target-group-attributes: proxy_protocol_v2.enabled=true
       service.beta.kubernetes.io/aws-load-balancer-type: external
-    # loadBalancerClass: eks.amazonaws.com/nlb
   metrics:
     enabled: true
     serviceMonitor:
@@ -1233,7 +1210,7 @@ mimir:
     multitenancy_enabled: false
     limits:
       compactor_blocks_retention_period: 30d
-      # {"ts":"2025-11-04T19:30:40.472926117Z","level":"error","msg":"non-recoverable error","component_path":"/","component_id":"prometheus.remote_write.mimir","subcomponent":"rw","remote_name":"5b0906","url":"http://mimir-gateway.mimir.svc.cluster.local/api/v1/push","failedSampleCount":2000,"failedHistogramCount":0,"failedExemplarCount":0,"err":"server returned HTTP status 400 Bad Request: received a series whose number of labels exceeds the limit (actual: 31, limit: 30) series: 'karpenter_nodes_allocatable{arch=\"amd64\", capacity_type=\"spot\", container=\"controller\", endpoint=\"http-metrics\", instance=\"192.168.92.152:8080\", instance_capability_flex=\"false\", instance_category=\"t\"…' (err-mimir-max-label-names-per-series). To adjust the related per-tenant limit, configure -validation.max-label-names-per-series, or contact your service administrator.\n"}
+      # "err":"server returned HTTP status 400 Bad Request: received a series whose number of labels exceeds the limit (actual: 31, limit: 30) ... (err-mimir-max-label-names-per-series). To adjust the related per-tenant limit, configure -validation.max-label-names-per-series, or contact your service administrator
       max_label_names_per_series: 50
       # Default is 150000
       max_global_series_per_user: 300000
@@ -1265,7 +1242,6 @@ alertmanager:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: alertmanager
         topologyKey: kubernetes.io/hostname
 distributor:
@@ -1276,7 +1252,6 @@ distributor:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: distributor
         topologyKey: kubernetes.io/hostname
 ingester:
@@ -1289,7 +1264,6 @@ ingester:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: ingester
         topologyKey: kubernetes.io/hostname
 overrides_exporter:
@@ -1302,7 +1276,6 @@ ruler:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: ruler
         topologyKey: kubernetes.io/hostname
 ruler_querier:
@@ -1313,7 +1286,6 @@ ruler_querier:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: ruler-querier
         topologyKey: kubernetes.io/hostname
 ruler_query_frontend:
@@ -1324,7 +1296,6 @@ ruler_query_frontend:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: ruler-query-frontend
         topologyKey: kubernetes.io/hostname
 ruler_query_scheduler:
@@ -1335,7 +1306,6 @@ ruler_query_scheduler:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: ruler-query-scheduler
         topologyKey: kubernetes.io/hostname
 querier:
@@ -1346,7 +1316,6 @@ querier:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: querier
         topologyKey: kubernetes.io/hostname
 query_frontend:
@@ -1357,7 +1326,6 @@ query_frontend:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: query-frontend
         topologyKey: kubernetes.io/hostname
 query_scheduler:
@@ -1368,7 +1336,6 @@ query_scheduler:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: query-scheduler
         topologyKey: kubernetes.io/hostname
 store_gateway:
@@ -1379,7 +1346,6 @@ store_gateway:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: store-gateway
         topologyKey: kubernetes.io/hostname
 compactor:
@@ -1390,7 +1356,6 @@ compactor:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: compactor
         topologyKey: kubernetes.io/hostname
 # https://github.com/grafana/helm-charts/blob/main/charts/rollout-operator/values.yaml
@@ -1426,7 +1391,6 @@ gateway:
       requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: mimir
             app.kubernetes.io/component: gateway
         topologyKey: kubernetes.io/hostname
 metaMonitoring:
@@ -1559,7 +1523,6 @@ affinity:
     requiredDuringSchedulingIgnoredDuringExecution:
       - labelSelector:
           matchLabels:
-            app.kubernetes.io/instance: tempo
             app.kubernetes.io/name: tempo
         topologyKey: kubernetes.io/hostname
 priorityClassName: high-priority
@@ -1889,6 +1852,11 @@ dashboards:
       gnetId: 15761
       revision: 20
       datasource: Mimir
+    15762-kubernetes-system-coredns:
+      # renovate: depName="Kubernetes / System / CoreDNS"
+      gnetId: 15762
+      revision: 20
+      datasource: Mimir
     16006-mimir-alertmanager-resources:
       # renovate: depName="Mimir / Alertmanager resources"
       gnetId: 16006
@@ -2029,6 +1997,31 @@ dashboards:
       gnetId: 22184
       revision: 3
       datasource: Mimir
+    22171-kubernetes-autoscaling-karpenter-overview:
+      # renovate: depName="Kubernetes / Autoscaling / Karpenter / Overview"
+      gnetId: 22171
+      revision: 3
+      datasource: Mimir
+    22172-kubernetes-autoscaling-karpenter-activity:
+      # renovate: depName="Kubernetes / Autoscaling / Karpenter / Activity"
+      gnetId: 22172
+      revision: 3
+      datasource: Mimir
+    22173-kubernetes-autoscaling-karpenter-performance:
+      # renovate: depName="Kubernetes / Autoscaling / Karpenter / Performance"
+      gnetId: 22173
+      revision: 3
+      datasource: Mimir
+    23471-karpenter-cluster-cost-estimate:
+      # renovate: depName="Karpenter Cluster Cost Estimate"
+      gnetId: 23471
+      revision: 1
+      datasource: Mimir
+    23838-velero-overview:
+      # renovate: depName="Velero Overview"
+      gnetId: 23838
+      revision: 1
+      datasource: Mimir
     # keep-sorted end
 grafana.ini:
   analytics:
@@ -2066,14 +2059,6 @@ MAILPIT_HELM_CHART_VERSION="0.31.0"
 
 helm repo add --force-update jouve https://jouve.github.io/charts/
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" << EOF
-replicaCount: 2
-affinity:
-  podAntiAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchLabels:
-            app.kubernetes.io/instance: mailpit
-        topologyKey: kubernetes.io/hostname
 ingress:
   enabled: true
   ingressClassName: nginx
@@ -2088,7 +2073,6 @@ ingress:
   hostname: mailpit.${CLUSTER_FQDN}
 EOF
 helm upgrade --install --version "${MAILPIT_HELM_CHART_VERSION}" --namespace mailpit --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mailpit.yml" mailpit jouve/mailpit
-kubectl label namespace mailpit pod-security.kubernetes.io/enforce=baseline
 ```
 
 Screenshot:
