@@ -712,7 +712,7 @@ to fit your environment and storage backend:
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
-KARPENTER_HELM_CHART_VERSION="1.8.3"
+KARPENTER_HELM_CHART_VERSION="1.8.4"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 serviceMonitor:
@@ -1500,7 +1500,7 @@ to fit your environment and storage requirements:
 
 ```bash
 # renovate: datasource=helm depName=tempo registryUrl=https://grafana.github.io/helm-charts
-TEMPO_HELM_CHART_VERSION="1.24.1"
+TEMPO_HELM_CHART_VERSION="1.24.3"
 
 helm repo add --force-update grafana https://grafana.github.io/helm-charts
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" << EOF
@@ -1855,7 +1855,7 @@ dashboards:
     15762-kubernetes-system-coredns:
       # renovate: depName="Kubernetes / System / CoreDNS"
       gnetId: 15762
-      revision: 20
+      revision: 22
       datasource: Mimir
     16006-mimir-alertmanager-resources:
       # renovate: depName="Mimir / Alertmanager resources"
