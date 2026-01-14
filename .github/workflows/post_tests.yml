@@ -58,13 +58,13 @@ jobs:
     name: "${{ inputs.action }} | ${{ inputs.posts }}"
     concurrency:
       group: post_tests-${{ inputs.cluster_fqdn }}
-    timeout-minutes: 100
+    timeout-minutes: 120 # Same as timeout for the AWS IAM role - AWS_ROLE_TO_ASSUME
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 7000
+          role-duration-seconds: 7200
           role-session-name: GitHubOidcFederatedRole
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           mask-aws-account-id: true
