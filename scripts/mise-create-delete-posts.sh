@@ -12,7 +12,8 @@ set -euo pipefail
 : "${TMP_DIR:="${PWD}"}"
 : "${RUN_FILE:="${TMP_DIR}/${1//[:|]/_}.sh"}"
 
-eval "$(aws sts assume-role --role-arn "${AWS_ROLE_TO_ASSUME}" --role-session-name "$USER@${HOSTNAME}-$(date +%s)" --duration-seconds 3600 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
+eval "$(aws sts assume-role --role-arn "${AWS_ROLE_TO_ASSUME}" --role-session-name "$USER@${HOSTNAME}-$(date +%s)" --duration-seconds 7200 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
+[[ "${GITHUB_ACTIONS:-}" == "true" ]] && echo -e "::add-mask::${AWS_ACCESS_KEY_ID}\n::add-mask::${AWS_SECRET_ACCESS_KEY}\n::add-mask::${AWS_SESSION_TOKEN}"
 
 echo "💡 *** $*"
 
@@ -24,13 +25,13 @@ echo "set -euxo pipefail" > "${RUN_FILE}"
 
 case "${1%:*}" in
   create)
-    MDQ_CODE_BLOCK='```^bash$'
+    MQ_CODE_BLOCK="bash"
     for ((idx = ${#POSTS[@]} - 1; idx >= 0; idx--)); do
       POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POSTS[idx]}*.md")")
     done
     ;;
   delete)
-    MDQ_CODE_BLOCK='```^sh$'
+    MQ_CODE_BLOCK="sh"
     for POST_FILE in "${POSTS[@]}"; do
       POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
     done
@@ -41,7 +42,7 @@ case "${1%:*}" in
     ;;
 esac
 
-mdq "${MDQ_CODE_BLOCK}" --br -o plain "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
+mq "select(.code.lang == \"${MQ_CODE_BLOCK}\") | to_text()" "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
 
 if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
   if eksctl get clusters --name="${CLUSTER_NAME}" && [[ "${1%:*}" = "delete" ]]; then

@@ -7,7 +7,7 @@
 [tools]
 # keep-sorted start
 "ubi:aws-cloudformation/rain" = "1.24.2"
-"ubi:yshavit/mdq" = "0.9.0"
+"ubi:harehare/mq" = "0.5.6"
 aws = "2.26.2"
 aws-copilot = "1.34.1"
 cilium-cli = "0.18.3"
@@ -33,7 +33,7 @@ trusted_config_paths = ["/"]
 AWS_DEFAULT_REGION = "us-east-1"
 AWS_ACCESS_KEY_ID = { value = "{{ env.AWS_ACCESS_KEY_ID }}", redact = true }
 AWS_SECRET_ACCESS_KEY = { value = "{{ env.AWS_SECRET_ACCESS_KEY }}", redact = true }
-AWS_ROLE_TO_ASSUME = "{{ env.AWS_ROLE_TO_ASSUME }}"
+AWS_ROLE_TO_ASSUME = { value = "{{ env.AWS_ROLE_TO_ASSUME }}", redact = true }
 
 # Google Configuration
 GOOGLE_CLIENT_ID = { value = "{{ env.GOOGLE_CLIENT_ID }}", redact = true }
@@ -63,12 +63,12 @@ FORCE_COLOR = 1
 description = 'EKS Access - eval "$(mise run a)"'
 alias = "a"
 quiet = true
-env.EKS_POST_FILE = "./_posts/2025/2025-08-08-amazon-eks-grafana-stack.md"
+env.EKS_POST_FILE = "./_posts/2026/2026-01-13-amazon-eks-grafana-stack.md"
 run = '''
 cat <<EOF
-$(mdq '```^bash$' --br -o json "${EKS_POST_FILE}" | jq -r '.[].[0].code_block.code')
+$(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
 
-eval "\$(aws sts assume-role --role-arn "\${AWS_ROLE_TO_ASSUME}" --role-session-name "\${USER}@\$(hostname -f)-\$(date +%s)" --duration-seconds 36000 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
+eval "\$(aws sts assume-role --role-arn "\${AWS_ROLE_TO_ASSUME}" --role-session-name "\${USER}@\$(hostname -f)-\$(date +%s)" --duration-seconds 7200 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
 export KUBECONFIG="/tmp/kubeconfig-\${CLUSTER_NAME}-\$\$.conf"
 aws eks update-kubeconfig --name "\${CLUSTER_NAME}" --kubeconfig "\${KUBECONFIG}"
 EOF
@@ -248,6 +248,17 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2025-07-10-ollama-k8s-exploitation|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
 description = 'Delete: Exploiting RCE Vulnerabilities in Ollama on Kubernetes'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS and Grafana stack
+#------------------------------------------------------------------------------
+[tasks."create:2026-01-13-amazon-eks-grafana-stack"]
+description = 'Create: Amazon EKS and Grafana stack'
+run = ["./scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}"]
+
+[tasks."delete:2026-01-13-amazon-eks-grafana-stack"]
+description = 'Delete: Amazon EKS and Grafana stack'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
