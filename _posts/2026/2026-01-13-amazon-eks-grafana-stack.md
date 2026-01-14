@@ -1637,6 +1637,7 @@ clusterMetrics:
       useDefaultAllowList: false
   windows-exporter:
     enabled: false
+    deploy: false
   # Disable the default allowlist for kube-state-metrics to enable all namespace metrics required by "Kubernetes / Views / Global" dashboard (https://github.com/dotdc/grafana-dashboards-kubernetes/issues/176)
   kube-state-metrics:
     metricsTuning:
