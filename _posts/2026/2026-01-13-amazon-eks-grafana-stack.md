@@ -100,7 +100,7 @@ Install the required tools:
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
 
-## Configure AWS Route 53 Domain delegation
+### Configure AWS Route 53 Domain delegation
 
 <!-- prettier-ignore-start -->
 > The DNS delegation tasks should be executed as a one-time operation.
@@ -208,7 +208,7 @@ localhost | CHANGED => {
 ![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
 _CloudFlare mylabs.dev zone_
 
-## Create the service-linked role
+### Create the service-linked role
 
 <!-- prettier-ignore-start -->
 > Creating the service-linked role for Spot Instances is a one-time operation.
@@ -224,7 +224,7 @@ aws iam create-service-linked-role --aws-service-name spot.amazonaws.com
 
 Details: [Work with Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-requests.html)
 
-## Create Route53 zone and KMS key infrastructure
+### Create Route53 zone and KMS key infrastructure
 
 Generate a CloudFormation template that defines an [Amazon Route 53](https://aws.amazon.com/route53/)
 zone and an [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
@@ -366,7 +366,7 @@ You should also see the following KMS key:
 ![KMS key](/assets/img/posts/2023/2023-08-03-cilium-amazon-eks/kms-key.avif)
 _KMS key_
 
-## Create Karpenter infrastructure
+### Create Karpenter infrastructure
 
 Use CloudFormation to set up the infrastructure needed by the EKS cluster.
 See [CloudFormation](https://karpenter.sh/docs/reference/cloudformation/) for
@@ -839,14 +839,14 @@ EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
 
-## Install Velero
+### Install Velero
 
 Velero is an open-source tool for backing up and restoring Kubernetes cluster
 resources and persistent volumes. It enables disaster recovery, data migration,
 and scheduled backups by integrating with cloud storage providers such as AWS
 S3.
 
-![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
+![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/Velero.svg){:width="500"}
 
 Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
 and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.2.0/charts/velero/values.yaml):
@@ -948,7 +948,7 @@ helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace vele
 
 {% endraw %}
 
-## Restore cert-manager objects
+#### Restore cert-manager objects
 
 The following steps will guide you through restoring a Let's Encrypt production
 certificate, previously backed up by Velero to S3, onto a new cluster.
@@ -1096,7 +1096,7 @@ EOF
 helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespace external-dns --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-external-dns.yml" external-dns external-dns/external-dns
 ```
 
-## Ingress NGINX Controller
+### Ingress NGINX Controller
 
 [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
 controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
@@ -1183,7 +1183,7 @@ EOF
 helm upgrade --install --version "${INGRESS_NGINX_HELM_CHART_VERSION}" --namespace ingress-nginx --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ingress-nginx.yml" ingress-nginx ingress-nginx/ingress-nginx
 ```
 
-## Mimir
+### Mimir
 
 [Grafana Mimir](https://grafana.com/oss/mimir/) is an open source, horizontally
 scalable, multi-tenant time series database for Prometheus metrics, designed for
@@ -1366,7 +1366,15 @@ rollout_operator:
 minio:
   enabled: false
 kafka:
-  priorityClassName: high-priority
+  # 3 replicas required for Raft quorum (tolerates 1 node failure)
+  replicas: 3
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchLabels:
+            app.kubernetes.io/component: kafka
+        topologyKey: kubernetes.io/hostname
 ingress:
   enabled: true
   ingressClassName: nginx
@@ -1404,17 +1412,17 @@ EOF
 helm upgrade --install --version "${MIMIR_DISTRIBUTED_HELM_CHART_VERSION}" --namespace mimir --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-mimir-distributed.yml" mimir grafana/mimir-distributed
 ```
 
-## Loki
+### Loki
 
 [Grafana Loki](https://grafana.com/oss/loki/) is a horizontally-scalable,
 highly-available, multi-tenant log aggregation system inspired by Prometheus. It
 is designed to be very cost-effective and easy to operate, as it does not index
 the contents of the logs, but rather a set of labels for each log stream.
 
-![Grafana Loki](https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo_and_name.png){:width="400"}
+![Grafana Loki](https://raw.githubusercontent.com/grafana/loki/5a8bc848dbe453ce27576d2058755a90f79d07b6/docs/sources/logo_and_name.png){:width="300"}
 
 Install the `loki` [Helm chart](https://github.com/grafana/loki/tree/helm-loki-6.42.0/production/helm/loki)
-and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.46.0/production/helm/loki/values.yaml)
+and customize its [default values](https://github.com/grafana/loki/blob/helm-loki-6.49.0/production/helm/loki/values.yaml)
 to fit your environment and storage requirements:
 
 ```bash
@@ -1437,12 +1445,6 @@ loki:
       admin: ${CLUSTER_FQDN}
     s3:
       region: ${AWS_REGION}
-      endpoint: s3.${AWS_REGION}.amazonaws.com
-    object_store:
-      storage_prefix: ruzickap
-      s3:
-        endpoint: s3.${AWS_REGION}.amazonaws.com
-        region: ${AWS_REGION}
   schemaConfig:
     configs:
       - from: 2024-04-01
@@ -1455,19 +1457,17 @@ loki:
   storage_config:
     aws:
       region: ${AWS_REGION}
-      # bucketnames: loki-chunk
-      # bucketnames: loki-chunk
-      # s3forcepathstyle: false
-      # s3: s3://s3.${AWS_REGION}.amazonaws.com/loki-storage
-      # endpoint: s3.${AWS_REGION}.amazonaws.com
+      bucketnames: ${CLUSTER_FQDN}
   limits_config:
     retention_period: 1w
   # Log retention in Loki is achieved through the Compactor (https://grafana.com/docs/loki/v3.5.x/get-started/components/#compactor)
-  # compactor:
-  #   delete_request_store: s3
-  #   retention_enabled: true
+  compactor:
+    delete_request_store: s3
+    retention_enabled: true
 lokiCanary:
   kind: Deployment
+gateway:
+  replicas: 2
 singleBinary:
   replicas: 2
   priorityClassName: high-priority
@@ -1485,7 +1485,7 @@ EOF
 helm upgrade --install --version "${LOKI_HELM_CHART_VERSION}" --namespace loki --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-loki.yml" loki grafana/loki
 ```
 
-## Tempo
+### Tempo
 
 [Grafana Tempo](https://grafana.com/oss/tempo/) is an open source, easy-to-use, and
 high-scale distributed tracing backend. It is designed to be cost-effective and
@@ -1530,12 +1530,12 @@ EOF
 helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-tempo.yml" tempo grafana/tempo
 ```
 
-## Pyroscope
+### Pyroscope
 
 [Grafana Pyroscope](https://github.com/grafana/pyroscope) is a Continuous Profiling
 Platform.
 
-![Grafana Pyroscope](https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png){:width="300"}
+![Grafana Pyroscope](https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png){:width="200"}
 
 Install the `pyroscope` [Helm chart](https://github.com/grafana/pyroscope/tree/main/operations/pyroscope/helm/pyroscope)
 and customize its [default values](https://github.com/grafana/pyroscope/blob/v1.16.0/operations/pyroscope/helm/pyroscope/values.yaml)
@@ -1685,9 +1685,6 @@ alloy-singleton:
 # Alloy DaemonSet for collecting logs from each node
 alloy-logs:
   enabled: true
-  # alloy:
-  #   clustering:
-  #     enabled: true
 # Alloy deployment for receiving OTLP data from applications
 alloy-receiver:
   enabled: true
@@ -1705,7 +1702,7 @@ EOF
 helm upgrade --install --version "${K8S_MONITORING_HELM_CHART_VERSION}" --namespace k8s-monitoring --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-k8s-monitoring.yml" k8s-monitoring grafana/k8s-monitoring
 ```
 
-## Grafana
+### Grafana
 
 [Grafana](https://github.com/grafana/grafana) is an open-source analytics and
 monitoring platform that allows you to query, visualize, alert on, and
@@ -1713,7 +1710,7 @@ understand your metrics, logs, and traces. It provides a powerful and flexible
 way to create dashboards and visualizations for monitoring your Kubernetes
 cluster and applications.
 
-![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="300"}
+![Grafana](https://raw.githubusercontent.com/grafana/grafana/cdca1518d2d2ee5d725517a8d8206b0cfa3656d0/public/img/grafana_text_logo_light.svg){:width="400"}
 
 Install the `grafana` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/grafana)
 and modify its [default values](https://github.com/grafana/helm-charts/blob/grafana-10.4.0/charts/grafana/values.yaml):
@@ -2144,7 +2141,7 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 
 Install [Homepage](https://gethomepage.dev/) to provide a nice dashboard.
 
-![Homepage](https://raw.githubusercontent.com/gethomepage/homepage/e56dccc7f17144a53b97a315c2e4f622fa07e58d/images/banner_light%402x.png){:width="300"}
+![Homepage](https://raw.githubusercontent.com/gethomepage/homepage/e56dccc7f17144a53b97a315c2e4f622fa07e58d/images/banner_light%402x.png){:width="350"}
 
 Install the `homepage` [Helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.1.0/charts/homepage)
 and modify its [default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.1.0/charts/homepage/values.yaml):
@@ -2221,6 +2218,10 @@ helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace ho
 ## Clean-up
 
 ![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="300"}
+
+![Clean-up](https://raw.githubusercontent.com/manongjohn/OTX/a80fe827b7a6316480974d712f9175d970729f04/toonz/sources/toonz/icons/dark/mimetypes/60/cleanup_icon.svg){:width="300"}
+![Clean-up](https://raw.githubusercontent.com/nilovelez/machete/fbf64142b596a645770eb5746537534b53220498/inc/cleanup/icon.svg){:width="300"}
+![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/4c7a28c07219338602d5e908c37c95db751b4d41/icons/cleanupdate.svg){:width="300"}
 
 Back up the certificate before deleting the cluster (in case it was renewed):
 

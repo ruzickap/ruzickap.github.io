@@ -7,7 +7,7 @@ on:
       posts:
         type: choice
         description: Select post
-        default: 2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto
+        default: 2026-01-13-amazon-eks-grafana-stack
         options:
           - 2022-11-27-cheapest-amazon-eks
           - 2022-12-24-amazon-eks-karpenter-tests|2022-11-27-cheapest-amazon-eks
