@@ -76,7 +76,7 @@
     ":pinSkipCi", // Pin dependencies and skip CI for pin-only updates
   ],
   // ignore chirpy dependencies
-  // https://renovatebot.com/docs/configuration-options/#ignoredeps
+  // https://docs.renovatebot.com/configuration-options/#ignoredeps
   ignorePaths: ["_posts/**"],
   // Pull Request Labeling
   labels: [
