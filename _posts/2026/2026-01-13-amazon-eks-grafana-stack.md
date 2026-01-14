@@ -383,7 +383,7 @@ eval aws cloudformation deploy \
   --parameter-overrides "ClusterName=${CLUSTER_NAME}" --tags "${TAGS//,/ }"
 ```
 
-## Create Amazon EKS
+### Create Amazon EKS
 
 I will use [eksctl](https://eksctl.io/) to create the [Amazon EKS](https://aws.amazon.com/eks/)
 cluster.
@@ -1535,7 +1535,7 @@ helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo
 [Grafana Pyroscope](https://github.com/grafana/pyroscope) is a Continuous Profiling
 Platform.
 
-![Grafana Pyroscope](https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png){:width="150"}
+![Grafana Pyroscope](https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png){:width="100"}
 
 Install the `pyroscope` [Helm chart](https://github.com/grafana/pyroscope/tree/main/operations/pyroscope/helm/pyroscope)
 and customize its [default values](https://github.com/grafana/pyroscope/blob/v1.16.0/operations/pyroscope/helm/pyroscope/values.yaml)
@@ -1635,7 +1635,7 @@ clusterMetrics:
   node-exporter:
     metricsTuning:
       useDefaultAllowList: false
-  windows-exporter
+  windows-exporter:
     enabled: false
   # Disable the default allowlist for kube-state-metrics to enable all namespace metrics required by "Kubernetes / Views / Global" dashboard (https://github.com/dotdc/grafana-dashboards-kubernetes/issues/176)
   kube-state-metrics:
@@ -2219,7 +2219,7 @@ helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace ho
 
 ## Clean-up
 
-![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="200"}
+![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
 
 Back up the certificate before deleting the cluster (in case it was renewed):
 
