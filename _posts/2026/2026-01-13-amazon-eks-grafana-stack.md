@@ -839,14 +839,14 @@ EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
 
-### Install Velero
+### Velero
 
 Velero is an open-source tool for backing up and restoring Kubernetes cluster
 resources and persistent volumes. It enables disaster recovery, data migration,
 and scheduled backups by integrating with cloud storage providers such as AWS
 S3.
 
-![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/Velero.svg){:width="500"}
+![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/Velero.svg){:width="400"}
 
 Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
 and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.2.0/charts/velero/values.yaml):
@@ -1492,7 +1492,7 @@ high-scale distributed tracing backend. It is designed to be cost-effective and
 simple to operate, as it only requires object storage to operate its backend and
 does not index the trace data.
 
-![Grafana Tempo](https://raw.githubusercontent.com/grafana/tempo/8dd75d18773d77149de8588f9dccbd680a03b00e/docs/sources/tempo/logo_and_name.png)
+![Grafana Tempo](https://raw.githubusercontent.com/grafana/tempo/8dd75d18773d77149de8588f9dccbd680a03b00e/docs/sources/tempo/logo_and_name.png){:width="500"}
 
 Install the `tempo` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/tempo)
 and customize its [default values](https://github.com/grafana/helm-charts/blob/main/charts/tempo/values.yaml)
@@ -1535,7 +1535,7 @@ helm upgrade --install --version "${TEMPO_HELM_CHART_VERSION}" --namespace tempo
 [Grafana Pyroscope](https://github.com/grafana/pyroscope) is a Continuous Profiling
 Platform.
 
-![Grafana Pyroscope](https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png){:width="200"}
+![Grafana Pyroscope](https://raw.githubusercontent.com/grafana/pyroscope/d3818254b7c70a43104effcfd300ff885035ac50/images/logo.png){:width="150"}
 
 Install the `pyroscope` [Helm chart](https://github.com/grafana/pyroscope/tree/main/operations/pyroscope/helm/pyroscope)
 and customize its [default values](https://github.com/grafana/pyroscope/blob/v1.16.0/operations/pyroscope/helm/pyroscope/values.yaml)
@@ -1635,6 +1635,8 @@ clusterMetrics:
   node-exporter:
     metricsTuning:
       useDefaultAllowList: false
+  windows-exporter
+    enabled: false
   # Disable the default allowlist for kube-state-metrics to enable all namespace metrics required by "Kubernetes / Views / Global" dashboard (https://github.com/dotdc/grafana-dashboards-kubernetes/issues/176)
   kube-state-metrics:
     metricsTuning:
@@ -2141,7 +2143,7 @@ helm upgrade --install --version "${OAUTH2_PROXY_HELM_CHART_VERSION}" --namespac
 
 Install [Homepage](https://gethomepage.dev/) to provide a nice dashboard.
 
-![Homepage](https://raw.githubusercontent.com/gethomepage/homepage/e56dccc7f17144a53b97a315c2e4f622fa07e58d/images/banner_light%402x.png){:width="350"}
+![Homepage](https://raw.githubusercontent.com/gethomepage/homepage/e56dccc7f17144a53b97a315c2e4f622fa07e58d/images/banner_light%402x.png){:width="400"}
 
 Install the `homepage` [Helm chart](https://github.com/jameswynn/helm-charts/tree/homepage-2.1.0/charts/homepage)
 and modify its [default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.1.0/charts/homepage/values.yaml):
@@ -2217,11 +2219,7 @@ helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace ho
 
 ## Clean-up
 
-![Clean-up](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/cleanup.svg){:width="300"}
-
-![Clean-up](https://raw.githubusercontent.com/manongjohn/OTX/a80fe827b7a6316480974d712f9175d970729f04/toonz/sources/toonz/icons/dark/mimetypes/60/cleanup_icon.svg){:width="300"}
-![Clean-up](https://raw.githubusercontent.com/nilovelez/machete/fbf64142b596a645770eb5746537534b53220498/inc/cleanup/icon.svg){:width="300"}
-![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/4c7a28c07219338602d5e908c37c95db751b4d41/icons/cleanupdate.svg){:width="300"}
+![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="200"}
 
 Back up the certificate before deleting the cluster (in case it was renewed):
 
