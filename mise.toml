@@ -33,7 +33,7 @@ trusted_config_paths = ["/"]
 AWS_DEFAULT_REGION = "us-east-1"
 AWS_ACCESS_KEY_ID = { value = "{{ env.AWS_ACCESS_KEY_ID }}", redact = true }
 AWS_SECRET_ACCESS_KEY = { value = "{{ env.AWS_SECRET_ACCESS_KEY }}", redact = true }
-AWS_ROLE_TO_ASSUME = "{{ env.AWS_ROLE_TO_ASSUME }}"
+AWS_ROLE_TO_ASSUME = { value = "{{ env.AWS_ROLE_TO_ASSUME }}", redact = true }
 
 # Google Configuration
 GOOGLE_CLIENT_ID = { value = "{{ env.GOOGLE_CLIENT_ID }}", redact = true }

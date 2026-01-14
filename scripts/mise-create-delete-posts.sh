@@ -13,6 +13,7 @@ set -euo pipefail
 : "${RUN_FILE:="${TMP_DIR}/${1//[:|]/_}.sh"}"
 
 eval "$(aws sts assume-role --role-arn "${AWS_ROLE_TO_ASSUME}" --role-session-name "$USER@${HOSTNAME}-$(date +%s)" --duration-seconds 3600 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
+[[ "${GITHUB_ACTIONS:-}" == "true" ]] && echo -e "::add-mask::${AWS_ACCESS_KEY_ID}\n::add-mask::${AWS_SECRET_ACCESS_KEY}\n::add-mask::${AWS_SESSION_TOKEN}"
 
 echo "💡 *** $*"
 
