@@ -1044,12 +1044,17 @@ and modify its [default values](https://github.com/oauth2-proxy/manifests/blob/o
 # renovate: datasource=helm depName=oauth2-proxy registryUrl=https://oauth2-proxy.github.io/manifests
 OAUTH2_PROXY_HELM_CHART_VERSION="6.24.1"
 
+set +x
+COOKIE_SECRET="$(openssl rand -base64 32 | head -c 32 | base64)"
+echo "::add-mask::${COOKIE_SECRET}"
+set -x
+
 helm repo add --force-update oauth2-proxy https://oauth2-proxy.github.io/manifests
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
 config:
   clientID: ${GOOGLE_CLIENT_ID}
   clientSecret: ${GOOGLE_CLIENT_SECRET}
-  cookieSecret: "$(openssl rand -base64 32 | head -c 32 | base64)"
+  cookieSecret: ${COOKIE_SECRET}
   configFile: |-
     cookie_domains = ".${CLUSTER_FQDN}"
     set_authorization_header = "true"

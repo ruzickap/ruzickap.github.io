@@ -2103,7 +2103,7 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-oauth2-proxy.yml" << EOF
 config:
   clientID: ${GOOGLE_CLIENT_ID}
   clientSecret: ${GOOGLE_CLIENT_SECRET}
-  cookieSecret: "${COOKIE_SECRET}"
+  cookieSecret: ${COOKIE_SECRET}
   configFile: |-
     cookie_domains = ".${CLUSTER_FQDN}"
     set_authorization_header = "true"
