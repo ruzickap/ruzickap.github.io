@@ -6,17 +6,17 @@ categories: [Linux, OpenWrt]
 tags: [TP-Link, WiFi, USB, PXE, Dnsmasq, iodine]
 ---
 
-I would like to describe another [OpenWrt](http://openwrt.org/) configuration.
+I would like to describe another [OpenWrt](https://openwrt.org/) configuration.
 It's going to be just a few examples on how to configure the latest available
-OpenWrt firmware [Backfire 10.03.1](http://downloads.openwrt.org/backfire/10.03.1/).
+OpenWrt firmware [Backfire 10.03.1](https://downloads.openwrt.org/backfire/10.03.1/).
 
 I'm going to use [TP-Link
-TL-WR1043ND](http://www.tp-link.com/en/products/details/?model=TL-WR1043ND) wifi
+TL-WR1043ND](https://www.tp-link.com/en/products/details/?model=TL-WR1043ND) wifi
 router with small 64MB USB stick [/dev/sda1] containing ext2 partition. I plan
 to have some stats on the USB stick and simple html pages as well.
 
 <!-- rumdl-disable MD013 -->
-After flashing the original firmware with [openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin](http://downloads.openwrt.org/backfire/10.03.1/ar71xx/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin)
+After flashing the original firmware with [openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin](https://downloads.openwrt.org/backfire/10.03.1/ar71xx/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin)
 I installed the kernel related packages and
 [extroot](http://wiki.openwrt.org/doc/howto/extroot):
 <!-- rumdl-enable MD013 -->

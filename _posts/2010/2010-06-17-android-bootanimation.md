@@ -11,10 +11,10 @@ You can find plenty of them in many places, but I tried to create my own from
 a movie.
 
 In this example I'm going to use movie from
-[Big Buck Bunny](http://www.bigbuckbunny.org/) which is licensed under the
-[Creative Commons Attribution 3.0](http://creativecommons.org/licenses/by/3.0/)
+[Big Buck Bunny](https://www.bigbuckbunny.org/) which is licensed under the
+[Creative Commons Attribution 3.0](https://creativecommons.org/licenses/by/3.0/)
 license. But you can probably use it generally for any movie which can be
-played in [mplayer](http://www.mplayerhq.hu/).
+played in [mplayer](https://mplayerhq.hu/).
 
 First download the movie:
 
@@ -76,7 +76,7 @@ adb reboot
 
 If you are missing adb command, please take it from the rooting CD (described
 in [Root HTC Desire under Debian](https://linux-old.xvx.cz/2010/05/root-htc-desire-under-debian/))
-or from official [Android SDK](http://developer.android.com/sdk/index.html).
+or from official [Android SDK](https://developer.android.com/sdk/index.html).
 
 Then you should see something like:
 

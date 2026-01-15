@@ -6,21 +6,21 @@ categories: [Linux, Debian]
 tags: [GRUB, Lua, USB, PXE, live-CD]
 ---
 
-I got 16 GB [USB flash](http://en.wikipedia.org/wiki/USB_flash_drive) from
+I got 16 GB [USB flash](https://en.wikipedia.org/wiki/USB_flash_drive) from
 my brother, because he can't see me still using my old 64 MB. He decided
 to buy Imation Nano Flash Drive.
 
 Because of many of my friends and colleagues are using Win, I use
-[NTFS](http://en.wikipedia.org/wiki/NTFS) on it. Old FAT is not "usable" in
+[NTFS](https://en.wikipedia.org/wiki/NTFS) on it. Old FAT is not "usable" in
 these days, because it can't handle bigger files.
 
 From the first time I use USB disks I always want to have bootable disk/flash
 with live CDs - so here are few notes how to create USB flash drive able to boot
 stored live CDs:
 
-First you need to compile [grub2](http://www.gnu.org/software/grub/index.html)
+First you need to compile [grub2](https://www.gnu.org/software/grub/index.html)
 yourself, because default grub2 installations in distributions do not
-have [LUA](http://en.wikipedia.org/wiki/Lua_%28programming_language%29)
+have [LUA](https://en.wikipedia.org/wiki/Lua_%28programming_language%29)
 support:
 
 ```bash
@@ -96,7 +96,7 @@ http://xpud.googlecode.com/files/xpud-0.9.2.iso
 ```
 
 The following code is taken from this web page
-[http://ubuntuforums.org/showthread.php?t=1288604](http://ubuntuforums.org/showthread.php?t=1288604)
+[https://ubuntuforums.org/showthread.php?t=1288604](https://ubuntuforums.org/showthread.php?t=1288604)
 where I added more live CDs. I also changed the main grub.cfg a little bit and
 use 64 live CDs (amd64).
 

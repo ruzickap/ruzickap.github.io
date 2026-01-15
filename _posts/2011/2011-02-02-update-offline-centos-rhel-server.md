@@ -7,7 +7,7 @@ tags: [yum, offline, security-updates]
 ---
 
 Sometimes you have a
-[RHEL](http://www.redhat.com/rhel/)/[CentOS](http://www.centos.org/) server
+[RHEL](https://www.redhat.com/rhel/)/[CentOS](https://www.centos.org/) server
 which is not connected to the Internet. But you should also install security
 updates to prevent local hackers from messing up your system.
 

@@ -17,7 +17,7 @@ See the picture:
 
 ![One page from Czech Panasonic DMC-G1 manual](/assets/img/posts/2009/2009-06-02-trim-margins-from-pdf-document/dmc-g1.avif)
 
-I used [pdfcrop](http://www.ctan.org/tex-archive/support/pdfcrop/) script from
+I used [pdfcrop](https://www.ctan.org/tex-archive/support/pdfcrop/) script from
 Heiko Oberdiek, which can easily trim margins.
 
 ```bash
