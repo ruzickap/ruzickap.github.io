@@ -7,16 +7,16 @@ tags: [HTC-Desire, CyanogenMod, adb, SSH]
 ---
 
 Since I bought my HTC Desire I wanted to put
-[CyanogenMod](http://www.cyanogenmod.com/) on it. This ROM is quite popular, but only
+[CyanogenMod](https://web.archive.org/web/2016/http://www.cyanogenmod.com/) on it. This ROM is quite popular, but only
 version 6.0 released last week supports [HTC
-Desire](http://wiki.cyanogenmod.com/index.php?title=HTC_Desire).
+Desire](https://web.archive.org/web/2016/http://wiki.cyanogenmod.com/index.php?title=HTC_Desire).
 
 I'm going to put a few notes here on how I did "post installation" changes like
 removing some programs, ssh key config, OpenVPN setup and few more.
 
 I don't want to describe here how to install this ROM to the HTC Desire,
 because there is nice how-to on their pages:
-[Full Update Guide - HTC Desire](http://wiki.cyanogenmod.com/index.php?title=Full_Update_Guide_-_HTC_Desire)
+[Full Update Guide - HTC Desire](https://web.archive.org/web/2016/http://wiki.cyanogenmod.com/index.php?title=Full_Update_Guide_-_HTC_Desire)
 
 Just one remark - If you suffer with signal lost please look at
 [this page](https://web.archive.org/web/2012/http://forum.cyanogenmod.com/topic/5437-signal-drops-after-rc2-final/).
