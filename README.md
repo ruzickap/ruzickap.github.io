@@ -34,19 +34,13 @@ Using Docker:
 
 ```bash
 # Build the site
-docker run --rm -it \
-  --volume="${PWD}:/srv/jekyll" \
-  -e JEKYLL_UID="${UID}" \
-  -e JEKYLL_GID="${GID}" \
-  jekyll/jekyll -- bash -c 'chown -R jekyll /usr/gem/ && jekyll build --destination "public"'
-
-# Serve the site locally
-docker run --rm -it \
-  --volume="${PWD}:/srv/jekyll" \
-  -e JEKYLL_UID="${UID}" \
-  -e JEKYLL_GID="${GID}" \
-  --publish 4000:4000 \
-  jekyll/jekyll -- bash -c 'chown -R jekyll /usr/gem/ && jekyll serve'
+docker run --rm -it --volume="${PWD}:/mnt" --workdir /mnt ubuntu bash -c 'set -x && \
+  apt update && \
+  apt install build-essential git ruby-bundler ruby-dev -y && \
+  git config --global --add safe.directory /mnt && \
+  bundle install && \
+  jekyll build --destination public
+'
 ```
 
 Megalinter:

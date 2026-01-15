@@ -40,6 +40,21 @@ jobs:
           fetch-depth: 0
           submodules: true
 
+      - name: 📦 Restore link checker cache
+        id: restore-cache
+        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        with:
+          path: .lycheecache
+          key: cache-lychee-${{ github.sha }}
+          restore-keys: cache-lychee-
+
+      - name: 🔗 Check for broken links
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
+        with:
+          fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
+
       - name: Set Variables
         env:
           CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN: ${{ secrets.CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN }}
@@ -48,14 +63,13 @@ jobs:
           CLOUDFLARE_PAGES_PROJECT=$(echo "${GITHUB_REPOSITORY#*/}" | tr . - )
           echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_ENV}"
 
-          # if [[ "${GITHUB_REF_NAME}" = "main" ]]; then
-          #   BASE_DOMAIN="${GITHUB_REPOSITORY#*/}"
-          # else
-          #   BASE_DOMAIN="dev.${CLOUDFLARE_PAGES_PROJECT}.pages.dev"
-          # fi
+          if [[ "${GITHUB_REF_NAME}" = "main" ]]; then
+            BASE_DOMAIN="${GITHUB_REPOSITORY#*/}"
+          else
+            BASE_DOMAIN="dev.${CLOUDFLARE_PAGES_PROJECT}.pages.dev"
+          fi
 
-          # echo "BASE_DOMAIN=${BASE_DOMAIN}" | tee -a "${GITHUB_ENV}"
-          # sed -i "s@^url: \"https://ruzickap.github.io\"@url: \"https://${BASE_DOMAIN}\"@" _config.yml
+          sed -i "s@^url:.*@url: \"https://${BASE_DOMAIN}\"@" _config.yml
           sed -i "/cloudflare:/{n;s@id:.*@id: ${CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN}@}" _config.yml
           mkdir public
 
@@ -81,22 +95,6 @@ jobs:
           bundle exec htmlproofer public \
             --disable-external \
             --ignore-urls "/127.0.0.1/,/0.0.0.0/,/localhost/,/.local/"
-
-      - name: 📦 Restore link checker cache
-        id: restore-cache
-        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
-        with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-
-      - name: 🔗 Check for broken links
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
-        with:
-          args: --root-dir "${PWD}/public" --no-progress public
-          fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
 
       - name: Publish to GitHub Pages
         uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0

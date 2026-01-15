@@ -102,224 +102,224 @@ use 64 live CDs (amd64).
 
 Save following text as 3 files:
 
-- /mnt/sdb1/boot/grub/grub.cfg
+- `/mnt/sdb1/boot/grub/grub.cfg`:
 
-```text
-insmod vbeinfo
-insmod font
+  ```bash
+  insmod vbeinfo
+  insmod font
 
-if loadfont /boot/grub/unifont.pf2 ; then
-  set gfxmode="1024x768x32,800x600x32,640x480x32,1024x768,800x600,640x480"
-#  set gfxpayload=keep
-  insmod gfxterm
-#  insmod vbe
-  if terminal_output gfxterm; then true ; else
-     terminal gfxterm
+  if loadfont /boot/grub/unifont.pf2 ; then
+    set gfxmode="1024x768x32,800x600x32,640x480x32,1024x768,800x600,640x480"
+  #  set gfxpayload=keep
+    insmod gfxterm
+  #  insmod vbe
+    if terminal_output gfxterm; then true ; else
+       terminal gfxterm
+    fi
   fi
-fi
 
-insmod jpeg
-if background_image /boot/grub/linux.jpg ; then
-  set menu_color_normal=black/black
-  set color_highlight=red/blue
-else
-  set menu_color_normal=cyan/blue
-  set menu_color_highlight=white/blue
-fi
-
-set default=0
-set timeout=10
-
-# Uncomment for a different ISO files search path
-#set isofolder="/boot/isos"
-#export isofolder
-
-# Uncomment for a different live system language
-#set isolangcode="us"
-#export isolangcode
-
-source /boot/grub/listisos.lua
-```
-
-- /mnt/sdb1/boot/grub/bootiso.lua
-
-```lua
-#!lua
-
--- Detects the live system type and boots it
-function boot_iso (isofile, langcode)
-  -- grml
-  if (dir_exist ("(loop)/boot/grml64")) then
-    boot_linux (
-      "(loop)/boot/grml64/linux26",
-      "(loop)/boot/grml64/initrd.gz",
-      "findiso=" .. isofile .. " apm=power-off quiet boot=live nomce"
-    )
-  -- Parted Magic
-  elseif (dir_exist ("(loop)/pmagic")) then
-    boot_linux (
-      "(loop)/pmagic/bzImage",
-      "(loop)/pmagic/initramfs",
-      "iso_filename=" .. isofile ..
-        " edd=off noapic load_ramdisk=1 prompt_ramdisk=0 rw" ..
-        " sleep=10 loglevel=0 keymap=" .. langcode
-    )
-  -- Sidux
-  elseif (dir_exist ("(loop)/sidux")) then
-    boot_linux (
-      find_file ("(loop)/boot", "vmlinuz%-.*%-sidux%-.*"),
-      find_file ("(loop)/boot", "initrd%.img%-.*%-sidux%-.*"),
-      "fromiso=" .. isofile .. " boot=fll quiet"
-    )
-  -- Slax
-  elseif (dir_exist ("(loop)/slax")) then
-    boot_linux (
-      "(loop)/boot/vmlinuz",
-      "(loop)/boot/initrd.gz",
-      "from=" .. isofile .. " ramdisk_size=6666 root=/dev/ram0 rw"
-    )
-  -- SystemRescueCd
-  elseif (grub.file_exist ("(loop)/isolinux/rescue64")) then
-    boot_linux (
-      "(loop)/isolinux/rescue64",
-      "(loop)/isolinux/initram.igz",
-      "isoloop=" .. isofile .. " docache rootpass=xxxx setkmap=" .. langcode
-    )
-  -- Tinycore
-  elseif (grub.file_exist ("(loop)/boot/tinycore.gz")) then
-    boot_linux (
-      "(loop)/boot/bzImage",
-      "(loop)/boot/tinycore.gz"
-    )
-  -- Ubuntu and Casper based Distros
-  elseif (dir_exist ("(loop)/casper")) then
-    boot_linux (
-      "(loop)/casper/vmlinuz",
-      find_file ("(loop)/casper", "initrd%..z"),
-      "boot=casper iso-scan/filename=" .. isofile ..
-        " quiet splash noprompt" ..
-        " keyb=" .. langcode ..
-        " debian-installer/language=" .. langcode ..
-        " console-setup/layoutcode?=" .. langcode ..
-        " --"
-    )
-  -- Xpud
-  elseif (grub.file_exist ("(loop)/boot/xpud")) then
-    boot_linux (
-      "(loop)/boot/xpud",
-      "(loop)/opt/media"
-    )
+  insmod jpeg
+  if background_image /boot/grub/linux.jpg ; then
+    set menu_color_normal=black/black
+    set color_highlight=red/blue
   else
-    print_error ("Unsupported ISO type")
-  end
-end
+    set menu_color_normal=cyan/blue
+    set menu_color_highlight=white/blue
+  fi
 
--- Help function to show an error
-function print_error (msg)
-  print ("Error: " .. msg)
-  grub.run ("read")
-end
+  set default=0
+  set timeout=10
 
--- Help function to search for a file
-function find_file (folder, match)
-  local filename
+  # Uncomment for a different ISO files search path
+  #set isofolder="/boot/isos"
+  #export isofolder
 
-  local function enum_file (name)
-    if (filename == nil) then
-      filename = string.match (name, match)
+  # Uncomment for a different live system language
+  #set isolangcode="us"
+  #export isolangcode
+
+  source /boot/grub/listisos.lua
+  ```
+
+- `/mnt/sdb1/boot/grub/bootiso.lua`:
+
+  ```lua
+  #!lua
+
+  -- Detects the live system type and boots it
+  function boot_iso (isofile, langcode)
+    -- grml
+    if (dir_exist ("(loop)/boot/grml64")) then
+      boot_linux (
+        "(loop)/boot/grml64/linux26",
+        "(loop)/boot/grml64/initrd.gz",
+        "findiso=" .. isofile .. " apm=power-off quiet boot=live nomce"
+      )
+    -- Parted Magic
+    elseif (dir_exist ("(loop)/pmagic")) then
+      boot_linux (
+        "(loop)/pmagic/bzImage",
+        "(loop)/pmagic/initramfs",
+        "iso_filename=" .. isofile ..
+          " edd=off noapic load_ramdisk=1 prompt_ramdisk=0 rw" ..
+          " sleep=10 loglevel=0 keymap=" .. langcode
+      )
+    -- Sidux
+    elseif (dir_exist ("(loop)/sidux")) then
+      boot_linux (
+        find_file ("(loop)/boot", "vmlinuz%-.*%-sidux%-.*"),
+        find_file ("(loop)/boot", "initrd%.img%-.*%-sidux%-.*"),
+        "fromiso=" .. isofile .. " boot=fll quiet"
+      )
+    -- Slax
+    elseif (dir_exist ("(loop)/slax")) then
+      boot_linux (
+        "(loop)/boot/vmlinuz",
+        "(loop)/boot/initrd.gz",
+        "from=" .. isofile .. " ramdisk_size=6666 root=/dev/ram0 rw"
+      )
+    -- SystemRescueCd
+    elseif (grub.file_exist ("(loop)/isolinux/rescue64")) then
+      boot_linux (
+        "(loop)/isolinux/rescue64",
+        "(loop)/isolinux/initram.igz",
+        "isoloop=" .. isofile .. " docache rootpass=xxxx setkmap=" .. langcode
+      )
+    -- Tinycore
+    elseif (grub.file_exist ("(loop)/boot/tinycore.gz")) then
+      boot_linux (
+        "(loop)/boot/bzImage",
+        "(loop)/boot/tinycore.gz"
+      )
+    -- Ubuntu and Casper based Distros
+    elseif (dir_exist ("(loop)/casper")) then
+      boot_linux (
+        "(loop)/casper/vmlinuz",
+        find_file ("(loop)/casper", "initrd%..z"),
+        "boot=casper iso-scan/filename=" .. isofile ..
+          " quiet splash noprompt" ..
+          " keyb=" .. langcode ..
+          " debian-installer/language=" .. langcode ..
+          " console-setup/layoutcode?=" .. langcode ..
+          " --"
+      )
+    -- Xpud
+    elseif (grub.file_exist ("(loop)/boot/xpud")) then
+      boot_linux (
+        "(loop)/boot/xpud",
+        "(loop)/opt/media"
+      )
+    else
+      print_error ("Unsupported ISO type")
     end
   end
 
-  grub.enum_file (enum_file, folder)
-
-  if (filename) then
-    return folder .. "/" .. filename
-  else
-    return nil
+  -- Help function to show an error
+  function print_error (msg)
+    print ("Error: " .. msg)
+    grub.run ("read")
   end
-end
 
--- Help function to check if a directory exist
-function dir_exist (dir)
-  return (grub.run("test -d '" .. dir .. "'") == 0)
-end
+  -- Help function to search for a file
+  function find_file (folder, match)
+    local filename
 
--- Boots a Linux live system
-function boot_linux (linux, initrd, params)
-  if (linux and grub.file_exist (linux)) then
-    if (initrd and grub.file_exist (initrd)) then
-      if (params) then
-        grub.run ("linux " .. linux .. " " .. params)
-      else
-        grub.run ("linux " .. linux)
+    local function enum_file (name)
+      if (filename == nil) then
+        filename = string.match (name, match)
       end
-      grub.run ("initrd " .. initrd)
-    else
-      print_error ("Booting Linux failed: cannot find initrd file '" .. initrd .. "'")
     end
-  else
-    print_error ("Booting Linux failed: cannot find linux file '" .. initrd .. "'")
-  end
-end
 
--- Mounts the iso file
-function mount_iso (isofile)
-  local result = false
+    grub.enum_file (enum_file, folder)
 
-  if (isofile == nil) then
-    print_error ("variable 'isofile' is undefined")
-  elseif (not grub.file_exist (isofile)) then
-    print_error ("Cannot find isofile '" .. isofile .. "'")
-  else
-    local err_no, err_msg = grub.run ("loopback loop " .. isofile)
-    if (err_no ~= 0) then
-      print_error ("Cannot load ISO: " .. err_msg)
+    if (filename) then
+      return folder .. "/" .. filename
     else
-      result = true
+      return nil
     end
   end
 
-  return result
-end
-
--- Getting the environment parameters
-isofile = grub.getenv ("isofile")
-langcode = grub.getenv ("isolangcode")
-if (langcode == nil) then
-  langcode = "us"
-end
-
--- Mounting and booting the live system
-if (mount_iso (isofile)) then
-  boot_iso (isofile, langcode)
-end
-```
-
-- /mnt/sdb1/boot/grub/listisos.lua
-
-```lua
-#!lua
-
-isofolder = grub.getenv ("isofolder")
-if (isofolder == nil) then
-  isofolder = "/isos"
-end
-
-function enum_file (name)
-  local title = string.match (name, "(.*)%.[iI][sS][oO]")
-
-  if (title) then
-    local source = "set isofile=" .. isofolder .. "/" .. name ..
-      "\nsource /boot/grub/bootiso.lua"
-
-    grub.add_menu (source, title)
+  -- Help function to check if a directory exist
+  function dir_exist (dir)
+    return (grub.run("test -d '" .. dir .. "'") == 0)
   end
-end
 
-grub.enum_file (enum_file, isofolder)
-```
+  -- Boots a Linux live system
+  function boot_linux (linux, initrd, params)
+    if (linux and grub.file_exist (linux)) then
+      if (initrd and grub.file_exist (initrd)) then
+        if (params) then
+          grub.run ("linux " .. linux .. " " .. params)
+        else
+          grub.run ("linux " .. linux)
+        end
+        grub.run ("initrd " .. initrd)
+      else
+        print_error ("Booting Linux failed: cannot find initrd file '" .. initrd .. "'")
+      end
+    else
+      print_error ("Booting Linux failed: cannot find linux file '" .. initrd .. "'")
+    end
+  end
 
-**UPDATE**
+  -- Mounts the iso file
+  function mount_iso (isofile)
+    local result = false
+
+    if (isofile == nil) then
+      print_error ("variable 'isofile' is undefined")
+    elseif (not grub.file_exist (isofile)) then
+      print_error ("Cannot find isofile '" .. isofile .. "'")
+    else
+      local err_no, err_msg = grub.run ("loopback loop " .. isofile)
+      if (err_no ~= 0) then
+        print_error ("Cannot load ISO: " .. err_msg)
+      else
+        result = true
+      end
+    end
+
+    return result
+  end
+
+  -- Getting the environment parameters
+  isofile = grub.getenv ("isofile")
+  langcode = grub.getenv ("isolangcode")
+  if (langcode == nil) then
+    langcode = "us"
+  end
+
+  -- Mounting and booting the live system
+  if (mount_iso (isofile)) then
+    boot_iso (isofile, langcode)
+  end
+  ```
+
+- `/mnt/sdb1/boot/grub/listisos.lua`:
+
+  ```lua
+  #!lua
+
+  isofolder = grub.getenv ("isofolder")
+  if (isofolder == nil) then
+    isofolder = "/isos"
+  end
+
+  function enum_file (name)
+    local title = string.match (name, "(.*)%.[iI][sS][oO]")
+
+    if (title) then
+      local source = "set isofile=" .. isofolder .. "/" .. name ..
+        "\nsource /boot/grub/bootiso.lua"
+
+      grub.add_menu (source, title)
+    end
+  end
+
+  grub.enum_file (enum_file, isofolder)
+  ```
+
+**UPDATE**:
 In the new grub versions I had to modify following lines (from "source" -> "lua"
 and one module name "vbeinfo" -> "vbe") otherwise it was not running correctly.
 Please look at these lines and change it in the scripts above:
