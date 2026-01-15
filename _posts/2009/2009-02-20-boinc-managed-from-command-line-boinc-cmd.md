@@ -6,11 +6,11 @@ categories: [Linux, Server]
 tags: [bash, BOINC]
 ---
 
-I installed [BOINC](http://boinc.berkeley.edu/) to my server to help the world
+I installed [BOINC](https://boinc.berkeley.edu/) to my server to help the world
 with scientific problems. It's really easy to install it from repositories of
 various distributions, but it's not so easy to configure it.
 
-Usually you can use [BOINC manager](http://en.wikipedia.org/wiki/Boinc) to
+Usually you can use [BOINC manager](https://en.wikipedia.org/wiki/Boinc) to
 configure BOINC. Unfortunately it is graphical application and it uses **port
 31416** to connect to local/remote BOINC installations.
 

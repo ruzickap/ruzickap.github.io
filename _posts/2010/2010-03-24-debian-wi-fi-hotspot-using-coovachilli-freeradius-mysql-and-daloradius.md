@@ -7,12 +7,12 @@ tags: [WiFi, hotspot, CoovaChilli, FreeRadius, MySQL, Apache]
 ---
 
 I decided to create a
-[hotspot](http://en.wikipedia.org/wiki/Hotspot_%28Wi-Fi%29) from my server to
+[hotspot](https://en.wikipedia.org/wiki/Hotspot_%28Wi-Fi%29) from my server to
 allow others to connect to the Internet for free. I used "[Captive
-portal](http://en.wikipedia.org/wiki/Captive_portal)" solution based on these
+portal](https://en.wikipedia.org/wiki/Captive_portal)" solution based on these
 applications:
 
-- [CoovaChilli](http://coova.org/CoovaChilli)
+- [CoovaChilli](https://coova.org/CoovaChilli)
 - [FreeRadius](http://freeradius.org/)
 - [MySQL](https://www.mysql.com/)
 - [daloRADIUS](http://daloradius.com/)

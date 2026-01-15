@@ -10,9 +10,9 @@ Like every UNIX server admin, I'm using many various text based configurations
 on my machines. It's important to track "every" change of these important files
 to prevent problems with service stability.
 
-I decided to set up [Subversion](http://subversion.apache.org/) server and store
+I decided to set up [Subversion](https://subversion.apache.org/) server and store
 all useful configurations from my Linux boxes there. For this purpose I wrote
-script [svnci](http://websvn.xvx.cz/wsvn-websvn.xvx.cz/projects/trunk/scripts/svnci/svnci)
+script [svnci](https://websvn.xvx.cz/wsvn-websvn.xvx.cz/projects/trunk/scripts/svnci/svnci)
 which is used to save/delete/update files from svn. You can of course save
 all necessary files to SVN by hand, but it's quicker to write a short parser
 for it.
@@ -137,10 +137,10 @@ The key's randomart image is:
 Now you should save $HOME/.ssh/id_rsa.pub to /home/svn/.ssh/authorized_keys
 like:
 
-```bash
+```text
 root@debian:/ echo "command=\"/usr/bin/svnserve -t -r /var/lib/svn-repos/system_configs \
---tunnel-user=`hostname`\",no-port-forwarding,no-pty,no-agent-forwarding,no-X11-forwarding \
-`cat $HOME/.ssh/id_rsa.pub`" >> /home/svn/.ssh/authorized_keys
+  --tunnel-user=`hostname`\",no-port-forwarding,no-pty,no-agent-forwarding,no-X11-forwarding \
+  `cat $HOME/.ssh/id_rsa.pub`" >> /home/svn/.ssh/authorized_keys
 ```
 
 I should do the same for my second host czbrn0208, but I have to first transfer
@@ -176,7 +176,7 @@ svn ci --message "Test" /root/configuration-debian/
 Now there should be first file in the repository.
 
 Now you can access your repository by [WebSVN](https://websvnphp.github.io/) using
-<http://my_server/websvn>.
+<https://my_server/websvn>.
 
 Everybody like screenshots so I put there some from my own SVN server:
 
@@ -186,7 +186,7 @@ Everybody like screenshots so I put there some from my own SVN server:
 
 Here is a link for my script which can help you to add/update/remove to
 svn repository without deep knowledge of it:
-[svnci](http://websvn.xvx.cz/wsvn-websvn.xvx.cz/projects/trunk/scripts/svnci/svnci).
+[svnci](https://websvn.xvx.cz/wsvn-websvn.xvx.cz/projects/trunk/scripts/svnci/svnci).
 
 I use it because it's faster and easy to remember than learn various svn
 commands combined with shell - so here are some examples:

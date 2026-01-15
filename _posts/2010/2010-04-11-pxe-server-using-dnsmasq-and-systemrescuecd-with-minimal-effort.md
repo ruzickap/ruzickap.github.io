@@ -208,7 +208,7 @@ dnsmasq-tftp: sent /home/ftp/pub/distributions/tftpboot/sysrcd.md5 to 192.168.0.
 dnsmasq-tftp: sent /home/ftp/pub/distributions/tftpboot/sysrcd.dat to 192.168.0.90
 ```
 
-To enable [NAT](http://en.wikipedia.org/wiki/Network_address_translation) + routing for the hosts run these commands:
+To enable [NAT](https://en.wikipedia.org/wiki/Network_address_translation) + routing for the hosts run these commands:
 
 ```bash
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
@@ -218,7 +218,7 @@ sysctl -p
 
 The SystemRescueCd guys did a great job. If you have similar PXE SystemRescueCd
 installation like I described above it's handy to put these lines into
-[GRUB2](http://en.wikipedia.org/wiki/GNU_GRUB) configuration to be able to boot
+[GRUB2](https://en.wikipedia.org/wiki/GNU_GRUB) configuration to be able to boot
 it when something goes wrong with the Linux box:
 
 ```lua

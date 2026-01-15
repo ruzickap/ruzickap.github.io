@@ -7,9 +7,9 @@ tags: [bash, perl, Apache, Cobbler, PXE, yum, serial]
 ---
 
 Look at small how-to install [cobbler](https://fedorahosted.org/cobbler/)
-with yum on [RHEL 4.6](http://www.redhat.com/rhel/) from scratch.
+with yum on [RHEL 4.6](https://www.redhat.com/rhel/) from scratch.
 
-Install RHEL 4.6 or [CentOS](http://www.centos.org/) 4.6 with default
+Install RHEL 4.6 or [CentOS](https://www.centos.org/) 4.6 with default
 partitioning and custom installation (unselect all possible packages during
 installation procedure). Disable firewall and SELinux.
 

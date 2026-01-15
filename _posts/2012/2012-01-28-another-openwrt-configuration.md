@@ -18,7 +18,7 @@ to have some stats on the USB stick and simple html pages as well.
 <!-- rumdl-disable MD013 -->
 After flashing the original firmware with [openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin](https://downloads.openwrt.org/backfire/10.03.1/ar71xx/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin)
 I installed the kernel related packages and
-[extroot](http://wiki.openwrt.org/doc/howto/extroot):
+[extroot](https://wiki.openwrt.org/doc/howto/extroot):
 <!-- rumdl-enable MD013 -->
 
 (if you have OpenWRT already installed use: mtd -e firmware -r write

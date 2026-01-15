@@ -22,7 +22,7 @@ unzip r4-desire-root.zip
 ```
 
 - If you are using 64 bit version of Debian, please install ia32-libs
-  first, because [adb](http://developer.android.com/guide/developing/tools/adb.html)
+  first, because [adb](https://developer.android.com/guide/developing/tools/adb.html)
   binary is 32 bit.
 
 ```bash
@@ -41,7 +41,7 @@ root@czbrn0208:/var/tmp/android$ ./adb-linux shell cat /sys/class/mmc_host/mmc1/
 
 - Put the output string to the following page:
 
-[http://hexrev.soaa.me/](http://hexrev.soaa.me/)
+[https://hexrev.soaa.me/](https://hexrev.soaa.me/)
 
 - You get another number (00a10004daba01804734305553445303) which you need
   to put to a GoldCard generator form together with your email address.

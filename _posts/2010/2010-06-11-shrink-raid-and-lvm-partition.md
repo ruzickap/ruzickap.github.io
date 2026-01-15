@@ -6,7 +6,7 @@ categories: [Linux, Storage]
 tags: [RAID, LVM, mdadm, ext4]
 ---
 
-I'm using [RAID1](http://en.wikipedia.org/wiki/RAID#RAID_1) in my servers. The
+I'm using [RAID1](https://en.wikipedia.org/wiki/RAID#RAID_1) in my servers. The
 disks I used are always the same size and the same type from one company.
 
 In one old server I had Maxtor disks, where one of the 20G disk failed. Because
@@ -20,7 +20,7 @@ The only way how to restore RAID1 was shrinking ext4, lvm, raid and then copy
 the disk layout to smaller disk.
 
 I have never done this before so I rather tried it in
-[VirtualBox](http://en.wikipedia.org/wiki/VirtualBox) than on a live system and
+[VirtualBox](https://en.wikipedia.org/wiki/VirtualBox) than on a live system and
 wrote a few notes about it.
 
 Let's have Debian installed on 2 10Gb disks, which using RAID1 with LVM in
@@ -90,7 +90,7 @@ total                 10578360    806616   9247668   9%
 ```
 
 You can see there is 4G free on /home partition. Download and boot
-[SystemRescueCD](http://www.sysresccd.org/) and shrink ext4 first.
+[SystemRescueCD](https://www.sysresccd.org/) and shrink ext4 first.
 
 ```bash
 e2fsck -f /dev/mapper/VG-home

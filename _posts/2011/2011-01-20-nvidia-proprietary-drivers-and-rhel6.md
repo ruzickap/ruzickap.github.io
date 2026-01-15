@@ -45,7 +45,7 @@ Stop the X server and run the Nvidia installation process from command line
 ```bash
 init 3
 chmod +x NVIDIA-Linux-x86-260.19.29.run
- ./NVIDIA-Linux-x86-260.19.29.run
+./NVIDIA-Linux-x86-260.19.29.run
 ```
 
 Enjoy :-)

@@ -6,8 +6,8 @@ categories: [Linux, Storage]
 tags: [RAID, SMART, mdadm, GRUB]
 ---
 
-One day I checked [dmesg](http://en.wikipedia.org/wiki/Dmesg) from one of
-my servers and I saw [I/O](http://en.wikipedia.org/wiki/I/O) errors :-(
+One day I checked [dmesg](https://en.wikipedia.org/wiki/Dmesg) from one of
+my servers and I saw [I/O](https://en.wikipedia.org/wiki/I/O) errors :-(
 
 ```bash
 gate:~ dmesg
@@ -20,7 +20,7 @@ gate:~ dmesg
 ```
 
 Lucky for me there are two disks in
-[RAID 1](http://en.wikipedia.org/wiki/Raid_1#RAID_1) so my data was not lost.
+[RAID 1](https://en.wikipedia.org/wiki/Raid_1#RAID_1) so my data was not lost.
 The machine is "just" a firewall, so I decided to play a little bit with the
 bad hard disk, because there are no important data on it. Usually if you see
 errors like I mentioned above you replace disk without any questions, but I
@@ -31,7 +31,7 @@ such case.
 ## S.M.A.R.T checks
 
 The drives are pretty old, so it's better to check if they support
-[S.M.A.R.T.](http://en.wikipedia.org/wiki/S.M.A.R.T.) and if it's enabled:
+[S.M.A.R.T.](https://en.wikipedia.org/wiki/S.M.A.R.T.) and if it's enabled:
 
 ```bash
 gate:~ smartctl -i /dev/hda | grep 'SMART support'
@@ -236,7 +236,7 @@ gate:~ cat /tmp/bad_blocks
 10533408
 ```
 
-[badblocks](http://en.wikipedia.org/wiki/Badblocks) and S.M.A.R.T show errors so
+[badblocks](https://en.wikipedia.org/wiki/Badblocks) and S.M.A.R.T show errors so
 it's pretty clear, that that disk needs to be replaced asap.
 The commands I used before tested disk from "hardware" level. Because there is a
 RAID 1 in place it was nice opportunity to see what was happening on "software"
