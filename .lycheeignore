@@ -6,11 +6,13 @@ cdn\.com
 ftp\.xvx\.cz
 github\.com/ruzickap
 helm\.sh
+hexrev\.soaa\.me
 https://(grafana|oauth2-proxy|ollama-vulnerable|open-webui|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
 kubernetes-sigs\.github\.io/aws-ebs-csi-driver
 kubernetes\.io
 mylabs\.dev
+smartmontools\.sourceforge\.net
 stefanprodan\.github\.io
 username\.github\.io/
 velero\.io
