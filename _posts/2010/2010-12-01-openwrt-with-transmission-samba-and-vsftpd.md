@@ -14,8 +14,8 @@ protocols.
 I have good experience with [OpenWrt](https://openwrt.org/), which is really
 good in customization and suits well for this purpose. Nowadays there are
 a few torrent clients in OpenWrt distribution, but I chose
-[transmission](http://www.transmissionbt.com/) and for ftp daemon
-[vsftpd](http://vsftpd.beasts.org/).
+[transmission](https://transmissionbt.com/) and for ftp daemon
+[vsftpd](https://security.appspot.com/vsftpd.html).
 
 I decided to compile it from scratch (using Fedora 13), because I'm able to
 include all necessary software in the image (since it's compressed). If I

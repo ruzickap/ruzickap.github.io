@@ -16,7 +16,7 @@ It's **OUTDATED** and **INCOMPLETE**, but it can still bring some light...
 Few days ago I bought WiFi router TP-Link TL-WR1043ND.
 The main reason was the USB, Gigabit Ethernet ports, 802.11n and
 [support](https://dev.openwrt.org/milestone/Backfire%2010.03) in latest
-[OpenWrt](http://openwrt.org/).
+[OpenWrt](https://openwrt.org/).
 
 OpenWrt is amazing project which can create really powerful device from the wifi
 routers.
@@ -28,7 +28,7 @@ thermometers.
 I decided to compile it from scratch (using Fedora 13), because squashfs can't
 work with block-extroot without building an image (see
 [https://forum.openwrt.org/viewtopic.php?pid=108642](https://forum.openwrt.org/viewtopic.php?pid=108642)).
-I prefer to use [squashfs](http://squashfs.sourceforge.net/), because some
+I prefer to use [squashfs](https://squashfs.sourceforge.net/), because some
 people say it's better than jffs2.
 
 Here you can find my notes...
@@ -113,7 +113,7 @@ sysupgrade openwrt-ar71xx-tl-wr1043nd-v1-squashfs-sysupgrade.bin
 ```
 
 Set your password using telnet command and setup up block-extroot ([Rootfs on
-External Storage](http://wiki.openwrt.org/doc/howto/extroot)) - use my USB stick
+External Storage](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration)) - use my USB stick
 as root partition to have more space:
 
 ```bash

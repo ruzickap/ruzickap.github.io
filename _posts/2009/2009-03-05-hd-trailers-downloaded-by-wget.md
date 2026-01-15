@@ -6,7 +6,7 @@ categories: [Linux, Scripting]
 tags: [bash, wget]
 ---
 
-I found nice page [hd-trailers.net](http://www.hd-trailers.net/) accessing
+I found nice page [hd-trailers.net](https://www.hd-trailers.net/) accessing
 HD trailers from Yahoo or [Apple](http://www.apple.com/trailers/) through
 downloadable [mov](http://en.wikipedia.org/wiki/.mov) files. It's quite
 useful to have mov files instead of using flash player especially if you

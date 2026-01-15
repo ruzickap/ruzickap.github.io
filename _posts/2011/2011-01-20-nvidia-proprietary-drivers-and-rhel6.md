@@ -6,9 +6,9 @@ categories: [Linux, RHEL]
 tags: [Nvidia, GRUB, drivers, yum]
 ---
 
-Sometimes you need to run [Nvidia](http://www.nvidia.com/) proprietary drivers
+Sometimes you need to run [Nvidia](https://www.nvidia.com/) proprietary drivers
 in various linux distributions.
-I was able to run it on standard [RHEL](http://www.redhat.com) 6.0 installed as
+I was able to run it on standard [RHEL](https://www.redhat.com/) 6.0 installed as
 "Desktop" with the following commands:
 
 Update the system and install the necessary packages
@@ -19,7 +19,7 @@ yum install gcc kernel-devel
 reboot
 ```
 
-Blacklist the [nouveau](http://nouveau.freedesktop.org) driver
+Blacklist the [nouveau](https://nouveau.freedesktop.org/) driver
 
 ```bash
 sed -i '/root=/s|$| rdblacklist=nouveau vga=791|' /boot/grub/grub.conf

@@ -165,14 +165,14 @@ on most of the other pages).
 -> the reason is, because the structure of the sqlite db changed between CM
 versions and that's the reason why simple copy of the .db files is not working.
 
-xxx (nejede) Restore SMS data:
+Restore SMS data:
 
 ```bash
 adb push $MY_BACKUP_PATH/sms /sdcard/
 adb shell sqlite3 /data/data/com.android.providers.telephony/databases/mmssms.db '.import /sdcard/sms sms'
 ```
 
-xxx (nejede) Restore browser settings:
+Restore browser settings:
 
 ```bash
 adb push $MY_BACKUP_PATH/bookmarks /sdcard/

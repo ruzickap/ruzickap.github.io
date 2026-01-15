@@ -12,11 +12,11 @@ in KDE.
 
 This software is storing all thumbnails in `~/.thumbnails/` according to the
 [thumbnail spec](https://specifications.freedesktop.org/thumbnail-spec/thumbnail-spec-latest.html)
-and creates a [sqlite](http://www.sqlite.org/) database where it stores all
+and creates a [sqlite](https://www.sqlite.org/) database where it stores all
 information about photos.
 
 - The advantage is, that these thumbnails can be also used by other KDE
-  viewers (like [Gwenview](http://gwenview.sourceforge.net/)).
+  viewers (like [Gwenview](https://apps.kde.org/gwenview/)).
 - The disadvantage can be that other viewers can generate new thumbnails
   which are no longer useful and the size of that directory can grow...
 
@@ -29,11 +29,7 @@ Here is my digiKam collection configuration:
 
 ![digiKam Configuration](/assets/img/posts/2009/2009-03-22-digikam-thumbnails-and-albums-with-photos-stored-on-remote-shares/digikam-configure.avif)
 
-This script deletes all thumbnails of the photos in
-
-```bash
-$HOME/.thumbnails/large/
-```
+This script deletes all thumbnails of the photos in `$HOME/.thumbnails/large/`
 
  which are **not** on network shares :
 
@@ -41,6 +37,6 @@ $HOME/.thumbnails/large/
 ages to create because of network or which are not changing, and delete all
 locally ones)
 
-[thumbnails_delete.pl](http://websvn.xvx.cz/wsvn/projects/trunk/scripts/thumbnails_delete/thumbnails_delete.pl)
+[thumbnails_delete.pl](https://websvn.xvx.cz/wsvn/projects/trunk/scripts/thumbnails_delete/thumbnails_delete.pl)
 
 Maybe you can find it helpful...

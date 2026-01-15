@@ -192,10 +192,10 @@ freeradius -X
 
 Few links we created:
 
-- <http://192.168.10.1/signup-free/> - sign up page (if you don't have username/password)
-- <http://192.168.10.1:3990/prelogin> - use for login to your portal
-- <http://192.168.10.1/daloradius/> - daloradius admin page
-- <http://192.168.10.1/phpmyadmin/> - phpmyadmin page (useful for sql database)
+- `http://192.168.10.1/signup-free/` - sign up page (if you don't have username/password)
+- `http://192.168.10.1:3990/prelogin` - use for login to your portal
+- `http://192.168.10.1/daloradius/` - daloradius admin page
+- `http://192.168.10.1/phpmyadmin/` - phpmyadmin page (useful for sql database)
 
 This how-to describes a simple configuration of CoovaChilli so there are many
 things to configure. I didn't mention anything about security - so it's up to

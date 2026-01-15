@@ -19,10 +19,10 @@ because there is nice how-to on their pages:
 [Full Update Guide - HTC Desire](http://wiki.cyanogenmod.com/index.php?title=Full_Update_Guide_-_HTC_Desire)
 
 Just one remark - If you suffer with signal lost please look at
-[this page](http://forum.cyanogenmod.com/topic/5437-signal-drops-after-rc2-final/).
+[this page](https://web.archive.org/web/2012/http://forum.cyanogenmod.com/topic/5437-signal-drops-after-rc2-final/).
 
 Put ssh keys to the phone and start dropbear (SSH server):
-(taken from [http://wiki.cyanogenmod.com/index.php?title=Howto:_Connect_to_Device_with_SSH](http://wiki.cyanogenmod.com/index.php?title=Howto:_Connect_to_Device_with_SSH))
+(taken from [CyanogenMod Wiki - Connect with SSH](https://web.archive.org/web/2016/http://wiki.cyanogenmod.org/w/Doc:_sshd))
 
 Copy your ssh public key from your linux box to the phone:
 
@@ -51,7 +51,7 @@ dropbear
 ```
 
 Remove some useless applications:
-(check this page [http://wiki.cyanogenmod.com/index.php?title=Barebones](http://wiki.cyanogenmod.com/index.php?title=Barebones) to see what can be removed)
+(check this page [CyanogenMod Wiki - Barebones](https://web.archive.org/web/2016/http://wiki.cyanogenmod.org/w/Barebones) to see what can be removed)
 
 Reboot to "ClockworkMod recovery" (using Fake Flash by Koush).
 
