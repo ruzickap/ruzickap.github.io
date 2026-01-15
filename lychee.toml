@@ -1,6 +1,9 @@
 # Configuration for lychee link checker
 # https://github.com/lycheeverse/lychee/blob/master/lychee.example.toml
 
+# Resolve root-relative links in local files
+root_dir = "."
+
 #############################  Cache  ###############################
 
 # Enable link caching to avoid checking the same links on multiple runs
