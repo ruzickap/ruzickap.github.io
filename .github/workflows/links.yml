@@ -38,7 +38,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
         with:
-          args: --include-verbatim --no-progress ${{ steps.pages.outputs.base_url }} --root-dir "${PWD}"
+          args: --include-verbatim --no-progress ${{ steps.pages.outputs.base_url }}
 
       - name: Save lychee cache
         uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
