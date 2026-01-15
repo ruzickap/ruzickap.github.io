@@ -11,7 +11,7 @@ TL-WR1043ND.
 He wants to use it for downloading torrents and sharing them using smb and ftp
 protocols.
 
-I have good experience with [OpenWrt](http://openwrt.org/), which is really
+I have good experience with [OpenWrt](https://openwrt.org/), which is really
 good in customization and suits well for this purpose. Nowadays there are
 a few torrent clients in OpenWrt distribution, but I chose
 [transmission](http://www.transmissionbt.com/) and for ftp daemon
@@ -61,7 +61,7 @@ make menuconfig
 
 Now you should select what you want to have in the final firmware image. I just
 selected what I installed from the feeds above (my
-[.config](http://ftp.xvx.cz/pub/distributions/openwrt/bracha/.config)):
+[.config](https://ftp.xvx.cz/pub/distributions/openwrt/bracha/.config)):
 
 Then run
 
@@ -72,10 +72,7 @@ make V=99
 ... and take a coffee :-)
 
 Connect router to your desktop/laptop and flash it form the webgui using
-this file: `/var/tmp/backfire/bin/ar71xx/`
-<!-- rumdl-disable MD013 -->
-[openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin](http://ftp.xvx.cz/pub/distributions/openwrt/bracha/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin)
-<!-- rumdl-enable MD013 -->
+this file: [openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin](https://ftp.xvx.cz/pub/distributions/openwrt/bracha/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin)
 
 If you already have OpenWrt installed you can replace it by this command:
 

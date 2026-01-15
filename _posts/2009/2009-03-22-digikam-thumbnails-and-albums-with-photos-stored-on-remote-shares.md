@@ -7,11 +7,11 @@ tags: [bash, digiKam, KDE]
 ---
 
 My photo collection is stored on the server and accessed by cifs protocol to my
-notebooks. I'm using [digiKam](http://www.digikam.org/) to browse my collection
+notebooks. I'm using [digiKam](https://www.digikam.org/) to browse my collection
 in KDE.
 
 This software is storing all thumbnails in `~/.thumbnails/` according to the
-[thumbnail spec](http://specifications.freedesktop.org/thumbnail-spec/thumbnail-spec-latest.html)
+[thumbnail spec](https://specifications.freedesktop.org/thumbnail-spec/thumbnail-spec-latest.html)
 and creates a [sqlite](http://www.sqlite.org/) database where it stores all
 information about photos.
 

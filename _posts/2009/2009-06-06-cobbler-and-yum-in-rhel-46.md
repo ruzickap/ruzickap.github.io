@@ -31,7 +31,7 @@ mount /media/cdrom
 ```bash
 mkdir /var/tmp/cobbler-4.6
 cd /var/tmp/cobbler-4.6
-<pre><code class="bash">rpm -i
+rpm -i
 ./python-elementtree-1.2.6-5.el4.centos.x86_64.rpm \
 ./python-urlgrabber-2.9.8-2.noarch.rpm ./sqlite-3.3.6-2.x86_64.rpm \
 ./python-sqlite-1.1.7-1.2.1.x86_64.rpm \
@@ -39,7 +39,8 @@ cd /var/tmp/cobbler-4.6
 ./centos-yumconf-4-4.5.noarch.rpm \
 ./yum-2.4.3-4.el4.centos.noarch.rpm \
 ./createrepo-0.4.4-2.noarch.rpm
-<pre><code class="bash">yum clean all
+
+yum clean all
 mkdir /var/tmp/rhel4_repo/
 ln -s /media/cdrom/RedHat/RPMS/ /var/tmp/rhel4_repo/RPMS
 createrepo /var/tmp/rhel4_repo/

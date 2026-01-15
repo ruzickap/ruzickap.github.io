@@ -449,11 +449,11 @@ logread
 
 Useful links:
 
-[http://josefsson.org/openwrt/](http://josefsson.org/openwrt/)
+[https://josefsson.org/openwrt/](https://josefsson.org/openwrt/)
 
 Serial Port Temperature Sensors:
-[http://www.linuxfocus.org/English/November2003/article315.shtml](http://www.linuxfocus.org/English/November2003/article315.shtml)
-[http://martybugs.net/electronics/tempsensor/hardware.cgi](http://martybugs.net/electronics/tempsensor/hardware.cgi)
+[https://web.archive.org/web/2020/http://www.linuxfocus.org/English/November2003/article315.shtml](https://web.archive.org/web/2020/http://www.linuxfocus.org/English/November2003/article315.shtml)
+[https://martybugs.net/electronics/tempsensor/hardware.cgi](https://martybugs.net/electronics/tempsensor/hardware.cgi)
 
 Serial cable:
-[http://halfface.se/wiki/index.php/Openwrt](http://halfface.se/wiki/index.php/Openwrt)
+[https://halfface.se/wiki/index.php/Openwrt](https://halfface.se/wiki/index.php/Openwrt)

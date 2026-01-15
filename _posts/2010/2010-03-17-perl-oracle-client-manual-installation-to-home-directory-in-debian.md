@@ -8,7 +8,7 @@ tags: [perl, Oracle, database]
 
 I need to connect to the Oracle database in my work to get some data from it.
 I'm not the Oracle expert, but I decided to use
-[DBD::Oracle](http://search.cpan.org/~pythian/DBD-Oracle/).
+[DBD::Oracle](https://metacpan.org/pod/DBD::Oracle).
 
 Most of the manuals and how-to pages describe, how to install client libraries
 to system (usually as root), which was not my case.
@@ -33,7 +33,7 @@ wget basiclite-11.1.0.7.0-linux-x86_64.zip sqlplus-11.1.0.7.0-linux-x86_64.zip s
 unzip *.zip
 ```
 
-Install [DBD::Oracle](http://search.cpan.org/~pythian/DBD-Oracle/):
+Install [DBD::Oracle](https://metacpan.org/pod/DBD::Oracle):
 
 ```bash
 wget http://search.cpan.org/CPAN/authors/id/P/PY/PYTHIAN/DBD-Oracle-1.24a.tar.gz

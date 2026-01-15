@@ -13,9 +13,9 @@ portal](https://en.wikipedia.org/wiki/Captive_portal)" solution based on these
 applications:
 
 - [CoovaChilli](https://coova.org/CoovaChilli)
-- [FreeRadius](http://freeradius.org/)
+- [FreeRadius](https://freeradius.org/)
 - [MySQL](https://www.mysql.com/)
-- [daloRADIUS](http://daloradius.com/)
+- [daloRADIUS](https://daloradius.com/)
 
 When somebody wants to connect to Internet using my wifi, the first page he can
 see is the register/login page (whatever page he wants to visit).
