@@ -70,7 +70,7 @@ debian = rw
 EOF
 ```
 
-svnserve.conf
+`svnserve.conf`:
 
 ```bash
 cat >> /var/lib/svn-repos/system_configs/conf/svnserve.conf << EOF
@@ -85,7 +85,7 @@ to SVN:
 
 ```bash
 mkdir -p /tmp/repo/debian /tmp/repo/czbrn0208
-svn import /tmp/repo file:///var/lib/svn-repos/system_configs -m "Initial import (`date +\"%F %T\"`)"
+svn import /tmp/repo file:///var/lib/svn-repos/system_configs -m "Initial import ($(date +"%F %T"))"
 rm -rf /tmp/repo
 ```
 
@@ -98,7 +98,7 @@ chown -R svn:svn /var/lib/svn-repos
 
 You should check your SVN directory structure and it should look like:
 
-```bash
+```text
 root@debian:/ svnlook tree /var/lib/svn-repos/system_configs
 /
  debian/
@@ -109,7 +109,7 @@ Now you need to add public keys to: /home/svn/.ssh/authorized_keys to allow
 access from hosts to SVN server using svn+ssh.
 I include here also ssh key generation:
 
-```bash
+```text
 root@debian:/ ssh-keygen
 Generating public/private rsa key pair.
 Enter file in which to save the key (/root/.ssh/id_rsa):
@@ -146,7 +146,7 @@ root@debian:/ echo "command=\"/usr/bin/svnserve -t -r /var/lib/svn-repos/system_
 I should do the same for my second host czbrn0208, but I have to first transfer
 its public key to the server and then run a similar command:
 
-```bash
+```text
 root@debian:/ echo "command=\"/usr/bin/svnserve -t -r /var/lib/svn-repos/system_configs \
 --tunnel-user=czbrn0208\",no-port-forwarding,no-pty,no-agent-forwarding,no-X11-forwarding \
 `ssh root@czbrn0208 "cat /root/.ssh/id_rsa.pub"`" >> /home/svn/.ssh/authorized_keys
@@ -158,7 +158,7 @@ root@debian:/
 
 Now you should be able to access SVN from the hosts:
 
-```bash
+```text
 root@debian:/ mkdir /root/configuration-`hostname`
 root@debian:/ svn co svn+ssh://svn@debian.xvx.cz/`hostname` /root/configuration-`hostname`
 root@czbrn0208:~ mkdir /root/configuration-`hostname`
@@ -168,7 +168,7 @@ root@czbrn0208:~ svn co svn+ssh://svn@debian.xvx.cz/`hostname` /root/configurati
 Now your repositories are ready to import first files/directories:
 
 ```bash
-cp /etc/rc.local /root/configuration-`hostname`/
+cp /etc/rc.local "/root/configuration-$(hostname)/"
 svn add /root/configuration-debian/rc.local
 svn ci --message "Test" /root/configuration-debian/
 ```
@@ -193,7 +193,7 @@ commands combined with shell - so here are some examples:
 
 Add files to repository:
 
-```bash
+```text
 gate:/etc/freeradius# svnci sql.conf
 `/etc/freeradius/sql.conf' -> `/root/configuration-gate/etc/freeradius/sql.conf'
 
@@ -220,7 +220,7 @@ Initial: /etc/freeradius/sites-available/default
 
 Add directory to repository:
 
-```bash
+```text
 gate:/etc# ls -ld cron.monthly
 drwxr-xr-x 2 root root 4096 2010-02-25 17:02 cron.monthly
 
@@ -246,7 +246,7 @@ Initial: /etc/cron.monthly/
 
 Removing file(s):
 
-```bash
+```text
 gate:/etc# cd cron.monthly
 gate:/etc/cron.monthly# svnci -r debsums standard
 Removing /etc/cron.monthly/debsums from repository: D         /root/configuration-gate/etc/cron.monthly/debsums
@@ -262,7 +262,7 @@ For updating files included in your repository you can use "svnci -u" command.
 It's also handy to run it every night by cron to automatically track changes in
 your "monitored" files:
 
-```bash
+```text
 gate:/etc# svnci -u
 Sending        configuration-gate/etc/apache2/httpd.conf
 Sending        configuration-gate/etc/apache2/sites-available/default-ssl

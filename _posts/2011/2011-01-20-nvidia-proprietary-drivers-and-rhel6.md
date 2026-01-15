@@ -29,8 +29,8 @@ echo "blacklist nouveau" >> /etc/modprobe.d/blacklist.conf
 Change the initrd image:
 
 ```bash
-mv /boot/initramfs-$(uname -r).img /boot/initramfs-$(uname  -r)-nouveau.img
-dracut /boot/initramfs-$(uname -r).img $(uname -r)
+mv "/boot/initramfs-$(uname -r).img" "/boot/initramfs-$(uname -r)-nouveau.img"
+dracut "/boot/initramfs-$(uname -r).img" "$(uname -r)"
 ```
 
 Remove the nouveau driver and reboot:
