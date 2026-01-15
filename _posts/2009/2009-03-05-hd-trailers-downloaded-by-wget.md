@@ -1,0 +1,30 @@
+---
+title: HD Trailers downloaded by wget
+author: Petr Ruzicka
+date: 2009-03-05
+categories: [Linux, Scripting]
+tags: [bash, wget]
+---
+
+I found nice page [hd-trailers.net](http://www.hd-trailers.net/) accessing
+HD trailers from Yahoo or [Apple](http://www.apple.com/trailers/) through
+downloadable [mov](http://en.wikipedia.org/wiki/.mov) files. It's quite
+useful to have mov files instead of using flash player especially if you
+have slower Internet connection.
+
+Here is short [wget](http://www.gnu.org/software/wget/) command which download
+mov files from Apple site into directories:
+
+```bash
+#!/bin/bash
+
+#480, 720, 1080
+RESOLUTION=480
+
+wget --recursive --level=2  --accept *${RESOLUTION}p.mov \
+--span-hosts --domains=movies.apple.com,www.hd-trailers.net \
+--no-host-directories --cut-dirs=2 --exclude-directories=/blog \
+http://www.hd-trailers.net/
+```
+
+Enjoy ;-)
