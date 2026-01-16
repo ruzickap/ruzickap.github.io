@@ -8,8 +8,8 @@ tags: [WiFi, hotspot, CoovaChilli, FreeRadius, MySQL, Apache]
 
 I decided to create a
 [hotspot](https://en.wikipedia.org/wiki/Hotspot_%28Wi-Fi%29) from my server to
-allow others to connect to the Internet for free. I used "[Captive
-portal](https://en.wikipedia.org/wiki/Captive_portal)" solution based on these
+allow others to connect to the Internet for free. I used [Captive
+portal](https://en.wikipedia.org/wiki/Captive_portal) solution based on these
 applications:
 
 - [CoovaChilli](https://coova.org/CoovaChilli)
@@ -128,8 +128,8 @@ $configValues['CONFIG_SIGNUP_SUCCESS_MSG_LOGIN_LINK'] = "Click <b>here</b>".
                                         " to return to the Login page and start your surfing";
 ```
 
-Change lines in `/var/www/signup*/index.php` to (changed 'User-Password' ->
-'Cleartext-Password' and '==' -> ':='):
+Change lines in `/var/www/signup*/index.php` to (changed `User-Password` ->
+`Cleartext-Password` and `==` -> `:=`):
 
 ```php
 $sql = "INSERT INTO ".$configValues['CONFIG_DB_TBL_RADCHECK']." (id, Username, Attribute, op, Value) ".
