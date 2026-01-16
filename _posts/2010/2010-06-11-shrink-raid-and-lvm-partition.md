@@ -96,7 +96,7 @@ You can see there is 4G free on `/home` partition. Download and boot
 [SystemRescueCD](https://www.sysresccd.org/) and shrink `ext4` first.
 
 ```console
-e2fsck -f /dev/mapper/VG-home
+root@sysresccd /root % e2fsck -f /dev/mapper/VG-home
 
 root@sysresccd /root % resize2fs /dev/mapper/VG-home 4G
 resize2fs 1.41.11 (14-Mar-2010)
