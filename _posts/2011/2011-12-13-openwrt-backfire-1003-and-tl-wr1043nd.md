@@ -42,14 +42,14 @@ yum install subversion gcc-c++ libz-dev flex unzip ncurses-devel zlib-devel
 Download OpenWrt Backfire from svn:
 
 ```bash
-cd /var/tmp/
+cd /var/tmp/ || exit
 svn co svn://svn.openwrt.org/openwrt/branches/backfire
 ```
 
 or use the standard way:
 
 ```bash
-cd /var/tmp/
+cd /var/tmp/ || exit
 wget http://downloads.openwrt.org/backfire/10.03/backfire_10.03_source.tar.bz2
 tar xvjf backfire_10.03_source.tar.bz2
 mv backfire_10.03 backfire
@@ -58,7 +58,7 @@ mv backfire_10.03 backfire
 Start configuring it:
 
 ```bash
-cd backfire/
+cd backfire/ || exit
 ./scripts/feeds update
 ./scripts/feeds install xxx
 make menuconfig
@@ -83,12 +83,12 @@ Utilities ---> disc ---> block-extroot
 and all the packages you installed before
 ```
 
-Run "make V=99" to compile it.
+Run `make V=99` to compile it.
 
 I'll put all the root files to the USB disk and I formatted my 500MB USB stick
 this way:
 
-```bash
+```console
 root@fedora:/# parted -s /dev/sda p
 Model: Generic STORAGE DEVICE (scsi)
 Disk /dev/sda: 492MB
@@ -101,9 +101,8 @@ Number Start End Size Type File system Flags
 ```
 
 Connect router to your desktop/laptop and flash it form the webgui using this
-file:
-/var/tmp/backfire/bin/ar71xx/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin
-or use these commands if you already have OpenWrt installed:
+file: `openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin` or use these commands
+if you already have OpenWrt installed:
 
 ```bash
 scp ./backfire/bin/ar71xx/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-sysupgrade.bin root@192.168.0.2:/tmp
@@ -112,9 +111,9 @@ sysupgrade openwrt-ar71xx-tl-wr1043nd-v1-squashfs-sysupgrade.bin
 #mtd -e firmware -r write /tmp/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-sysupgrade.bin firmware
 ```
 
-Set your password using telnet command and setup up block-extroot ([Rootfs on
-External Storage](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration)) - use my USB stick
-as root partition to have more space:
+Set your password using telnet command and setup up `block-extroot` ([Rootfs on
+External Storage](https://openwrt.org/docs/guide-user/additional-software/extroot_configuration))
+and use my USB stick as root partition to have more space:
 
 ```bash
 ifconfig eth0 192.168.1.2 netmask 255.255.255.0
@@ -446,10 +445,6 @@ cat /proc/net/vlan/config
 snmpwalk -v2c -c public_wifi 192.168.0.2
 logread
 ```
-
-Useful links:
-
-[https://josefsson.org/openwrt/](https://josefsson.org/openwrt/)
 
 Serial Port Temperature Sensors:
 [https://web.archive.org/web/2020/http://www.linuxfocus.org/English/November2003/article315.shtml](https://web.archive.org/web/2020/http://www.linuxfocus.org/English/November2003/article315.shtml)
