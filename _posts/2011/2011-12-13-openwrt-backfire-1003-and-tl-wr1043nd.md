@@ -139,8 +139,8 @@ uci set fstab.@swap[0].device=/dev/sda2
 uci set fstab.@swap[0].enabled=1
 ```
 
-Add option force_space in /etc/opkg.conf to allow installation of packets bigger
-than your /rom partitions free space:
+Add option `force_space` in `/etc/opkg.conf` to allow installation of packets
+bigger than your `/rom` partitions free space:
 
 ```bash
 echo option force_space >> /etc/opkg.conf

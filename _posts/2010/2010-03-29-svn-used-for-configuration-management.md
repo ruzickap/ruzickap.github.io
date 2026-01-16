@@ -56,8 +56,9 @@ svnadmin create --fs-type fsfs /var/lib/svn-repos/system_configs
 
 Now it's necessary to setup access rights for servers which will read/write
 configuration to your SVN server. In my example I will use servers with
-hostnames "debian" and "czbrn0208".
-authz
+hostnames `debian` and `czbrn0208`.
+
+`authz`:
 
 ```bash
 cat >> /var/lib/svn-repos/system_configs/conf/authz << EOF
@@ -89,7 +90,7 @@ svn import /tmp/repo file:///var/lib/svn-repos/system_configs -m "Initial import
 rm -rf /tmp/repo
 ```
 
-We should also change rights to "svn" user:
+We should also change rights to `svn` user:
 
 ```bash
 chmod -R g+w /var/lib/svn-repos/system_configs
@@ -98,18 +99,19 @@ chown -R svn:svn /var/lib/svn-repos
 
 You should check your SVN directory structure and it should look like:
 
-```text
+```console
 root@debian:/ svnlook tree /var/lib/svn-repos/system_configs
 /
  debian/
  czbrn0208/
 ```
 
-Now you need to add public keys to: /home/svn/.ssh/authorized_keys to allow
+Now you need to add public keys to: `/home/svn/.ssh/authorized_keys` to allow
 access from hosts to SVN server using svn+ssh.
+
 I include here also ssh key generation:
 
-```text
+```console
 root@debian:/ ssh-keygen
 Generating public/private rsa key pair.
 Enter file in which to save the key (/root/.ssh/id_rsa):
@@ -134,19 +136,19 @@ The key's randomart image is:
 +-----------------+
 ```
 
-Now you should save $HOME/.ssh/id_rsa.pub to /home/svn/.ssh/authorized_keys
+Now you should save `$HOME/.ssh/id_rsa.pub` to `/home/svn/.ssh/authorized_keys`
 like:
 
-```text
+```console
 root@debian:/ echo "command=\"/usr/bin/svnserve -t -r /var/lib/svn-repos/system_configs \
   --tunnel-user=`hostname`\",no-port-forwarding,no-pty,no-agent-forwarding,no-X11-forwarding \
   `cat $HOME/.ssh/id_rsa.pub`" >> /home/svn/.ssh/authorized_keys
 ```
 
-I should do the same for my second host czbrn0208, but I have to first transfer
-its public key to the server and then run a similar command:
+I should do the same for my second host `czbrn0208`, but I have to first
+transfer its public key to the server and then run a similar command:
 
-```text
+```console
 root@debian:/ echo "command=\"/usr/bin/svnserve -t -r /var/lib/svn-repos/system_configs \
 --tunnel-user=czbrn0208\",no-port-forwarding,no-pty,no-agent-forwarding,no-X11-forwarding \
 `ssh root@czbrn0208 "cat /root/.ssh/id_rsa.pub"`" >> /home/svn/.ssh/authorized_keys
@@ -158,7 +160,7 @@ root@debian:/
 
 Now you should be able to access SVN from the hosts:
 
-```text
+```console
 root@debian:/ mkdir /root/configuration-`hostname`
 root@debian:/ svn co svn+ssh://svn@debian.xvx.cz/`hostname` /root/configuration-`hostname`
 root@czbrn0208:~ mkdir /root/configuration-`hostname`
@@ -180,7 +182,9 @@ Now you can access your repository by [WebSVN](https://websvnphp.github.io/) usi
 
 Everybody like screenshots so I put there some from my own SVN server:
 
-[gallery link="file" order="DESC"]
+![WebSVN 1](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_1.avif){: .left }
+![WebSVN 2](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_2.avif){: .normal }
+![WebSVN 3](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_3.avif){: .right }
 
 ### snvci script
 

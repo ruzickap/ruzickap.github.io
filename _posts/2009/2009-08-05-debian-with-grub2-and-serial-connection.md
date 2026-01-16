@@ -10,13 +10,13 @@ Sometimes I'm using the serial connection to my server if anything goes wrong.
 It's because I don't have a monitor/TV attached to it.
 
 I had some problems setting it up using Debian in GRUB2 after I upgraded to
-grub-pc
+`grub-pc`.
 
 So here is a short way how to do it:
 
-Edit file containing configuration in Debian: ***/etc/default/grub***
+Edit file containing configuration in Debian: `/etc/default/grub`
 
-```bash
+```ini
 # If you change this file, run 'update-grub' afterwards to update
 # /boot/grub/grub.cfg.
 
@@ -38,4 +38,4 @@ GRUB_SERIAL_COMMAND="serial --speed=9600 --unit=0 --word=8 --parity=no --stop=1"
 #GRUB_DISABLE_LINUX_UUID=true
 ```
 
-Don't forget to run ***update-grub*** after change.
+Don't forget to run `update-grub` after change.

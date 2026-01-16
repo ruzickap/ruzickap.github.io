@@ -21,30 +21,30 @@ That's time for `boinc_cmd` and here are few tips how to use it.
 
 - Set ***http proxy*** 10.226.56.40:3128:
 
-```bash
-boinc_cmd --passwd my_password --set_proxy_settings 10.226.56.40 3128 "" "" "" "" "" "" ""
-```
+  ```bash
+  boinc_cmd --passwd my_password --set_proxy_settings 10.226.56.40 3128 "" "" "" "" "" "" ""
+  ```
 
 - Count all the time:
 
-```bash
-boinc_cmd --passwd my_password --set_run_mode always
-```
+  ```bash
+  boinc_cmd --passwd my_password --set_run_mode always
+  ```
 
 - Don't get more work:
 
-```bash
-boinc_cmd --passwd my_password --project http://abcathome.com/ nomorework
-```
+  ```bash
+  boinc_cmd --passwd my_password --project http://abcathome.com/ nomorework
+  ```
 
 - Attach to the project:
 
-```bash
-boinc_cmd --passwd my_password --project_attach http://abcathome.com/  project_id
-```
+  ```bash
+  boinc_cmd --passwd my_password --project_attach http://abcathome.com/  project_id
+  ```
 
 - Update project preferences:
 
-```bash
-boinc_cmd --passwd my_password --project http://abcathome.com/ update
-```
+  ```bash
+  boinc_cmd --passwd my_password --project http://abcathome.com/ update
+  ```

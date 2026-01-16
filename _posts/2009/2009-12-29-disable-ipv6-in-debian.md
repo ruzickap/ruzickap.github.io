@@ -15,13 +15,13 @@ were not working for me.
 
 The easiest one worked well:
 
-Modify ***/etc/default/grub***:
+Modify `/etc/default/grub`:
 
-```bash
+```ini
 GRUB_CMDLINE_LINUX_DEFAULT="ipv6.disable=1"
 ```
 
-Don't forget to run ***update-grub*** after change (and reboot).
+Don't forget to run `update-grub` after change (and reboot).
 
 Then if you run
 

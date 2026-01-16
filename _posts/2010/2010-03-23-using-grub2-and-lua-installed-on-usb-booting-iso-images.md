@@ -62,7 +62,7 @@ make
 make install
 ```
 
-Mount USB to some directory (in my case /mnt/sdb1) and install grub with Lua
+Mount USB to some directory (in my case `/mnt/sdb1`) and install grub with Lua
 support on it:
 
 ```bash
@@ -97,7 +97,7 @@ http://xpud.googlecode.com/files/xpud-0.9.2.iso
 
 The following code is taken from this web page
 [https://ubuntuforums.org/showthread.php?t=1288604](https://ubuntuforums.org/showthread.php?t=1288604)
-where I added more live CDs. I also changed the main grub.cfg a little bit and
+where I added more live CDs. I also changed the main `grub.cfg` a little bit and
 use 64 live CDs (amd64).
 
 Save following text as 3 files:
@@ -319,10 +319,10 @@ Save following text as 3 files:
   grub.enum_file (enum_file, isofolder)
   ```
 
-**UPDATE**:
-In the new grub versions I had to modify following lines (from "source" -> "lua"
-and one module name "vbeinfo" -> "vbe") otherwise it was not running correctly.
-Please look at these lines and change it in the scripts above:
+**UPDATE**: In the new grub versions I had to modify following lines
+(from "source" -> "lua" and one module name "vbeinfo" -> "vbe") otherwise it was
+not running correctly. Please look at these lines and change it in the scripts
+above:
 
 ```lua
 insmod vbe
@@ -335,8 +335,6 @@ lua /boot/grub/listisos.lua
 After unmounting your USB flash should be bootable and you should get menu
 similar to this one:
 
-<!-- rumdl-disable MD013 -->
-[![GRUB2 USB Boot Menu](/assets/img/posts/2010/2010-03-23-using-grub2-and-lua-installed-on-usb-booting-iso-images/grub_usb.avif)](/assets/img/posts/2010/2010-03-23-using-grub2-and-lua-installed-on-usb-booting-iso-images/grub_usb.avif)
-<!-- rumdl-enable MD013 -->
+![GRUB2 USB Boot Menu](/assets/img/posts/2010/2010-03-23-using-grub2-and-lua-installed-on-usb-booting-iso-images/grub_usb.avif)
 
 Enjoy :-)

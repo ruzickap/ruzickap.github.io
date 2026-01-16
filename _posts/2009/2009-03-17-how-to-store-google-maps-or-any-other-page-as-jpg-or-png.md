@@ -25,17 +25,13 @@ I found solution in KDE:
 2. Run Firefox and chose your place in the map.
 3. Press ALT + F3 -> Advanced -> Special Windows Settings...
 
-<!-- rumdl-disable MD013 -->
-[![Advanced Windows Settings - KDE](/assets/img/posts/2009/2009-03-17-how-to-store-google-maps-or-any-other-page-as-jpg-or-png/advanced_settings.avif)](/assets/img/posts/2009/2009-03-17-how-to-store-google-maps-or-any-other-page-as-jpg-or-png/advanced_settings.avif)
-<!-- rumdl-enable MD013 -->
-*Advanced Windows Settings - KDE*
+   ![Advanced Windows Settings - KDE](/assets/img/posts/2009/2009-03-17-how-to-store-google-maps-or-any-other-page-as-jpg-or-png/advanced_settings.avif)
+   _Advanced Windows Settings - KDE_
 
-1. Select Geometry tab and modify "Size" parameters:
+4. Select Geometry tab and modify "Size" parameters:
 
-<!-- rumdl-disable MD013 -->
-[![Edit Window Specific Settings Kwin](/assets/img/posts/2009/2009-03-17-how-to-store-google-maps-or-any-other-page-as-jpg-or-png/edit_window-specific_settings-kwin.avif)](/assets/img/posts/2009/2009-03-17-how-to-store-google-maps-or-any-other-page-as-jpg-or-png/edit_window-specific_settings-kwin.avif)
-<!-- rumdl-enable MD013 -->
-*Edit Window Specific Settings Kwin*
+   ![Edit Window Specific Settings Kwin](/assets/img/posts/2009/2009-03-17-how-to-store-google-maps-or-any-other-page-as-jpg-or-png/edit_window-specific_settings-kwin.avif)
+   _Edit Window Specific Settings Kwin_
 
 Then your Firefox should be much bigger (above screen borders) and you should be
 able to save "one big" page as image...

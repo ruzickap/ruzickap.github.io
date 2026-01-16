@@ -19,7 +19,7 @@ some data from the database - no system installations.
 Here are the steps how to install DBD-Oracle and its libraries to "one"
 directory without making a mess in the system:
 
-First let's install core system related libraries and tools
+First let's install core system related libraries and tools:
 
 ```bash
 aptitude install gcc libdbi-perl libaio1 libstdc++6-4.4-dev unzip
@@ -47,7 +47,7 @@ perl Makefile.PL PREFIX=$HOME/lib
 make && make install
 ```
 
-Now you should have DBD::Oracle installed in your $HOME/lib directory.
+Now you should have `DBD::Oracle` installed in your `$HOME/lib` directory.
 
 You can modify this short script to see if it's really working:
 
@@ -78,5 +78,5 @@ $sth->finish();
 $dbh->disconnect();
 ```
 
-I believe you can install DBD::Oracle without dependencies above like gcc or
-libstdc++, but I'm fine to install these.
+I believe you can install `DBD::Oracle` without dependencies above like `gcc` or
+`libstdc++`, but I'm fine to install these.

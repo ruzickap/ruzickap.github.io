@@ -55,7 +55,7 @@ Remove some useless applications:
 
 Reboot to "ClockworkMod recovery" (using Fake Flash by Koush).
 
-Mount /system partition:
+Mount `/system` partition:
 
 ```bash
 adb shell
@@ -63,7 +63,7 @@ mount -o nodev,noatime,nodiratime -t yaffs2 /dev/block/mtdblock3 /system
 mount /data
 ```
 
-Backup directories under /data:
+Backup directories under `/data`:
 
 ```bash
 BACKUP_DESTINATION="/sdcard/mybackup"

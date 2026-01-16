@@ -70,7 +70,7 @@ Warning: given size (20964762) exceeds max allowable size (20900502)
 ...
 ```
 
-To prevent this error I need to shrink raid partition located on /dev/sdb1 by
+To prevent this error I need to shrink raid partition located on `/dev/sdb1` by
 31MB.
 
 Look at the disk layout:
@@ -89,7 +89,7 @@ tmpfs                   125604         0    125604   0% /dev/shm
 total                 10578360    806616   9247668   9%
 ```
 
-You can see there is 4G free on /home partition. Download and boot
+You can see there is 4G free on `/home` partition. Download and boot
 [SystemRescueCD](https://www.sysresccd.org/) and shrink ext4 first.
 
 ```bash
@@ -101,7 +101,7 @@ Resizing the filesystem on /dev/mapper/VG-home to 1048576 (4k) blocks.
 The filesystem on /dev/mapper/VG-home is now 1048576 blocks long.
 ```
 
-Now the home partition has 4G and I can change size of /dev/mapper/vg-home.
+Now the home partition has 4G and I can change size of `/dev/mapper/vg-home`.
 Here is the lvm configuration:
 
 ```bash

@@ -32,7 +32,7 @@ gpg --gen-key
 
 List the keys and write down the secret key ID (9BB7698A):
 
-```bash
+```console
 gpg --list-keys
 
 /root/.gnupg/pubring.gpg
@@ -55,7 +55,7 @@ will be the key used for dm-crypt:
 head -c 256 /dev/urandom | gpg --batch --passphrase test --verbose --throw-keyids --local-user 9BB7698A --sign --yes --cipher-algo AES256 --encrypt --hidden-recipient 9BB7698A --no-encrypt-to --output ~/public_html/abcd.html -
 ```
 
-### Client side (where the data will be encrypted)
+## Client side (where the data will be encrypted)
 
 Login to the machine where you want to crypt your data.
 
@@ -71,7 +71,7 @@ lvcreate -v -l 100%FREE vgdata -n lvdata
 
 Import secret private key from the http server (don't forget to remove
 secret.key from the server after this) and then download and decrypt the cipher
-key for dm-crypt [/mykey]:
+key for dm-crypt `/mykey`:
 
 ```bash
 #gpg --yes --delete-secret-keys 9BB7698A
@@ -80,13 +80,13 @@ wget https://10.0.2.2/~ruzickap/secret.key -O - | gpg --import -
 wget https://10.0.2.2/~ruzickap/abcd.html -O - | gpg --quiet --passphrase test --batch --decrypt > /mykey
 ```
 
-Encrypt the lvm [vgdata-lvdata] using [/mykey]:
+Encrypt the lvm `vgdata-lvdata` using `/mykey`:
 
 ```bash
 cryptsetup -s 512 -c aes-xts-plain luksFormat /dev/mapper/vgdata-lvdata /mykey
 ```
 
-Add the dm-crypt key [/mykey] to the "LUKS"
+Add the dm-crypt key `/mykey` to the "LUKS":
 
 ```bash
 cryptsetup --key-file=/mykey luksOpen /dev/mapper/vgdata-lvdata vgdata-lvdata_crypt
@@ -103,7 +103,7 @@ cryptsetup luksClose vgdata-lvdata_crypt
 rm /mykey
 ```
 
-Now we have to create a short script [/script] which will download the key from
+Now we have to create a short script `/script` which will download the key from
 remote server and decrypt it using imported secret key by GPG and display it on
 the screen:
 
@@ -113,7 +113,7 @@ the screen:
 ```
 
 We should not forget to mount our encrypted filesystem after boot
-[/etc/rc.local]:
+`/etc/rc.local`:
 
 ```bash
 echo "Mounting encrypted file system in 5 seconds..."
@@ -123,16 +123,16 @@ mount /mnt
 ```
 
 Another necessary thing needs to be done - putting the right information to
-[/etc/crypttab]:
+`/etc/crypttab`:
 
-```bash
+```console
 vgdata-lvdata_crypt     /dev/mapper/vgdata-lvdata       none noauto,cipher=aes-xts-plain,size=512,luks,tries=1,checkargs=ext2,keyscript=/script
 ```
 
 We don't want to mount encrypted filesystem with others, because the network is
-not ready that time [/etc/fstab]:
+not ready that time `/etc/fstab`:
 
-```bash
+```console
 /dev/mapper/vgdata-lvdata_crypt /mnt    ext3    noauto,rw,exec,async,noatime,nocheck,data=writeback    0       0
 ```
 

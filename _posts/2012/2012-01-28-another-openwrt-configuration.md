@@ -12,7 +12,7 @@ OpenWrt firmware [Backfire 10.03.1](https://downloads.openwrt.org/backfire/10.03
 
 I'm going to use [TP-Link
 TL-WR1043ND](https://www.tp-link.com/en/products/details/?model=TL-WR1043ND) wifi
-router with small 64MB USB stick [/dev/sda1] containing ext2 partition. I plan
+router with small 64MB USB stick `/dev/sda1` containing ext2 partition. I plan
 to have some stats on the USB stick and simple html pages as well.
 
 <!-- rumdl-disable MD013 -->

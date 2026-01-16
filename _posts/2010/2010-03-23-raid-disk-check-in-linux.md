@@ -9,7 +9,7 @@ tags: [RAID, SMART, mdadm, GRUB]
 One day I checked [dmesg](https://en.wikipedia.org/wiki/Dmesg) from one of
 my servers and I saw [I/O](https://en.wikipedia.org/wiki/I/O) errors :-(
 
-```bash
+```console
 gate:~ dmesg
 ...
 [ 4220.798665] ide: failed opcode was: unknown
@@ -24,16 +24,15 @@ Lucky for me there are two disks in
 The machine is "just" a firewall, so I decided to play a little bit with the
 bad hard disk, because there are no important data on it. Usually if you see
 errors like I mentioned above you replace disk without any questions, but I
-would like to
-"get" some outputs from diagnostic commands. So you can see what you can do in
-such case.
+would like to "get" some outputs from diagnostic commands. So you can see what
+you can do in such case.
 
 ## S.M.A.R.T checks
 
 The drives are pretty old, so it's better to check if they support
 [S.M.A.R.T.](https://en.wikipedia.org/wiki/S.M.A.R.T.) and if it's enabled:
 
-```bash
+```console
 gate:~ smartctl -i /dev/hda | grep 'SMART support'
 SMART support is: Available - device has SMART capability.
 SMART support is: Enabled
@@ -41,7 +40,7 @@ SMART support is: Enabled
 
 Let's check some information about the disk. You can see - it's quite old:
 
-```bash
+```console
 gate:~ smartctl --attributes /dev/hda
 === START OF READ SMART DATA SECTION ===
 SMART Attributes Data Structure revision number: 16
@@ -81,7 +80,7 @@ ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_
 
 The basic S.M.A.R.T. test shows there is a problem on the disk:
 
-```bash
+```console
 gate:~ smartctl --health /dev/hda
 === START OF READ SMART DATA SECTION ===
 SMART overall-health self-assessment test result: PASSED
@@ -92,7 +91,7 @@ ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_
 
 Let's run the "short" test to do quick test of the disk:
 
-```bash
+```console
 gate:~ smartctl -t short /dev/hda
 === START OF OFFLINE IMMEDIATE AND SELF-TEST SECTION ===
 Sending command: "Execute SMART Short self-test routine immediately in off-line mode".
@@ -106,7 +105,7 @@ Use smartctl -X to abort test.
 
 Here are the results from the previous test:
 
-```bash
+```console
 gate:~ smartctl -l selftest /dev/hda
 === START OF READ SMART DATA SECTION ===
 SMART Self-test log structure revision number 1
@@ -136,7 +135,7 @@ Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA
 
 Looks like short test doesn't tell much about errors. Run "long" one:
 
-```bash
+```console
 gate:~ smartctl -t long /dev/hda
 === START OF OFFLINE IMMEDIATE AND SELF-TEST SECTION ===
 Sending command: "Execute SMART Extended self-test routine immediately in off-line mode".
@@ -150,7 +149,7 @@ Use smartctl -X to abort test.
 
 The "long" test shows the errors:
 
-```bash
+```console
 gate:~ smartctl -l selftest /dev/hda
 === START OF READ SMART DATA SECTION ===
 SMART Self-test log structure revision number 1
@@ -180,7 +179,7 @@ Num  Test_Description    Status                  Remaining  LifeTime(hours)  LBA
 
 See all previous errors:
 
-```bash
+```console
 gate:~  smartctl --attributes --log=selftest --quietmode=errorsonly /dev/hda
 ID# ATTRIBUTE_NAME          FLAG     VALUE WORST THRESH TYPE      UPDATED  WHEN_FAILED RAW_VALUE
 203 Run_Out_Cancel          0x000b   253   096   180    Pre-fail  Always   In_the_past 66
@@ -198,11 +197,11 @@ Error 2102 occurred at disk power-on lifetime: 2188 hours (91 days + 4 hours)
 Error 2101 occurred at disk power-on lifetime: 2188 hours (91 days + 4 hours)
 ```
 
-### Bad block test
+## Bad block test
 
-You can see the errors also in the syslog:
+You can see the errors also in the `syslog`:
 
-```bash
+```console
 gate:~ grep LBA /var/log/messages
 ...
 Mar 18 08:34:01 gate kernel: [   74.222868] hda: dma_intr: error=0x40 { UncorrectableError }, LBAsect=4518804, sector=4518798
@@ -216,9 +215,9 @@ Mar 18 08:37:49 gate kernel: [  359.932012] hda: dma_intr: error=0x40 { Uncorrec
 ...
 ```
 
-Use badblock check as the last, because it's time consuming:
+Use `badblock` check as the last, because it's time consuming:
 
-```bash
+```console
 gate:~ time badblocks -s -v -o /tmp/bad_blocks /dev/hda
 Checking blocks 0 to 19938239
 Checking for bad blocks (read-only test): done
@@ -242,11 +241,11 @@ The commands I used before tested disk from "hardware" level. Because there is a
 RAID 1 in place it was nice opportunity to see what was happening on "software"
 level.
 
-### RAID checks
+## RAID checks
 
-Here is the fdisk output for both disks:
+Here is the `fdisk` output for both disks:
 
-```bash
+```console
 gate:~ fdisk -l /dev/hda /dev/hdc
 
 Disk /dev/hda: 20.4 GB, 20416757760 bytes
@@ -272,7 +271,7 @@ Before I began to do any high disk utilization operations, it was good to check
 used max speed for RAID check. If I had this value "higher" it could really slow
 down the server. 1 MB/s is enough for my old disks:
 
-```bash
+```console
 gate:~ echo 1000 > /proc/sys/dev/raid/speed_limit_max
 gate:~ cat /etc/sysctl.conf
 ...
@@ -283,7 +282,7 @@ dev.raid.speed_limit_max = 1000
 
 Start disk check:
 
-```bash
+```console
 gate:~ /usr/share/mdadm/checkarray --all
 checkarray: I: check queued for array md0.
 checkarray: I: check queued for array md1.
@@ -325,14 +324,15 @@ gate:~ dmesg
 </none>
 ```
 
-To my surprise mdadm didn't find any errors :-(
+To my surprise `mdadm` didn't find any errors :-(
 
-### Disk replacement
+## Disk replacement
 
 The disk needed to be replaced by the new one.
+
 First I had to mark it as failed:
 
-```bash
+```console
 gate:~ mdadm --manage /dev/md0 --fail /dev/hda1
 mdadm: set /dev/hda1 faulty in /dev/md0
 gate:~ cat /proc/mdstat
@@ -347,16 +347,16 @@ unused devices: <none>
 </none>
 ```
 
-Then I removed it from /dev/md0:
+Then I removed it from `/dev/md0`:
 
-```bash
+```console
 gate:~ mdadm --manage /dev/md0 --remove /dev/hda1
 mdadm: hot removed /dev/hda1
 ```
 
 Dmesg:
 
-```bash
+```console
 gate:~ dmesg
 ...
 [142783.600283] raid1: Disk failure on hda1, disabling device.
@@ -374,18 +374,18 @@ gate:~ dmesg
 </hda1>
 ```
 
-I had to do the same procedure for md1:
+I had to do the same procedure for `md1`:
 
-```bash
+```console
 gate:~ mdadm --manage /dev/md1 --fail /dev/hda2
 mdadm: set /dev/hda2 faulty in /dev/md1
 gate:~ mdadm --manage /dev/md1 --remove /dev/hda2
 mdadm: hot removed /dev/hda2
 ```
 
-Warning email from mdadm was sent:
+Warning email from `mdadm` was sent:
 
-```email
+```text
 Subject: Fail event on /dev/md0:gate
 
 This is an automatically generated mail message from mdadm
@@ -396,34 +396,34 @@ A Fail event had been detected on md device /dev/md0.
 It could be related to component device /dev/hda1.
 ```
 
-### After disk change
+## After disk change
 
 New disk was installed, OS was up and running - it's time to check bad sectors
 on the new one:
 
-```bash
+```console
 gate:~ time badblocks -s -v -w -o /var/tmp/bad_blocks /dev/hda
 ```
 
 I needed to have the same partitions like on the new "clean" disk like on the
-old one. The easiest way is to use sfdisk:
+old one. The easiest way is to use `sfdisk`:
 
-```bash
+```console
 gate:~ sfdisk -d /dev/hdc | sfdisk --force /dev/hda
 ```
 
 Added the partitions to the RAID:
 
-```bash
+```console
 gate:~ mdadm --manage /dev/md0 --add /dev/hda1
 gate:~ mdadm --manage /dev/md1 --add /dev/hda2
 ```
 
 The last step is installing the GRUB to MBR of the new disk. If you forgot about
-it, than I will not be able to boot from the "new" (hda) disk if "old" disk
-(hdc) fail.
+it, than I will not be able to boot from the "new" `hda` disk if "old" disk
+`hdc` fail.
 
-```bash
+```console
 gate:~ grub
 root (hd0,0)
 setup (hd0)

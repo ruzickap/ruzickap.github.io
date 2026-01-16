@@ -23,8 +23,8 @@ After registration/login he is able to connect to Internet.
 
 So let's see how I did it.
 
-Let's have one server with two network interfaces - first (eth0) goes to
-Internet, the second one (eth1) is the wifi for "unknown" clients.
+Let's have one server with two network interfaces - first `eth0` goes to
+Internet, the second one `eth1` is the wifi for "unknown" clients.
 
 ![Embedded content](/assets/img/posts/2010/2010-03-24-debian-wi-fi-hotspot-using-coovachilli-freeradius-mysql-and-daloradius/hotspot.svg)
 
@@ -63,25 +63,25 @@ dpkg -i coova-chilli_*_amd64.deb
 
 ## Configure FreeRadius
 
-Change */etc/freeradius/clients.conf*:
+Change `/etc/freeradius/clients.conf`:
 
-```bash
+```text
 client 127.0.0.1 {
- secret     = mysecret
+  secret     = mysecret
 }
 ```
 
-Change */etc/freeradius/sql.conf*:
+Change `/etc/freeradius/sql.conf`:
 
-```bash
-server = "localhost"
+```ini
+        server = "localhost"
         login = "root"
         password = "xxxx"
 ```
 
-Uncomment in */etc/freeradius/sites-available/default*:
+Uncomment in `/etc/freeradius/sites-available/default`:
 
-```bash
+```text
 authorize {
           sql
 }
@@ -91,13 +91,13 @@ accounting {
 }
 ```
 
-Uncomment in */etc/freeradius/radiusd.conf*:
+Uncomment in `/etc/freeradius/radiusd.conf`:
 
-```bash
-$INCLUDE sql.conf
+```text
+       $INCLUDE sql.conf
 ```
 
-### Configure MySQL database for FreeRadius
+## Configure MySQL database for FreeRadius
 
 ```bash
 mysql -u root --password=xxxx
@@ -107,9 +107,9 @@ mysql> exit
 mysql -u root --password=xxxx radius < /var/www/daloradius/contrib/db/fr2-mysql-daloradius-and-freeradius.sql
 ```
 
-### daloRADIUS configuration
+## daloRADIUS configuration
 
-Modify this file */var/www/daloradius/library/daloradius.conf.php*
+Modify this file `/var/www/daloradius/library/daloradius.conf.php`
 
 ```php
 $configValues['CONFIG_DB_PASS'] = 'xxxx';
@@ -118,7 +118,7 @@ $configValues['CONFIG_DB_TBL_RADUSERGROUP'] = 'radusergroup';
 ```
 
 You also need to modify following configuration files to setup sign in web pages
-*/var/www/signup-*/library/daloradius.conf.php*:
+`/var/www/signup-*/library/daloradius.conf.php`:
 
 ```php
 $configValues['CONFIG_DB_PASS'] = 'xxxx';
@@ -128,7 +128,7 @@ $configValues['CONFIG_SIGNUP_SUCCESS_MSG_LOGIN_LINK'] = "Click <b>here</b>".
                                         " to return to the Login page and start your surfing";
 ```
 
-Change lines in */var/www/signup*/index.php* to (changed 'User-Password' ->
+Change lines in `/var/www/signup*/index.php` to (changed 'User-Password' ->
 'Cleartext-Password' and '==' -> ':='):
 
 ```php
@@ -137,7 +137,7 @@ $sql = "INSERT INTO ".$configValues['CONFIG_DB_TBL_RADCHECK']." (id, Username, A
 ```
 
 Another file that needs to be modified to communicate with CoovaChilli is
-*/var/www/hotspotlogin/hotspotlogin.php*
+`/var/www/hotspotlogin/hotspotlogin.php`
 
 ```php
 $uamsecret = "uamsecret";
@@ -151,7 +151,7 @@ username: administrator
 password: radius
 ```
 
-### Routing
+## Routing
 
 We should not forget to enable packet forwarding and setup NAT:
 
@@ -162,11 +162,11 @@ sed --in-place=.old 's/^#\(net.ipv4.ip_forward=1\)/\1/' /etc/sysctl.conf
 sysctl -p
 ```
 
-### CoovaChilli configuration
+## CoovaChilli configuration
 
-Let's start with */etc/chilli/defaults*:
+Let's start with `/etc/chilli/defaults`:
 
-```bash
+```ini
 HS_NETWORK=192.168.10.0
 HS_UAMLISTEN=192.168.10.1
 
@@ -176,9 +176,9 @@ HS_UAMFORMAT=https://\$HS_UAMLISTEN/hotspotlogin/hotspotlogin.php
 HS_UAMHOMEPAGE=https://\$HS_UAMLISTEN
 ```
 
-Then don't forget to enable CoovaChilli to start in */etc/default/chilli*
+Then don't forget to enable CoovaChilli to start in `/etc/default/chilli`:
 
-```bash
+```ini
 START_CHILLI=1
 ```
 

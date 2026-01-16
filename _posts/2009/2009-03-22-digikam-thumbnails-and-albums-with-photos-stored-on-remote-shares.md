@@ -30,8 +30,7 @@ Here is my digiKam collection configuration:
 ![digiKam Configuration](/assets/img/posts/2009/2009-03-22-digikam-thumbnails-and-albums-with-photos-stored-on-remote-shares/digikam-configure.avif)
 
 This script deletes all thumbnails of the photos in `$HOME/.thumbnails/large/`
-
- which are **not** on network shares :
+which are **not** on network shares:
 
 (It preserves all the thumbnails of photos stored on network share, which take
 ages to create because of network or which are not changing, and delete all

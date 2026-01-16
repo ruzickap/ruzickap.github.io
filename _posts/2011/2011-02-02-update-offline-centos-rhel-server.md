@@ -22,7 +22,7 @@ the Internet.
 Then we need station (or laptop / virtual machine), which has the same OS as
 server and is connected to the Internet.
 
-Copy the /var/lib/rpm to the station (you can use USB/CD...)
+Copy the `/var/lib/rpm` to the station (you can use USB/CD...)
 
 ```bash
 scp -r /var/lib/rpm root@station:/tmp/
@@ -42,7 +42,7 @@ mv -v /var/lib/rpm /var/lib/rpm.orig
 mv -v /tmp/rpm /var/lib/
 ```
 
-Download updates to /tmp/rpm_updates and return back the /var/lib/rpm
+Download updates to `/tmp/rpm_updates` and return back the `/var/lib/rpm`
 
 ```bash
 mkdir -v /tmp/rpm_updates
