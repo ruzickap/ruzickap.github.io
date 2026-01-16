@@ -37,7 +37,7 @@ END="2"
 START_AT_2="0:06:27"
 END_2="2"
 SIZE="480x800"
-DESC_SIZE=$(echo $SIZE|sed 's/x/ /')
+DESC_SIZE=$(echo $SIZE | sed 's/x/ /')
 
 #Create png files from the selected movie part
 mplayer -nosound -vo png:z=9:outdir=part0 -ss $START_AT -endpos $END $MOVIE_FILE
@@ -49,7 +49,7 @@ COUNT_PART=1
 for FILE in part[01]/*.png; do
   echo "*** ($COUNT_PART) $FILE"
   if echo $FILE | grep part0; then
-    convert $FILE -crop 870x1080+510+0 -units PixelsPerCentimeter -type TrueColor -density 37.78x37.78 -depth 8 -resize $SIZE -size $SIZE xc:black +swap -gravity center -composite -verbose part0/`printf "%05d.${FILE##*.}" $COUNT_PART`
+    convert $FILE -crop 870x1080+510+0 -units PixelsPerCentimeter -type TrueColor -density 37.78x37.78 -depth 8 -resize $SIZE -size $SIZE xc:black +swap -gravity center -composite -verbose part0/$(printf "%05d.${FILE##*.}" $COUNT_PART)
     COUNT_PART=$(($COUNT_PART+1))
 #You can add the following frame (but I don't like it) - see imagemagick home page for more details
 # -mattecolor SkyBlue -frame 6x6+2+2

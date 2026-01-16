@@ -107,7 +107,7 @@ The filesystem on /dev/mapper/VG-home is now 1048576 blocks long.
 Now the home partition has 4G and I can change size of `/dev/mapper/vg-home`.
 Here is the lvm configuration:
 
-```bash
+```console
 root@sysresccd /root % lvs
   LV   VG   Attr   LSize   Origin Snap%  Move Log Copy%  Convert
   home VG   -wi-a-   4.42g

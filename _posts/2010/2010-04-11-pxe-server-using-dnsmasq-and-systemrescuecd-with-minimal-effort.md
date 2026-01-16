@@ -223,7 +223,7 @@ installation like I described above it's handy to put these lines into
 it when something goes wrong with the Linux box:
 
 ```bash
-cat << EOF >>/etc/grub.d/40_custom
+cat << EOF >> /etc/grub.d/40_custom
 
 menuentry "SystemRescueCd 1.5.1" {
     loopback loop /home/ftp/pub/distributions/systemrescuecd-x86-1.5.1.iso
