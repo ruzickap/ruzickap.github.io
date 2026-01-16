@@ -47,17 +47,17 @@ Because my machine is 64 bit I need to build CoovaChilli package myself:
 
 ```bash
 aptitude --assume-yes install dpkg-dev debhelper libssl-dev
-cd /tmp
+cd /tmp || exit
 wget -c http://ap.coova.org/chilli/coova-chilli-1.2.2.tar.gz
 tar xzf coova-chilli*.tar.gz
-cd coova-chilli*
+cd coova-chilli* || exit
 dpkg-buildpackage -rfakeroot
 ```
 
 Install CoovaChilli:
 
 ```bash
-cd ..
+cd .. || exit
 dpkg -i coova-chilli_*_amd64.deb
 ```
 
@@ -99,7 +99,7 @@ Uncomment in `/etc/freeradius/radiusd.conf`:
 
 ## Configure MySQL database for FreeRadius
 
-```bash
+```console
 mysql -u root --password=xxxx
 mysql> CREATE DATABASE radius;
 mysql> exit

@@ -30,7 +30,7 @@ Let's start with installing dnsmasq and downloading iso image of SystemRescueCd:
 ```bash
 aptitude install dnsmasq bzip2
 mkdir -vp /home/ftp/pub/distributions
-cd /home/ftp/pub/distributions
+cd /home/ftp/pub/distributions || exit
 wget http://sourceforge.net/projects/systemrescuecd/files/sysresccd-x86/1.5.1/systemrescuecd-x86-1.5.1.iso/download
 ```
 
@@ -38,7 +38,7 @@ Mount ISO file and make it permanent in fstab:
 
 ```bash
 mkdir -v systemrescuecd tftpboot
-echo "`readlink -f systemrescuecd*.iso` $PWD/systemrescuecd iso9660 ro,loop,auto 0 0" >> /etc/fstab
+echo "$(readlink -f systemrescuecd*.iso) $PWD/systemrescuecd iso9660 ro,loop,auto 0 0" >> /etc/fstab
 mount systemrescuecd
 ```
 
@@ -48,7 +48,7 @@ Fill tftpboot directory with necessary files/links:
 mkdir -v tftpboot/pxelinux.cfg
 sed 's@initrd=initram.igz@initrd=initram.igz netboot=tftp://192.168.0.1/sysrcd.dat  rootpass=xxxx setkmap=us@' systemrescuecd/isolinux/isolinux.cfg >tftpboot/pxelinux.cfg/default
 for FILE in systemrescuecd/isolinux/* systemrescuecd/sysrcd* systemrescuecd/ntpasswd systemrescuecd/bootdisk
-  do ln -vs ../$FILE tftpboot/`basename $FILE`
+  do ln -vs "../$FILE" "tftpboot/$(basename "$FILE")"
 done
 wget http://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-3.86.tar.bz2 -O - | \
 tar xvjf - --to-stdout syslinux-3.86/core/pxelinux.0 >tftpboot/pxelinux.0
@@ -58,7 +58,7 @@ Configure dnsmasq to listen on eth1:
 
 ```bash
 mv -v /etc/dnsmasq.conf /etc/dnsmasq.conf.old
-cat < EOF >/etc/dnsmasq.conf
+cat << EOF > /etc/dnsmasq.conf
 domain-needed
 bogus-priv
 interface=eth1
