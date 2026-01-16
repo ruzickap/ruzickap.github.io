@@ -178,7 +178,7 @@ svn ci --message "Test" /root/configuration-debian/
 Now there should be first file in the repository.
 
 Now you can access your repository by [WebSVN](https://websvnphp.github.io/) using
-<https://my_server/websvn>.
+`https://my_server/websvn`.
 
 Everybody like screenshots so I put there some from my own SVN server:
 
@@ -190,7 +190,7 @@ Everybody like screenshots so I put there some from my own SVN server:
 
 Here is a link for my script which can help you to add/update/remove to
 svn repository without deep knowledge of it:
-[svnci](https://websvn.xvx.cz/wsvn-websvn.xvx.cz/projects/trunk/scripts/svnci/svnci).
+[svnci](https://github.com/ruzickap/old_stuff/blob/af1cd07294b2aa2441d184aaa5361f1a59139ca5/svnci/svnci).
 
 I use it because it's faster and easy to remember than learn various svn
 commands combined with shell - so here are some examples:
