@@ -7,9 +7,6 @@ categories: [Linux, Storage]
 tags: [RAID, LVM, mdadm, ext4]
 ---
 
-> <https://linux-old.xvx.cz/2010/06/shrink-raid-and-lvm-partition/>
-{: .prompt-info }
-
 > Not completed...
 {: .prompt-info }
 

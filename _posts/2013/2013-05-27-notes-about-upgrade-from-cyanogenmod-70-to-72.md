@@ -7,9 +7,6 @@ categories: [Linux, Android]
 tags: [HTC-Desire, CyanogenMod, adb, backup]
 ---
 
-> <https://linux-old.xvx.cz/2013/05/notes-about-upgrade-from-cyanogenmod-70-to-72/>
-{: .prompt-info }
-
 > Not completed...
 {: .prompt-info }
 
