@@ -10,7 +10,7 @@ Sometimes I'm using the serial connection to my server if anything goes wrong.
 It's because I don't have a monitor/TV attached to it.
 
 I had some problems setting it up using Debian in GRUB2 after I upgraded to
-`grub-pc`.
+grub-pc.
 
 So here is a short way how to do it:
 

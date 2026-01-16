@@ -13,7 +13,7 @@ I'm not the Oracle expert, but I decided to use
 Most of the manuals and how-to pages describe, how to install client libraries
 to system (usually as root), which was not my case.
 
-I just need one directory with libraries in my $HOME and a few scripts to get
+I just need one directory with libraries in my `$HOME` and a few scripts to get
 some data from the database - no system installations.
 
 Here are the steps how to install DBD-Oracle and its libraries to "one"

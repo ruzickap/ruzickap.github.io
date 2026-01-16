@@ -109,7 +109,7 @@ the screen:
 
 ```bash
 #!/bin/bash
-/usr/bin/wget --quiet https://10.0.2.2/~ruzickap/abcd.html -O - | /usr/bin/gpg --quiet --homedir /root/.gnupg --quiet --passphrase xxxx --batch --decrypt 2>/dev/null
+/usr/bin/wget --quiet https://10.0.2.2/~ruzickap/abcd.html -O - | /usr/bin/gpg --quiet --homedir /root/.gnupg --quiet --passphrase xxxx --batch --decrypt 2> /dev/null
 ```
 
 We should not forget to mount our encrypted filesystem after boot
