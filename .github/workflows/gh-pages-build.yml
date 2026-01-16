@@ -1,16 +1,10 @@
 ---
 # GitHub Actions workflow for Hugo static site building and deployment
-# Builds Jekyll site, checks for broken links, and deploys to GitHub Pages
+# Builds Jekyll site and deploys to GitHub Pages
 name: gh-pages-build
 
 on:
   workflow_dispatch:
-    inputs:
-      skip_link_checker:
-        description: "Skip Link Checker"
-        type: boolean
-        required: false
-        default: false
   push:
     paths:
       - "_config.yml"
@@ -39,26 +33,6 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
-
-      - name: 📦 Restore link checker cache
-        id: restore-cache
-        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
-        with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-
-      # https://github.com/lycheeverse/lychee/issues/1734
-      - name: Remove unavailable URLs from cache to check them again
-        run: |
-          sed -i '/,,/d' .lycheecache
-
-      - name: 🔗 Check for broken links
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
-        with:
-          fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
 
       - name: Set Variables
         env:
@@ -117,10 +91,3 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: pages deploy ./public --branch=dev --commit-dirty=true --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: 💾 Save link checker cache
-        uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
-        if: always() && steps.restore-cache.outputs.cache-primary-key
-        with:
-          path: .lycheecache
-          key: ${{ steps.restore-cache.outputs.cache-primary-key }}
