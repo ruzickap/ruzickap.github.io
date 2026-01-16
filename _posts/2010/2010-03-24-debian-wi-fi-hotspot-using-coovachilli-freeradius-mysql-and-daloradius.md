@@ -14,7 +14,7 @@ applications:
 
 - [CoovaChilli](https://coova.org/CoovaChilli)
 - [FreeRadius](https://freeradius.org/)
-- [MySQL](https://mysql.com/)
+- [MySQL](https://www.mysql.com/)
 - [daloRADIUS](https://daloradius.com/)
 
 When somebody wants to connect to Internet using my wifi, the first page he can
