@@ -30,7 +30,7 @@ Generate a new key pair:
 gpg --gen-key
 ```
 
-List the keys and write down the secret key ID (9BB7698A):
+List the keys and write down the secret key ID `9BB7698A`:
 
 ```console
 gpg --list-keys
@@ -70,8 +70,8 @@ lvcreate -v -l 100%FREE vgdata -n lvdata
 ```
 
 Import secret private key from the http server (don't forget to remove
-secret.key from the server after this) and then download and decrypt the cipher
-key for dm-crypt `/mykey`:
+`secret.key` from the server after this) and then download and decrypt the
+cipher key for dm-crypt `/mykey`:
 
 ```bash
 #gpg --yes --delete-secret-keys 9BB7698A

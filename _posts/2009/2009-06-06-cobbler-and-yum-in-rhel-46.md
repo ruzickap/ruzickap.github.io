@@ -34,8 +34,7 @@ installation procedure). Disable firewall and SELinux.
   ```
 
   ```bash
-  rpm -i
-    ./python-elementtree-1.2.6-5.el4.centos.x86_64.rpm \
+  rpm -i ./python-elementtree-1.2.6-5.el4.centos.x86_64.rpm \
     ./python-urlgrabber-2.9.8-2.noarch.rpm ./sqlite-3.3.6-2.x86_64.rpm \
     ./python-sqlite-1.1.7-1.2.1.x86_64.rpm \
     ./yum-metadata-parser-1.0-8.el4.centos.x86_64.rpm \
@@ -49,7 +48,7 @@ installation procedure). Disable firewall and SELinux.
   mkdir /var/tmp/rhel4_repo/
   ln -s /media/cdrom/RedHat/RPMS/ /var/tmp/rhel4_repo/RPMS
   createrepo /var/tmp/rhel4_repo/
-  cat >/etc/yum.repos.d/RHEL-4.6-Media.repo << +
+  cat > /etc/yum.repos.d/RHEL-4.6-Media.repo << +
   [rhel4-media]
   name=RHEL4 - Media
   baseurl=file:///var/tmp/rhel4_repo/
@@ -58,7 +57,7 @@ installation procedure). Disable firewall and SELinux.
   +
 
   createrepo /var/tmp/cobbler-4.6/
-  cat >>/etc/yum.repos.d/my.repo << +
+  cat >> /etc/yum.repos.d/my.repo << +
   [my-repo]
   name=My Repository
   baseurl=file:///var/tmp/cobbler-4.6/
