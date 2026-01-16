@@ -28,9 +28,9 @@ aptitude install gcc libdbi-perl libaio1 libstdc++6-4.4-dev unzip
 Get the Oracle client libraries from the Oracle Instant Client download page:
 
 ```bash
-mkdir $HOME/lib/ && cd $HOME/lib/
+mkdir "${HOME}/lib/" && cd "${HOME}/lib/" || exit
 wget basiclite-11.1.0.7.0-linux-x86_64.zip sqlplus-11.1.0.7.0-linux-x86_64.zip sdk-11.1.0.7.0-linux-x86_64.zip
-unzip *.zip
+unzip ./*.zip
 ```
 
 Install [DBD::Oracle](https://metacpan.org/pod/DBD::Oracle):
@@ -38,12 +38,12 @@ Install [DBD::Oracle](https://metacpan.org/pod/DBD::Oracle):
 ```bash
 wget http://search.cpan.org/CPAN/authors/id/P/PY/PYTHIAN/DBD-Oracle-1.24a.tar.gz
 tar xvzf DBD-Oracle*.tar.gz
-cd DBD-Oracle*
+cd DBD-Oracle* || exit
 
-export LD_LIBRARY_PATH=$HOME/lib/instantclient_11_1
-export C_INCLUDE_PATH=$HOME/lib/instantclient_11_1/sdk/include
+export LD_LIBRARY_PATH="${HOME}/lib/instantclient_11_1"
+export C_INCLUDE_PATH="${HOME}/lib/instantclient_11_1/sdk/include"
 
-perl Makefile.PL PREFIX=$HOME/lib
+perl Makefile.PL PREFIX="${HOME}/lib"
 make && make install
 ```
 
