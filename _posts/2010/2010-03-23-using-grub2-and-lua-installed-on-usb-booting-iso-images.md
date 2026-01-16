@@ -95,10 +95,9 @@ http://releases.ubuntu.com/karmic/ubuntu-9.10-desktop-amd64.iso \
 http://xpud.googlecode.com/files/xpud-0.9.2.iso
 ```
 
-The following code is taken from this web page
-[https://ubuntuforums.org/showthread.php?t=1288604](https://ubuntuforums.org/showthread.php?t=1288604)
+The following code is taken from [Ubuntu Forums](https://ubuntuforums.org)
 where I added more live CDs. I also changed the main `grub.cfg` a little bit and
-use 64 live CDs (amd64).
+use 64 live CDs `amd64`.
 
 Save following text as 3 files:
 
@@ -320,7 +319,7 @@ Save following text as 3 files:
   ```
 
 **UPDATE**: In the new grub versions I had to modify following lines
-(from "source" -> "lua" and one module name "vbeinfo" -> "vbe") otherwise it was
+(from `source` -> `lua` and one module name `vbeinfo` -> `vbe`) otherwise it was
 not running correctly. Please look at these lines and change it in the scripts
 above:
 

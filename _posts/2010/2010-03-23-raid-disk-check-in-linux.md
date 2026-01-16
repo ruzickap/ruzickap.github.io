@@ -430,4 +430,4 @@ setup (hd0)
 ```
 
 You find fine a lot of great tips regarding "bad sectors" on
-[this page](https://web.archive.org/web/20111001233522/http://smartmontools.sourceforge.net/badblockhowto.html).
+[this page](https://web.archive.org/web/20100116011157/http://smartmontools.sourceforge.net/badblockhowto.html).
