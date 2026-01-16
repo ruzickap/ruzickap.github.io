@@ -58,7 +58,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
         with:
-          args: --root-dir ./public ./public
           fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}
 
       - name: Set Variables
