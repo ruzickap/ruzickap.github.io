@@ -130,6 +130,7 @@ auto_from on
 maildomain ser.no-ip.org
 EOF
 
+# shellcheck disable=SC2016 # Single quotes intentional - backticks expand on router, not locally
 sed -i '/^exit 0/i echo -e "Subject: Reboot `uci get system.@system[0].hostname`\\n\\nOpenwrt rebooted: `date`\\n\\n`grep -B 50 \\"syslogd started\\" /etc/messages`" | sendmail petr.ruzicka@gmail.com' /etc/rc.local
 ```
 
@@ -316,7 +317,7 @@ cat > /www2/vnstat/index.html << \EOF
 EOF
 
 for IFCE in "$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf)"/*; do
-cat >> /www2/vnstat/index.html << EOF
+  cat >> /www2/vnstat/index.html << EOF
     <h3>Traffic of Interface $IFCE</h3>
     <table>
         <tbody>

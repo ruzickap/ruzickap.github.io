@@ -360,11 +360,14 @@ dropbearkey -t rsa -f /root/.ssh/id_rsa
 
 # Save the public key to the ~/.ssh/authorized_keys on the server cat > /etc/fswebcam.script << \EOF
 #!/bin/sh
-OUTPUT_FILE="/tmp/webcam/$(date +%F_%H-%M).png" OUTPUT_DIR=$(dirname
-"$OUTPUT_FILE") date > /tmp/fswebcam.script.log
+OUTPUT_FILE="/tmp/webcam/$(date +%F_%H-%M).png"
+OUTPUT_DIR=$(dirname "$OUTPUT_FILE")
+
+date > /tmp/fswebcam.script.log
 
 if [ "$(pgrep -f fswebcam | wc -l)" -ge 4 ]; then
   BAD_STATE=1
+  # shellcheck disable=SC2009 # ps | grep is intentional to show full process details for debugging
   echo -e "*** fswebcam already running [$(pgrep -f fswebcam | wc -l)] !!!\n*** ps -ef | grep -E '(fswebcam|scp)':\n$(ps -ef | grep -E '(fswebcam|scp)')\n*** killall fswebcam:\n$(killall fswebcam)\n" | tee -a /tmp/fswebcam.script.log
 fi
 

@@ -140,7 +140,7 @@ adb push $MY_BACKUP_PATH/ru.org.amip.ClockSync_preferences.xml /data/data/ru.org
 adb shell mkdir -p /data/data/menion.android.locus.pro/shared_prefs/
 adb push $MY_BACKUP_PATH/menion.android.locus.pro_preferences.xml /data/data/menion.android.locus.pro/shared_prefs/
 adb shell mkdir -p /data/data/eu.inmite.apps.smsjizdenka/databases/
-adb push $MY_BACKUP_PATH/smsjizdenka.db  /data/data/eu.inmite.apps.smsjizdenka/databases/
+adb push $MY_BACKUP_PATH/smsjizdenka.db /data/data/eu.inmite.apps.smsjizdenka/databases/
 adb shell mkdir -p /data/data/com.prey/shared_prefs/
 adb push $MY_BACKUP_PATH/com.prey_preferences.xml /data/data/com.prey/shared_prefs/
 adb shell mkdir -p /data/data/com.newsrob/shared_prefs/
@@ -158,6 +158,7 @@ Fix all permissions and reboot:
 
 ```bash
 adb shell fix_permissions
+# shellcheck disable=SC2016 # Single quotes intentional - $APP expands on Android device, not locally
 adb shell 'for APP in CarHomeGoogle.apk Email.apk GenieWidget.apk RomManager.apk Stk.apk Talk.apk; do rm -f /system/app/$APP; done'
 
 adb reboot
@@ -165,6 +166,7 @@ adb reboot
 
 Maybe you are asking why not to just copy the ".db" files (like it's mentioned
 on most of the other pages).
+
 -> the reason is, because the structure of the sqlite db changed between CM
 versions and that's the reason why simple copy of the .db files is not working.
 
