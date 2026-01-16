@@ -54,7 +54,7 @@ wget http://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-3.86.tar.bz2 -
   tar xvjf - --to-stdout syslinux-3.86/core/pxelinux.0 > tftpboot/pxelinux.0
 ```
 
-Configure dnsmasq to listen on eth1:
+Configure dnsmasq to listen on `eth1`:
 
 ```bash
 mv -v /etc/dnsmasq.conf /etc/dnsmasq.conf.old
@@ -73,7 +73,7 @@ EOF
 ```
 
 Restart dnsmasq daemon and try to boot over network from computer connected to
-eth1 interface.
+`eth1` interface.
 
 ```bash
 ifconfig eth1 192.168.0.1 netmask 255.255.255.0
@@ -208,7 +208,8 @@ dnsmasq-tftp: sent /home/ftp/pub/distributions/tftpboot/sysrcd.md5 to 192.168.0.
 dnsmasq-tftp: sent /home/ftp/pub/distributions/tftpboot/sysrcd.dat to 192.168.0.90
 ```
 
-To enable [NAT](https://en.wikipedia.org/wiki/Network_address_translation) + routing for the hosts run these commands:
+To enable [NAT](https://en.wikipedia.org/wiki/Network_address_translation) and
+routing for the hosts run these commands:
 
 ```bash
 iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
@@ -221,7 +222,7 @@ installation like I described above it's handy to put these lines into
 [GRUB2](https://en.wikipedia.org/wiki/GNU_GRUB) configuration to be able to boot
 it when something goes wrong with the Linux box:
 
-```lua
+```bash
 cat << EOF >>/etc/grub.d/40_custom
 
 menuentry "SystemRescueCd 1.5.1" {

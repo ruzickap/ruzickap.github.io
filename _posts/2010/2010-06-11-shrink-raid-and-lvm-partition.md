@@ -6,6 +6,9 @@ categories: [Linux, Storage]
 tags: [RAID, LVM, mdadm, ext4]
 ---
 
+> Not completed...
+{: .prompt-info }
+
 I'm using [RAID1](https://en.wikipedia.org/wiki/RAID#RAID_1) in my servers. The
 disks I used are always the same size and the same type from one company.
 
@@ -26,7 +29,7 @@ wrote a few notes about it.
 Let's have Debian installed on 2 10Gb disks, which using RAID1 with LVM in
 VirtualBox:
 
-```bash
+```console
 root@debian:~# fdisk -l /dev/sda /dev/sdb | grep 'Disk /dev/'
 Disk /dev/sda: 10.7 GB, 10737418240 bytes
 Disk /dev/sdb: 10.7 GB, 10737418240 bytes
@@ -34,7 +37,7 @@ Disk /dev/sdb: 10.7 GB, 10737418240 bytes
 
 I remove the first disk from RAID:
 
-```bash
+```console
 root@debian:~# mdadm --manage /dev/md0 --fail /dev/sda1
 mdadm: set /dev/sda1 faulty in /dev/md0
 
@@ -45,7 +48,7 @@ mdadm: hot removed /dev/sda1
 It's time to replace first disk with smaller one in VirtualBox. Then there
 should be two different disks with degraded raid array:
 
-```bash
+```console
 root@debian:~# fdisk -l /dev/sda /dev/sdb | grep 'Disk /dev/'
 Disk /dev/sda doesn't contain a valid partition table
 Disk /dev/sda: 10.7 GB, 10704912384 bytes
@@ -63,7 +66,7 @@ unused devices: <none>
 If I use sfdisk to copy partition layout from bigger disk to smaller disk I get
 this warning:
 
-```bash
+```console
 root@debian:~# sfdisk -d /dev/sdb | sfdisk --force /dev/sda
 ...
 Warning: given size (20964762) exceeds max allowable size (20900502)
@@ -75,7 +78,7 @@ To prevent this error I need to shrink raid partition located on `/dev/sdb1` by
 
 Look at the disk layout:
 
-```bash
+```console
 root@debian:~# df --total
 Filesystem           1K-blocks      Used Available Use% Mounted on
 /dev/mapper/VG-root     959512    148832    761940  17% /
@@ -90,9 +93,9 @@ total                 10578360    806616   9247668   9%
 ```
 
 You can see there is 4G free on `/home` partition. Download and boot
-[SystemRescueCD](https://www.sysresccd.org/) and shrink ext4 first.
+[SystemRescueCD](https://www.sysresccd.org/) and shrink `ext4` first.
 
-```bash
+```console
 e2fsck -f /dev/mapper/VG-home
 
 root@sysresccd /root % resize2fs /dev/mapper/VG-home 4G
@@ -133,7 +136,7 @@ It means:
 
 It's necessary to reduce logical volume first:
 
-```bash
+```console
 root@sysresccd /root % lvdisplay /dev/VG/home | grep 'LV Size'
   LV Size                4.42 GiB
 
@@ -150,7 +153,7 @@ resize2fs /dev/mapper/VG-home
 We are done with logical volume resizing and we should see some free space in
 volume group (324M):
 
-```bash
+```console
 root@sysresccd / % pvs
   PV         VG   Fmt  Attr PSize  PFree
   /dev/md0   VG   lvm2 a-   10.00g 324.00m
@@ -159,7 +162,7 @@ root@sysresccd / % pvs
 Now it's necessary to shrink physical volume (the "lowest" volume) [10G -
 0.031G]:
 
-```bash
+```console
 pvresize /dev/md0 --setphysicalvolumesize 9.9G
 
 root@sysresccd / % pvs
@@ -171,7 +174,7 @@ root@sysresccd / % pvs
 
 The last thing we need to resize is disk array:
 
-```bash
+```console
 root@sysresccd / % mdadm --detail /dev/md0 | grep Size
      Array Size : 10482304 (10.00 GiB 10.73 GB)
   Used Dev Size : 10482304 (10.00 GiB 10.73 GB)
@@ -182,12 +185,11 @@ mdadm: component size of /dev/md0 has been set to 10433331K
 ```
 
 Now we can safely create raid partition on the first empty "smaller" disk and
-mirror data:
-(Use fdisk to create "Linux raid autodetect" partition [fd] on the first disk)
+mirror data. (Use fdisk to create "Linux raid autodetect" partition [fd] on the
+first disk):
 
 ```bash
 mdadm --manage /dev/md0 --add /dev/sda1
-```
 
 mdadm --create /dev/md1 --verbose --metadata=0.90 --level=1 --raid-devices=2
 /dev/sda1 missing
@@ -200,3 +202,4 @@ mdadm --stop /dev/md0
 mdadm --zero-superblock /dev/sdb1
 sfdisk -d /dev/sda | sfdisk --force /dev/sdb
 mdadm --manage /dev/md1 --add /dev/sdb1
+```

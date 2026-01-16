@@ -6,6 +6,9 @@ categories: [Linux, Android]
 tags: [HTC-Desire, bootanimation, adb, mplayer]
 ---
 
+> Not completed...
+{: .prompt-info }
+
 I decided to change the boot animation on my HTC Desire.
 You can find plenty of them in many places, but I tried to create my own from
 a movie.
@@ -22,7 +25,7 @@ First download the movie:
 wget http://mirror.bigbuckbunny.de/peach/bigbuckbunny_movies/big_buck_bunny_1080p_h264.mov
 ```
 
-To make it quick you can use this script to create bootanimation.zip file. I
+To make it quick you can use this script to create `bootanimation.zip` file. I
 commented some parts of the code, so it should be understandable.
 
 ```bash
@@ -66,8 +69,8 @@ p 0 0 part1" > desc.txt
 zip -0 --recurse-paths --move bootanimation.zip part0 part1 desc.txt
 ```
 
-If you have bootanimation.zip you just need to copy it to the phone and restart
-it.
+If you have `bootanimation.zip` you just need to copy it to the phone and
+restart it.
 
 ```bash
 adb push bootanimation.zip /data/local/

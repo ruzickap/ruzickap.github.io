@@ -6,8 +6,8 @@ categories: [Linux, OpenWrt]
 tags: [Transmission, Samba, vsftpd, WiFi, USB, TP-Link]
 ---
 
-My brother asked me to customize firmware in his WiFi router TP-Link
-TL-WR1043ND.
+My brother asked me to customize firmware in his WiFi router
+[TP-Link TL-WR1043ND](https://openwrt.org/toh/tp-link/tl-wr1043nd).
 He wants to use it for downloading torrents and sharing them using smb and ftp
 protocols.
 
@@ -19,7 +19,7 @@ a few torrent clients in OpenWrt distribution, but I chose
 
 I decided to compile it from scratch (using Fedora 13), because I'm able to
 include all necessary software in the image (since it's compressed). If I
-install the packages using opkg later I will not have enough free space to
+install the packages using `opkg` later I will not have enough free space to
 install all my favorite programs.
 
 Here are my notes beginning with the compilation from sources, uploading

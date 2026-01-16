@@ -30,6 +30,7 @@ subdirectories correspond to hostnames of your machines:
 Then the access rights are set for each host to access the right directory in
 SVN. Then you should be able to commit changes to SVN using svn+ssh and private
 keys.
+
 Use cron to automatically check changes in your files and add them to SVN.
 
 Here is the example how I installed subversion server to debian and managed
@@ -155,7 +156,6 @@ root@debian:/ echo "command=\"/usr/bin/svnserve -t -r /var/lib/svn-repos/system_
 root@debian:/ cat /home/svn/.ssh/authorized_keys
 command="/usr/bin/svnserve -t -r /var/lib/svn-repos --tunnel-user=debian",no-port-forwarding,no-pty,no-agent-forwarding,no-X11-forwarding ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA7INCS6YC4VtsBpPa7H3sg4grSeRXSosWhWFzqyNDf++pau37DH1wZYCunfBpJjbiVMFJnOoT3LPmNc7DUTipEUAbz8p9XNt20qG8edLuf2zJ1VrqCxTydIJon+X+ZT6CI95v6/xG3SBevRKaV07kwzxIPdLMhJKdF0d7HKUOGTgWrWGIoRCnxSyIO5Jn7qEA+7/h7IYZo94IOedwDi1009akOfU73Iw/ArxtDAM752UNf7Y0gANtJRngBdT1nkiW1Yko2OPMG+gMDkc4bZ14TYqXzHeFHSGD/ipZlKn9czry3z5Pw5quI/K6m6uaWP9WuMC/CEjhRmNbOpsVRNg00Q== root@debian
 command="/usr/bin/svnserve -t -r /var/lib/svn-repos/system_configs --tunnel-user=czbrn0208",no-port-forwarding,no-pty,no-agent-forwarding,no-X11-forwarding ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA4p/ax75qZ5KiI1j3uy3rmgNFjyaxflKdVN0mQKPg4xzHAIy2cVdAk9eVdmNJOCKzjJej4dEL2NwgR0LDaaVJelZt2tI/GMZj4VnxLyAJQeJEeyMuUccwDJLF4X6CtUP22f7dzkHe6ovpRgBdUiuNWlmmOVkTwJqgQMp6P7c5BtKA60VLWvu1dfnChbJ8hay+9y890n893egOm6aAHpzbsaSPF0DxqrkNnVYrabOh4Y7HoXuKwJNdQtbR0zKdnURTk+GWMiUgyMU5NkEAC9GqAzVN/t+4NWZHDWuS1VlBdNbt1pmfMNhlUAIm/tsWtPdPwYEnI8MqolQHnHSDw9KYeQ== root@czbrn0208
-root@debian:/
 ```
 
 Now you should be able to access SVN from the hosts:
