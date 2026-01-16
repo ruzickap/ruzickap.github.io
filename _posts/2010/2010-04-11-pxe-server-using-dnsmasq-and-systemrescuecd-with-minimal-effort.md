@@ -47,11 +47,11 @@ Fill tftpboot directory with necessary files/links:
 ```bash
 mkdir -v tftpboot/pxelinux.cfg
 sed 's@initrd=initram.igz@initrd=initram.igz netboot=tftp://192.168.0.1/sysrcd.dat  rootpass=xxxx setkmap=us@' systemrescuecd/isolinux/isolinux.cfg > tftpboot/pxelinux.cfg/default
-for FILE in systemrescuecd/isolinux/* systemrescuecd/sysrcd* systemrescuecd/ntpasswd systemrescuecd/bootdisk
-  do ln -vs "../$FILE" "tftpboot/$(basename "$FILE")"
+for FILE in systemrescuecd/isolinux/* systemrescuecd/sysrcd* systemrescuecd/ntpasswd systemrescuecd/bootdisk; do
+  ln -vs "../$FILE" "tftpboot/$(basename "$FILE")"
 done
-wget http://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-3.86.tar.bz2 -O - | \
-  tar xvjf - --to-stdout syslinux-3.86/core/pxelinux.0 >tftpboot/pxelinux.0
+wget http://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-3.86.tar.bz2 -O - |
+tar xvjf - --to-stdout syslinux-3.86/core/pxelinux.0 >tftpboot/pxelinux.0
 ```
 
 Configure dnsmasq to listen on eth1:
