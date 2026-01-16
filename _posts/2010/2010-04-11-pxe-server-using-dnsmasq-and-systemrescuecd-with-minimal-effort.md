@@ -80,9 +80,8 @@ ifconfig eth1 192.168.0.1 netmask 255.255.255.0
 dnsmasq --keep-in-foreground --no-daemon --log-queries --log-facility=/tmp/dnsmasq_log --log-dhcp --dhcp-leasefile=/tmp/dhcp-leasefile
 ```
 
-You should see something like:
-(I included examples for 100 Mbit and 1 Gbit network to see the speed
-difference)
+You should see something like (I included examples for 100 Mbit and 1 Gbit
+network to see the speed difference):
 
 {% include embed/youtube.html id='acREwhuPI4c' %}
 
