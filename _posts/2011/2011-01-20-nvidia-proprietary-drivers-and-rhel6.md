@@ -8,6 +8,7 @@ tags: [Nvidia, GRUB, drivers, yum]
 
 Sometimes you need to run [Nvidia](https://www.nvidia.com/) proprietary drivers
 in various linux distributions.
+
 I was able to run it on standard [RHEL](https://www.redhat.com/) 6.0 installed as
 "Desktop" with the following commands:
 

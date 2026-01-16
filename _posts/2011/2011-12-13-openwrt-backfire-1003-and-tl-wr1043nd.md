@@ -13,7 +13,7 @@ It's **OUTDATED** and **INCOMPLETE**, but it can still bring some light...
 
 ---
 
-Few days ago I bought WiFi router TP-Link TL-WR1043ND.
+Few days ago I bought WiFi router [TP-Link TL-WR1043ND](https://openwrt.org/toh/tp-link/tl-wr1043nd).
 The main reason was the USB, Gigabit Ethernet ports, 802.11n and
 [support](https://dev.openwrt.org/milestone/Backfire%2010.03) in latest
 [OpenWrt](https://openwrt.org/).

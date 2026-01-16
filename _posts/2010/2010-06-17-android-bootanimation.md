@@ -51,8 +51,8 @@ for FILE in part[01]/*.png; do
   if echo "$FILE" | grep part0; then
     convert "$FILE" -crop 870x1080+510+0 -units PixelsPerCentimeter -type TrueColor -density 37.78x37.78 -depth 8 -resize $SIZE -size $SIZE xc:black +swap -gravity center -composite -verbose "part0/$(printf "%05d.${FILE##*.}" $COUNT_PART)"
     COUNT_PART=$((COUNT_PART + 1))
-#You can add the following frame (but I don't like it) - see imagemagick home page for more details
-# -mattecolor SkyBlue -frame 6x6+2+2
+    #You can add the following frame (but I don't like it) - see imagemagick home page for more details
+    # -mattecolor SkyBlue -frame 6x6+2+2
     else
       convert "$FILE" -crop 540x900+1150+150 -units PixelsPerCentimeter -type TrueColor -density 37.78x37.78 -depth 8 -resize $SIZE -size $SIZE xc:black +swap -gravity center -composite -verbose "part1/$(printf "%05d.${FILE##*.}" $COUNT_PART)"
       COUNT_PART=$((COUNT_PART + 1))
