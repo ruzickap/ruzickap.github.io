@@ -30,18 +30,18 @@ installation procedure). Disable firewall and SELinux.
 
   ```bash
   mkdir /var/tmp/cobbler-4.6
-  cd /var/tmp/cobbler-4.6
+  cd /var/tmp/cobbler-4.6 || exit
   ```
 
   ```bash
   rpm -i
-  ./python-elementtree-1.2.6-5.el4.centos.x86_64.rpm \
-  ./python-urlgrabber-2.9.8-2.noarch.rpm ./sqlite-3.3.6-2.x86_64.rpm \
-  ./python-sqlite-1.1.7-1.2.1.x86_64.rpm \
-  ./yum-metadata-parser-1.0-8.el4.centos.x86_64.rpm \
-  ./centos-yumconf-4-4.5.noarch.rpm \
-  ./yum-2.4.3-4.el4.centos.noarch.rpm \
-  ./createrepo-0.4.4-2.noarch.rpm
+    ./python-elementtree-1.2.6-5.el4.centos.x86_64.rpm \
+    ./python-urlgrabber-2.9.8-2.noarch.rpm ./sqlite-3.3.6-2.x86_64.rpm \
+    ./python-sqlite-1.1.7-1.2.1.x86_64.rpm \
+    ./yum-metadata-parser-1.0-8.el4.centos.x86_64.rpm \
+    ./centos-yumconf-4-4.5.noarch.rpm \
+    ./yum-2.4.3-4.el4.centos.noarch.rpm \
+    ./createrepo-0.4.4-2.noarch.rpm
   ```
 
   ```bash
@@ -49,7 +49,7 @@ installation procedure). Disable firewall and SELinux.
   mkdir /var/tmp/rhel4_repo/
   ln -s /media/cdrom/RedHat/RPMS/ /var/tmp/rhel4_repo/RPMS
   createrepo /var/tmp/rhel4_repo/
-  cat >/etc/yum.repos.d/RHEL-4.6-Media.repo <<+
+  cat >/etc/yum.repos.d/RHEL-4.6-Media.repo << +
   [rhel4-media]
   name=RHEL4 - Media
   baseurl=file:///var/tmp/rhel4_repo/
@@ -58,7 +58,7 @@ installation procedure). Disable firewall and SELinux.
   +
 
   createrepo /var/tmp/cobbler-4.6/
-  cat >>/etc/yum.repos.d/my.repo <<+
+  cat >>/etc/yum.repos.d/my.repo << +
   [my-repo]
   name=My Repository
   baseurl=file:///var/tmp/cobbler-4.6/
@@ -244,7 +244,7 @@ installation procedure). Disable firewall and SELinux.
 
 ```bash
 cobbler system add --comment="c3virt01ce01 machine" --name=c3virt01ce01 --hostname=c3virt01ce01 --netboot-enabled=1 --profile=NGP_RHEL4.6-AS-x86_64 --name-servers=192.168.0.129 --static=0 --kickstart=/var/lib/cobbler/kickstarts/legacy.ks
-cobbler system edit --name c3virt01ce01 --interface=eth0 --mac=00:0c:29:68:78:96 --ip=192.168.0.10 --netmask=255.255.255.0  --static=1 --dns-name=c3virt01ce01.my.domain.cz
+cobbler system edit --name c3virt01ce01 --interface=eth0 --mac=00:0c:29:68:78:96 --ip=192.168.0.10 --netmask=255.255.255.0 --static=1 --dns-name=c3virt01ce01.my.domain.cz
 cobbler system edit --name c3virt01ce01 --interface=eth1 --mac=00:0c:29:68:78:b4 --ip=192.168.1.10 --netmask=255.255.255.0 --static=1
 cobbler system edit --name c3virt01ce01 --interface=eth2 --mac=00:0c:29:68:78:aa --ip=192.168.2.10 --netmask=255.255.255.0 --static=1
 cobbler system edit --name c3virt01ce01 --interface=eth3 --mac=00:0c:29:68:78:be --static=0
