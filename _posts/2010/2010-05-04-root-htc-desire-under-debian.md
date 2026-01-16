@@ -33,9 +33,9 @@ Here you can find the way how to get root on the HTC Desire using Debian.
   *Settings -> Applications -> Development -> USB debugging*
   and get the CID number:
 
-  ```console
-  root@czbrn0208:/$ cd /var/tmp/android
-  root@czbrn0208:/var/tmp/android$ ./adb-linux shell cat /sys/class/mmc_host/mmc1/mmc1:*/cid
+  ```bash
+  cd /var/tmp/android || exit
+  ./adb-linux shell cat /sys/class/mmc_host/mmc1/mmc1:*/cid
   03534453553034478001bada0400a1f2
   ```
 
@@ -50,7 +50,7 @@ Here you can find the way how to get root on the HTC Desire using Debian.
   this command!)
 
   ```console
-  root@czbrn0208:/var/tmp$ dd if=/var/tmp/goldcard.img of=/dev/mmcblk1
+  dd if=/var/tmp/goldcard.img of=/dev/mmcblk1
   0+1 records in
   0+1 records out
   384 bytes (384 B) copied, 0.00537284 s, 71.5 kB/s
@@ -61,8 +61,8 @@ Here you can find the way how to get root on the HTC Desire using Debian.
   Connect your phone to the PC and run:
 
   ```console
-  root@czbrn0208:/$ cd /var/tmp/android
-  root@czbrn0208:/var/tmp/android$ ./step1-linux.sh
+  cd /var/tmp/android || exit
+  ./step1-linux.sh
   Desire Root Step 1
 
   Erasing cache and rebooting in RUU mode...
@@ -214,7 +214,7 @@ Here you can find the way how to get root on the HTC Desire using Debian.
   Wait 10 seconds until the white HTC screen disappears and run:
 
   ```console
-  root@czbrn0208:/var/tmp/android$ time ./step2-linux.sh
+  time ./step2-linux.sh
   Desire Root Step 2
 
   Pushing required files to device...
