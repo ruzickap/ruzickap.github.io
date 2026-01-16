@@ -92,7 +92,7 @@ Another example from [VirtualBox](https://www.virtualbox.org/):
 
 Dnsmasq produced this output:
 
-```text
+```console
 root@debian:/home/ftp/pub/distributions# dnsmasq --keep-in-foreground --no-daemon --log-queries --log-facility=/tmp/dnsmasq_log --log-dhcp --dhcp-leasefile=/tmp/dhcp-leasefile
 dnsmasq: started, version 2.52 cachesize 150
 dnsmasq: compile time options: IPv6 GNU-getopt DBus I18N DHCP TFTP

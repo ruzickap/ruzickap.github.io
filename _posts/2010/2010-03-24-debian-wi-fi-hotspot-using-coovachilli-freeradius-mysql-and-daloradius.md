@@ -146,7 +146,7 @@ $uamsecret = "uamsecret";
 Now you should be able to reach daloRADIUS installation on
 <http://127.0.0.1/daloradius/>
 
-```text
+```yaml
 username: administrator
 password: radius
 ```

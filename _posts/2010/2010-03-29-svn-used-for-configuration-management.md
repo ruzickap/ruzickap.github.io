@@ -182,9 +182,9 @@ Now you can access your repository by [WebSVN](https://websvnphp.github.io/) usi
 
 Everybody like screenshots so I put there some from my own SVN server:
 
-![WebSVN 1](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_1.avif){: .left }
-![WebSVN 2](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_2.avif){: .normal }
-![WebSVN 3](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_3.avif){: .right }
+![WebSVN 1](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_1.avif)
+![WebSVN 2](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_2.avif)
+![WebSVN 3](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_3.avif)
 
 ### snvci script
 
@@ -197,7 +197,7 @@ commands combined with shell - so here are some examples:
 
 Add files to repository:
 
-```text
+```console
 gate:/etc/freeradius# svnci sql.conf
 `/etc/freeradius/sql.conf' -> `/root/configuration-gate/etc/freeradius/sql.conf'
 
@@ -224,7 +224,7 @@ Initial: /etc/freeradius/sites-available/default
 
 Add directory to repository:
 
-```text
+```console
 gate:/etc# ls -ld cron.monthly
 drwxr-xr-x 2 root root 4096 2010-02-25 17:02 cron.monthly
 
@@ -250,7 +250,7 @@ Initial: /etc/cron.monthly/
 
 Removing file(s):
 
-```text
+```console
 gate:/etc# cd cron.monthly
 gate:/etc/cron.monthly# svnci -r debsums standard
 Removing /etc/cron.monthly/debsums from repository: D         /root/configuration-gate/etc/cron.monthly/debsums
@@ -262,11 +262,11 @@ Transmitting file data .
 Committed revision 39.
 ```
 
-For updating files included in your repository you can use "svnci -u" command.
+For updating files included in your repository you can use `svnci -u` command.
 It's also handy to run it every night by cron to automatically track changes in
 your "monitored" files:
 
-```text
+```console
 gate:/etc# svnci -u
 Sending        configuration-gate/etc/apache2/httpd.conf
 Sending        configuration-gate/etc/apache2/sites-available/default-ssl
