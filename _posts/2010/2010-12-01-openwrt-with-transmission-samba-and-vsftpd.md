@@ -189,7 +189,7 @@ EOF
 Setup the ssh key to enable autologin:
 
 ```bash
-scp $HOME/.ssh/id_rsa.pub root@192.168.0.2:/tmp/authorized_keys
+scp "$HOME"/.ssh/id_rsa.pub root@192.168.0.2:/tmp/authorized_keys
 ssh root@192.168.0.2
 cp /tmp/authorized_keys /etc/dropbear/authorized_keys
 chmod 600 /etc/dropbear/authorized_keys

@@ -148,7 +148,7 @@ echo option force_space >> /etc/opkg.conf
 Setup the ssh key to enable autologin:
 
 ```bash
-scp $HOME/.ssh/id_rsa.pub root@192.168.0.2:/tmp/authorized_keys
+scp "$HOME/.ssh/id_rsa.pub" root@192.168.0.2:/tmp/authorized_keys
 ssh root@192.168.0.2
 cp /tmp/authorized_keys /etc/dropbear/authorized_keys
 chmod 600 /etc/dropbear/authorized_keys
@@ -360,29 +360,29 @@ dropbearkey -t rsa -f /root/.ssh/id_rsa
 
 # Save the public key to the ~/.ssh/authorized_keys on the server cat > /etc/fswebcam.script << \EOF
 #!/bin/sh
-OUTPUT_FILE="/tmp/webcam/`date +%F_%H-%M`.png" OUTPUT_DIR=`dirname
-$OUTPUT_FILE` date > /tmp/fswebcam.script.log
+OUTPUT_FILE="/tmp/webcam/$(date +%F_%H-%M).png" OUTPUT_DIR=$(dirname
+"$OUTPUT_FILE") date > /tmp/fswebcam.script.log
 
-if [ `pgrep -f fswebcam | wc -l` -ge 4 ]; then
+if [ "$(pgrep -f fswebcam | wc -l)" -ge 4 ]; then
 BAD_STATE=1
-echo -e "*** fswebcam already running [`pgrep -f fswebcam | wc -l`] !!!\n*** ps -ef | grep -E '(fswebcam|scp)':\n`ps -ef | grep -E '(fswebcam|scp)'`\n*** killall fswebcam:\n`killall fswebcam`\n" | tee -a /tmp/fswebcam.script.log
+echo -e "*** fswebcam already running [$(pgrep -f fswebcam | wc -l)] !!!\n*** ps -ef | grep -E '(fswebcam|scp)':\n$(ps -ef | grep -E '(fswebcam|scp)')\n*** killall fswebcam:\n$(killall fswebcam)\n" | tee -a /tmp/fswebcam.script.log
 fi
 
-test -d $OUTPUT_DIR || mkdir -p $OUTPUT_DIR
+test -d "$OUTPUT_DIR" || mkdir -p "$OUTPUT_DIR"
 
-fswebcam --no-banner --rotate 180 --resolution 640x480 --fps 15 --png 7 --save $OUTPUT_FILE 2>&1 | tee -a /tmp/fswebcam.script.log
+fswebcam --no-banner --rotate 180 --resolution 640x480 --fps 15 --png 7 --save "$OUTPUT_FILE" 2>&1 | tee -a /tmp/fswebcam.script.log
 
-if scp -B -p -i /root/.ssh/id_rsa $OUTPUT_FILE ruzickap@gate.xvx.cz:/home/ftp/ 2>&1 >> /tmp/fswebcam.script.log; then
-rm $OUTPUT_FILE
+if scp -B -p -i /root/.ssh/id_rsa "$OUTPUT_FILE" ruzickap@gate.xvx.cz:/home/ftp/ >> /tmp/fswebcam.script.log 2>&1; then
+rm "$OUTPUT_FILE"
 else
 BAD_STATE=1
 test -d /root/webcam_medlanky || mkdir -p /root/webcam_medlanky
-mv $OUTPUT_FILE /root/webcam_medlanky/
-echo -e "*** ls -la /root/webcam_medlanky/:\n`ls -la /root/webcam_medlanky/`\n" | tee -a /tmp/fswebcam.script.log
+mv "$OUTPUT_FILE" /root/webcam_medlanky/
+echo -e "*** ls -la /root/webcam_medlanky/:\n$(ls -la /root/webcam_medlanky/)\n" | tee -a /tmp/fswebcam.script.log
 fi
 
 if [ "$BAD_STATE" -eq 1 ]; then
-echo -e "Subject: Webcam script failed!\n\n`cat /tmp/fswebcam.script.log`\n" | ssmtp petr.ruzicka@gmail.com
+echo -e "Subject: Webcam script failed!\n\n$(cat /tmp/fswebcam.script.log)\n" | ssmtp petr.ruzicka@gmail.com
 fi
 EOF
 

@@ -21,8 +21,8 @@ I installed the kernel related packages and
 [extroot](https://wiki.openwrt.org/doc/howto/extroot):
 <!-- rumdl-enable MD013 -->
 
-(if you have OpenWRT already installed use: mtd -e firmware -r write
-/www2/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-sysupgrade.bin firmware)
+(if you have OpenWRT already installed use: `mtd -e firmware -r write
+/www2/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-sysupgrade.bin firmware`)
 
 ```bash
 telnet 192.168.1.1
@@ -197,7 +197,7 @@ uci set iodined.@iodined[0].tld=tunnel.XXXXX.cz
 /etc/init.d/iodined enable
 ```
 
-Configure httpd daemon for the "/www2":
+Configure httpd daemon for the `/www2`:
 
 ```bash
 opkg install px5g uhttpd-mod-tls
@@ -259,7 +259,7 @@ uci set luci_statistics.collectd_rrdtool.CacheFlush=900
 
 /etc/init.d/luci_statistics enable
 /etc/init.d/collectd enable
-<pre><code class="bash">opkg install luci-app-vnstat vnstat vnstati
+opkg install luci-app-vnstat vnstat vnstati
 
 mkdir /etc/vnstat
 sed -i 's@^\(DatabaseDir\).*@\1 "/overlay/etc/vnstat"@' /etc/vnstat.conf
