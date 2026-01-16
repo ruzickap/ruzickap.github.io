@@ -2,10 +2,12 @@
 title: Encrypted disks with remote key placed on http server
 author: Petr Ruzicka
 date: 2009-06-07
-description: https://linux-old.xvx.cz/2009/06/crypted-disks-with-remote-key-placed-on-http-server/
 categories: [Linux, Storage]
 tags: [bash, LVM, USB, wget, encryption, dm-crypt]
 ---
+
+> <https://linux-old.xvx.cz/2009/06/crypted-disks-with-remote-key-placed-on-http-server/>
+{: .prompt-info }
 
 This page contains some information on how to create an encrypted disk using
 dm_crypt, lvm, gpg with remote key stored on http server.

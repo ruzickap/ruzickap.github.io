@@ -2,10 +2,12 @@
 title: SVN used for configuration management
 author: Petr Ruzicka
 date: 2010-03-29
-description: https://linux-old.xvx.cz/2010/03/svn-used-for-configuration-management/
 categories: [Linux, Server]
 tags: [SVN, Apache, configuration-management, WebSVN]
 ---
+
+> <https://linux-old.xvx.cz/2010/03/svn-used-for-configuration-management/>
+{: .prompt-info }
 
 Like every UNIX server admin, I'm using many various text based configurations
 on my machines. It's important to track "every" change of these important files

@@ -2,10 +2,12 @@
 title: Disable IPv6 in Debian
 author: Petr Ruzicka
 date: 2009-12-29
-description: https://linux-old.xvx.cz/2009/12/disable-ipv6-in-debian/
 categories: [Linux, Debian]
 tags: [GRUB, IPv6, networking]
 ---
+
+> <https://linux-old.xvx.cz/2009/12/disable-ipv6-in-debian/>
+{: .prompt-info }
 
 I have a problem with Java Webstart applications, which are using IPv6 by
 default. Because I'm not using IPv6 at all I decided to disable this protocol

@@ -2,10 +2,12 @@
 title: digiKam thumbnails and Albums with photos stored on remote shares
 author: Petr Ruzicka
 date: 2009-03-22
-description: https://linux-old.xvx.cz/2009/03/digikam-thumbnails-and-albums-with-photos-stored-on-remote-shares/
 categories: [Linux, Desktop]
 tags: [bash, digiKam, KDE]
 ---
+
+> <https://linux-old.xvx.cz/2009/03/digikam-thumbnails-and-albums-with-photos-stored-on-remote-shares/>
+{: .prompt-info }
 
 My photo collection is stored on the server and accessed by cifs protocol to my
 notebooks. I'm using [digiKam](https://www.digikam.org/) to browse my collection

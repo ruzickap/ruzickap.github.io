@@ -2,10 +2,12 @@
 title: BOINC managed from command line - boinc_cmd
 author: Petr Ruzicka
 date: 2009-02-20
-description: https://linux-old.xvx.cz/2009/02/boinc-managed-from-command-line-boinc_cmd/
 categories: [Linux, Server]
 tags: [bash, BOINC]
 ---
+
+> <https://linux-old.xvx.cz/2009/02/boinc-managed-from-command-line-boinc_cmd/>
+{: .prompt-info }
 
 I installed [BOINC](https://boinc.berkeley.edu/) to my server to help the world
 with scientific problems. It's really easy to install it from repositories of

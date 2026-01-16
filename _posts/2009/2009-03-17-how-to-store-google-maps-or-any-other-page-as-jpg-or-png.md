@@ -2,10 +2,12 @@
 title: How to store Google Maps (or any other page) as jpg or png
 author: Petr Ruzicka
 date: 2009-03-17
-description: https://linux-old.xvx.cz/2009/03/how-to-store-google-maps-or-any-other-page-as-jpg-or-png/
 categories: [Linux, Desktop]
 tags: [KDE, Firefox]
 ---
+
+> <https://linux-old.xvx.cz/2009/03/how-to-store-google-maps-or-any-other-page-as-jpg-or-png/>
+{: .prompt-info }
 
 I'm using my old Palm TX to navigate during my travels. I don't have GPS, but I
 usually get some maps from the web, store them as jpg and view on Palm as a

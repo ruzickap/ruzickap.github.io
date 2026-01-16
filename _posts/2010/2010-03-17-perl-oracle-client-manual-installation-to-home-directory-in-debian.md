@@ -2,10 +2,12 @@
 title: Perl Oracle client manual installation to home directory in Debian
 author: Petr Ruzicka
 date: 2010-03-17
-description: https://linux-old.xvx.cz/2010/03/perl-oracle-client-manual-installation-to-home-directory-in-debian/
 categories: [Linux, Debian]
 tags: [perl, Oracle, database]
 ---
+
+> <https://linux-old.xvx.cz/2010/03/perl-oracle-client-manual-installation-to-home-directory-in-debian/>
+{: .prompt-info }
 
 I need to connect to the Oracle database in my work to get some data from it.
 I'm not the Oracle expert, but I decided to use

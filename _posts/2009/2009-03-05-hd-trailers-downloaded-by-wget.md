@@ -2,10 +2,12 @@
 title: HD Trailers downloaded by wget
 author: Petr Ruzicka
 date: 2009-03-05
-description: https://linux-old.xvx.cz/2009/03/hd-trailers-downloaded-by-wget/
 categories: [Linux, Scripting]
 tags: [bash, wget]
 ---
+
+> <https://linux-old.xvx.cz/2009/03/hd-trailers-downloaded-by-wget/>
+{: .prompt-info }
 
 I found nice page [hd-trailers.net](https://www.hd-trailers.net/) accessing
 HD trailers from Yahoo or [Apple](https://www.apple.com/trailers/) through

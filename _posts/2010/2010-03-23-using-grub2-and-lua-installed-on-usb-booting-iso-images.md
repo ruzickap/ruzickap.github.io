@@ -2,10 +2,12 @@
 title: Using Grub2 and LUA installed on USB booting ISO images
 author: Petr Ruzicka
 date: 2010-03-23
-description: https://linux-old.xvx.cz/2010/03/using-grub2-and-lua-installed-on-usb-booting-iso-images-2/
 categories: [Linux, Debian]
 tags: [GRUB, Lua, USB, PXE, live-CD]
 ---
+
+> <https://linux-old.xvx.cz/2010/03/using-grub2-and-lua-installed-on-usb-booting-iso-images-2/>
+{: .prompt-info }
 
 I got 16 GB [USB flash](https://en.wikipedia.org/wiki/USB_flash_drive) from
 my brother, because he can't see me still using my old 64 MB. He decided

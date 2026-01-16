@@ -2,10 +2,12 @@
 title: Another OpenWrt configuration
 author: Petr Ruzicka
 date: 2012-01-28
-description: https://linux-old.xvx.cz/2012/01/another-openwrt-configuration/
 categories: [Linux, OpenWrt]
 tags: [TP-Link, WiFi, USB, PXE, Dnsmasq, iodine]
 ---
+
+> <https://linux-old.xvx.cz/2012/01/another-openwrt-configuration/>
+{: .prompt-info }
 
 I would like to describe another [OpenWrt](https://openwrt.org/) configuration.
 It's going to be just a few examples on how to configure the latest available

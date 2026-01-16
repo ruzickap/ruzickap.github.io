@@ -2,10 +2,12 @@
 title: Notes about upgrade from CyanogenMod 7.0 to 7.2
 author: Petr Ruzicka
 date: 2013-05-27
-description: https://linux-old.xvx.cz/2013/05/notes-about-upgrade-from-cyanogenmod-70-to-72/
 categories: [Linux, Android]
 tags: [HTC-Desire, CyanogenMod, adb, backup]
 ---
+
+> <https://linux-old.xvx.cz/2013/05/notes-about-upgrade-from-cyanogenmod-70-to-72/>
+{: .prompt-info }
 
 > Not completed...
 {: .prompt-info }

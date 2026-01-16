@@ -2,10 +2,12 @@
 title: Trim margins from PDF document
 author: Petr Ruzicka
 date: 2009-06-02
-description: https://linux-old.xvx.cz/2009/06/trim-margins-from-pdf-document/
 categories: [Linux, Desktop]
 tags: [bash, PDF]
 ---
+
+> <https://linux-old.xvx.cz/2009/06/trim-margins-from-pdf-document/>
+{: .prompt-info }
 
 It happened to me once that I wanted to trim margins from a PDF document.
 

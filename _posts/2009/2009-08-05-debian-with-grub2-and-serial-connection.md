@@ -2,10 +2,12 @@
 title: Debian with GRUB2 and serial connection
 author: Petr Ruzicka
 date: 2009-08-05
-description: https://linux-old.xvx.cz/2009/08/debian-with-grub2-and-serial-connection/
 categories: [Linux, Debian]
 tags: [GRUB, serial]
 ---
+
+> <https://linux-old.xvx.cz/2009/08/debian-with-grub2-and-serial-connection/>
+{: .prompt-info }
 
 Sometimes I'm using the serial connection to my server if anything goes wrong.
 It's because I don't have a monitor/TV attached to it.

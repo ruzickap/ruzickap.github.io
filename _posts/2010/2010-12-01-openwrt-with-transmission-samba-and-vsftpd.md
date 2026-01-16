@@ -2,10 +2,12 @@
 title: OpenWrt with Transmission, Samba and vsftpd
 author: Petr Ruzicka
 date: 2010-12-01
-description: https://linux-old.xvx.cz/2010/12/openwrt-with-transmission-samba-and-vsftpd/
 categories: [Linux, OpenWrt]
 tags: [Transmission, Samba, vsftpd, WiFi, USB, TP-Link]
 ---
+
+> <https://linux-old.xvx.cz/2010/12/openwrt-with-transmission-samba-and-vsftpd/>
+{: .prompt-info }
 
 My brother asked me to customize firmware in his WiFi router
 [TP-Link TL-WR1043ND](https://openwrt.org/toh/tp-link/tl-wr1043nd).

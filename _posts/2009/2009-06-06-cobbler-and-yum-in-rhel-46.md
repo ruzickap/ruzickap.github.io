@@ -2,10 +2,12 @@
 title: Cobbler and yum in RHEL 4.6
 author: Petr Ruzicka
 date: 2009-06-06
-description: https://linux-old.xvx.cz/2009/06/cobbler-and-yum-in-rhel-46/
 categories: [Linux, RHEL]
 tags: [bash, perl, Apache, Cobbler, PXE, yum, serial]
 ---
+
+> <https://linux-old.xvx.cz/2009/06/cobbler-and-yum-in-rhel-46/>
+{: .prompt-info }
 
 Look at small how-to install [cobbler](https://fedorahosted.org/cobbler/)
 with yum on [RHEL 4.6](https://www.redhat.com/rhel/) from scratch.

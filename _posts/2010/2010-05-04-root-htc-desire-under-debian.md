@@ -2,10 +2,12 @@
 title: Root HTC Desire under Debian
 author: Petr Ruzicka
 date: 2010-05-04
-description: https://linux-old.xvx.cz/2010/05/root-htc-desire-under-debian/
 categories: [Linux, Android]
 tags: [HTC-Desire, rooting, adb]
 ---
+
+> <https://linux-old.xvx.cz/2010/05/root-htc-desire-under-debian/>
+{: .prompt-info }
 
 Two weeks ago I bought HTC Desire cell phone and I decided to get root on it.
 Rooting guide for this phone was published a few days ago, but most of it is
