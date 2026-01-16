@@ -2,6 +2,7 @@
 title: OpenWrt (Backfire 10.03) and TL-WR1043ND
 author: Petr Ruzicka
 date: 2011-12-13
+description: https://linux-old.xvx.cz/2011/12/openwrt-backfire-1003-and-tl-wr1043nd/
 categories: [Linux, OpenWrt]
 tags: [TP-Link, WiFi, USB, Dnsmasq, webcam]
 ---

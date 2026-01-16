@@ -2,6 +2,7 @@
 title: RAID disk check in Linux
 author: Petr Ruzicka
 date: 2010-03-23
+description: https://linux-old.xvx.cz/2010/03/raid-disk-check-in-linux/
 categories: [Linux, Storage]
 tags: [RAID, SMART, mdadm, GRUB]
 ---

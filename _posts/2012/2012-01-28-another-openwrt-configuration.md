@@ -2,6 +2,7 @@
 title: Another OpenWrt configuration
 author: Petr Ruzicka
 date: 2012-01-28
+description: https://linux-old.xvx.cz/2012/01/another-openwrt-configuration/
 categories: [Linux, OpenWrt]
 tags: [TP-Link, WiFi, USB, PXE, Dnsmasq, iodine]
 ---

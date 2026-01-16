@@ -2,6 +2,7 @@
 title: Update offline CentOS-RHEL server
 author: Petr Ruzicka
 date: 2011-02-02
+description: https://linux-old.xvx.cz/2011/02/update-offline-centosrhel-server/
 categories: [Linux, RHEL]
 tags: [yum, offline, security-updates]
 ---
