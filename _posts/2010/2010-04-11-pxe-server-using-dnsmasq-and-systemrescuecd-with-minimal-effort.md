@@ -51,7 +51,7 @@ for FILE in systemrescuecd/isolinux/* systemrescuecd/sysrcd* systemrescuecd/ntpa
   ln -vs "../$FILE" "tftpboot/$(basename "$FILE")"
 done
 wget http://www.kernel.org/pub/linux/utils/boot/syslinux/syslinux-3.86.tar.bz2 -O - |
-tar xvjf - --to-stdout syslinux-3.86/core/pxelinux.0 >tftpboot/pxelinux.0
+  tar xvjf - --to-stdout syslinux-3.86/core/pxelinux.0 >tftpboot/pxelinux.0
 ```
 
 Configure dnsmasq to listen on eth1:
