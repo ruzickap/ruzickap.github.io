@@ -2,6 +2,7 @@
 title: My basic setup of CyanogenMod-6.0 on HTC Desire
 author: Petr Ruzicka
 date: 2010-09-09
+description: ""
 categories: [Linux, Android]
 tags: [HTC-Desire, CyanogenMod, adb, SSH]
 ---

@@ -2,6 +2,7 @@
 title: Android bootanimation
 author: Petr Ruzicka
 date: 2010-06-17
+description: ""
 categories: [Linux, Android]
 tags: [HTC-Desire, bootanimation, adb, mplayer]
 ---

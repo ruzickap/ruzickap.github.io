@@ -2,6 +2,7 @@
 title: How to store Google Maps (or any other page) as jpg or png
 author: Petr Ruzicka
 date: 2009-03-17
+description: ""
 categories: [Linux, Desktop]
 tags: [KDE, Firefox]
 ---

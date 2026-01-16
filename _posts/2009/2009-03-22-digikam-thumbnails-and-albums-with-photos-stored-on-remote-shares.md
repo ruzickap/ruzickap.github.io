@@ -2,6 +2,7 @@
 title: digiKam thumbnails and Albums with photos stored on remote shares
 author: Petr Ruzicka
 date: 2009-03-22
+description: ""
 categories: [Linux, Desktop]
 tags: [bash, digiKam, KDE]
 ---

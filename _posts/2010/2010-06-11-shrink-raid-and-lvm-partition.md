@@ -2,6 +2,7 @@
 title: Shrink RAID and LVM partition
 author: Petr Ruzicka
 date: 2010-06-11
+description: ""
 categories: [Linux, Storage]
 tags: [RAID, LVM, mdadm, ext4]
 ---

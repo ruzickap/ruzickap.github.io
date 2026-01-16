@@ -2,6 +2,7 @@
 title: Cobbler and yum in RHEL 4.6
 author: Petr Ruzicka
 date: 2009-06-06
+description: ""
 categories: [Linux, RHEL]
 tags: [bash, perl, Apache, Cobbler, PXE, yum, serial]
 ---

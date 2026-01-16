@@ -2,6 +2,7 @@
 title: OpenWrt with Transmission, Samba and vsftpd
 author: Petr Ruzicka
 date: 2010-12-01
+description: ""
 categories: [Linux, OpenWrt]
 tags: [Transmission, Samba, vsftpd, WiFi, USB, TP-Link]
 ---
