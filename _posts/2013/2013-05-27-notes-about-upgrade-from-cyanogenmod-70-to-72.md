@@ -6,6 +6,9 @@ categories: [Linux, Android]
 tags: [HTC-Desire, CyanogenMod, adb, backup]
 ---
 
+> Not completed...
+{: .prompt-info }
+
 I decided to upgrade my "old" CyanogenMod 7.0 on my HTC Desire to the latest and
 "greatest" 7.2 version.
 

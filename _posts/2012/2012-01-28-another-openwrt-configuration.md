@@ -106,7 +106,7 @@ uci set dhcp.@host[-1].mac=XX:XX:XX:XX:XX:XX
 Configure the ssh to enable autologin:
 
 ```bash
-scp $HOME/.ssh/id_rsa.pub root@192.168.1.1:/tmp/authorized_keys
+scp "$HOME/.ssh/id_rsa.pub" root@192.168.1.1:/tmp/authorized_keys
 ssh root@192.168.1.1
 cp /tmp/authorized_keys /etc/dropbear/authorized_keys
 chmod 600 /etc/dropbear/authorized_keys
@@ -315,7 +315,7 @@ cat > /www2/vnstat/index.html << \EOF
   <body>
 EOF
 
-for IFCE in $(ls -1 `awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf`); do
+for IFCE in "$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf)"/*; do
 cat >> /www2/vnstat/index.html << EOF
     <h3>Traffic of Interface $IFCE</h3>
     <table>

@@ -34,14 +34,14 @@ yum install subversion gcc-c++ libz-dev flex unzip ncurses-devel zlib-devel
 Download OpenWrt Backfire from svn:
 
 ```bash
-cd /var/tmp/
+cd /var/tmp/ || exit
 svn co svn://svn.openwrt.org/openwrt/branches/backfire
 ```
 
 or use the standard way:
 
 ```bash
-cd /var/tmp/
+cd /var/tmp/ || exit
 wget http://downloads.openwrt.org/backfire/10.03/backfire_10.03_source.tar.bz2
 tar xvjf backfire_10.03_source.tar.bz2
 mv backfire_10.03 backfire
@@ -50,7 +50,7 @@ mv backfire_10.03 backfire
 Start configuring it:
 
 ```bash
-cd backfire
+cd backfire || exit
 
 ./scripts/feeds update
 
