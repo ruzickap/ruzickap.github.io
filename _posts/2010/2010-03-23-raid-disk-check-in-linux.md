@@ -199,7 +199,7 @@ Error 2101 occurred at disk power-on lifetime: 2188 hours (91 days + 4 hours)
 
 ## Bad block test
 
-You can see the errors also in the `syslog`:
+You can see the errors also in the syslog:
 
 ```console
 gate:~ grep LBA /var/log/messages
@@ -401,22 +401,22 @@ It could be related to component device /dev/hda1.
 New disk was installed, OS was up and running - it's time to check bad sectors
 on the new one:
 
-```console
-gate:~ time badblocks -s -v -w -o /var/tmp/bad_blocks /dev/hda
+```bash
+time badblocks -s -v -w -o /var/tmp/bad_blocks /dev/hda
 ```
 
 I needed to have the same partitions like on the new "clean" disk like on the
 old one. The easiest way is to use `sfdisk`:
 
-```console
-gate:~ sfdisk -d /dev/hdc | sfdisk --force /dev/hda
+```bash
+sfdisk -d /dev/hdc | sfdisk --force /dev/hda
 ```
 
 Added the partitions to the RAID:
 
-```console
-gate:~ mdadm --manage /dev/md0 --add /dev/hda1
-gate:~ mdadm --manage /dev/md1 --add /dev/hda2
+```bash
+mdadm --manage /dev/md0 --add /dev/hda1
+mdadm --manage /dev/md1 --add /dev/hda2
 ```
 
 The last step is installing the GRUB to MBR of the new disk. If you forgot about
@@ -430,4 +430,4 @@ setup (hd0)
 ```
 
 You find fine a lot of great tips regarding "bad sectors" on
-[this page](https://smartmontools.sourceforge.net).
+[this page](https://web.archive.org/web/20111001233522/http://smartmontools.sourceforge.net/badblockhowto.html).
