@@ -36,6 +36,6 @@ which are **not** on network shares:
 ages to create because of network or which are not changing, and delete all
 locally ones)
 
-[thumbnails_delete.pl](https://websvn.xvx.cz/wsvn/projects/trunk/scripts/thumbnails_delete/thumbnails_delete.pl)
+[thumbnails_delete.pl](https://github.com/ruzickap/old_stuff/blob/af1cd07294b2aa2441d184aaa5361f1a59139ca5/thumbnails_delete/thumbnails_delete.pl)
 
 Maybe you can find it helpful...

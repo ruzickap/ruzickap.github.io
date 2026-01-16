@@ -8,7 +8,7 @@ tags: [bash, PDF]
 
 It happened to me once that I wanted to trim margins from a PDF document.
 
-It was a manual for Panasonic G1 camera: [https://ftp.xvx.cz/pub/docs/my/panasonic_g1.pdf](https://ftp.xvx.cz/pub/docs/my/panasonic_g1.pdf)
+It was a manual for Panasonic G1 camera.
 
 You can see huge margins there, because it was officially written for A5 paper
 and they create manual for A4.

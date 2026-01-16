@@ -31,6 +31,9 @@ installation procedure). Disable firewall and SELinux.
   ```bash
   mkdir /var/tmp/cobbler-4.6
   cd /var/tmp/cobbler-4.6
+  ```
+
+  ```bash
   rpm -i
   ./python-elementtree-1.2.6-5.el4.centos.x86_64.rpm \
   ./python-urlgrabber-2.9.8-2.noarch.rpm ./sqlite-3.3.6-2.x86_64.rpm \
@@ -39,7 +42,9 @@ installation procedure). Disable firewall and SELinux.
   ./centos-yumconf-4-4.5.noarch.rpm \
   ./yum-2.4.3-4.el4.centos.noarch.rpm \
   ./createrepo-0.4.4-2.noarch.rpm
+  ```
 
+  ```bash
   yum clean all
   mkdir /var/tmp/rhel4_repo/
   ln -s /media/cdrom/RedHat/RPMS/ /var/tmp/rhel4_repo/RPMS
@@ -122,7 +127,7 @@ installation procedure). Disable firewall and SELinux.
 
 ## Cobbler/DHCPd/bind configuration
 
-- Change listening interface for `dhcpd` in `/etc/sysconfig/dhcpd`:
+- Change listening interface for dhcpd in `/etc/sysconfig/dhcpd`:
 
   ```ini
   DHCPDARGS=eth0;
@@ -172,8 +177,8 @@ installation procedure). Disable firewall and SELinux.
 
 - and see something like that:
 
-  ```bash
-  cobbler check
+  ```console
+  [root@c2virtud tmp]# cobbler check
   No setup problems found
   Manual review and editing of /var/lib/cobbler/settings is recommended to tailor cobbler to your particular configuration.
   ```
@@ -226,7 +231,7 @@ installation procedure). Disable firewall and SELinux.
 
 - Change line in `/etc/cobbler/modules.conf`:
 
-  ```bash
+  ```ini
   module = authn_configfile
   ```
 
