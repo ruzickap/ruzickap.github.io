@@ -42,7 +42,7 @@ Here are the steps to configure your Raspberry Pi to use Grafana Cloud:
 
 - Then continue by "Test integration and finish installation":
 
-  ![Test Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/test-integration.avif){:width="200"}
+  ![Test Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/test-integration.avif){:width="400"}
 
 After these steps the Grafana Agent should be configured and should start
 sending data to Grafana Cloud.
@@ -201,14 +201,14 @@ Then go to the Grafana Cloud again...
   - [1860](https://grafana.com/grafana/dashboards/1860) - [Node Exporter Full](https://grafana.com/grafana/dashboards/1860)
   - [405](https://grafana.com/grafana/dashboards/405) - [Node Exporter Server Metrics](https://grafana.com/grafana/dashboards/405)
 
-- Do not forget to select the proper prometheus datasource (ends with "-prom"):
+- Do not forget to select the proper prometheus datasource (ends with `-prom`):
 
   ![Prometheus Datasource](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/prometheus-datasource.avif)
 
 - After you import the Dashboard you should see them by going to
   "Dashboards -> Browse":
 
-  ![Dashboards Browse](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/dashboards-browse.avif)
+  ![Dashboards Browse](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/dashboards-browse.avif){:width="500"}
 
   ![Node Exporter Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/node-exporter-dashboard.avif)
 
