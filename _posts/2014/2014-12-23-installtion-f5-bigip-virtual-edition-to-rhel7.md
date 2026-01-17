@@ -25,7 +25,7 @@ In short I had to deal with bonding (two cables going to the 2 separate
 switches), trunk containing 3 vlans, bridges and finally with the F5
 configuration itself.
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/f5_kvm/f5_kvm.svg)
+![F5 BIG-IP Virtual Edition network diagram with KVM](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/f5_kvm/f5_kvm.svg)
 
 Here are some notes about it...
 

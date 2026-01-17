@@ -16,11 +16,11 @@ router. It was getting some pictures from camera using
 [fswebcam](https://web.archive.org/web/20130621044049/http://www.firestorm.cx/fswebcam/) and measuring internal/external
 temperature using [digitemp](https://www.digitemp.com/).
 
-![image](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110435.avif)
+![TL-WR1043ND router with attached webcam and thermometers - front view](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110435.avif)
 
-![image](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110447.avif)
+![TL-WR1043ND router with attached webcam and thermometers - side view](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110447.avif)
 
-![image](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110611.avif)
+![TL-WR1043ND router with attached webcam and thermometers - detail view](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110611.avif)
 
 All that time it was running:
 

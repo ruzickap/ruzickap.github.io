@@ -108,7 +108,7 @@ in the next few days.
 
 Here is the example:
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/gh-pages/files/turris_configured/www3/temperature_sensors/daily.png)
+![Turris temperature sensors daily graph](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/gh-pages/files/turris_configured/www3/temperature_sensors/daily.png)
 
 ## External thermometers
 
@@ -232,7 +232,7 @@ EOF
 
 Graph example:
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/gh-pages/files/turris_configured/www3/mydigitemp/daily.png)
+![External thermometers daily graph](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/gh-pages/files/turris_configured/www3/mydigitemp/daily.png)
 
 (you can see the temperature was higher when I turned the PC near the wifi
 router 16:00 and 00:00)

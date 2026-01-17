@@ -12,7 +12,7 @@ tags: [wifi, wi-fi, Transmission, torrent, tftp, TL-WR1043ND, dhcp]
 
 I decided to change my home network to match the following "network diagram":
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt2.svg)
+![OpenWrt multi-SSID network diagram](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt2.svg)
 
 The core part of the design is [TP-Link
 TL-WR1043ND](https://www.tp-link.com/en/products/details/?model=TL-WR1043ND) wifi

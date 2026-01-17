@@ -21,7 +21,7 @@ and [pgpool](https://www.pgpool.net/) load distribution and HA. The replication
 
 Here is the network diagram:
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram.svg)
+![PostgreSQL pgpool-II and repmgr architecture diagram](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram.svg)
 
 - Master PostgreSQL database installation - `cz01-psql01`:
 
@@ -445,7 +445,7 @@ be a new master. The result is that the read-only slave will become read/write
 master. In the diagram below I used the red colour to see the changes which were
 done when slave was promoted to master.
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_master_down.svg)
+![PostgreSQL failover diagram - master down](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_master_down.svg)
 
 ### `pgpool01` logs right after the master was stopped
 
@@ -855,7 +855,7 @@ new master fails. Again the slave is automatically promoted by pgpool to the new
 master and "original master" (later slave) is master again. Changes are using
 blue color in the diagram below.
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_new_slave-original_master-become_master_again.svg)
+![PostgreSQL failover diagram - original master becomes master again](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_new_slave-original_master-become_master_again.svg)
 
 ### Logs right after the master (original slave) was stopped
 
@@ -1072,7 +1072,7 @@ needs to initialize the failed master as a slave (by running command above).
 Then everything is like before the testing - original master/slave state. The
 green color is used for showing up the changes in the diagram.
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_make_original_slave-failed_master-to_become_slave_again.svg)
+![PostgreSQL failover diagram - failed master becomes slave again](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_make_original_slave-failed_master-to_become_slave_again.svg)
 
 ### Check cluster status after recovery
 

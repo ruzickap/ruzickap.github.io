@@ -21,9 +21,9 @@ The latest Ansible 2.4 is working fine with Packer + Qemu + WinRM when you want
 to create the Windows images:
 [https://www.packer.io/docs/provisioners/ansible.html#winrm-communicator](https://www.packer.io/docs/provisioners/ansible.html#winrm-communicator)
 
-![image](https://www.packer.io/img/logo-hashicorp.svg)
+![HashiCorp Packer logo](https://www.packer.io/img/logo-hashicorp.svg)
 
-![image](https://s3.amazonaws.com/media-p.slid.es/uploads/team-32/images/1859201/Ansible-Official-Logo-Black.svg)
+![Ansible logo](https://s3.amazonaws.com/media-p.slid.es/uploads/team-32/images/1859201/Ansible-Official-Logo-Black.svg)
 
 Let's see how you can do it in Fedora 26:
 

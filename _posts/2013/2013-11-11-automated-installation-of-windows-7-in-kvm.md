@@ -24,9 +24,9 @@ automated Windows installation in the
 
 Here are the screenshots from the VirtManager:
 
-![image](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win02.avif)
+![Virtual Machine Manager VirtIO disk configuration](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win02.avif)
 
-![image](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win01.avif)
+![Virtual Machine Manager Windows 7 VM overview](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win01.avif)
 
 As you can see above I decided to use [VirtIO][virtio] for disk access to
 get the best performance. In such a case I'll need the
@@ -78,7 +78,7 @@ rm $ISO
 
 Another screenshot showing the second CD-ROM with the `autostart.iso`:
 
-![image](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win03.avif)
+![Virtual Machine Manager CD-ROM configuration with autostart.iso](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win03.avif)
 
 Once the installation of the Windows 7 is completed you should run the
 `autostart.bat` using the "Run as administrator" option.

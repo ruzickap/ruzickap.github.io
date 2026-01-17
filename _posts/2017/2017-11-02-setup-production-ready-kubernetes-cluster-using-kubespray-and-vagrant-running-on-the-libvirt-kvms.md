@@ -30,7 +30,7 @@ I'm fine to create a few virtual machines (using
 [Vagrant](https://www.vagrantup.com/)) on my laptop and install Kubernetes
 there.
 
-![image](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png)
+![Kubernetes logo](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png)
 
 I'll use 3 VMs, all 3 have etcd installed, all 3 are nodes (running pods), 2 of
 them run master components.

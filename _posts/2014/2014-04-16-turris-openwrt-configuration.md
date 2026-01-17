@@ -16,7 +16,7 @@ command outputs in my previous blog post
 Now I would like to describe how I configured it according to the network
 diagram:
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt3.svg)
+![Turris OpenWrt network configuration diagram](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt3.svg)
 
 I will also need my own web pages, transmission torrent client, microsd card,
 Dynamic DNS and extend the luci interface to add some more stats + graphs. Here
@@ -500,7 +500,7 @@ EOF
 
 Here is the example how the stats look like:
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/screenshot-gate-xvx-cz-myadmin-vnstat.png)
+![vnStat network traffic statistics screenshot](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/screenshot-gate-xvx-cz-myadmin-vnstat.png)
 
 [Transmission](https://www.transmissionbt.com/) bittorrent client configuration:
 

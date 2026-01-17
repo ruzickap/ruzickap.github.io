@@ -16,7 +16,7 @@ are free. Because I switched from [JPEG](https://en.wikipedia.org/wiki/JPEG) to
 editor that could help me with this task.... and I found
 [Darktable](https://www.darktable.org/).
 
-![image](https://ia800104.us.archive.org/6/items/darktable-2.4.0-src/screenshot_darkroom1.jpg)
+![Darktable darkroom interface screenshot](https://ia800104.us.archive.org/6/items/darktable-2.4.0-src/screenshot_darkroom1.jpg)
 
 Darktable is used by many professional photographers and starting with it is not
 very easy.

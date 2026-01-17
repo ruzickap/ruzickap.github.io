@@ -30,7 +30,7 @@ and people are using older Kubernetes/minikube versions (like here:
 Instead of troubleshooting Travis CI - I decided to use
 [AppVeyor](https://www.appveyor.com/).
 
-![image](/assets/img/posts/2018/2018-04-20-running-kubernetes-on-appveyor-with-minikube/appveyor_kubernetes.avif)
+![AppVeyor Kubernetes build screenshot](/assets/img/posts/2018/2018-04-20-running-kubernetes-on-appveyor-with-minikube/appveyor_kubernetes.avif)
 
 It's another free service like Travis doing basically the same, but it has some
 advantages:

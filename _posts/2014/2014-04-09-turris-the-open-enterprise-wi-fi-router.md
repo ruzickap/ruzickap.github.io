@@ -34,14 +34,14 @@ These details are really nice, because everybody can look at it and improve...
 
 Here are some pictures of how the router looks:
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165738.jpg)
+![Turris router front view in metal enclosure](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165738.jpg)
 
 The well-designed metal box looks much better than any cheap routers I worked
 with before.
 
 Another photo showing it from the back side:
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-170025.jpg)
+![Turris router back view showing ports](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-170025.jpg)
 
 Let's see the hardware side - which is really interesting:
 
@@ -197,53 +197,53 @@ after I finished the "connection wizard".
 
 Next pictures are showing the original package, t-shirt, invoice, etc:
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165933.jpg)
+![Turris package contents with t-shirt](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165933.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-163632.jpg)
+![Turris shipping box](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-163632.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-164952.jpg)
+![Turris package opening](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-164952.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165004.jpg)
+![Turris router in packaging](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165004.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165039.jpg)
+![Turris router unboxing](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165039.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165102.jpg)
+![Turris router with accessories](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165102.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165112.jpg)
+![Turris router antennas](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165112.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165137.jpg)
+![Turris router power adapter](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165137.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165159.jpg)
+![Turris router enclosure detail](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165159.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165233.jpg)
+![Turris router side view](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165233.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165257.jpg)
+![Turris router top view](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165257.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165316.jpg)
+![Turris router bottom view](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165316.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165339.jpg)
+![Turris router label and specifications](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165339.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165418.jpg)
+![Turris router ports closeup](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165418.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165505.jpg)
+![Turris router LED indicators](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165505.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165738.jpg)
+![Turris router assembled front view](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-165738.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-170025.jpg)
+![Turris router assembled back view](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-170025.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-170053.jpg)
+![Turris router with antennas attached](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-170053.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-170202.jpg)
+![Turris router running](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140331-170202.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140401-170528.jpg)
+![Turris setup wizard screenshot 1](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140401-170528.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140401-170627.jpg)
+![Turris setup wizard screenshot 2](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140401-170627.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140412-153358.jpg)
+![Turris web interface screenshot 1](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140412-153358.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140412-153428.jpg)
+![Turris web interface screenshot 2](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140412-153428.jpg)
 
-![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140412-153456.jpg)
+![Turris web interface screenshot 3](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/20140412-153456.jpg)
 
 Next time I'll describe the additional OpenWrt configuration which I did to make
 the router work better.

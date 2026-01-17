@@ -24,7 +24,7 @@ found are quite old:
 
 - [https://blog.heptio.com/how-heptio-engineers-ace-the-certified-kubernetes-administrator-exam-93d20af32557](https://blog.heptio.com/how-heptio-engineers-ace-the-certified-kubernetes-administrator-exam-93d20af32557)
 
-![image](https://web.archive.org/web/20200916225354/https://www.cncf.io/wp-content/uploads/2020/08/logo_cka_whitetext-2-500x500.png)
+![CKA Certified Kubernetes Administrator logo](https://web.archive.org/web/20200916225354/https://www.cncf.io/wp-content/uploads/2020/08/logo_cka_whitetext-2-500x500.png)
 
 So I decided to write some more fresh stuff from the April 2018.
 
@@ -35,7 +35,7 @@ with a command showing you which cluster to use.) Here is how it looks (picture
 is taken from
 [web.archive.org](https://web.archive.org/web/20180321024730/http://madorn.com/certified-kubernetes-administrator-exam.html))
 
-![image](https://s3.amazonaws.com/madorn.com/images/cka-exam.jpeg)
+![CKA exam terminal interface screenshot](https://s3.amazonaws.com/madorn.com/images/cka-exam.jpeg)
 
 - When you are doing some cluster troubleshooting it may be useful to know
 "**[screen](https://www.gnu.org/software/screen/)**" command and [how to

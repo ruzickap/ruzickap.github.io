@@ -17,7 +17,7 @@ Anyway I tried to make a short screencast showing the most used shortcuts:
 
 Maybe you can also use this "Atom Cheatsheet" to help you learn the shortcuts:
 
-![image](https://github.com/ruzickap/cheatsheet-atom/releases/download/v1.0.1/atom_cheatsheet.png)
+![Atom editor keyboard shortcuts cheatsheet](https://github.com/ruzickap/cheatsheet-atom/releases/download/v1.0.1/atom_cheatsheet.png)
 
 You can download the available formats from
 GitHub: [https://github.com/ruzickap/cheatsheet-atom/releases](https://github.com/ruzickap/cheatsheet-atom/releases)

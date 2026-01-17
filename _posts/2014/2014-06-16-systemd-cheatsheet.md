@@ -16,7 +16,7 @@ a simple "pdf" cheatsheet which helps me to print it and learn it.
 
 See the example:
 
-![image](https://github.com/ruzickap/cheatsheet-systemd/releases/download/v1.0.0/systemd_cheatsheet.png)
+![Systemd cheatsheet preview](https://github.com/ruzickap/cheatsheet-systemd/releases/download/v1.0.0/systemd_cheatsheet.png)
 
 Here is the PDF:
 [systemd_cheatsheet.pdf](https://github.com/ruzickap/cheatsheet-systemd/releases/download/v1.0.0/systemd_cheatsheet.pdf)

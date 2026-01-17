@@ -19,7 +19,7 @@ who want to access the "Internet". In my solution I'm using the
 offers a simple way to provide restricted access to an Internet connection. Here
 is the extended network diagram:
 
-![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt4.svg)
+![Turris OpenWrt guest access network diagram](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt4.svg)
 
 Start with creating the Guest WiFi - [OpenWrt Guest WLAN](https://web.archive.org/web/20140825150515/http://wiki.openwrt.org/doc/recipes/guest-wlan):
 

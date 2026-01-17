@@ -21,7 +21,7 @@ few networks with IP ranges: deploy_network 192.168.25.0/24, control_network
 
 Here is the network diagram of the lab:
 
-![image](/assets/img/posts/2018/2018-02-20-create-lab-infrastructure-running-virtual-machines-with-maas-using-vagrant/network_diagram.avif)
+![MAAS lab network diagram with three VMs](/assets/img/posts/2018/2018-02-20-create-lab-infrastructure-running-virtual-machines-with-maas-using-vagrant/network_diagram.avif)
 
 You can see the commands I used and descriptive video...
 

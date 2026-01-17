@@ -18,7 +18,7 @@ At the time you wrote your shiny page you probably checked all these external
 dependencies to be sure it's working to make your readers happy, because nobody
 likes to see errors like this:
 
-![image](/assets/img/posts/2020/2020-02-02-check-availability-of-external-links-in-your-web-pages/youtube_missing_video.avif)
+![YouTube missing video error message](/assets/img/posts/2020/2020-02-02-check-availability-of-external-links-in-your-web-pages/youtube_missing_video.avif)
 
 Now the page is working fine with all external dependencies because I checked it
 properly - but what about in a few months / years / ... ?

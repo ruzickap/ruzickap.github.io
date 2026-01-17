@@ -17,7 +17,7 @@ installation wizard where you need to specify some details.
 I would like to share the details on how to install Cacti 0.8.8b the automated
 way without user interaction.
 
-![image](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti01.avif)
+![Cacti dashboard overview](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti01.avif)
 
 Cacti Installation:
 
@@ -123,10 +123,10 @@ first)
 
 Few Screenshots:
 
-![image](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti03.avif)
+![Cacti graphs showing system metrics](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti03.avif)
 
-![image](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti04.avif)
+![Cacti host monitoring view](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti04.avif)
 
-![image](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti02.avif)
+![Cacti device management interface](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti02.avif)
 
 Enjoy :-)

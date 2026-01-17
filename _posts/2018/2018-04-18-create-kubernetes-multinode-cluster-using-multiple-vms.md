@@ -23,7 +23,7 @@ these projects [kubeadm][kubeadm] and [kubespray](https://kubespray.io/).
 
 [kubeadm]: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
 
-![image](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png)
+![Kubernetes logo](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png)
 
 - Kubespray is handy for enterprise installations where HA is a must, but it
   can be used for standard testing if you have [Ansible][ansible] installed.
