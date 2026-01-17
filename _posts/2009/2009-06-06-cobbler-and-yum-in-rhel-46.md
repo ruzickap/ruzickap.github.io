@@ -10,7 +10,7 @@ tags: [bash, perl, Apache, Cobbler, PXE, yum, serial]
 > <https://linux-old.xvx.cz/2009/06/cobbler-and-yum-in-rhel-46/>
 {: .prompt-info }
 
-Look at small how-to install [cobbler](https://fedorahosted.org/cobbler/)
+Here's a short how-to for installing [cobbler](https://fedorahosted.org/cobbler/)
 with yum on [RHEL 4.6](https://www.redhat.com/rhel/) from scratch.
 
 Install RHEL 4.6 or [CentOS](https://www.centos.org/) 4.6 with default
@@ -91,7 +91,7 @@ installation procedure). Disable firewall and SELinux.
   yum -y install syslinux
   ```
 
-- Disable firewall (just for sure):
+- Disable firewall (just to be sure):
 
   ```bash
   chkconfig --level 2345 iptables off
@@ -136,7 +136,7 @@ installation procedure). Disable firewall and SELinux.
   DHCPDARGS=eth0;
   ```
 
-- Modify file `/etc/cobbler/dhcp.template` according your needs:
+- Modify file `/etc/cobbler/dhcp.template` according to your needs:
 
   ```text
   subnet 192.168.0.0 netmask 255.255.255.0 {
@@ -178,7 +178,7 @@ installation procedure). Disable firewall and SELinux.
   cobbler check
   ```
 
-- and see something like that:
+- and see something like this:
 
   ```console
   [root@c2virtud tmp]# cobbler check
@@ -257,4 +257,4 @@ cobbler system edit --name c3virt01ce01 --interface=eth3 --mac=00:0c:29:68:78:be
 cobbler sync
 ```
 
-Hope it will be possible to use PXE boot to install machines.
+Hopefully it will be possible to use PXE boot to install machines.

@@ -14,13 +14,13 @@ I got 16 GB [USB flash](https://en.wikipedia.org/wiki/USB_flash_drive) from
 my brother, because he can't see me still using my old 64 MB. He decided
 to buy Imation Nano Flash Drive.
 
-Because of many of my friends and colleagues are using Win, I use
+Because many of my friends and colleagues are using Windows, I use
 [NTFS](https://en.wikipedia.org/wiki/NTFS) on it. Old FAT is not "usable" in
 these days, because it can't handle bigger files.
 
-From the first time I use USB disks I always want to have bootable disk/flash
-with live CDs - so here are few notes how to create USB flash drive able to boot
-stored live CDs:
+From the first time I used USB disks I always wanted to have a bootable
+disk/flash with live CDs - so here are a few notes on how to create a USB flash
+drive able to boot stored live CDs:
 
 First you need to compile [grub2](https://www.gnu.org/software/grub/index.html)
 yourself, because default grub2 installations in distributions do not

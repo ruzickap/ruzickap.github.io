@@ -12,24 +12,26 @@ tags: [PXE, Dnsmasq, TFTP, SystemRescueCD, GRUB]
 
 If you are using
 [DHCP](https://en.wikipedia.org/wiki/Dynamic_Host_Configuration_Protocol) server
-in your network environment, it's handy to be able to boot from network. It
-brings you many advantages especially when you are not able to boot operating
-system from the workstation's disk.
+in your network environment, it's handy to be able to boot from the network. It
+brings you many advantages especially when you are not able to boot the
+operating system from the workstation's disk.
 
 I would like to describe my experience with DHCP server called
 [Dnsmasq](https://thekelleys.org.uk/dnsmasq/doc.html). This software can also
 serve [TFTP](https://en.wikipedia.org/wiki/Trivial_File_Transfer_Protocol)
 requests and act as DNS forwarder.
 
-There are many how-to pages how to setup PXE. In most of them you need
+There are many how-to pages on how to set up PXE. In most of them you need
 [NFS](https://en.wikipedia.org/wiki/Network_File_System_%28protocol%29),
 [xinetd](https://en.wikipedia.org/wiki/Xinetd) or similar CPU/memory
 consuming stuff.
 
-You can see how you can setup working boot environment "only" with ISO image of
+You can see how you can set up a working boot environment "only" with the ISO
+image of
 [SystemRescueCd](https://www.sysresccd.org/) and dnsmasq.
 
-Let's start with installing dnsmasq and downloading iso image of SystemRescueCd:
+Let's start with installing dnsmasq and downloading the ISO image of
+SystemRescueCd:
 
 ```bash
 aptitude install dnsmasq bzip2

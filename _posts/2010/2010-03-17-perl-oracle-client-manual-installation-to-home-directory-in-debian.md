@@ -10,20 +10,20 @@ tags: [perl, Oracle, database]
 > <https://linux-old.xvx.cz/2010/03/perl-oracle-client-manual-installation-to-home-directory-in-debian/>
 {: .prompt-info }
 
-I need to connect to the Oracle database in my work to get some data from it.
-I'm not the Oracle expert, but I decided to use
+I needed to connect to the Oracle database at my work to get some data from it.
+I'm not an Oracle expert, but I decided to use
 [DBD::Oracle](https://metacpan.org/pod/DBD::Oracle).
 
-Most of the manuals and how-to pages describe, how to install client libraries
-to system (usually as root), which was not my case.
+Most of the manuals and how-to pages describe how to install client libraries
+to the system (usually as root), which was not my case.
 
 I just need one directory with libraries in my `$HOME` and a few scripts to get
 some data from the database - no system installations.
 
-Here are the steps how to install DBD-Oracle and its libraries to "one"
+Here are the steps to install DBD-Oracle and its libraries to "one"
 directory without making a mess in the system:
 
-First let's install core system related libraries and tools:
+First let's install the core system-related libraries and tools:
 
 ```bash
 aptitude install gcc libdbi-perl libaio1 libstdc++6-4.4-dev unzip
@@ -66,7 +66,7 @@ $user="ORACLEUSER";
 $passwd='MYPASS';
 
 #tnsping
-#lsnrctl services - to find right sid
+#lsnrctl services - to find the right SID
 
 $dbh = DBI->connect("dbi:Oracle:host=$host;sid=ORCH3;port=1521", $user, $passwd);
   or die "Couldn't connect to database: " . DBI->errstr;
@@ -82,5 +82,5 @@ $sth->finish();
 $dbh->disconnect();
 ```
 
-I believe you can install `DBD::Oracle` without dependencies above like `gcc` or
-`libstdc++`, but I'm fine to install these.
+I believe you can install `DBD::Oracle` without the dependencies above like
+`gcc` or `libstdc++`, but I'm fine with installing these.

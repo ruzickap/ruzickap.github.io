@@ -13,7 +13,7 @@ tags: [HTC-Desire, CyanogenMod, adb, backup]
 I decided to upgrade my "old" CyanogenMod 7.0 on my HTC Desire to the latest and
 "greatest" 7.2 version.
 
-The steps how to do the upgrade were mentioned on the CyanogenMod WiKi and I
+The steps to do the upgrade were mentioned on the CyanogenMod WiKi and I
 don't want to repeat them here.
 
 What is important for me is the part about "Wipe data/factory reset". This is
@@ -22,9 +22,9 @@ recommended to do it before updating and it's also mentioned on the wiki page.
 You can use many tools to backup/restore your data like SMS, Call Log,
 application's settings and other data.
 
-But I prefer to do it myself using command line (adb)...
+But I prefer to do it myself using the command line (adb)...
 
-## Backup part executed on your linux machine
+## Backup part executed on your Linux machine
 
 ```bash
 MY_BACKUP_PATH=/var/tmp/android_backup
@@ -168,8 +168,8 @@ adb reboot
 Maybe you are asking why not to just copy the ".db" files (like it's mentioned
 on most of the other pages).
 
--> the reason is, because the structure of the sqlite db changed between CM
-versions and that's the reason why simple copy of the .db files is not working.
+-> the reason is that the structure of the sqlite db changed between CM versions
+and that's the reason why a simple copy of the .db files is not working.
 
 Restore SMS data:
 

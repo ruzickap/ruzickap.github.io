@@ -13,21 +13,21 @@ tags: [RAID, LVM, mdadm, ext4]
 I'm using [RAID1](https://en.wikipedia.org/wiki/RAID#RAID_1) in my servers. The
 disks I used are always the same size and the same type from one company.
 
-In one old server I had Maxtor disks, where one of the 20G disk failed. Because
-it's almost impossible to buy/get another Maxtor disk of such small size I
-replaced broken disk with 20G Seagate disk.
+In one old server I had Maxtor disks, where one of the 20G disks failed. Because
+it's almost impossible to buy/get another Maxtor disk of such a small size I
+replaced the broken disk with a 20G Seagate disk.
 
 The problem began when I wanted to copy the partition layout from Maxtor to
 empty Seagate and found out that Seagate is "smaller" than Maxtor.
 
-The only way how to restore RAID1 was shrinking ext4, lvm, raid and then copy
-the disk layout to smaller disk.
+The only way to restore RAID1 was shrinking ext4, lvm, raid and then copying
+the disk layout to the smaller disk.
 
 I have never done this before so I rather tried it in
 [VirtualBox](https://en.wikipedia.org/wiki/VirtualBox) than on a live system and
 wrote a few notes about it.
 
-Let's have Debian installed on 2 10Gb disks, which using RAID1 with LVM in
+Let's have Debian installed on two 10Gb disks using RAID1 with LVM in
 VirtualBox:
 
 ```console
@@ -36,7 +36,7 @@ Disk /dev/sda: 10.7 GB, 10737418240 bytes
 Disk /dev/sdb: 10.7 GB, 10737418240 bytes
 ```
 
-I remove the first disk from RAID:
+I removed the first disk from RAID:
 
 ```console
 root@debian:~# mdadm --manage /dev/md0 --fail /dev/sda1
@@ -46,7 +46,7 @@ root@debian:~# mdadm --manage /dev/md0 --remove /dev/sda1
 mdadm: hot removed /dev/sda1
 ```
 
-It's time to replace first disk with smaller one in VirtualBox. Then there
+It's time to replace the first disk with a smaller one in VirtualBox. Then there
 should be two different disks with degraded raid array:
 
 ```console

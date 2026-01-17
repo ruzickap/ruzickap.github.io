@@ -11,7 +11,7 @@ tags: [Nvidia, GRUB, drivers, yum]
 {: .prompt-info }
 
 Sometimes you need to run [Nvidia](https://www.nvidia.com/) proprietary drivers
-in various linux distributions.
+in various Linux distributions.
 
 I was able to run it on standard [RHEL](https://www.redhat.com/) 6.0 installed as
 "Desktop" with the following commands:
@@ -45,7 +45,7 @@ yum remove xorg-x11-drv-nouveau
 reboot
 ```
 
-Stop the X server and run the Nvidia installation process from command line
+Stop the X server and run the Nvidia installation process from the command line
 
 ```bash
 init 3

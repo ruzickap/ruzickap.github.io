@@ -23,13 +23,13 @@ gate:~ dmesg
 ...
 ```
 
-Lucky for me there are two disks in
+Luckily for me there are two disks in
 [RAID 1](https://en.wikipedia.org/wiki/Raid_1#RAID_1) so my data was not lost.
 The machine is "just" a firewall, so I decided to play a little bit with the
 bad hard disk, because there are no important data on it. Usually if you see
-errors like I mentioned above you replace disk without any questions, but I
+errors like I mentioned above you replace the disk without any questions, but I
 would like to "get" some outputs from diagnostic commands. So you can see what
-you can do in such case.
+you can do in such a case.
 
 ## S.M.A.R.T checks
 
@@ -402,15 +402,15 @@ It could be related to component device /dev/hda1.
 
 ## After disk change
 
-New disk was installed, OS was up and running - it's time to check bad sectors
+A new disk was installed, OS was up and running - it's time to check bad sectors
 on the new one:
 
 ```bash
 time badblocks -s -v -w -o /var/tmp/bad_blocks /dev/hda
 ```
 
-I needed to have the same partitions like on the new "clean" disk like on the
-old one. The easiest way is to use `sfdisk`:
+I needed to have the same partitions on the new "clean" disk as on the old
+one. The easiest way is to use `sfdisk`:
 
 ```bash
 sfdisk -d /dev/hdc | sfdisk --force /dev/hda
@@ -423,9 +423,9 @@ mdadm --manage /dev/md0 --add /dev/hda1
 mdadm --manage /dev/md1 --add /dev/hda2
 ```
 
-The last step is installing the GRUB to MBR of the new disk. If you forgot about
-it, than I will not be able to boot from the "new" `hda` disk if "old" disk
-`hdc` fail.
+The last step is installing GRUB to the MBR of the new disk. If you forget about
+it, then you will not be able to boot from the "new" `hda` disk if the "old"
+disk `hdc` fails.
 
 ```console
 gate:~ grub
@@ -433,5 +433,5 @@ root (hd0,0)
 setup (hd0)
 ```
 
-You find fine a lot of great tips regarding "bad sectors" on
+You can find a lot of great tips regarding "bad sectors" on
 [this page](https://web.archive.org/web/20100116011157/http://smartmontools.sourceforge.net/badblockhowto.html).

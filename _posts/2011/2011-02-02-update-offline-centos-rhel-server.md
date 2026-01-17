@@ -19,11 +19,11 @@ I was not able to find a good description of how to do it. Some people are using
 proxies - but then you still need some connection to the proxy - which can not
 be the case.
 
-Here is my way how I did it....
+Here is how I did it....
 
 Let's say there is a server which is offline and doesn't have any connection to
-the Internet. Then we need station (or laptop / virtual machine), which has the
-same OS as server and is connected to the Internet.
+the Internet. Then we need a station (or laptop / virtual machine), which has
+the same OS as the server and is connected to the Internet.
 
 Copy the `/var/lib/rpm` to the station (you can use USB/CD...)
 
@@ -64,4 +64,4 @@ rpm -Uvh /tmp/rpm_updates/*
 
 ...and the server is updated ;-)
 
-This is probably not the best way how to do it, but it's working for me.
+This is probably not the best way to do it, but it's working for me.

@@ -21,14 +21,14 @@ applications:
 - [MySQL](https://www.mysql.com/)
 - [daloRADIUS](https://daloradius.com/)
 
-When somebody wants to connect to Internet using my wifi, the first page he can
-see is the register/login page (whatever page he wants to visit).
-After registration/login he is able to connect to Internet.
+When somebody wants to connect to the Internet using my wifi, the first page
+they see is the register/login page (whatever page they want to visit).
+After registration/login they are able to connect to the Internet.
 
 So let's see how I did it.
 
-Let's have one server with two network interfaces - first `eth0` goes to
-Internet, the second one `eth1` is the wifi for "unknown" clients.
+Let's have one server with two network interfaces - the first `eth0` goes to
+the Internet, the second one `eth1` is the wifi for "unknown" clients.
 
 ![Embedded content](/assets/img/posts/2010/2010-03-24-debian-wi-fi-hotspot-using-coovachilli-freeradius-mysql-and-daloradius/hotspot.svg)
 
@@ -47,7 +47,7 @@ cp -r /var/www/daloradius/contrib/chilli/portal2/* /var/www/
 rm /var/www/index.html
 ```
 
-Because my machine is 64 bit I need to build CoovaChilli package myself:
+Because my machine is 64-bit I needed to build the CoovaChilli package myself:
 
 ```bash
 aptitude --assume-yes install dpkg-dev debhelper libssl-dev

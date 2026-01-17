@@ -11,22 +11,22 @@ tags: [KDE, Firefox]
 {: .prompt-info }
 
 I'm using my old Palm TX to navigate during my travels. I don't have GPS, but I
-usually get some maps from the web, store them as jpg and view on Palm as a
-picture.
+usually get some maps from the web, store them as jpg and view them on Palm as
+a picture.
 
-I had problems to get big maps from Google to jpg, because all screen snapshot
+I had problems getting big maps from Google to jpg, because all screen snapshot
 programs can only get actual "screen" (usually just 1440x900).
 
-My palm and other devices can handle much bigger images and it's possible to
+My Palm and other devices can handle much bigger images and it's possible to
 scroll them. My laptop screen resolution was quite limiting... :-(
 
 ---
 
-I found solution in KDE:
+I found a solution in KDE:
 
 1. Install Firefox add-on called Abduction! It will allow you to save pages or
    part of the page as image (File -> Save Page As Image...)
-2. Run Firefox and chose your place in the map.
+2. Run Firefox and choose your place in the map.
 3. Press ALT + F3 -> Advanced -> Special Windows Settings...
 
    ![Advanced Windows Settings - KDE](/assets/img/posts/2009/2009-03-17-how-to-store-google-maps-or-any-other-page-as-jpg-or-png/advanced_settings.avif)

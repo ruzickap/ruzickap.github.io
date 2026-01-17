@@ -14,7 +14,7 @@ I decided to change the boot animation on my HTC Desire.
 You can find plenty of them in many places, but I tried to create my own from
 a movie.
 
-In this example I'm going to use movie from
+In this example I'm going to use a movie from
 [Big Buck Bunny](https://www.bigbuckbunny.org/) which is licensed under the
 [Creative Commons Attribution 3.0](https://creativecommons.org/licenses/by/3.0/)
 license. But you can probably use it generally for any movie which can be
@@ -78,9 +78,11 @@ adb push bootanimation.zip /data/local/
 adb reboot
 ```
 
-If you are missing adb command, please take it from the rooting CD (described
-in [Root HTC Desire under Debian](https://linux-old.xvx.cz/2010/05/root-htc-desire-under-debian/))
-or from official [Android SDK](https://developer.android.com/sdk/index.html).
+If you are missing the adb command, please take it from the rooting CD
+(described in [Root HTC Desire under Debian][htc-desire]) or from the official
+[Android SDK](https://developer.android.com/sdk/index.html).
+
+[htc-desire]: https://linux-old.xvx.cz/2010/05/root-htc-desire-under-debian/
 
 Then you should see something like:
 

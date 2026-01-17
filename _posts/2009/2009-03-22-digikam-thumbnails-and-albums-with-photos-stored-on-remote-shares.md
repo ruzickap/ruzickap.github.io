@@ -37,8 +37,8 @@ This script deletes all thumbnails of the photos in `$HOME/.thumbnails/large/`
 which are **not** on network shares:
 
 (It preserves all the thumbnails of photos stored on network share, which take
-ages to create because of network or which are not changing, and delete all
-locally ones)
+ages to create because of the network or which are not changing, and deletes
+all local ones)
 
 [thumbnails_delete.pl](https://github.com/ruzickap/old_stuff/blob/af1cd07294b2aa2441d184aaa5361f1a59139ca5/thumbnails_delete/thumbnails_delete.pl)
 
