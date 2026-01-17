@@ -145,7 +145,10 @@ done
 # Check the subnets
 virsh net-list --all | grep network
 VIRSH_NETWORKS=$(virsh net-list | awk '/network|vagrant/ { print $1 }')
-for VIRSH_NETWORK in $VIRSH_NETWORKS; do echo "*** $VIRSH_NETWORK"; virsh net-dumpxml "$VIRSH_NETWORK"; done
+for VIRSH_NETWORK in $VIRSH_NETWORKS; do
+  echo "*** $VIRSH_NETWORK"
+  virsh net-dumpxml "$VIRSH_NETWORK"
+done
 
 # Check the DHCP lease file - there should be only kvm01
 DEVICE=$(virsh net-dumpxml vagrant-libvirt | awk -F\' '/bridge/ { print $2 }')
