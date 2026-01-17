@@ -192,7 +192,7 @@ Memory          : 2048 MB
 
 The rest of the commands can be seen in my GitHub
 [repository](https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/turris).
-On the same page you can see the "original" /etc directory compressed right
+On the same page you can see the "original" `/etc` directory compressed right
 after I finished the "connection wizard".
 
 Next pictures are showing the original package, t-shirt, invoice, etc:

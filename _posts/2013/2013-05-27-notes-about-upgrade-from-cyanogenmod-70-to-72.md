@@ -169,7 +169,7 @@ Maybe you are asking why not to just copy the ".db" files (like it's mentioned
 on most of the other pages).
 
 -> the reason is that the structure of the sqlite db changed between CM versions
-and that's the reason why a simple copy of the .db files is not working.
+and that's the reason why a simple copy of the `.db` files is not working.
 
 Restore SMS data:
 

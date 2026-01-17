@@ -175,7 +175,7 @@ Run the "livemedia-creator":
 2017-07-16 08:47:42,531: Results are in /var/tmp/a/result
 ```
 
-Then you should see the following file in /var/tmp/a directory:
+Then you should see the following file in `/var/tmp/a` directory:
 
 ```bash
 $ find /var/tmp/a
@@ -193,8 +193,9 @@ kernel <PXE_DIR>/vmlinuz-4.11.9-300.fc26.x86_64
 append initrd=<PXE_DIR>/initramfs-4.11.9-300.fc26.x86_64.img root=live:<URL>/live-rootfs.squashfs.img
 ```
 
-Then you can use the vmlinuz, initramfs and squashfs.img files and put them to
-your TFTP server. Once you configure your TFTP + DHCP server properly you should
+Then you can use the `vmlinuz`, `initramfs` and `squashfs.img` files and put
+them to your TFTP server. Once you configure your TFTP + DHCP server properly
+you should
 be able to "PXE boot" these files.
 
 You can find some more details here as well:

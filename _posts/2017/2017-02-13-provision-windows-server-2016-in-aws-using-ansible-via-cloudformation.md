@@ -44,7 +44,7 @@ Here is the file/directory structure:
 
 Here you can find the files:
 
-- group_vars/all
+- `group_vars/all`
 
 {% raw %}
 
@@ -83,7 +83,7 @@ aws_cf_instance_tags:
 
 {% endraw %}
 
-- tasks/create_cf_stack.yml
+- `tasks/create_cf_stack.yml`
 
 {% raw %}
 
@@ -193,7 +193,7 @@ aws_cf_instance_tags:
 
 {% endraw %}
 
-- tasks/win.yml
+- `tasks/win.yml`
 
 ```yaml
 ---
@@ -221,7 +221,7 @@ aws_cf_instance_tags:
   raw: $WScriptShell = New-Object -ComObject WScript.Shell; $Shortcut = $WScriptShell.CreateShortcut("${Env:Public}\Desktop\PuTTY.lnk"); $Shortcut.TargetPath = "${Env:ProgramFiles(x86)}\PuTTY\putty.exe"; $Shortcut.Save()
 ```
 
-- templates/aws_cf_stack.yml.j2
+- `templates/aws_cf_stack.yml.j2`
 
 {% raw %}
 
@@ -341,7 +341,7 @@ Outputs:
 
 {% endraw %}
 
-- site_aws.yml
+- `site_aws.yml`
 
 ```yaml
 ---
@@ -360,13 +360,13 @@ Outputs:
     - include: tasks/win.yml
 ```
 
-- run_aws.sh
+- `run_aws.sh`
 
 ```bash
 ansible-playbook -i "127.0.0.1," site_aws.yml
 ```
 
-You needs to run the run_aws.sh and do necessary modifications in the
-group_vars/all to get it working...
+You needs to run the `run_aws.sh` and do necessary modifications in the
+`group_vars/all` to get it working...
 
 Enjoy :-)

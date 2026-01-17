@@ -48,7 +48,7 @@ echo "$(readlink -f systemrescuecd*.iso) $PWD/systemrescuecd iso9660 ro,loop,aut
 mount systemrescuecd
 ```
 
-Fill tftpboot directory with necessary files/links:
+Fill `tftpboot` directory with necessary files/links:
 
 ```bash
 mkdir -v tftpboot/pxelinux.cfg
