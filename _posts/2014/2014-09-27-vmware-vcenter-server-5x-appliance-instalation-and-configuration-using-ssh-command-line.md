@@ -17,7 +17,7 @@ Tool](https://web.archive.org/web/20140715092309/https://www.vmware.com/support/
 ![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiP6NriLRFRljobZpIo3_jYdIn_rXRTKjJflK4TTFwK7sH3aHdQPrgCF6hhgOBqMFm-8fo_L8HRq9kZWdYXFnhRV3UjslgAtlGS4m-Lgx9giB_wFgA10vC-g9Cof3pTuRmaLdbgPMPWU90/s640/vcenter.png)
 
 Install the OVF tools first. Details can be found here:
-[http://www.virtuallyghetto.com/2012/05/how-to-deploy-ovfova-in-esxi-shell.html](http://www.virtuallyghetto.com/2012/05/how-to-deploy-ovfova-in-esxi-shell.html).
+[https://www.virtuallyghetto.com/2012/05/how-to-deploy-ovfova-in-esxi-shell.html](https://www.virtuallyghetto.com/2012/05/how-to-deploy-ovfova-in-esxi-shell.html).
 
 ```bash
 #Download OVF tools
@@ -99,7 +99,7 @@ Then you can automatically register the ESXi servers to the vCenter using
 "[joinvCenter.py](https://github.com/lamw/vghetto-scripts/blob/master/python/joinvCenter.py)".
 
 Details here
-[http://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html](http://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html).
+[https://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html](https://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html).
 
-Thank you guys from the [virtuallyGhetto](http://www.virtuallyghetto.com/) for
+Thank you guys from the [virtuallyGhetto](https://www.virtuallyghetto.com/) for
 their awesome blog full of great "VMware ideas".

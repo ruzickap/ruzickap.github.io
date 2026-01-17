@@ -164,10 +164,10 @@ Useful links:
 
 [How to Create Active Directory Domain](https://web.archive.org/web/20150423185240/http://stef.thewalter.net/how-to-create-active-directory-domain.html)
 
-[http://www.freeipa.org/page/Active_Directory_trust_setup](http://www.freeipa.org/page/Active_Directory_trust_setup)
+[https://www.freeipa.org/page/Active_Directory_trust_setup](https://www.freeipa.org/page/Active_Directory_trust_setup)
 
-[http://www.freeipa.org/page/Setting_up_Active_Directory_domain_for_testing_purposes](http://www.freeipa.org/page/Setting_up_Active_Directory_domain_for_testing_purposes)
+[https://www.freeipa.org/page/Setting_up_Active_Directory_domain_for_testing_purposes](https://www.freeipa.org/page/Setting_up_Active_Directory_domain_for_testing_purposes)
 
-[http://www.certdepot.net/wp-content/uploads/2015/07/Summit_IdM_Lab_User_Guide_2015.pdf](http://www.certdepot.net/wp-content/uploads/2015/07/Summit_IdM_Lab_User_Guide_2015.pdf)
+[https://www.certdepot.net/wp-content/uploads/2015/07/Summit_IdM_Lab_User_Guide_2015.pdf](https://www.certdepot.net/wp-content/uploads/2015/07/Summit_IdM_Lab_User_Guide_2015.pdf)
 
 Enjoy :-)

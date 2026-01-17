@@ -10,11 +10,9 @@ tags: [router, wifi, turris, nic.cz, nic, captive portal, open, hardware]
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/05/turris-openwrt-and-guest-access.html)
 {: .prompt-info }
 
-In my previous [blog
-post](http://linux.xvx.cz/2014/04/turris-openwrt-configuration.html) I described
-how to configure the [Turris](https://www.turris.cz/en/) router for my
-[home
-network](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/openwrt/wifi_openwrt4.svg).
+In my previous blog post "[Turris - OpenWrt configuration]({% post_url /2014/2014-04-16-turris-openwrt-configuration %})"
+I described how to configure the [Turris](https://www.turris.cz/en/) router for my
+[home network](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/openwrt/wifi_openwrt4.svg).
 I decided to extend the configuration and create the Guest WiFi for other people
 who want to access the "Internet". In my solution I'm using the
 [nodogsplash](https://web.archive.org/web/20140210131130/http://kokoro.ucsd.edu/nodogsplash/) captive portal solution which

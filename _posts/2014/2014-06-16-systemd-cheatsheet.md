@@ -11,7 +11,7 @@ tags: [print, cheatsheet, pdf, systemd]
 {: .prompt-info }
 
 Recently I started to use the new init system called
-[systemd](http://www.freedesktop.org/wiki/Software/systemd/). I decided to write
+[systemd](https://www.freedesktop.org/wiki/Software/systemd/). I decided to write
 a simple "pdf" cheatsheet which helps me to print it and learn it.
 
 See the example:

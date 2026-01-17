@@ -23,14 +23,14 @@ There is also a 16GB USB stick and 2 thermometers connected using USB Serial
 connector (bought on eBay):
 
 I'm going to use the last stable version of the OpenWrt firmware:
-[openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin](http://downloads.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin)
+[openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin](https://downloads.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin)
 
 Upgrade the firmware and remove the old configuration:
 
 ```bash
 rm -r /tmp/opkg-lists/
 sysctl -w vm.drop_caches=1
-sysupgrade -v -n http://downloads.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin
+sysupgrade -v -n https://downloads.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin
 ```
 
 Here are the notes how way how I configured it.
@@ -127,7 +127,7 @@ uci del wireless.@wifi-device[0].disabled
 Configure the wifi_open - guest wifi access. For some reason
 [OpenWrt Guest WLAN](https://web.archive.org/web/20140825150515/http://wiki.openwrt.org/doc/recipes/guest-wlan)
 is not working for me. I found this article (Polish)
-[http://eko.one.pl/forum/viewtopic.php?id=2937](http://eko.one.pl/forum/viewtopic.php?id=2937)
+[https://eko.one.pl/forum/viewtopic.php?id=2937](https://eko.one.pl/forum/viewtopic.php?id=2937)
 how to do it.
 
 ```bash
@@ -219,7 +219,7 @@ uci set 'ddns.myddns.update_url=http://www.duckdns.org/update?domains=[DOMAIN]&t
 
 Here are some details about thermometers:
 
-[http://www.linuxfocus.org/English/November2003/article315.shtml](http://www.linuxfocus.org/English/November2003/article315.shtml)
+[DS18S20 article](https://web.archive.org/web/20130219033601/http://www.linuxfocus.org/English/November2003/article315.shtml)
 
 [https://martybugs.net/electronics/tempsensor/hardware.cgi](https://martybugs.net/electronics/tempsensor/hardware.cgi)
 

@@ -17,9 +17,8 @@ I would like to put here some notes about the thermometers in
 
 Turris has its own thermometers which are monitoring the temperature of CPU and
 board. This how-to expects the previous lighttpd configuration described in my
-[previous post](http://linux.xvx.cz/2014/04/turris-openwrt-configuration.html).
-Here is how you can create graphs from the data using
-[RRDtool](https://oss.oetiker.ch/rrdtool/).
+previous post "[Turris - OpenWrt configuration]({% post_url /2014/2014-04-22-turris-openwrt-and-thermometers %})".
+Here is how you can create graphs from the data using [RRDtool](https://oss.oetiker.ch/rrdtool/).
 
 ```bash
 mkdir -p /data/temperature_sensors /www3/temperature_sensors
@@ -117,7 +116,7 @@ Here is the example:
 I'm using two external thermometers to monitor temperature around router + in
 the room. These were built according to the following descriptions:
 
-[http://www.linuxfocus.org/English/November2003/article315.shtml](http://www.linuxfocus.org/English/November2003/article315.shtml)
+[DS18S20 article](https://web.archive.org/web/20130219033601/http://www.linuxfocus.org/English/November2003/article315.shtml)
 
 [https://martybugs.net/electronics/tempsensor/hardware.cgi](https://martybugs.net/electronics/tempsensor/hardware.cgi)
 

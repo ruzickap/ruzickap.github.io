@@ -11,7 +11,7 @@ tags: [.appveyor.yml, appveyor, ci, minikube, travis]
 {: .prompt-info }
 
 When I was playing with Kubernetes I made a lot of
-[notes](http://multinode-kubernetes-cluster.readthedocs.io) on how to do things.
+[notes](https://multinode-kubernetes-cluster.readthedocs.io) on how to do things.
 Then I realized it may be handy to put those notes to Github and let them go
 through some CI to be sure they are correct.
 

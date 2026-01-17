@@ -11,9 +11,9 @@ tags: [wifi, router, turris, nic.cz, nic, open, hardware]
 {: .prompt-info }
 
 You can find some details about the Turris wifi router, lots of photos and some
-command outputs in my [previous blog
-post](http://linux.xvx.cz/2014/04/turris-open-enterprise-wi-fi-router.html). Now
-I would like to describe how I configured it according to the network
+command outputs in my previous blog post
+"[Turris - The Open Enterprise Wi-Fi Router]({% post_url /2014/2014-04-09-turris-the-open-enterprise-wi-fi-router %})".
+Now I would like to describe how I configured it according to the network
 diagram:
 
 ![image](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/openwrt/wifi_openwrt3.svg)
@@ -273,7 +273,7 @@ uci set 'ddns.myddns.update_url=http://www.duckdns.org/update?domains=[DOMAIN]&t
 ```
 
 Modify the lighttpd web server to enable ssl (https), serve personal pages and
-[Transmission](http://www.transmissionbt.com/):
+[Transmission](https://www.transmissionbt.com/):
 
 ```bash
 opkg install lighttpd-mod-proxy
@@ -501,7 +501,7 @@ Here is the example how the stats look like:
 
 ![image](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/screenshot-gate-xvx-cz-myadmin-vnstat.png)
 
-[Transmission](http://www.transmissionbt.com/) bittorrent client configuration:
+[Transmission](https://www.transmissionbt.com/) bittorrent client configuration:
 
 ```bash
 opkg install transmission-remote transmission-web
