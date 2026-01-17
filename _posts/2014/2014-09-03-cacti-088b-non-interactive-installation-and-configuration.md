@@ -39,6 +39,7 @@ DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.
 DROP DATABASE test;
 EOF
 
+# shellcheck disable=SC2016
 sed -i.orig 's/^\(\$database_username\).*/\1 = "cacti";/;s/^\(\$database_password\).*/\1 = "admin123";/' /etc/cacti/db.php
 sed -i.orig 's/\(Allow from\) localhost/\1 all/' /etc/httpd/conf.d/cacti.conf
 sed -i 's@^#\(\*/5 \* \* \* \*.*cacti.*\)@\1@' /etc/cron.d/cacti
@@ -55,7 +56,7 @@ EOF
 
 mysql -u cacti --password=admin123 cacti < "$(rpm -ql cacti | grep cacti.sql)"
 
-mysql -u root --password=admin123 -v  << EOF
+mysql -u root --password=admin123 -v << EOF
 USE cacti;
 UPDATE user_auth SET password = md5('admin123') WHERE username = 'admin';
 UPDATE user_auth SET must_change_password = '' WHERE username = 'admin';
