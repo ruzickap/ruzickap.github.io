@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2024-12-14
 description: Build "cheap and secure" Amazon EKS Auto Mode with network policies, cluster encryption and logging
 categories: [Kubernetes, Amazon EKS Auto Mode, Security]
-tags: [amazon eks, amaozn eks auto mode, k8s, kubernetes, security, eksctl, cert-manager, external-dns, prometheus, sso, oauth2-proxy]
+tags: [amazon eks, amazon eks auto mode, k8s, kubernetes, security, eksctl, cert-manager, external-dns, prometheus, sso, oauth2-proxy]
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 

@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2025-02-01
 description:
 categories: [Kubernetes, Amazon EKS Auto Mode, Velero, cert-manager]
-tags: [amaozn eks auto mode, amazon eks, cert-manager, certificates, eksctl, k8s, kubernetes, security, velero]
+tags: [amazon eks auto mode, amazon eks, cert-manager, certificates, eksctl, k8s, kubernetes, security, velero]
 image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
 ---
 

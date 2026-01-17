@@ -17,17 +17,16 @@ It's **OUTDATED** and **INCOMPLETE**, but it can still bring some light...
 
 ---
 
-Few days ago I bought WiFi router [TP-Link TL-WR1043ND](https://openwrt.org/toh/tp-link/tl-wr1043nd).
+A few days ago I bought the WiFi router [TP-Link TL-WR1043ND](https://openwrt.org/toh/tp-link/tl-wr1043nd).
 The main reason was the USB, Gigabit Ethernet ports, 802.11n and
 [support](https://dev.openwrt.org/milestone/Backfire%2010.03) in latest
 [OpenWrt](https://openwrt.org/).
 
-OpenWrt is amazing project which can create really powerful device from the wifi
-routers.
+OpenWrt is an amazing project which can create a really powerful device from
+wifi routers.
 
-I spent many days with collecting various information about OpenWrt, because I
-want to use web camera, USB hub, external USB storage and later few
-thermometers.
+I spent many days collecting various information about OpenWrt, because I want
+to use a web camera, USB hub, external USB storage and later a few thermometers.
 
 I decided to compile it from scratch (using Fedora 13), because squashfs can't
 work with block-extroot without building an image (see
@@ -104,7 +103,7 @@ Number Start End Size Type File system Flags
 2 450MB 492MB 41.9MB primary linux-swap(v1)
 ```
 
-Connect router to your desktop/laptop and flash it form the webgui using this
+Connect router to your desktop/laptop and flash it from the webgui using this
 file: `openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin` or use these commands
 if you already have OpenWrt installed:
 

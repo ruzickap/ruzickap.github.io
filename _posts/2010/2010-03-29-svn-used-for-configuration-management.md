@@ -10,7 +10,7 @@ tags: [SVN, Apache, configuration-management, WebSVN]
 > <https://linux-old.xvx.cz/2010/03/svn-used-for-configuration-management/>
 {: .prompt-info }
 
-Like every UNIX server admin, I'm using many various text based configurations
+Like every UNIX server admin, I'm using many various text-based configurations
 on my machines. It's important to track "every" change of these important files
 to prevent problems with service stability.
 
@@ -21,7 +21,7 @@ which is used to save/delete/update files from svn. You can of course save
 all necessary files to SVN by hand, but it's quicker to write a short parser
 for it.
 
-The idea is to create main repository "system_configs" where you will have
+The idea is to create the main repository "system_configs" where you will have
 subdirectories correspond to hostnames of your machines:
 
 ```text
@@ -37,7 +37,7 @@ keys.
 
 Use cron to automatically check changes in your files and add them to SVN.
 
-Here is the example how I installed subversion server to debian and managed
+Here is an example of how I installed subversion server on Debian and managed
 configuration files in it.
 
 ## SVN server installation and configuration together with WebSVN
@@ -59,7 +59,7 @@ chown -R svn:svn /home/svn
 svnadmin create --fs-type fsfs /var/lib/svn-repos/system_configs
 ```
 
-Now it's necessary to setup access rights for servers which will read/write
+Now it's necessary to set up access rights for servers which will read/write
 configuration to your SVN server. In my example I will use servers with
 hostnames `debian` and `czbrn0208`.
 
@@ -171,7 +171,7 @@ root@czbrn0208:~ mkdir /root/configuration-`hostname`
 root@czbrn0208:~ svn co svn+ssh://svn@debian.xvx.cz/`hostname` /root/configuration-`hostname`
 ```
 
-Now your repositories are ready to import first files/directories:
+Now your repositories are ready to import the first files/directories:
 
 ```bash
 cp /etc/rc.local "/root/configuration-$(hostname)/"
@@ -179,24 +179,24 @@ svn add /root/configuration-debian/rc.local
 svn ci --message "Test" /root/configuration-debian/
 ```
 
-Now there should be first file in the repository.
+Now there should be the first file in the repository.
 
 Now you can access your repository by [WebSVN](https://websvnphp.github.io/) using
 `https://my_server/websvn`.
 
-Everybody like screenshots so I put there some from my own SVN server:
+Everybody likes screenshots so I put there some from my own SVN server:
 
 ![WebSVN 1](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_1.avif)
 ![WebSVN 2](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_2.avif)
 ![WebSVN 3](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_3.avif)
 
-### snvci script
+### Script svnci
 
-Here is a link for my script which can help you to add/update/remove to
-svn repository without deep knowledge of it:
+Here is a link for my script which can help you add/update/remove from the SVN
+repository without deep knowledge of it:
 [svnci](https://github.com/ruzickap/old_stuff/blob/af1cd07294b2aa2441d184aaa5361f1a59139ca5/svnci/svnci).
 
-I use it because it's faster and easy to remember than learn various svn
+I use it because it's faster and easier to remember than learning various SVN
 commands combined with shell - so here are some examples:
 
 Add files to repository:

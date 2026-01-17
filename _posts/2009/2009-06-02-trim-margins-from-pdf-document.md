@@ -12,10 +12,10 @@ tags: [bash, PDF]
 
 It happened to me once that I wanted to trim margins from a PDF document.
 
-It was a manual for Panasonic G1 camera.
+It was a manual for the Panasonic G1 camera.
 
 You can see huge margins there, because it was officially written for A5 paper
-and they create manual for A4.
+and they created a manual for A4.
 
 See the picture:
 
@@ -34,5 +34,5 @@ Here is the result:
 
 I hope this can be useful for somebody who needs this...
 
-KDE pdf viewer Okular, has the function "Trim Margins", which works very well,
-but you can not save the PDF...
+The KDE PDF viewer Okular has the function "Trim Margins", which works very
+well, but you cannot save the PDF...

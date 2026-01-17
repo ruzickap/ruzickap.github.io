@@ -16,19 +16,19 @@ it. This ROM is quite popular, but only version 6.0 released last week supports
 [HTC Desire](https://web.archive.org/web/20161224225045/https://wiki.cyanogenmod.org/w/bravo_Info).
 
 I'm going to put a few notes here on how I did "post installation" changes like
-removing some programs, ssh key config, OpenVPN setup and few more.
+removing some programs, ssh key config, OpenVPN setup, and a few more.
 
 I don't want to describe here how to install this ROM to the HTC Desire,
 because there is nice how-to on their pages:
 [Full Update Guide - HTC Desire](https://web.archive.org/web/20161224202150/https://wiki.cyanogenmod.org/w/Install_CM_for_bravo)
 
-Just one remark - If you suffer with signal lost please look at
+Just one remark - If you suffer from signal loss please look at
 [this page](https://web.archive.org/web/2012/http://forum.cyanogenmod.com/topic/5437-signal-drops-after-rc2-final/).
 
 Put ssh keys to the phone and start dropbear (SSH server):
 (taken from [CyanogenMod Wiki - Connect with SSH](https://web.archive.org/web/2016/http://wiki.cyanogenmod.org/w/Doc:_sshd))
 
-Copy your ssh public key from your linux box to the phone:
+Copy your ssh public key from your Linux box to the phone:
 
 ```bash
 adb push /home/ruzickap/.ssh/id_rsa.pub /sdcard/authorized_keys

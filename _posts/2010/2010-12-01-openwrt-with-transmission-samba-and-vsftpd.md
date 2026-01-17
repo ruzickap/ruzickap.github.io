@@ -75,7 +75,7 @@ make V=99
 
 ... and take a coffee :-)
 
-Connect router to your desktop/laptop and flash it form the webgui using
+Connect router to your desktop/laptop and flash it from the webgui using
 this file: [openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin](https://ftp.xvx.cz/pub/distributions/openwrt/bracha/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin)
 
 If you already have OpenWrt installed you can replace it by this command:

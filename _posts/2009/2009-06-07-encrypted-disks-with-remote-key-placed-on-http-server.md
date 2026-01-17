@@ -11,13 +11,13 @@ tags: [bash, LVM, USB, wget, encryption, dm-crypt]
 {: .prompt-info }
 
 This page contains some information on how to create an encrypted disk using
-dm_crypt, lvm, gpg with remote key stored on http server.
+dm_crypt, lvm, gpg with a remote key stored on an HTTP server.
 The advantage is to have the key, used for unlocking encrypted disk(s),
 somewhere on the server instead of having it on USB.
 
 * You can easily delete this key if your disks are stolen and nobody can
   access them any longer...
-* If you use USB stick to save key then you need to have it connected to
+* If you use a USB stick to save the key then you need to have it connected to
   the machine with the encrypted disks every reboot - usually it will be
   plugged all the time to the server which destroys all security.
 * Keys are downloaded automatically every reboot from remote HTTP server
@@ -46,14 +46,14 @@ uid                  test_name (test_comment) test@xvx.cz
 sub   2048g/A0DA1037 2009-06-07
 ```
 
-Export private key and save it somewhere "public" temporary...
+Export the private key and save it somewhere "public" temporarily...
 
 ```bash
 gpg --verbose --export-options export-attributes,export-sensitive-revkeys --export-secret-keys 9BB7698A > ~/public_html/secret.key
 ```
 
-Generate random key and encrypt it by previously generated private key. That
-will be the key used for dm-crypt:
+Generate a random key and encrypt it with the previously generated private key.
+That will be the key used for dm-crypt:
 
 ```bash
 head -c 256 /dev/urandom | gpg --batch --passphrase test --verbose --throw-keyids --local-user 9BB7698A --sign --yes --cipher-algo AES256 --encrypt --hidden-recipient 9BB7698A --no-encrypt-to --output ~/public_html/abcd.html -
@@ -61,9 +61,9 @@ head -c 256 /dev/urandom | gpg --batch --passphrase test --verbose --throw-keyid
 
 ## Client side (where the data will be encrypted)
 
-Login to the machine where you want to crypt your data.
+Log in to the machine where you want to encrypt your data.
 
-Create lvm volume:
+Create an LVM volume:
 
 ```bash
 #lvremove -f lvdata
@@ -73,7 +73,7 @@ vgcreate -v -s 16 vgdata /dev/hda2 /dev/hdb1
 lvcreate -v -l 100%FREE vgdata -n lvdata
 ```
 
-Import secret private key from the http server (don't forget to remove
+Import the secret private key from the HTTP server (don't forget to remove
 `secret.key` from the server after this) and then download and decrypt the
 cipher key for dm-crypt `/mykey`:
 
@@ -107,9 +107,9 @@ cryptsetup luksClose vgdata-lvdata_crypt
 rm /mykey
 ```
 
-Now we have to create a short script `/script` which will download the key from
-remote server and decrypt it using imported secret key by GPG and display it on
-the screen:
+Now we have to create a short script `/script` that will download the key from
+the remote server and decrypt it using the imported secret key with GPG and
+display it on the screen:
 
 ```bash
 #!/bin/bash
@@ -133,8 +133,8 @@ Another necessary thing needs to be done - putting the right information to
 vgdata-lvdata_crypt     /dev/mapper/vgdata-lvdata       none noauto,cipher=aes-xts-plain,size=512,luks,tries=1,checkargs=ext2,keyscript=/script
 ```
 
-We don't want to mount encrypted filesystem with others, because the network is
-not ready that time `/etc/fstab`:
+We don't want to mount the encrypted filesystem with others, because the network
+is not ready at that time `/etc/fstab`:
 
 ```console
 /dev/mapper/vgdata-lvdata_crypt /mnt    ext3    noauto,rw,exec,async,noatime,nocheck,data=writeback    0       0

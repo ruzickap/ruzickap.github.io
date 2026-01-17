@@ -16,13 +16,14 @@ OpenWrt firmware [Backfire 10.03.1](https://downloads.openwrt.org/backfire/10.03
 
 I'm going to use [TP-Link
 TL-WR1043ND](https://www.tp-link.com/en/products/details/?model=TL-WR1043ND) wifi
-router with small 64MB USB stick `/dev/sda1` containing ext2 partition. I plan
+router with a small 64MB USB stick `/dev/sda1` containing an ext2 partition. I
+plan
 to have some stats on the USB stick and simple html pages as well.
 
 <!-- rumdl-disable MD013 -->
 After flashing the original firmware with [openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin](https://downloads.openwrt.org/backfire/10.03.1/ar71xx/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin)
 I installed the kernel related packages and
-[extroot](https://wiki.openwrt.org/doc/howto/extroot):
+[extroot](https://web.archive.org/web/20120203182855/http://wiki.openwrt.org/doc/howto/extroot):
 <!-- rumdl-enable MD013 -->
 
 (if you have OpenWRT already installed use: `mtd -e firmware -r write
@@ -116,7 +117,7 @@ cp /tmp/authorized_keys /etc/dropbear/authorized_keys
 chmod 600 /etc/dropbear/authorized_keys
 ```
 
-Install few applications:
+Install a few applications:
 
 ```bash
 opkg update
@@ -179,10 +180,10 @@ echo "dhcp-script=/etc/dnsmasq-script.sh" >> /etc/dnsmasq.conf
 cat > /etc/dnsmasq-script.sh << \EOF
 #!/bin/sh
 
-/bin/echo `/bin/date +"%F %T"` $* >> /www2/dnsmasq.script.log
+/bin/echo $(/bin/date +"%F %T") $* >> /www2/dnsmasq.script.log
 
-if [ "$1" == "add" ] && ! grep -iq $2 /etc/config/dhcp; then
-  echo -e "Subject: New MAC on `uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`\\n\\n`/bin/date +"%F %T"` $*" | sendmail petr.ruzicka@gmail.com
+if [ "$1" == "add" ] && ! grep -iq "$2" /etc/config/dhcp; then
+  echo -e "Subject: New MAC on $(uci get system.@system[0].hostname).$(uci get dhcp.@dnsmasq[0].domain)\\n\\n$(/bin/date +"%F %T") $*" | sendmail petr.ruzicka@gmail.com
 fi
 EOF
 
@@ -237,7 +238,7 @@ reboot
 
 Repeat the previous steps and continue...
 You need to repeat it, because your router now reads the configs from "empty"
-USB stick and not form internal memory. If you will remove the USB stick openwrt
+USB stick and not from internal memory. If you remove the USB stick OpenWrt
 will read the configs from the memory.
 
 Configure statistics (collectd):
@@ -281,13 +282,13 @@ cat > /etc/graphs-vnstat.sh << \EOF
 # Source: http://code.google.com/p/x-wrt/source/browse/trunk/package/webif/files/www/cgi-bin/webif/graphs-vnstat.sh
 
 WWW_D=/www2/vnstat # output images to here
-LIB_D=`awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf` # db location
+LIB_D=$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf) # db location
 BIN=/usr/bin/vnstati  # which vnstati
 
 outputs="s h d t m"   # what images to generate
 
 # Sanity checks
-[ -d "$WWW_D" ] || mkdir -p "$WWW_D" # make the folder if it dont exist.
+[ -d "$WWW_D" ] || mkdir -p "$WWW_D" # make the folder if it doesn't exist.
 
 # End of config changes
 interfaces="$(ls -1 $LIB_D)"

@@ -14,7 +14,7 @@ Two weeks ago I bought HTC Desire cell phone and I decided to get root on it.
 Rooting guide for this phone was published a few days ago, but most of it is
 "windows only".
 
-Here you can find the way how to get root on the HTC Desire using Debian.
+Here you can find out how to get root on the HTC Desire using Debian.
 
 - Download the zip file from the HTC Desire rooting guide and unzip it:
 
@@ -25,9 +25,9 @@ Here you can find the way how to get root on the HTC Desire using Debian.
   unzip r4-desire-root.zip
   ```
 
-- If you are using 64 bit version of Debian, please install ia32-libs
+- If you are using a 64-bit version of Debian, please install ia32-libs
   first, because [adb](https://developer.android.com/guide/developing/tools/adb.html)
-  binary is 32 bit.
+  binary is 32-bit.
 
   ```bash
   apt-get install ia32-libs

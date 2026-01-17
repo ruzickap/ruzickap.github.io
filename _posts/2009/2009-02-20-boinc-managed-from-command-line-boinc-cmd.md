@@ -21,7 +21,7 @@ configure BOINC. Unfortunately it is graphical application and it uses **port
 For obvious reasons you don't want to install GUI applications on servers and
 you also don't want to enable ports on firewall.
 
-That's time for `boinc_cmd` and here are few tips how to use it.
+That's time for `boinc_cmd` and here are a few tips on how to use it.
 
 - Set ***http proxy*** 10.226.56.40:3128:
 
