@@ -122,9 +122,9 @@ Here is the network diagram:
 
   # Private key for CA
   (
-  umask 077
-  openssl genrsa -passout pass:password123 -out private/example.com-ca.key 1024
-  openssl pkey -text -passout pass:password123 -in private/example.com-ca.key > private/example.com-ca.key.info
+    umask 077
+    openssl genrsa -passout pass:password123 -out private/example.com-ca.key 1024
+    openssl pkey -text -passout pass:password123 -in private/example.com-ca.key > private/example.com-ca.key.info
   )
 
   SUBJ="
@@ -162,10 +162,10 @@ Here is the network diagram:
   chmod 0600 /var/lib/pgsql/9.3/server.key
 
   sed -i \
-  -e "s/#ssl = off/ssl = on/" \
-  -e "s@#ssl_cert_file = 'server.crt'@ssl_cert_file = '../server.crt'@" \
-  -e "s@#ssl_key_file = 'server.key'@ssl_key_file = '../server.key'@" \
-  /var/lib/pgsql/9.3/data/postgresql.conf
+    -e "s/#ssl = off/ssl = on/" \
+    -e "s@#ssl_cert_file = 'server.crt'@ssl_cert_file = '../server.crt'@" \
+    -e "s@#ssl_key_file = 'server.key'@ssl_key_file = '../server.key'@" \
+    /var/lib/pgsql/9.3/data/postgresql.conf
 
   service postgresql-9.3 restart
 

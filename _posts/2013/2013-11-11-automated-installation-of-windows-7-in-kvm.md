@@ -281,11 +281,11 @@ echo ssh-rsa xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx ruzickap@peru >> "%PROGRAMFIL
 )  > "%PROGRAMFILES%\ICW\home\Administrator\.ssh\id_rsa"
 
 (
-echo Host *
-echo UserKnownHostsFile /dev/null
-echo StrictHostKeyChecking no
-echo User root
-)  > "%PROGRAMFILES%\ICW\home\Administrator\.ssh\config"
+  echo Host *
+  echo UserKnownHostsFile /dev/null
+  echo StrictHostKeyChecking no
+  echo User root
+) > "%PROGRAMFILES%\ICW\home\Administrator\.ssh\config"
 
 
 @echo.

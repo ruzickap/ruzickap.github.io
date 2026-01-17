@@ -83,62 +83,62 @@ selinux-policy-targeted                 # this is needed for livemedia-creator
 
 %post
 (
-set -x
+  set -x
 
-#################
-# Configuration
-#################
+  #################
+  # Configuration
+  #################
 
-echo " * setting up systemd"
-echo "DumpCore=no" >> /etc/systemd/system.conf
+  echo " * setting up systemd"
+  echo "DumpCore=no" >> /etc/systemd/system.conf
 
-echo " * setting up journald"
-echo "Storage=volatile" >> /etc/systemd/journald.conf
-echo "RuntimeMaxUse=15M" >> /etc/systemd/journald.conf
-echo "ForwardToSyslog=no" >> /etc/systemd/journald.conf
-echo "ForwardToConsole=no" >> /etc/systemd/journald.conf
+  echo " * setting up journald"
+  echo "Storage=volatile" >> /etc/systemd/journald.conf
+  echo "RuntimeMaxUse=15M" >> /etc/systemd/journald.conf
+  echo "ForwardToSyslog=no" >> /etc/systemd/journald.conf
+  echo "ForwardToConsole=no" >> /etc/systemd/journald.conf
 
 
-#################
-# Minimize
-#################
+  #################
+  # Minimize
+  #################
 
-# Packages to Remove
-dnf remove -y audit cracklib-dicts dnf-yum fedora-logos firewalld grubby kbd parted plymouth polkit sssd-client xkeyboard-config
+  # Packages to Remove
+  dnf remove -y audit cracklib-dicts dnf-yum fedora-logos firewalld grubby kbd parted plymouth polkit sssd-client xkeyboard-config
 
-echo " * purge existing SSH host keys"
-rm -f /etc/ssh/ssh_host_*key{,.pub}
+  echo " * purge existing SSH host keys"
+  rm -f /etc/ssh/ssh_host_*key{,.pub}
 
-echo " * remove KMS DRM video drivers"
-rm -rf /lib/modules/*/kernel/drivers/gpu/drm /lib/firmware/{amdgpu,radeon}
+  echo " * remove KMS DRM video drivers"
+  rm -rf /lib/modules/*/kernel/drivers/gpu/drm /lib/firmware/{amdgpu,radeon}
 
-echo " * remove unused drivers"
-rm -rf /lib/modules/*/kernel/{sound,drivers/media,fs/nls}
+  echo " * remove unused drivers"
+  rm -rf /lib/modules/*/kernel/{sound,drivers/media,fs/nls}
 
-echo " * compressing cracklib dictionary"
-xz -9 /usr/share/cracklib/pw_dict.pwd
+  echo " * compressing cracklib dictionary"
+  xz -9 /usr/share/cracklib/pw_dict.pwd
 
-echo " * purging images"
-rm -rf /usr/share/backgrounds/* /usr/share/kde4/* /usr/share/anaconda/pixmaps/rnotes/*
+  echo " * purging images"
+  rm -rf /usr/share/backgrounds/* /usr/share/kde4/* /usr/share/anaconda/pixmaps/rnotes/*
 
-echo " * truncating various logfiles"
-for log in dnf.log dracut.log lastlog; do
-  truncate -c -s 0 /var/log/${log}
-done
+  echo " * truncating various logfiles"
+  for log in dnf.log dracut.log lastlog; do
+    truncate -c -s 0 /var/log/${log}
+  done
 
-echo " * removing trusted CA certificates"
-truncate -s0 /usr/share/pki/ca-trust-source/ca-bundle.trust.crt
-update-ca-trust
+  echo " * removing trusted CA certificates"
+  truncate -s0 /usr/share/pki/ca-trust-source/ca-bundle.trust.crt
+  update-ca-trust
 
-echo " * cleaning up dnf cache"
-dnf clean all
+  echo " * cleaning up dnf cache"
+  dnf clean all
 
-# no more python loading after this step
-echo " * removing python precompiled *.pyc files"
-find /usr/lib64/python*/ /usr/lib/python*/ -name '*py[co]' -print0 | xargs -0 rm -f
+  # no more python loading after this step
+  echo " * removing python precompiled *.pyc files"
+  find /usr/lib64/python*/ /usr/lib/python*/ -name '*py[co]' -print0 | xargs -0 rm -f
 
-echo " * remove login banner"
-rm /etc/issue
+  echo " * remove login banner"
+  rm /etc/issue
 
 ) &> /root/ks.out
 %end
