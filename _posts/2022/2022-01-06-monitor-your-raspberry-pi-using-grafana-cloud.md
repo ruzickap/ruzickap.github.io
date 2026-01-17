@@ -59,7 +59,6 @@ Do the changes in the terminal:
 apt update
 apt install -y prometheus-blackbox-exporter
 
-
 # Change the grafana agent config file /etc/grafana-agent.yaml
 cat > /etc/grafana-agent.yaml << EOF
 integrations:
