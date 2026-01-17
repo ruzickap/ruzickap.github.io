@@ -19,23 +19,20 @@ But sometimes you need to run tests on a multinode cluster running on
 multiple VMs.
 
 There are many ways to install a Kubernetes Multinode Cluster but I chose
-these projects [kubeadm][kubeadm] and [kubespray](https://kubespray.io/).
-
-[kubeadm]: https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/
+these projects [kubeadm](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/)
+and [kubespray](https://kubespray.io/).
 
 ![Kubernetes logo](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png)
 
 - Kubespray is handy for enterprise installations where HA is a must, but it
-  can be used for standard testing if you have [Ansible][ansible] installed.
-
-[ansible]: https://www.ansible.com/
+  can be used for standard testing if you have [Ansible](https://www.ansible.com/)
+  installed.
 
 - Kubeadm is the official tool for Kubernetes installation, but it needs more
   love when you want to use it in enterprise to configure HA.
 
 Let's look at these two projects to see how "easy" it is to install Kubernetes
-to
-multiple nodes (VMs):
+to multiple nodes (VMs):
 
 ## Kubeadm
 
@@ -127,6 +124,8 @@ ssh root@node1
 kubectl get nodes
 ```
 
+[![asciicast](https://asciinema.org/a/176954.svg)](https://asciinema.org/a/176954)
+
 If you want to do it quickly with creating the VMs in Linux you can use this
 script:
 
@@ -135,6 +134,8 @@ script:
 It will create 4 VMs using Vagrant (you should have these vagrant plugins
 installed: vagrant-libvirt + vagrant-hostmanager) and install Kubernetes using
 kubeadm.
+
+[![asciicast](https://asciinema.org/a/176939.svg)](https://asciinema.org/a/176939)
 
 ## Kubespray
 
@@ -147,5 +148,7 @@ automation:
 It will create 4 VMs using Vagrant (you should have these vagrant plugins
 installed: vagrant-libvirt + vagrant-hostmanager) and install Kubernetes using
 kubespray+ansible.
+
+[![asciicast](https://asciinema.org/a/176949.svg)](https://asciinema.org/a/176949)
 
 Enjoy... :-)

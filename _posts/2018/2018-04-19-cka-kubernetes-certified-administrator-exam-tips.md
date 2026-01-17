@@ -17,11 +17,8 @@ I was looking for some details about the exam before, but most of the articles I
 found are quite old:
 
 - [https://medium.com/@walidshaari/kubernetes-certified-administrator-cka-43a25ca4c61c](https://medium.com/@walidshaari/kubernetes-certified-administrator-cka-43a25ca4c61c)
-
 - [https://github.com/walidshaari/Kubernetes-Certified-Administrator](https://github.com/walidshaari/Kubernetes-Certified-Administrator)
-
 - [https://web.archive.org/web/20180321024730/http://madorn.com/certified-kubernetes-administrator-exam.html](https://web.archive.org/web/20180321024730/http://madorn.com/certified-kubernetes-administrator-exam.html)
-
 - [https://blog.heptio.com/how-heptio-engineers-ace-the-certified-kubernetes-administrator-exam-93d20af32557](https://blog.heptio.com/how-heptio-engineers-ace-the-certified-kubernetes-administrator-exam-93d20af32557)
 
 ![CKA Certified Kubernetes Administrator logo](https://web.archive.org/web/20200916225354/https://www.cncf.io/wp-content/uploads/2020/08/logo_cka_whitetext-2-500x500.png)
