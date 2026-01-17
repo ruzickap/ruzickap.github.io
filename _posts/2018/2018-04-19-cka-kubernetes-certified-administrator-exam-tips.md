@@ -24,7 +24,7 @@ found are quite old:
 
 - [https://blog.heptio.com/how-heptio-engineers-ace-the-certified-kubernetes-administrator-exam-93d20af32557](https://blog.heptio.com/how-heptio-engineers-ace-the-certified-kubernetes-administrator-exam-93d20af32557)
 
-![image](https://www.cncf.io/wp-content/uploads/2020/08/logo_cka_whitetext-2-500x500.png)
+![image](https://web.archive.org/web/20200916225354/https://www.cncf.io/wp-content/uploads/2020/08/logo_cka_whitetext-2-500x500.png)
 
 So I decided to write some more fresh stuff from the April 2018.
 

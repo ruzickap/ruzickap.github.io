@@ -13,7 +13,7 @@ tags: [server, upgrade, hp, hp spp, nfs, cobbler, pxe, firmware, pxe boot]
 If you have to upgrade the firmware (iLO, BIOS, Disk firmware, NIC firmware,
 ...)
 inside many HP servers and for this task it's useful to use [HP Service Pack for
-ProLiant](http://www8.hp.com/us/en/products/server-software/product-detail.html?oid=5104018)
+ProLiant](https://web.archive.org/web/20140102225926/http://www8.hp.com/us/en/products/server-software/product-detail.html?oid=5104018)
 ([HP
 SPP](https://web.archive.org/web/20140103153853/http://h17007.www1.hp.com/us/en/enterprise/servers/products/service_pack/spp/index.aspx)).
 

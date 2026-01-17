@@ -200,7 +200,6 @@ Then go to the Grafana Cloud again...
 - [715](https://grafana.com/grafana/dashboards/715) - [Named processes stacked](https://grafana.com/grafana/dashboards/715)
 - [8378](https://grafana.com/grafana/dashboards/8378) - [System Processes Metrics](https://grafana.com/grafana/dashboards/8378)
 - [5984](https://grafana.com/grafana/dashboards/5984) - [Alerts - Linux Nodes](https://grafana.com/grafana/dashboards/5984)
-- [1856](https://grafana.com/grafana/dashboards/1856) - [Node - Network Overview](https://grafana.com/grafana/dashboards/1856)
 - [1860](https://grafana.com/grafana/dashboards/1860) - [Node Exporter Full](https://grafana.com/grafana/dashboards/1860)
 - [405](https://grafana.com/grafana/dashboards/405) - [Node Exporter Server Metrics](https://grafana.com/grafana/dashboards/405)
 
@@ -208,8 +207,8 @@ Then go to the Grafana Cloud again...
 
 ![Prometheus Datasource](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXjs3coJfUFzjNJYXtugyrYDFMU6iP3gqv9PFIZqm_4Ltx9QISxutF7T2vdrFQVwnVcNAIEcUjSAr2lBPdRekCwILoIJdNBcZIsWBea0r3vDCoY75pBGEprtTTb7m0UiKUf1GCt6PhHqk/w616-h640/image.png)
 
-- After you import the Dashboard you should see them by going to "Dashboards ->
-Browse":
+- After you import the Dashboard you should see them by going to
+  "Dashboards -> Browse":
 
 ![Dashboards Browse](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhkNEMYyeaKJsgFxjtWlUgaNSMiUzh5xwJMr_fob1DeDZIHY6ilWsQKAOgX9zwH_9xue5iArjTVI7pJ5XOptCrI_S1UjmaK2r1cExRGisRH7ntaPc5sIIKtnmcSqEhtlw1U-RnjdzDJbkM/w520-h640/image.png)
 

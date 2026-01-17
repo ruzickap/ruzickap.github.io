@@ -28,8 +28,8 @@ hardware/software platform.
 
 The details about the hardware including design and manufacture data is
 published under the terms of the [CERN Open Hardware
-License](https://www.ohwr.org/projects/cernohl/wiki) and can be found here:
-[https://www.turris.cz/en/hardware-documentation](https://www.turris.cz/en/hardware-documentation).
+License](https://web.archive.org/web/20140510092123/http://www.ohwr.org/projects/cernohl/wiki) and can be found here:
+[https://www.turris.cz/en/hardware-documentation](https://web.archive.org/web/20160321003446/https://www.turris.cz/en/hardware-documentation).
 These details are really nice, because everybody can look at it and improve...
 
 Here are some pictures of how the router looks:

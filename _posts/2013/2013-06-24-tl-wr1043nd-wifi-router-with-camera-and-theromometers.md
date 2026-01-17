@@ -13,7 +13,7 @@ tags: [TL-WR1043ND, WiFi, router, webcam, temperature, digitemp]
 Here are a few photos of my 2-year-old [TP-Link
 TL-WR1043ND](https://www.tp-link.com/en/products/details/?model=TL-WR1043ND) wifi
 router. It was getting some pictures from camera using
-[fswebcam](https://www.firestorm.cx/fswebcam/) and measuring internal/external
+[fswebcam](https://web.archive.org/web/20130621044049/http://www.firestorm.cx/fswebcam/) and measuring internal/external
 temperature using [digitemp](https://www.digitemp.com/).
 
 ![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJZyVnM53gvOAuhuJ7t-zXzHVwrbFVWgGs1ZlX2KWVV4_oDTh8kkYYqa_VQQCHPjpSQqQbiXSsGy9SM6O8yk3eELsyFYzjThbkVON3cPKl_p8fWocSsuzeLLw8Lwb_bqN7QN1Y8_tQlfw/s400/20130623-110435.jpg)

@@ -19,7 +19,7 @@ as virtual machine.
 
 That is the way I would like to describe here. I had one spare [HP ProLiant
 DL380p
-Gen8](http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=5177957)
+Gen8](https://web.archive.org/web/20150207155049/http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=5177957)
 so [RHEL7](https://en.wikipedia.org/wiki/Red_Hat_Enterprise_Linux#RHEL_7)
 virtualization ([KVM](https://www.linux-kvm.org/)) was the first choice.
 
@@ -97,11 +97,6 @@ yum install -y bash-completion bind-utils bridge-utils dstat htop httpd ipmitool
 sed -i 's@^\*/10 \*@\*/1 \*@' /etc/cron.d/sysstat
 echo "PS1='\[\033[01;31m\]\h\[\033[01;34m\] \w #\[\033[00m\] '" >> /root/.bashrc
 echo -e "\nalias sar='LANG=C sar'" >> /etc/bashrc
-
-cat >> /etc/vimrc << \EOF
-set laststatus=2
-set statusline=%F%m%r%h%w\ (%{&ff}){%Y}[%l,%v][%p%%]\ %{strftime(\"%d/%m/%y\ -\ %H:%M\")}
-EOF
 
 cat >> /etc/screenrc << EOF
 defscrollback 10000

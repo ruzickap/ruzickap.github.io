@@ -13,7 +13,7 @@ tags: [hp, c7000, enclosure, script, command line]
 In the past few days I was doing some scripting to get the details about the
 [HP BladeSystem c7000][c7000].
 
-[c7000]: http://h18004.www1.hp.com/products/blades/components/enclosures/c-class/c7000/
+[c7000]: https://web.archive.org/web/20130919051544/http://h18004.www1.hp.com/products/blades/components/enclosures/c-class/c7000/
 
 You can do a lot through SSH access, but I prefer to get the data without
 setting up ssh keys or doing some expect scripts. I needed "showAll" output
