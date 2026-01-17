@@ -20,7 +20,7 @@ found are quite old:
 
 - [https://github.com/walidshaari/Kubernetes-Certified-Administrator](https://github.com/walidshaari/Kubernetes-Certified-Administrator)
 
-- [http://madorn.com/certified-kubernetes-administrator-exam.html](http://madorn.com/certified-kubernetes-administrator-exam.html)
+- [https://web.archive.org/web/20180321024730/http://madorn.com/certified-kubernetes-administrator-exam.html](https://web.archive.org/web/20180321024730/http://madorn.com/certified-kubernetes-administrator-exam.html)
 
 - [https://blog.heptio.com/how-heptio-engineers-ace-the-certified-kubernetes-administrator-exam-93d20af32557](https://blog.heptio.com/how-heptio-engineers-ace-the-certified-kubernetes-administrator-exam-93d20af32557)
 
@@ -33,7 +33,7 @@ So I decided to write some more fresh stuff from the April 2018.
 Kubernetes clusters using "kubectl config use-context ". (Every exercise starts
 with a command showing you which cluster to use.) Here is how it looks (picture
 is taken from
-[http://madorn.com/certified-kubernetes-administrator-exam.html](http://madorn.com/certified-kubernetes-administrator-exam.html))
+[web.archive.org](https://web.archive.org/web/20180321024730/http://madorn.com/certified-kubernetes-administrator-exam.html))
 
 ![image](https://s3.amazonaws.com/madorn.com/images/cka-exam.jpeg)
 

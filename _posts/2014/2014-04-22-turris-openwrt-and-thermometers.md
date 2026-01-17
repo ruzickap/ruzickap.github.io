@@ -103,8 +103,7 @@ cat >> /etc/crontabs/root << EOF
 EOF
 ```
 
-You should be able to see the generated graphs in
-[http://192.168.1.1/myadmin/temperature_sensors](http://192.168.1.1/myadmin/temperature_sensors)
+You should be able to see the generated graphs in `http://192.168.1.1/myadmin/temperature_sensors`
 in the next few days.
 
 Here is the example:
