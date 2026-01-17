@@ -18,8 +18,7 @@ single VM with Kubernetes. This is probably the best way to start with it.
 
 Sometimes it's handy to have "production ready" Kubernetes cluster running on
 your laptop containing multiple VMs (like in a real production environment) -
-that's
-where you need to look around and search for another solution.
+that's where you need to look around and search for another solution.
 
 After trying a few tools I decided to use
 [Kubespray](https://github.com/kubernetes-incubator/kubespray). It's a tool for
@@ -42,118 +41,117 @@ Let's see how you can do it in Fedora 26 using Vagrant + libvirt + Kubespray +
 Kubespray-cli.
 
 - Install Vagrant VMs + libvirt and the Vagrantfile template for building the
+  VMs
 
-VMs
+  ```bash
+  # Install Vagrant libvirt plugin (with all the dependencies like qemu, libvirt, vagrant, ...)
+  dnf install -y -q ansible git libvirt-client libvirt-nss python-netaddr python-virtualenv vagrant-libvirt
+  vagrant plugin install vagrant-libvirt
 
-```bash
-# Install Vagrant libvirt plugin (with all the dependencies like qemu, libvirt, vagrant, ...)
-dnf install -y -q ansible git libvirt-client libvirt-nss python-netaddr python-virtualenv vagrant-libvirt
-vagrant plugin install vagrant-libvirt
+  # Enable dns resolution of VMs taken from libvirt (https://lukas.zapletalovi.com/2017/10/definitive-solution-to-libvirt-guest-naming.html)
+  sed -i.orig 's/files dns myhostname/files libvirt libvirt_guest dns myhostname/' /etc/nsswitch.conf
 
-# Enable dns resolution of VMs taken from libvirt (https://lukas.zapletalovi.com/2017/10/definitive-solution-to-libvirt-guest-naming.html)
-sed -i.orig 's/files dns myhostname/files libvirt libvirt_guest dns myhostname/' /etc/nsswitch.conf
+  # Start the libvirt daemon
+  service libvirtd start
 
-# Start the libvirt daemon
-service libvirtd start
+  # Create ssh key if it doesn't exist
+  test -f ~/.ssh/id_rsa.pub || ssh-keygen -f $HOME/.ssh/id_rsa -N ''
 
-# Create ssh key if it doesn't exist
-test -f ~/.ssh/id_rsa.pub || ssh-keygen -f $HOME/.ssh/id_rsa -N ''
+  # Create directory structure
+  mkdir /var/tmp/kubernetes_cluster
+  cd /var/tmp/kubernetes_cluster
 
-# Create directory structure
-mkdir /var/tmp/kubernetes_cluster
-cd /var/tmp/kubernetes_cluster
+  # Create Vagrantfile
+  cat > Vagrantfile << EOF
+  box_image = "peru/my_ubuntu-16.04-server-amd64"
+  node_count = 4
+  ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
 
-# Create Vagrantfile
-cat > Vagrantfile << EOF
-box_image = "peru/my_ubuntu-16.04-server-amd64"
-node_count = 4
-ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+  Vagrant.configure(2) do |config|
+    config.vm.synced_folder ".", "/vagrant", :disabled => true
+    config.vm.box = box_image
 
-Vagrant.configure(2) do |config|
-  config.vm.synced_folder ".", "/vagrant", :disabled => true
-  config.vm.box = box_image
-
-  config.vm.provider :libvirt do |domain|
-    domain.cpus = 2
-    domain.memory = 2048
-    domain.default_prefix = ''
-  end
-
-  (1..node_count).each do |i|
-    config.vm.define "kube0#{i}" do |config|
-      config.vm.hostname = "kube0#{i}"
+    config.vm.provider :libvirt do |domain|
+      domain.cpus = 2
+      domain.memory = 2048
+      domain.default_prefix = ''
     end
+
+    (1..node_count).each do |i|
+      config.vm.define "kube0#{i}" do |config|
+        config.vm.hostname = "kube0#{i}"
+      end
+    end
+
+    config.vm.provision 'shell', inline: "install -m 0700 -d /root/.ssh/; echo #{ssh_pub_key} >> /root/.ssh/authorized_keys; chmod 0600 /root/.ssh/authorized_keys"
+    config.vm.provision 'shell', inline: "echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys", privileged: false
   end
+  EOF
 
-  config.vm.provision 'shell', inline: "install -m 0700 -d /root/.ssh/; echo #{ssh_pub_key} >> /root/.ssh/authorized_keys; chmod 0600 /root/.ssh/authorized_keys"
-  config.vm.provision 'shell', inline: "echo #{ssh_pub_key} >> /home/vagrant/.ssh/authorized_keys", privileged: false
-end
-EOF
-
-# Create and start virtual machines
-vagrant up
-```
+  # Create and start virtual machines
+  vagrant up
+  ```
 
 - Create Python's Virtualenv for kubespray and start the Kubernetes cluster
-provisioning
+  provisioning
 
-```bash
-# Create Virtual env for Kubespray and make it active
-virtualenv --system-site-packages kubespray_virtenv
-source kubespray_virtenv/bin/activate
+  ```bash
+  # Create Virtual env for Kubespray and make it active
+  virtualenv --system-site-packages kubespray_virtenv
+  source kubespray_virtenv/bin/activate
 
-# Install Ansible and Kubespray to virtualenv
-pip install kubespray
+  # Install Ansible and Kubespray to virtualenv
+  pip install kubespray
 
-# Create kubespray config file
-cat > ~/.kubespray.yml << EOF
-kubespray_git_repo: "https://github.com/kubespray/kubespray.git"
-kubespray_path: "$PWD/kubespray"
-loglevel: "info"
-EOF
+  # Create kubespray config file
+  cat > ~/.kubespray.yml << EOF
+  kubespray_git_repo: "https://github.com/kubespray/kubespray.git"
+  kubespray_path: "$PWD/kubespray"
+  loglevel: "info"
+  EOF
 
-# Prepare kubespray for deployment
-kubespray prepare --assumeyes --path $PWD/kubespray --nodes kubernetes_cluster_kube01 kubernetes_cluster_kube02 kubernetes_cluster_kube03 kubernetes_cluster_kube04
+  # Prepare kubespray for deployment
+  kubespray prepare --assumeyes --path $PWD/kubespray --nodes kubernetes_cluster_kube01 kubernetes_cluster_kube02 kubernetes_cluster_kube03 kubernetes_cluster_kube04
 
-cat > kubespray/inventory/inventory.cfg << EOF
-[kube-master]
-kube01
-kube02
+  cat > kubespray/inventory/inventory.cfg << EOF
+  [kube-master]
+  kube01
+  kube02
 
-[all]
-kube01
-kube02
-kube03
-kube04
+  [all]
+  kube01
+  kube02
+  kube03
+  kube04
 
-[k8s-cluster:children]
-kube-node
-kube-master
+  [k8s-cluster:children]
+  kube-node
+  kube-master
 
-[kube-node]
-kube01
-kube02
-kube03
-kube04
+  [kube-node]
+  kube01
+  kube02
+  kube03
+  kube04
 
-[etcd]
-kube01
-kube02
-kube03
-EOF
+  [etcd]
+  kube01
+  kube02
+  kube03
+  EOF
 
-# Set password for kube user
-test -d kubespray/credentials || mkdir kubespray/credentials
-echo "kube123" > kubespray/credentials/kube_user
+  # Set password for kube user
+  test -d kubespray/credentials || mkdir kubespray/credentials
+  echo "kube123" > kubespray/credentials/kube_user
 
-# Deploy Kubernetes cluster
-kubespray deploy --assumeyes --user root --apps efk helm netchecker
-```
+  # Deploy Kubernetes cluster
+  kubespray deploy --assumeyes --user root --apps efk helm netchecker
+  ```
 
 After the deployment is over you should be able to login to one of the master
 node and run + see something like:
 
-```bash
+```console
 root@kube01:~# kubectl get nodes
 NAME      STATUS    ROLES         AGE       VERSION
 kube01    Ready     master,node   7m        v1.8.3+coreos.0
@@ -480,6 +478,8 @@ Events:
 Then you can work with the Kubernetes Cluster like usual...
 
 You can see the whole installation here:
+
+[![asciicast](https://asciinema.org/a/150506.svg)](https://asciinema.org/a/150506)
 
 Some parts mentioned above are specific to Fedora 26, but most of it can be
 achievable on the other distros.

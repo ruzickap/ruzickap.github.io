@@ -35,7 +35,7 @@ Let's see how you can do it in Fedora 26:
   dnf install -y -q ansible qemu-img qemu-kvm wget unzip
 
   # Download and unpack Packer
-  cd /tmp
+  cd /tmp || exit
   wget https://releases.hashicorp.com/packer/1.1.3/packer_1.1.3_linux_amd64.zip
   unzip packer*.zip
 
@@ -54,7 +54,7 @@ helper scripts
   ```bash
   # Prepare directory structure
   mkdir -p /var/tmp/packer_windows-server-2016-eval/{scripts/win-common,http/windows-server-2016,ansible}
-  cd /var/tmp/packer_windows-server-2016-eval
+  cd /var/tmp/packer_windows-server-2016-eval || exit
 
   # Download Autounattended file for Windows Server 2016 Evaluation
   wget -c -P http/windows-server-2016 https://raw.githubusercontent.com/ruzickap/packer-templates/master/http/windows-server-2016/Autounattend.xml
@@ -93,23 +93,24 @@ helper scripts
 - Download and mount the virtio-win iso and run Packer
 
   ```bash
-  export VIRTIO_WIN_ISO_DIR=$(mktemp -d --suffix=_virtio-win-iso)
+  VIRTIO_WIN_ISO_DIR=$(mktemp -d --suffix=_virtio-win-iso)
+  export VIRTIO_WIN_ISO_DIR
   export NAME=windows-server-2016-standard-x64-eval
   export WINDOWS_VERSION=2016
   export WINDOWS_TYPE=server
   export TMPDIR="/var/tmp/"
 
-  cd /var/tmp/packer_windows-server-2016-eval
+  cd /var/tmp/packer_windows-server-2016-eval || exit
 
   # Download and mount virtio-win to provide basic virtio Windows drivers
   wget -c https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso
-  mount -o loop virtio-win.iso $VIRTIO_WIN_ISO_DIR
+  mount -o loop virtio-win.iso "$VIRTIO_WIN_ISO_DIR"
 
   # Build image with packer
   /usr/local/bin/packerio build windows-server-2016-eval.json
 
-  umount $VIRTIO_WIN_ISO_DIR
-  rmdir $VIRTIO_WIN_ISO_DIR
+  umount "$VIRTIO_WIN_ISO_DIR"
+  rmdir "$VIRTIO_WIN_ISO_DIR"
   ```
 
 Complete build log:

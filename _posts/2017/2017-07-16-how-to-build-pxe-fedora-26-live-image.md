@@ -26,16 +26,16 @@ Here are a few steps on how to do it using the Lorax project.
 
 Prepare kickstart file:
 
-```bash
+```yaml
 #version=DEVEL
 # Firewall configuration
 firewall --disabled
 # Use network installation
-url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+url --mirrorlist='https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch'
 # Root password
 rootpw --plaintext xxxxxxxx
 # Network information
-network  --bootproto=dhcp --device=link --activate
+network --bootproto=dhcp --device=link --activate
 # System authorization information
 auth --enableshadow --passalgo=sha512
 # poweroff after installation
@@ -60,7 +60,6 @@ repo --name=my-fedora-updates --mirrorlist=http://mirrors.fedoraproject.org/mirr
 
 #My
 sshkey --username=root "ssh-rsa AAAAB3N...kxZaCiM="
-
 
 %packages --excludedocs --instLangs=en_US
 ethtool
@@ -136,7 +135,7 @@ dnf clean all
 
 # no more python loading after this step
 echo " * removing python precompiled *.pyc files"
-find /usr/lib64/python*/ /usr/lib/python*/ -name *py[co] -print0 | xargs -0 rm -f
+find /usr/lib64/python*/ /usr/lib/python*/ -name '*py[co]' -print0 | xargs -0 rm -f
 
 echo " * remove login banner"
 rm /etc/issue
