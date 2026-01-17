@@ -15,7 +15,7 @@ notes about the IPA and AD integration.
 
 Network diagram:
 
-![IPA and Active Directory integration network diagram](/assets/img/posts/2015/2015-07-21-ipa-centos7-integration-with-active-directory-w2k8/ipa.avif){:width="400"}
+![IPA and Active Directory integration network diagram](/assets/img/posts/2015/2015-07-21-ipa-centos7-integration-with-active-directory-w2k8/ipa.avif){:width="500"}
 
 I created the trust between the Active Directory and IPA server. There is one
 windows client connected to the AD and one CentOS7 client connected to the IPA.
@@ -124,7 +124,6 @@ ipa trustdomain-find example.com
 echo "Add new server"
 ipa host-add centos7-client.ec.example.com --password=secret --ip-address=192.168.122.46 --os="CentOS 7" --platform="VMware" --location="My lab" --locality="Brno" --desc="Test server"
 
-
 #Enable kerberos in Firefox
 # about:config -> network.negotiate-auth.trusted-uris -> .example.com
 ```
@@ -149,7 +148,7 @@ yum install -y ipa-client
 # Register to IPA (there is automatic discovery of IPA IP via DNS)
 ipa-client-install -w secret --mkhomedir
 
----
+#---
 
 # DNS checks
 dig SRV _ldap._tcp.example.com
