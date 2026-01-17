@@ -25,9 +25,11 @@ Instead of describing the whole installation - I decided to record a video
 containing the AD/IPA installation, client registration and Firefox/PuTTY/WinSCP
 Kerberos/GSSAPI configuration.
 
+{% include embed/youtube.html id='n_Jk-9ibFqE' %}
+
 The commands used in the video can be found below:
 
-```bash
+```powershell
 @echo Change TimeZone
 tzutil /s "Central Europe Standard Time"
 
@@ -65,7 +67,7 @@ dsadd user CN=testuser2,CN=Users,DC=example,DC=com -samid testuser2 -pwd Adminte
 #https://support.microsoft.com/en-us/kb/228477
 ```
 
-```bash
+```powershell
 @echo Change DNS to AD server
 netsh interface ipv4 add dnsserver "Local Area Connection" address=192.168.122.247 index=1
 
@@ -162,12 +164,9 @@ The video has some description, but is't not very detailed.
 
 Useful links:
 
-[How to Create Active Directory Domain](https://web.archive.org/web/20150423185240/http://stef.thewalter.net/how-to-create-active-directory-domain.html)
-
-[https://www.freeipa.org/page/Active_Directory_trust_setup](https://www.freeipa.org/page/Active_Directory_trust_setup)
-
-[https://www.freeipa.org/page/Setting_up_Active_Directory_domain_for_testing_purposes](https://www.freeipa.org/page/Setting_up_Active_Directory_domain_for_testing_purposes)
-
-[https://www.certdepot.net/wp-content/uploads/2015/07/Summit_IdM_Lab_User_Guide_2015.pdf](https://www.certdepot.net/wp-content/uploads/2015/07/Summit_IdM_Lab_User_Guide_2015.pdf)
+* [How to Create Active Directory Domain](https://web.archive.org/web/20150423185240/http://stef.thewalter.net/how-to-create-active-directory-domain.html)
+* [https://www.freeipa.org/page/Active_Directory_trust_setup](https://www.freeipa.org/page/Active_Directory_trust_setup)
+* [https://www.freeipa.org/page/Setting_up_Active_Directory_domain_for_testing_purposes](https://www.freeipa.org/page/Setting_up_Active_Directory_domain_for_testing_purposes)
+* [https://www.certdepot.net/wp-content/uploads/2015/07/Summit_IdM_Lab_User_Guide_2015.pdf](https://www.certdepot.net/wp-content/uploads/2015/07/Summit_IdM_Lab_User_Guide_2015.pdf)
 
 Enjoy :-)
