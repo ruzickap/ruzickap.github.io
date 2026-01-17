@@ -16,7 +16,7 @@ instead of writing it here.
 
 Most of them are related to Kubernetes...
 
-![Kubernetes Logo](https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Kubernetes_%28container_engine%29.png/1055px-Kubernetes_%28container_engine%29.png)
+![Kubernetes logo](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png){:width="200"}
 
 Anyway I put some of my notes / articles here:
 
