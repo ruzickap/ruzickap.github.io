@@ -17,7 +17,7 @@ CentOS 7
 instances, configure disks, tags volumes and instances and install public ssh
 key to root for example.
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhcvVpdKaL9fnM055ceCIe_fTgxlPgWXB-hvhglG8X7YMwA4dXLrFIifgfeHzY7LjMKOI_omQZ8F8btiCwCTbEOXJxXQ7_1tHqoXJ-ulVCS5DmyabEk2HpShmzbptYLSVfqB8qKh2XE5u4/s640/Screenshot_20170216_154501.png)
+![image](/assets/img/posts/2017/2017-02-16-use-ansible-to-create-and-tag-instances-in-aws-ec2/Screenshot_20170216_154501.avif)
 AWS Console
 
 Here is the playbook:

@@ -17,7 +17,7 @@ installation wizard where you need to specify some details.
 I would like to share the details on how to install Cacti 0.8.8b the automated
 way without user interaction.
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiCPI_pZ4Yq_Bq8FPzEZzImhBiYQvEeiUoiiUebt4YDVaUxV1UqIPNeyNTNz_6iDeu34UhCxi62pONgyk_kTtWo2KADPQN7HZ6y0B5zoZGtOXVPSFSGK2ZICkMJ8UNL4UwpEOHQXXiAWEE/s640/cacti01.png)
+![image](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti01.avif)
 
 Cacti Installation:
 
@@ -123,10 +123,10 @@ first)
 
 Few Screenshots:
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgOH_oSj-NozqK3Fhm4P7QwgmrlYaQg-ogZVZh_AcLcNkoz8ltgVcnV1PxRM1bSg_LOqEIJB_OT0d5IWohjjFcbfTSo8760Fb79YJvehn3KiEuDqqfzFLEOQXfaiLNVlhN2UlIbH5f3pSI/s640/cacti03.png)
+![image](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti03.avif)
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgW8pe6qVVBj0ua0uxpYiqkL7GKMOTfzLPD85ewHVvtKj2wdbLo7D5ZLLD2Uzqz4McOgUt7yQDD22gAinV80EgwmgnuuIsbRALVIzp9ynN3hcODlFazhJ5Dxc3IyyOJLmLvcm5javv8uq4/s640/cacti04.png)
+![image](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti04.avif)
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgPGDgpzfhSxiUq4VFh-Uf_kpVZodiAzu83xWgteKH2ojY_UAtmUzSHXZdnTTmEsz9iqeJoTxvLGK0sX-JHK_mD9xmYX2WmexT-hmA5xz-4eS-gxCvyjPChlYKcwXmbkoV0fsata8UNTDs/s1600/cacti02.png)
+![image](/assets/img/posts/2014/2014-09-03-cacti-088b-non-interactive-installation-and-configuration/cacti02.avif)
 
 Enjoy :-)

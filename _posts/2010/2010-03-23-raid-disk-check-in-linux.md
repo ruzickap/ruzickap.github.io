@@ -219,7 +219,7 @@ Mar 18 08:37:49 gate kernel: [  359.932012] hda: dma_intr: error=0x40 { Uncorrec
 ...
 ```
 
-Use `badblock` check as the last, because it's time consuming:
+Use `badblocks` check as the last, because it's time consuming:
 
 ```console
 gate:~ time badblocks -s -v -o /tmp/bad_blocks /dev/hda

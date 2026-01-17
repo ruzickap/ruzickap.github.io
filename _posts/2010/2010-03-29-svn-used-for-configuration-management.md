@@ -190,7 +190,7 @@ Everybody likes screenshots so I put there some from my own SVN server:
 ![WebSVN 2](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_2.avif)
 ![WebSVN 3](/assets/img/posts/2010/2010-03-29-svn-used-for-configuration-management/svn_3.avif)
 
-### snvci script
+### Script svnci
 
 Here is a link for my script which can help you add/update/remove from the SVN
 repository without deep knowledge of it:

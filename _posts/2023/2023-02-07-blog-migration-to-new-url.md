@@ -16,7 +16,7 @@ based". The new web page is based on [Jekyll](https://jekyllrb.com/) and
 
 I'm going to move to the new URL as well...
 
-![Jekyll and Chirpy Blog](https://blogger.googleusercontent.com/img/a/AVvXsEgLHM4BOncYdA1nidQ6qzwc9iiYwx3oL6YB_XKZLkv9I0hSjP6M7CbYwWfyS65_Rvd-WzFdeMgfpjfwYaZIPc-qsOPZgKl26a-u4_gdpjy0DiYPxdLEa655CenSWCeBxMCMYT5FdUwoUws1In0AfrgW7OYNDb6WeM4Lq9D1uxeUuGRtfyQh9BiDVo99)
+![Jekyll and Chirpy Blog](/assets/img/posts/2023/2023-02-07-blog-migration-to-new-url/jekyll-chirpy-blog.avif)
 
 [https://ruzickap.github.io](https://ruzickap.github.io)
 

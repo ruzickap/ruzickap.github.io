@@ -24,9 +24,9 @@ automated Windows installation in the
 
 Here are the screenshots from the VirtManager:
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj0KKP81N1wAojydffgCH6BKcz89W3WF-NYOh_b_hsO7VMPxreEq3wBxNek9D1-58SAqhhK-vopq_wGbe_c9lgKqiO77yXdajwDdt_A010QVdGwS-QPZ1qDxZZy3QjgKKBZegXdiA3RCew/s640/win02.png)
+![image](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win02.avif)
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjc2SFqjG0ET0c97xji7uf0jNRlbeL8NWXF4cbAGxs6gnN-DyvqJTsfhaVtVDOqQkapIcolJtfBfB7yCySTmEH41WoASI_w2csdAqYW9pq_x8OqgLTfxvRVcg1GTzdcaTjgM3D0VphyphenhyphenLMQ/s640/win01.png)
+![image](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win01.avif)
 
 As you can see above I decided to use [VirtIO][virtio] for disk access to
 get the best performance. In such a case I'll need the
@@ -78,7 +78,7 @@ rm $ISO
 
 Another screenshot showing the second CD-ROM with the `autostart.iso`:
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhVqJxi_xPmKDPUq73vuBj5CI9pAHJa8e-LwL2XvtKQ1HMfvxgPrMvtj1w4Z4FS5mzCxV7D2ZVl7U4W9uVJLL6FZMzIj3uOMW07ZeBs3vqz5SaT0Mq3XOYmNuquT_6BRg2cm0pd15bwKwg/s640/win03.png)
+![image](/assets/img/posts/2013/2013-11-11-automated-installation-of-windows-7-in-kvm/win03.avif)
 
 Once the installation of the Windows 7 is completed you should run the
 `autostart.bat` using the "Run as administrator" option.

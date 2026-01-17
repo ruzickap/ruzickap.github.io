@@ -27,22 +27,22 @@ Here are the steps to configure your Raspberry Pi to use Grafana Cloud:
 account.
 - Select your "Team URL" and region:
 
-![Grafana Cloud Team URL](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgNRReYLRmbkKDVeyWrobvEXHf-AiUHl-0j-SDRjvhflgLxkWsF3VZUnmBp74EFjukFl-qj1Y1yn0g-IsxTWM6ZM06WH7O1j1CNp6RpRLF3AZIXlqktR-oZ20Oz5gByYW1Z0HmM1VOb5Go/w400-h313/image.png)
+![Grafana Cloud Team URL](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-team-url.avif)
 
 - Then select the "Linux Server" and click "Install integration"
 
-![Linux Server Integration](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjuFSVlvcfMDy0dKbwKEAIhDy-PNC6SYbSzKERKOi7e0Al17BLWEjNwGXviuE3uZT6yg34pxRxClp6JDFtkNFXafvr5v9zIeCujoGS4FtjSkeCgHFRN1ihDA9NdCT2PfJm9UQmLKEYW4dU/w400-h243/image.png)
+![Linux Server Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/linux-server-integration.avif)
 
 - I left the "Debian - based" as a default and changed the "Architecture" to
 "Armv7"
 - Copy the content from the Grafana Agent field and paste it to your shell
 connected to RPi
 
-![Grafana Agent Configuration](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEg7xfBNwj3JnXF6UqGtHaAzOOBFtL8sZsvB8oX7zTYm4fOd2vW8QVjrBKTuSyG9NVDZGL3U1WtRP52rBeO06lP7uwUIGxVwIy_HO4gr8_6CRlGiFIszdVq6u8nRdKIWE3Y0bdJIarbxfLQ/w400-h281/image.png)
+![Grafana Agent Configuration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-agent-configuration.avif)
 
 - Then continue by "Test integration and finish installation":
 
-![Test Integration](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjyBS4986Gx_5h3adiUrl7nAGupMu-spyaExoM6os2D4MnPwmrDTOpwChypH5Y-WFgV9mMYlxqhuGFAgj51k1eFMC1N_D6sWdaTe_lSrmaSyTmRKFBaT4lXhJLLf1eWo5CwWpWb_ZnU3kI/)
+![Test Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/test-integration.avif)
 
 After these steps the Grafana Agent should be configured and should start
 sending data to Grafana Cloud.
@@ -184,11 +184,11 @@ Then go to the Grafana Cloud again...
 
 - Login to Grafana Cloud again and click on Grafana:
 
-![Grafana Cloud Dashboard](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhyPsxLS-y2jE6efXcrwFEAvFC351QglI3U1Q52BaYl3_VGUYpohziPZIsmurPuvI2wM3vy9UordFHjrtzV3cZ0EOCAvOFzq8MqqbMmQT7QAcUN6hdikxVFg4Zuj9SffO5_jhBvU9i37hc/w400-h299/image.png)
+![Grafana Cloud Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-dashboard.avif)
 
 - Click on Import:
 
-![Import Dashboard](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgtFDQ7R0jcUzOLnNd6ukgdHNtB3OOcmFKkVyYFR8SBO9VqjRr_oSTkwx2tT45KXb9wlf0vfR4pBw10CW4zQDCo7ztCE3E2CgFQmqXrQe_BDfqERaOlcUcm0iMrOXDKZvlepcJo0S2qhbo/w640-h276/image.png)
+![Import Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/import-dashboard.avif)
 
 - Import these Dashboards with numbers
 
@@ -205,18 +205,18 @@ Then go to the Grafana Cloud again...
 
 - Do not forget to select the proper prometheus datasource (ends with "-prom"):
 
-![Prometheus Datasource](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiXjs3coJfUFzjNJYXtugyrYDFMU6iP3gqv9PFIZqm_4Ltx9QISxutF7T2vdrFQVwnVcNAIEcUjSAr2lBPdRekCwILoIJdNBcZIsWBea0r3vDCoY75pBGEprtTTb7m0UiKUf1GCt6PhHqk/w616-h640/image.png)
+![Prometheus Datasource](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/prometheus-datasource.avif)
 
 - After you import the Dashboard you should see them by going to
   "Dashboards -> Browse":
 
-![Dashboards Browse](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhkNEMYyeaKJsgFxjtWlUgaNSMiUzh5xwJMr_fob1DeDZIHY6ilWsQKAOgX9zwH_9xue5iArjTVI7pJ5XOptCrI_S1UjmaK2r1cExRGisRH7ntaPc5sIIKtnmcSqEhtlw1U-RnjdzDJbkM/w520-h640/image.png)
+![Dashboards Browse](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/dashboards-browse.avif)
 
-![Node Exporter Dashboard](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgMzCgGWLPp7J88cRIErcuCrrgLr5xy2OB0eW3Sj0WLEXjWRjClj2U1VAjkSKiGJcRUEWZTkZwVOG1XWYhQKXIwEyJzA7HLAH8X8OWhuIyYANWjO_zEE80m0cp9B5y-LDU-pQhfm3MbPOg/w640-h293/image.png)
+![Node Exporter Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/node-exporter-dashboard.avif)
 
 - You can also see the logs from your RPi collected by Loki:
 
-![Loki Logs](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgHFd7PDv9pLQUXHeW0JNlBuVG5849CbEzIhk34deEpF09pj2u0lkEjyi9DbfcdgNc8gUoBHOEMFxcmtbiNjtoF0qDEpCUQ4Z7OM-Uau77jbIQCVWAchAsmHDhaxGvR070PKI398O3mrS8/w640-h617/image.png)
+![Loki Logs](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/loki-logs.avif)
 
 The YouTube video showing all the steps can be found here:
 

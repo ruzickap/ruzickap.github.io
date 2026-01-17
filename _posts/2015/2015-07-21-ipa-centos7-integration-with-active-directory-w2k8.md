@@ -15,7 +15,7 @@ notes about the IPA and AD integration.
 
 Network diagram:
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjrRQpsMzaB0MskKfSAtntItpVTLdFrYPVlYWegjgFmrZpyHsxkUK3SeMfWIngvjdWOBfZVRen73_WA4o3-VwG1kKNJDEX-IqnK3QihMherqpQ0sb-dySIYJIV-6G53pc-IndTnusDg6eA/s400/ipa+%25281%2529.png)
+![image](/assets/img/posts/2015/2015-07-21-ipa-centos7-integration-with-active-directory-w2k8/ipa.avif)
 
 I created the trust between the Active Directory and IPA server. There is one
 windows client connected to the AD and one CentOS7 client connected to the IPA.

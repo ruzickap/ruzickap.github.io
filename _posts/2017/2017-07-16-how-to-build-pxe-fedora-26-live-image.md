@@ -22,7 +22,7 @@ need GUI and many other applications located on Fedora Live CD.
 
 Here are a few steps on how to do it using the Lorax project.
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjZf6aLdWmTsc5PyYwu00DC7djE9uhm2VnvCuvVfbmvkM4hXfJY7yhDfuXae5fqRLUnKAgvgxqLVQkYPMR0CVYFZ3cFhD9rZylcCiXAnzwkG58IXQaN1GJ-pMN_oqBMMgTRNhiPJz8y1fM/s640/Screenshot_20170716_081506.png)
+![image](/assets/img/posts/2017/2017-07-16-how-to-build-pxe-fedora-26-live-image/Screenshot_20170716_081506.avif)
 
 Prepare kickstart file:
 

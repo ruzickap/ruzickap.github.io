@@ -16,11 +16,11 @@ router. It was getting some pictures from camera using
 [fswebcam](https://web.archive.org/web/20130621044049/http://www.firestorm.cx/fswebcam/) and measuring internal/external
 temperature using [digitemp](https://www.digitemp.com/).
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEgJZyVnM53gvOAuhuJ7t-zXzHVwrbFVWgGs1ZlX2KWVV4_oDTh8kkYYqa_VQQCHPjpSQqQbiXSsGy9SM6O8yk3eELsyFYzjThbkVON3cPKl_p8fWocSsuzeLLw8Lwb_bqN7QN1Y8_tQlfw/s400/20130623-110435.jpg)
+![image](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110435.avif)
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhEyOIdxkHx23HGMqOp-7VFPGQUI64Zp2SRq7L2Jij62-DdMkGrMmktUVLMHVIDihx4zRa78BOjV743CvNVsML4LNmkIrsLUk1vJ9avIVqOqSUAy5-cOUXLYQMfHHLky_ZH_gnXpaFDuZc/s400/20130623-110447.jpg)
+![image](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110447.avif)
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiC_ugr7QMqXeTba4oJ0aZGL_WsbSR4qjIhA8M8VdFH2MsTE6P0M8tvgOaASCZ_8GlrQCByow69DvY0bi6AOMmsLI8xa-xMXIHeXGK-ZSfjKvLeTKW9QKnbmNHiZBMceQXEzFn2kXd135g/s400/20130623-110611.jpg)
+![image](/assets/img/posts/2013/2013-06-24-tl-wr1043nd-wifi-router-with-camera-and-theromometers/20130623-110611.avif)
 
 All that time it was running:
 

@@ -13,7 +13,7 @@ tags: [appliance, ovftool, vmware, command line, vcenter, ssh]
 Here you can find some notes about installing VMware vCenter Appliance from
 command line directly from ESXi using [OVF Tool](https://web.archive.org/web/20140715092309/https://www.vmware.com/support/developer/ovf/).
 
-![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiP6NriLRFRljobZpIo3_jYdIn_rXRTKjJflK4TTFwK7sH3aHdQPrgCF6hhgOBqMFm-8fo_L8HRq9kZWdYXFnhRV3UjslgAtlGS4m-Lgx9giB_wFgA10vC-g9Cof3pTuRmaLdbgPMPWU90/s640/vcenter.png)
+![image](/assets/img/posts/2014/2014-09-27-vmware-vcenter-server-5x-appliance-instalation-and-configuration-using-ssh-command-line/vcenter.avif)
 
 Install the OVF tools first. Details can be found here:
 [https://www.virtuallyghetto.com/2012/05/how-to-deploy-ovfova-in-esxi-shell.html](https://www.virtuallyghetto.com/2012/05/how-to-deploy-ovfova-in-esxi-shell.html).
