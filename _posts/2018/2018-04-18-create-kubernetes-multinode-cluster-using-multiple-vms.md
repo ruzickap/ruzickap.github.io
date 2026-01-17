@@ -101,7 +101,8 @@ EOF2
 # Install necessary packages:
 apt-get update -qq
 apt-get install -y -qq docker.io kubelet=${KUBERNETES_VERSION}-00 kubeadm=${KUBERNETES_VERSION}-00 kubectl=${KUBERNETES_VERSION}-00
-exit
+
+# Exit SSH session on worker nodes and return to local machine
 
 # All the worker nodes are prepared now - let's connect them to master node.
 # SSH to the master node again and generate the "joining" command:

@@ -53,7 +53,7 @@ ssh-keygen -P "" -f /root/.ssh/id_rsa -C "admin@example.com"
 VIRSH_VMS=$(virsh list | awk '/_kvm/ { print $2 }')
 for VIRSH_VM in $VIRSH_VMS; do
   echo "*** $VIRSH_VM"
-  virsh dumpxml $VIRSH_VM | grep 'mac address' | sort
+  virsh dumpxml "$VIRSH_VM" | grep 'mac address' | sort
 done
 
 # Check the subnets
@@ -61,7 +61,7 @@ virsh net-list --all | grep network
 VIRSH_NETWORKS=$(virsh net-list | awk '/network|vagrant/ { print $1 }')
 for VIRSH_NETWORK in $VIRSH_NETWORKS; do
   echo "*** $VIRSH_NETWORK"
-  virsh net-dumpxml $VIRSH_NETWORK
+  virsh net-dumpxml "$VIRSH_NETWORK"
 done
 
 # Create Vagrantfile
@@ -130,23 +130,23 @@ end
 # Tenant network subnet:  192.168.27.0/24, GW: 192.168.127.1
 EOF
 
-cd /var/tmp/test
+cd /var/tmp/test || exit
 # Start all VMs + create networking
 vagrant up kvm01
 vagrant up
 
 # Check the VMs - all should be running
 VIRSH_VMS=$(virsh list | awk '/_kvm/ { print $2 }')
-for VIRSH_VM in $VIRSH_VMS; do echo "*** $VIRSH_VM"; virsh dumpxml $VIRSH_VM | grep 'mac address' | sort; done
+for VIRSH_VM in $VIRSH_VMS; do echo "*** $VIRSH_VM"; virsh dumpxml "$VIRSH_VM" | grep 'mac address' | sort; done
 
 # Check the subnets
 virsh net-list --all | grep network
 VIRSH_NETWORKS=$(virsh net-list | awk '/network|vagrant/ { print $1 }')
-for VIRSH_NETWORK in $VIRSH_NETWORKS; do echo "*** $VIRSH_NETWORK"; virsh net-dumpxml $VIRSH_NETWORK; done
+for VIRSH_NETWORK in $VIRSH_NETWORKS; do echo "*** $VIRSH_NETWORK"; virsh net-dumpxml "$VIRSH_NETWORK"; done
 
 # Check the DHCP lease file - there should be only kvm01
 DEVICE=$(virsh net-dumpxml vagrant-libvirt | awk -F\' '/bridge/ { print $2 }')
-cat /var/lib/libvirt/dnsmasq/${DEVICE}.status
+cat "/var/lib/libvirt/dnsmasq/${DEVICE}.status"
 
 # SSH to the first node where MAAS will be installed
 ssh -o StrictHostKeyChecking=no kvm01
@@ -203,7 +203,7 @@ maas-region local_config_set --maas-url http://192.168.25.11:5240/MAAS
 systemctl restart maas-regiond
 
 # Register a rack controller with the MAAS
-maas-rack register --url http://192.168.25.11:5240/MAAS --secret $(cat /var/lib/maas/secret)
+maas-rack register --url http://192.168.25.11:5240/MAAS --secret "$(cat /var/lib/maas/secret)"
 
 # Create administrator (MAAS "superuser")
 maas createadmin --username=admin --email=admin@example.com --password admin123
@@ -242,22 +242,22 @@ virsh -c qemu+tcp://192.168.25.1/system destroy test_kvm03
 virsh -c qemu+tcp://192.168.25.1/system list --all
 
 SUBNET_CIDR="192.168.25.0/24"
-SUBNET_PREFIX=$(echo $SUBNET_CIDR | sed -r 's/(([0-9]{1,3}\.){2}.[0-9]{1,3}).*/\1/')
+SUBNET_PREFIX=$(echo "$SUBNET_CIDR" | sed -r 's/(([0-9]{1,3}\.){2}.[0-9]{1,3}).*/\1/')
 PRIMARY_RACK_CONTROLLER=$(maas admin rack-controllers read | jq -r '.[0].system_id')
-VLAN_FABRIC_ID=$(maas admin subnet read $SUBNET_CIDR | jq '.vlan.fabric_id')
+VLAN_FABRIC_ID=$(maas admin subnet read "$SUBNET_CIDR" | jq '.vlan.fabric_id')
 VLAN_VID=$(maas admin subnets read | jq -r ".[] |  select(.cidr==\"$SUBNET_CIDR\")".vlan.vid)
 
 # Add default gateway for 192.168.25.0/24
-maas admin subnet update cidr:${SUBNET_CIDR} gateway_ip=${SUBNET_PREFIX}.1
+maas admin subnet update "cidr:${SUBNET_CIDR}" "gateway_ip=${SUBNET_PREFIX}.1"
 
 # Enable DHCP on the subnet 192.168.25.0/24 and reserve dynamic IP range (192.168.25.200 - 192.168.25.250) - used for commissioning
-maas admin ipranges create type=dynamic start_ip=${SUBNET_PREFIX}.200 end_ip=${SUBNET_PREFIX}.250 comment='This is a reserved dynamic range'
-maas admin vlan update $VLAN_FABRIC_ID $VLAN_VID dhcp_on=True primary_rack=$PRIMARY_RACK_CONTROLLER
+maas admin ipranges create type=dynamic "start_ip=${SUBNET_PREFIX}.200" "end_ip=${SUBNET_PREFIX}.250" comment='This is a reserved dynamic range'
+maas admin vlan update "$VLAN_FABRIC_ID" "$VLAN_VID" dhcp_on=True "primary_rack=$PRIMARY_RACK_CONTROLLER"
 
 # Define node by specifying the libvirt VM management and start commissioning
 for INDEX in {2..3}; do
   MAC="52:54:00:00:25:1${INDEX}"
-  maas admin machines create power_parameters_power_address=qemu+tcp://192.168.25.1/system hostname=kvm0${INDEX} power_type=virsh power_parameters_power_id=test_kvm0${INDEX} architecture=amd64/generic mac_addresses=$MAC
+  maas admin machines create power_parameters_power_address=qemu+tcp://192.168.25.1/system "hostname=kvm0${INDEX}" power_type=virsh "power_parameters_power_id=test_kvm0${INDEX}" architecture=amd64/generic "mac_addresses=$MAC"
 done
 
 # All the machines should be in commissioning state right now
@@ -277,7 +277,7 @@ for INDEX in {2..3}; do
   IP_3="192.168.27.1${INDEX}"
   SUBNET_CIDR_3="192.168.27.0/24"
 
-  maas admin nodes read mac_address=$MAC_1 > /tmp/maas_nodes_read
+  maas admin nodes read "mac_address=$MAC_1" > /tmp/maas_nodes_read
   SYSTEM_ID=$(jq -r ".[].system_id" /tmp/maas_nodes_read)
   INTERFACE_ID_1=$(jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_1\").id" /tmp/maas_nodes_read)
   INTERFACE_ID_2=$(jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_2\").id" /tmp/maas_nodes_read)
@@ -288,30 +288,30 @@ for INDEX in {2..3}; do
   # Remove the "Auto assign" IP address and set static instead
   # https://askubuntu.com/questions/942412/how-do-you-statically-asign-an-ip-to-a-commissioned-machine-in-maas
   OLD_LINK_ID=$(jq ".[].interface_set[] | select(.id==$INTERFACE_ID_1).links[].id" /tmp/maas_nodes_read)
-  maas admin interface unlink-subnet $SYSTEM_ID $INTERFACE_ID_1 id=$OLD_LINK_ID
-  maas admin interface link-subnet $SYSTEM_ID $INTERFACE_ID_1 mode=STATIC subnet="cidr:$SUBNET_CIDR_1" ip_address=$IP_1 default_gateway=true
+  maas admin interface unlink-subnet "$SYSTEM_ID" "$INTERFACE_ID_1" "id=$OLD_LINK_ID"
+  maas admin interface link-subnet "$SYSTEM_ID" "$INTERFACE_ID_1" mode=STATIC "subnet=cidr:$SUBNET_CIDR_1" "ip_address=$IP_1" default_gateway=true
 
   # Create bond interfaces
-  maas admin interfaces create-bond $SYSTEM_ID name=bond0 parents=$INTERFACE_ID_2 mac_address=$MAC_2 parents=$INTERFACE_ID_3 bond_mode=active-backup
-  maas admin interfaces create-bond $SYSTEM_ID name=bond1 parents=$INTERFACE_ID_4 mac_address=$MAC_4 parents=$INTERFACE_ID_5 bond_mode=active-backup
+  maas admin interfaces create-bond "$SYSTEM_ID" name=bond0 "parents=$INTERFACE_ID_2" "mac_address=$MAC_2" "parents=$INTERFACE_ID_3" bond_mode=active-backup
+  maas admin interfaces create-bond "$SYSTEM_ID" name=bond1 "parents=$INTERFACE_ID_4" "mac_address=$MAC_4" "parents=$INTERFACE_ID_5" bond_mode=active-backup
 
   # Regenerate /tmp/maas_nodes_read - now with the bond interfaces
-  maas admin nodes read mac_address=$MAC_1 > /tmp/maas_nodes_read
+  maas admin nodes read "mac_address=$MAC_1" > /tmp/maas_nodes_read
   BOND0_ID=$(jq -r ".[].interface_set[] | select(.name==\"bond0\").id" /tmp/maas_nodes_read)
   BOND1_ID=$(jq -r ".[].interface_set[] | select(.name==\"bond1\").id" /tmp/maas_nodes_read)
 
   # Assign proper fabric and IP to the bond0
   FABRIC_VLAN_ID=$(maas admin subnets read | jq ".[] | select(.cidr==\"$SUBNET_CIDR_2\").vlan.id")
-  maas admin interface update $SYSTEM_ID $BOND0_ID vlan=$FABRIC_VLAN_ID
-  maas admin interface link-subnet $SYSTEM_ID $BOND0_ID mode=STATIC subnet="cidr:$SUBNET_CIDR_2" ip_address=$IP_2
+  maas admin interface update "$SYSTEM_ID" "$BOND0_ID" "vlan=$FABRIC_VLAN_ID"
+  maas admin interface link-subnet "$SYSTEM_ID" "$BOND0_ID" mode=STATIC "subnet=cidr:$SUBNET_CIDR_2" "ip_address=$IP_2"
 
   # Assign proper fabric and IP to the bond1
   FABRIC_VLAN_ID=$(maas admin subnets read | jq ".[] | select(.cidr==\"$SUBNET_CIDR_3\").vlan.id")
-  maas admin interface update $SYSTEM_ID $BOND1_ID vlan=$FABRIC_VLAN_ID
-  maas admin interface link-subnet $SYSTEM_ID $BOND1_ID mode=STATIC subnet="cidr:$SUBNET_CIDR_3" ip_address=$IP_3
+  maas admin interface update "$SYSTEM_ID" "$BOND1_ID" "vlan=$FABRIC_VLAN_ID"
+  maas admin interface link-subnet "$SYSTEM_ID" "$BOND1_ID" mode=STATIC "subnet=cidr:$SUBNET_CIDR_3" "ip_address=$IP_3"
 
   # Deploy server
-  maas admin machine deploy $SYSTEM_ID
+  maas admin machine deploy "$SYSTEM_ID"
 done
 
 # All machines should be installed + deployed...

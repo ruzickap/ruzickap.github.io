@@ -151,7 +151,7 @@ gpgcheck=0
 EOF
 
 yum install -y hponcfg hp-snmp-agents hp-ams hpssacli hp-smh-templates hpsmh
-hpsnmpconfig --a --rws my_write --ros my_read --rwmips 127.0.0.1 my_write --romips 127.0.0.1 my_read --tcs private --tdips 127.0.0.1 public --sci $HOSTNAME --sli My_Servers
+hpsnmpconfig --a --rws my_write --ros my_read --rwmips 127.0.0.1 my_write --romips 127.0.0.1 my_read --tcs private --tdips 127.0.0.1 public --sci "$HOSTNAME" --sli My_Servers
 /opt/hp/hpsmh/sbin/smhconfig --autostart=true
 
 postconf -e 'relayhost = yum.example.com'
@@ -394,8 +394,8 @@ tmsh create sys application service dns-ext-vip1_53 '{ \
 
 tmsh modify ltm virtual dns-ext-vip1_53.app/dns-ext-vip1_53_dns_tcp description "DNS VIP - External - NS1 TCP 53"
 tmsh modify ltm virtual dns-ext-vip1_53.app/dns-ext-vip1_53_dns_udp description "DNS VIP - External - NS1 UDP 53"
-tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_tcp_pool description "DNS VIP - External - NS1 TCP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
-tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_udp_pool description "DNS VIP - External - NS1 UDP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
+tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_tcp_pool description "DNS VIP - External - NS1 TCP 53" members modify '{ 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }'
+tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_udp_pool description "DNS VIP - External - NS1 UDP 53" members modify '{ 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }'
 
 tmsh create sys application service dns-ext-vip2_53 '{ \
     description "DNS VIP - External - NS2 53" \
@@ -424,8 +424,8 @@ tmsh create sys application service dns-ext-vip2_53 '{ \
 
 tmsh modify ltm virtual dns-ext-vip2_53.app/dns-ext-vip2_53_dns_tcp description "DNS VIP - External - NS2 TCP 53"
 tmsh modify ltm virtual dns-ext-vip2_53.app/dns-ext-vip2_53_dns_udp description "DNS VIP - External - NS2 UDP 53"
-tmsh modify ltm pool dns-ext-vip2_53.app/dns-ext-vip2_53_tcp_pool description "DNS VIP - External - NS2 TCP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
-tmsh modify ltm pool dns-ext-vip2_53.app/dns-ext-vip2_53_udp_pool description "DNS VIP - External - NS2 UDP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
+tmsh modify ltm pool dns-ext-vip2_53.app/dns-ext-vip2_53_tcp_pool description "DNS VIP - External - NS2 TCP 53" members modify '{ 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }'
+tmsh modify ltm pool dns-ext-vip2_53.app/dns-ext-vip2_53_udp_pool description "DNS VIP - External - NS2 UDP 53" members modify '{ 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }'
 tmsh modify ltm node 10.0.1.10 description "Public DNS Master"
 tmsh modify ltm node 10.0.1.20 description "Public DNS Slave"
 ```
@@ -468,7 +468,7 @@ tmsh create sys application service ds-vip_389 '{ \
 
 tmsh modify ltm virtual ds-vip_389.app/ds-vip_389_vs description "Directory Server VIP 389 tcp"
 
-tmsh modify ltm pool ds-vip_389.app/ds-vip_389_pool description "Directory Server VIP 389" members modify { 10.0.0.150:ldap { description "Directory server - primary" } 10.0.0.151:ldap { description "Directory server - secondary" } }
+tmsh modify ltm pool ds-vip_389.app/ds-vip_389_pool description "Directory Server VIP 389" members modify '{ 10.0.0.150:ldap { description "Directory server - primary" } 10.0.0.151:ldap { description "Directory server - secondary" } }'
 
 tmsh modify ltm node 10.0.0.150 description "Directory server - primary"
 tmsh modify ltm node 10.0.0.151 description "Directory server - secondary"

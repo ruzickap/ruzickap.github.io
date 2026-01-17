@@ -20,7 +20,7 @@ Here you can find out how to get root on the HTC Desire using Debian.
 
   ```bash
   mkdir -v /var/tmp/android
-  cd /var/tmp/android
+  cd /var/tmp/android || exit
   wget http://www.romraid.com/paul/bravo/r4-desire-root.zip
   unzip r4-desire-root.zip
   ```

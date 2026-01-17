@@ -41,10 +41,10 @@ dpkg-source -x grub2_1.98-1.dsc
 
 bzr branch http://bzr.savannah.gnu.org/r/grub-extras/lua ./grub2-1.98/debian/grub-extras/lua
 
-cd grub2-1.98
-dpkg-buildpackage -rfakeroot -b
-
-cd ..
+(
+  cd grub2-1.98 || exit
+  dpkg-buildpackage -rfakeroot -b
+)
 dpkg -r grub-pc grub-common
 dpkg -i ./grub-common_1.98-1_amd64.deb ./grub-pc_1.98-1_amd64.deb
 ```
@@ -58,12 +58,14 @@ mkdir ./grub/grub-extras
 bzr branch http://bzr.savannah.gnu.org/r/grub-extras/lua ./grub/grub-extras/lua
 #bzr branch http://bzr.savannah.gnu.org/r/grub-extras/gpxe ./grub/grub-extras/gpxe
 
-cd grub
-export GRUB_CONTRIB=./grub-extras/
-./autogen.sh
-./configure --prefix=/tmp/grub
-make
-make install
+(
+  cd grub || exit
+  export GRUB_CONTRIB=./grub-extras/
+  ./autogen.sh
+  ./configure --prefix=/tmp/grub
+  make
+  make install
+)
 ```
 
 Mount USB to some directory (in my case `/mnt/sdb1`) and install grub with Lua
@@ -107,7 +109,7 @@ Save following text as 3 files:
 
 - `/mnt/sdb1/boot/grub/grub.cfg`:
 
-  ```bash
+  ```lua
   insmod vbeinfo
   insmod font
 
