@@ -33,8 +33,8 @@ of your web pages instead of manually clicking the links.
 I would like to share how I'm periodically checking my documents / pages
 using the [GitHub Actions](https://github.com/features/actions).
 
-Here is the GitHub Action I wrote for this purpose: [My Broken Link
-Checker](https://github.com/ruzickap/action-my-broken-link-checker)
+Here is the GitHub Action I wrote for this purpose: 
+[My Broken Link Checker](https://github.com/ruzickap/action-my-broken-link-checker)
 
 In short you can simply create a git repository in GitHub and store there the
 file defining which URLs should be checked/verified:
@@ -87,9 +87,10 @@ and start checking the `https://google.com` every midnight (UTC).
 
 This is the screencast where you can see it all in action:
 
-This URL checker script is based on
-[muffet](https://github.com/raviqqe/muffet) and you can set its parameters by
-changing the INPUT_CMD_PARAMS variable.
+{% include embed/youtube.html id='H6H523TMPXk' %}
+
+This URL checker script is based on [muffet](https://github.com/raviqqe/muffet) 
+and you can set its parameters by changing the `INPUT_CMD_PARAMS` variable.
 
 Feel free to look at more details
 here: [https://github.com/ruzickap/action-my-broken-link-checker](https://github.com/ruzickap/action-my-broken-link-checker)
