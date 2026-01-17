@@ -3,18 +3,23 @@
 \.elb\.amazonaws\.com
 \.local
 cdn\.com
+ftp\.xvx\.cz
 github\.com/ruzickap
 helm\.sh
+hexrev\.soaa\.me
 https://(grafana|oauth2-proxy|ollama-vulnerable|open-webui|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
-kubernetes\.io
 kubernetes-sigs\.github\.io/aws-ebs-csi-driver
+kubernetes\.io
 mylabs\.dev
+smartmontools\.sourceforge\.net
 stefanprodan\.github\.io
 username\.github\.io/
 velero\.io
+websvn\.xvx\.cz
 www\.conventionalcommits\.org
 www\.cvedetails\.com
 www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
+www\.mysql\.com
 www\.reddit\.com/submit\?url=
 # keep-sorted end

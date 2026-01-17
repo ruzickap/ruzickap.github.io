@@ -1,16 +1,11 @@
+---
+# GitHub Actions workflow for Hugo static site building and deployment
+# Builds Jekyll site and deploys to GitHub Pages
 name: gh-pages-build
 
 on:
   workflow_dispatch:
-    inputs:
-      skip_link_checker:
-        description: "Skip Link Checker"
-        type: boolean
-        required: false
-        default: false
   push:
-    branches-ignore:
-      - renovate/**
     paths:
       - "_config.yml"
       - "_data/**"
@@ -23,9 +18,13 @@ on:
 
 permissions: read-all
 
+defaults:
+  run:
+    shell: bash -euxo pipefail {0}
+
 jobs:
   gh-pages-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     permissions:
       contents: write
       deployments: write
@@ -36,12 +35,12 @@ jobs:
           submodules: true
 
       - name: Set Variables
-        id: variables
         env:
           CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN: ${{ secrets.CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN }}
         run: |
           set -euo pipefail
           CLOUDFLARE_PAGES_PROJECT=$(echo "${GITHUB_REPOSITORY#*/}" | tr . - )
+          echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_ENV}"
 
           if [[ "${GITHUB_REF_NAME}" = "main" ]]; then
             BASE_DOMAIN="${GITHUB_REPOSITORY#*/}"
@@ -49,9 +48,7 @@ jobs:
             BASE_DOMAIN="dev.${CLOUDFLARE_PAGES_PROJECT}.pages.dev"
           fi
 
-          echo "BASE_DOMAIN=${BASE_DOMAIN}" | tee -a "${GITHUB_OUTPUT}"
-          echo "CLOUDFLARE_PAGES_PROJECT=${CLOUDFLARE_PAGES_PROJECT}" | tee -a "${GITHUB_OUTPUT}"
-          sed -i "s@^url: \"https://ruzickap.github.io\"@url: \"https://${BASE_DOMAIN}\"@" _config.yml
+          sed -i "s@^url:.*@url: \"https://${BASE_DOMAIN}\"@" _config.yml
           sed -i "/cloudflare:/{n;s@id:.*@id: ${CLOUDFLARE_WEB_ANALYTICS_SITE_TOKEN}@}" _config.yml
           mkdir public
 
@@ -92,20 +89,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy ./public --branch=dev --commit-dirty=true --project-name=${{ steps.variables.outputs.CLOUDFLARE_PAGES_PROJECT }}
+          command: pages deploy ./public --branch=dev --commit-dirty=true --project-name=${{ env.CLOUDFLARE_PAGES_PROJECT }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Restore lychee cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
-        with:
-          path: .lycheecache
-          key: cache-lychee-${{ github.sha }}
-          restore-keys: cache-lychee-
-
-      - name: Link Checker
-        uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          args: "https://${{ steps.variables.outputs.BASE_DOMAIN }}"
-          fail: ${{ inputs.skip_link_checker && 'false' || 'true' }}

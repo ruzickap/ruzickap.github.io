@@ -4,6 +4,7 @@
 # Generated files by Jekyll
 .jekyll-cache
 _site
+public/
 Gemfile.lock
 
 # Lychee cache

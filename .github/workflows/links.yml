@@ -1,14 +1,21 @@
+---
+# GitHub Actions workflow for broken link detection
+# Scans website content and external links for broken or invalid URLs
 name: links
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/links.yml
+      - lychee.toml
   schedule:
     - cron: "0 0 * * 1"
 
 permissions: read-all
 
 jobs:
-  linkChecker:
+  links:
     runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
@@ -19,15 +26,28 @@ jobs:
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
 
       - name: Restore lychee cache
-        uses: actions/cache@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        id: restore-cache
+        uses: actions/cache/restore@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
         with:
           path: .lycheecache
           key: cache-lychee-${{ github.sha }}
           restore-keys: cache-lychee-
+
+      # https://github.com/lycheeverse/lychee/issues/1734
+      - name: Remove unavailable URLs from cache to check them again
+        run: |
+          sed -i '/,,/d' .lycheecache
 
       - name: Link Checker
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: lycheeverse/lychee-action@a8c4c7cb88f0c7386610c35eb25108e448569cb0 # v2.7.0
         with:
-          args: "--include-verbatim --no-progress --base-url ${{ steps.pages.outputs.base_url }} ."
+          args: --include-verbatim --no-progress ${{ steps.pages.outputs.base_url }}
+
+      - name: Save lychee cache
+        uses: actions/cache/save@9255dc7a253b0ccc959486e2bca901246202afeb # v5.0.1
+        if: always() && steps.restore-cache.outputs.cache-primary-key
+        with:
+          path: .lycheecache
+          key: ${{ steps.restore-cache.outputs.cache-primary-key }}

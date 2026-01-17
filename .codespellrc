@@ -1,2 +1,3 @@
 [codespell]
-ignore-words-list = aks,Regist,rouge
+skip = *.svg
+ignore-words-list = aks,hda,menion,Regist,rouge,ser
