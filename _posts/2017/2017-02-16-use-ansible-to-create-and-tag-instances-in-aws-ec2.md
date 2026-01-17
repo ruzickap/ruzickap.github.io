@@ -13,12 +13,11 @@ tags: [ec2, tag]
 It may be handy to quickly create a few instances for testing in AWS.
 
 For such a case I'm using a simple Ansible playbook which can deploy a few
-CentOS 7
-instances, configure disks, tags volumes and instances and install public ssh
-key to root for example.
+CentOS 7 instances, configure disks, tags volumes and instances and install
+public ssh key to root for example.
 
 ![AWS EC2 Console showing instances](/assets/img/posts/2017/2017-02-16-use-ansible-to-create-and-tag-instances-in-aws-ec2/Screenshot_20170216_154501.avif)
-AWS Console
+_AWS Console_
 
 Here is the playbook:
 
@@ -200,7 +199,9 @@ Here is the playbook:
 
 You can easily run it using:
 
+```bash
 ansible-playbook -i "127.0.0.1," site_aws.yml
+```
 
 I hope some parts will be handy...
 
