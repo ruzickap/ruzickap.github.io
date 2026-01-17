@@ -567,7 +567,7 @@ cat > /etc/graphs-vnstat.sh << \EOF
 # Source:  https://code.google.com/p/x-wrt/source/browse/package/webif/files/www/cgi-bin/webif/graphs-vnstat.sh
 
 WWW_D=/www/myadmin/vnstat # output images to here
-LIB_D=`awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf` # db location
+LIB_D=$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf) # db location
 BIN=/usr/bin/vnstati  # which vnstati
 
 outputs="s h d t m"   # what images to generate
@@ -607,7 +607,7 @@ cat > /www/myadmin/vnstat/index.html << EOF
 EOF
 
 for IFCE in "$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf)"/*; do
-cat >> /www/myadmin/vnstat/index.html << EOF
+  cat >> /www/myadmin/vnstat/index.html << EOF
     <h2>Traffic of Interface $IFCE</h2>
     <table>
         <tbody>

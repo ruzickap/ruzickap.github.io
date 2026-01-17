@@ -263,7 +263,7 @@ Here is the network diagram:
   scp cz01-psql01.example.com:/root/.pgpass /root/
 
   cp /etc/pgpool-II-93/pcp.conf.sample /etc/pgpool-II-93/pcp.conf
-  echo "admin:`pg_md5 password123`" >> /etc/pgpool-II-93/pcp.conf
+  echo "admin:$(pg_md5 password123)" >> /etc/pgpool-II-93/pcp.conf
 
   sed \
   -e "s/^listen_addresses = .localhost./listen_addresses = '*'/" \

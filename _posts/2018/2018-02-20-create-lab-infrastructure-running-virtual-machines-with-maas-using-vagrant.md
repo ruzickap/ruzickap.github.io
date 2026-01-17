@@ -197,7 +197,7 @@ maas-region local_config_set --maas-url http://192.168.25.11:5240/MAAS
 systemctl restart maas-regiond
 
 # Register a rack controller with the MAAS
-maas-rack register --url http://192.168.25.11:5240/MAAS --secret `cat /var/lib/maas/secret`
+maas-rack register --url http://192.168.25.11:5240/MAAS --secret $(cat /var/lib/maas/secret)
 
 # Create administrator (MAAS "superuser")
 maas createadmin --username=admin --email=admin@example.com --password admin123
@@ -227,7 +227,7 @@ chmod a+x /root/maas-login.sh
 ssh-keygen -P "" -f /root/.ssh/id_rsa -C "admin@example.com"
 
 # Import the admin SSH key
-maas admin sshkeys create "key=`cat /root/.ssh/id_rsa.pub`"
+maas admin sshkeys create "key=$(cat /root/.ssh/id_rsa.pub)"
 
 # Turn OFF all VMs except the first one running MAAS
 # This will also test if the libvirtd daemon is properly configured allowing MAAS to manage the VMs
@@ -238,8 +238,8 @@ virsh -c qemu+tcp://192.168.25.1/system list --all
 SUBNET_CIDR="192.168.25.0/24"
 SUBNET_PREFIX=$(echo $SUBNET_CIDR | sed -r 's/(([0-9]{1,3}\.){2}.[0-9]{1,3}).*/\1/')
 PRIMARY_RACK_CONTROLLER=$(maas admin rack-controllers read | jq -r '.[0].system_id')
-VLAN_FABRIC_ID=`maas admin subnet read $SUBNET_CIDR | jq '.vlan.fabric_id'`
-VLAN_VID=`maas admin subnets read | jq -r ".[] |  select(.cidr==\"$SUBNET_CIDR\")".vlan.vid`
+VLAN_FABRIC_ID=$(maas admin subnet read $SUBNET_CIDR | jq '.vlan.fabric_id')
+VLAN_VID=$(maas admin subnets read | jq -r ".[] |  select(.cidr==\"$SUBNET_CIDR\")".vlan.vid)
 
 # Add default gateway for 192.168.25.0/24
 maas admin subnet update cidr:${SUBNET_CIDR} gateway_ip=${SUBNET_PREFIX}.1
@@ -272,16 +272,16 @@ for INDEX in {2..3}; do
   SUBNET_CIDR_3="192.168.27.0/24"
 
   maas admin nodes read mac_address=$MAC_1 > /tmp/maas_nodes_read
-  SYSTEM_ID=`jq -r ".[].system_id" /tmp/maas_nodes_read`
-  INTERFACE_ID_1=`jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_1\").id" /tmp/maas_nodes_read`
-  INTERFACE_ID_2=`jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_2\").id" /tmp/maas_nodes_read`
-  INTERFACE_ID_3=`jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_3\").id" /tmp/maas_nodes_read`
-  INTERFACE_ID_4=`jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_4\").id" /tmp/maas_nodes_read`
-  INTERFACE_ID_5=`jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_5\").id" /tmp/maas_nodes_read`
+  SYSTEM_ID=$(jq -r ".[].system_id" /tmp/maas_nodes_read)
+  INTERFACE_ID_1=$(jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_1\").id" /tmp/maas_nodes_read)
+  INTERFACE_ID_2=$(jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_2\").id" /tmp/maas_nodes_read)
+  INTERFACE_ID_3=$(jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_3\").id" /tmp/maas_nodes_read)
+  INTERFACE_ID_4=$(jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_4\").id" /tmp/maas_nodes_read)
+  INTERFACE_ID_5=$(jq -r ".[].interface_set[] | select(.mac_address==\"$MAC_5\").id" /tmp/maas_nodes_read)
 
   # Remove the "Auto assign" IP address and set static instead
   # https://askubuntu.com/questions/942412/how-do-you-statically-asign-an-ip-to-a-commissioned-machine-in-maas
-  OLD_LINK_ID=`jq ".[].interface_set[] | select(.id==$INTERFACE_ID_1).links[].id" /tmp/maas_nodes_read`
+  OLD_LINK_ID=$(jq ".[].interface_set[] | select(.id==$INTERFACE_ID_1).links[].id" /tmp/maas_nodes_read)
   maas admin interface unlink-subnet $SYSTEM_ID $INTERFACE_ID_1 id=$OLD_LINK_ID
   maas admin interface link-subnet $SYSTEM_ID $INTERFACE_ID_1 mode=STATIC subnet="cidr:$SUBNET_CIDR_1" ip_address=$IP_1 default_gateway=true
 
@@ -291,16 +291,16 @@ for INDEX in {2..3}; do
 
   # Regenerate /tmp/maas_nodes_read - now with the bond interfaces
   maas admin nodes read mac_address=$MAC_1 > /tmp/maas_nodes_read
-  BOND0_ID=`jq -r ".[].interface_set[] | select(.name==\"bond0\").id" /tmp/maas_nodes_read`
-  BOND1_ID=`jq -r ".[].interface_set[] | select(.name==\"bond1\").id" /tmp/maas_nodes_read`
+  BOND0_ID=$(jq -r ".[].interface_set[] | select(.name==\"bond0\").id" /tmp/maas_nodes_read)
+  BOND1_ID=$(jq -r ".[].interface_set[] | select(.name==\"bond1\").id" /tmp/maas_nodes_read)
 
   # Assign proper fabric and IP to the bond0
-  FABRIC_VLAN_ID=`maas admin subnets read | jq ".[] | select(.cidr==\"$SUBNET_CIDR_2\").vlan.id"`
+  FABRIC_VLAN_ID=$(maas admin subnets read | jq ".[] | select(.cidr==\"$SUBNET_CIDR_2\").vlan.id")
   maas admin interface update $SYSTEM_ID $BOND0_ID vlan=$FABRIC_VLAN_ID
   maas admin interface link-subnet $SYSTEM_ID $BOND0_ID mode=STATIC subnet="cidr:$SUBNET_CIDR_2" ip_address=$IP_2
 
   # Assign proper fabric and IP to the bond1
-  FABRIC_VLAN_ID=`maas admin subnets read | jq ".[] | select(.cidr==\"$SUBNET_CIDR_3\").vlan.id"`
+  FABRIC_VLAN_ID=$(maas admin subnets read | jq ".[] | select(.cidr==\"$SUBNET_CIDR_3\").vlan.id")
   maas admin interface update $SYSTEM_ID $BOND1_ID vlan=$FABRIC_VLAN_ID
   maas admin interface link-subnet $SYSTEM_ID $BOND1_ID mode=STATIC subnet="cidr:$SUBNET_CIDR_3" ip_address=$IP_3
 

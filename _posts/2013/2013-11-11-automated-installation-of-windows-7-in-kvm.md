@@ -46,7 +46,7 @@ Here is a short script to create such an ISO:
 #!/bin/bash -x
 
 URL="http://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-65.iso"
-ISO=`basename $URL`
+ISO=$(basename $URL)
 
 sudo rm autostart.iso
 wget --continue $URL

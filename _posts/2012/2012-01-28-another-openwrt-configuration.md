@@ -180,7 +180,7 @@ echo "dhcp-script=/etc/dnsmasq-script.sh" >> /etc/dnsmasq.conf
 cat > /etc/dnsmasq-script.sh << \EOF
 #!/bin/sh
 
-/bin/echo `/bin/date +"%F %T"` $* >> /www2/dnsmasq.script.log
+/bin/echo $(/bin/date +"%F %T") $* >> /www2/dnsmasq.script.log
 
 if [ "$1" == "add" ] && ! grep -iq "$2" /etc/config/dhcp; then
   echo -e "Subject: New MAC on $(uci get system.@system[0].hostname).$(uci get dhcp.@dnsmasq[0].domain)\\n\\n$(/bin/date +"%F %T") $*" | sendmail petr.ruzicka@gmail.com
@@ -282,7 +282,7 @@ cat > /etc/graphs-vnstat.sh << \EOF
 # Source: http://code.google.com/p/x-wrt/source/browse/trunk/package/webif/files/www/cgi-bin/webif/graphs-vnstat.sh
 
 WWW_D=/www2/vnstat # output images to here
-LIB_D=`awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf` # db location
+LIB_D=$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf) # db location
 BIN=/usr/bin/vnstati  # which vnstati
 
 outputs="s h d t m"   # what images to generate

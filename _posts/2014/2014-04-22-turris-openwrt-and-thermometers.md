@@ -63,25 +63,25 @@ RRD_PARAMETERS='
 
 case $1 in
   daily)
-    eval /usr/bin/rrdtool graph --start="end-2days" --title \'Daily graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-2days" --title \'Daily graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   weekly)
-    eval /usr/bin/rrdtool graph --start="end-2week" --title \'Weekly graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-2week" --title \'Weekly graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   monthly)
-    eval /usr/bin/rrdtool graph --start="end-2month" --title \'Monthly graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-2month" --title \'Monthly graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   yearly)
-    eval /usr/bin/rrdtool graph --start="end-1year" --title \'Yearly graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-1year" --title \'Yearly graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   2years)
-    eval /usr/bin/rrdtool graph --start="end-2years" --title \'2 Years graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-2years" --title \'2 Years graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   5years)
-    eval /usr/bin/rrdtool graph --start="end-5years" --title \'5 Years graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-5years" --title \'5 Years graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   10years)
-    eval /usr/bin/rrdtool graph --start="end-10years" --title \'10 Years graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-10years" --title \'10 Years graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   *)
     echo "Please specify $0 [daily|weekly|monthly|yearly|2years|5years|10years]"
@@ -152,12 +152,12 @@ TEMP1_ROUNDED=1000
 #Sometimes the values are not in the right "range" and need to be read a few times
 while [ $TEMP0_ROUNDED -gt 50 ] || [ $TEMP0_ROUNDED -lt 5 ] ; do
   TEMP0=$(/usr/bin/digitemp_DS9097 -c/etc/digitemp.conf -t0 -q -s/dev/ttyUSB0 -o"%.2C")
-  TEMP0_ROUNDED=`echo $TEMP0 | awk '{print int($1+0.5)}'`
+  TEMP0_ROUNDED=$(echo $TEMP0 | awk '{print int($1+0.5)}')
 done
 
 while [ $TEMP1_ROUNDED -gt 50 ] || [ $TEMP1_ROUNDED -lt 5 ] ; do
   TEMP1=$(/usr/bin/digitemp_DS9097 -c/etc/digitemp.conf -t1 -q -s/dev/ttyUSB0 -o"%.2C")
-  TEMP1_ROUNDED=`echo $TEMP1 | awk '{print int($1+0.5)}'`
+  TEMP1_ROUNDED=$(echo $TEMP1 | awk '{print int($1+0.5)}')
 done
 
 /usr/bin/rrdtool update /data/mydigitemp/mydigitemp.rrd $(date +%s):$TEMP0:$TEMP1
@@ -189,25 +189,25 @@ RRD_PARAMETERS='
 
 case $1 in
   daily)
-    eval /usr/bin/rrdtool graph --start="end-2days" --title \'Daily graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-2days" --title \'Daily graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   weekly)
-    eval /usr/bin/rrdtool graph --start="end-2week" --title \'Weekly graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-2week" --title \'Weekly graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   monthly)
-    eval /usr/bin/rrdtool graph --start="end-2month" --title \'Monthly graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-2month" --title \'Monthly graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   yearly)
-    eval /usr/bin/rrdtool graph --start="end-1year" --title \'Yearly graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-1year" --title \'Yearly graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   2years)
-    eval /usr/bin/rrdtool graph --start="end-2years" --title \'2 Years graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-2years" --title \'2 Years graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   5years)
-    eval /usr/bin/rrdtool graph --start="end-5years" --title \'5 Years graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-5years" --title \'5 Years graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   10years)
-    eval /usr/bin/rrdtool graph --start="end-10years" --title \'10 Years graph [`date +"%F %H:%M"`]\' $RRD_PARAMETERS
+    eval /usr/bin/rrdtool graph --start="end-10years" --title \'10 Years graph [$(date +"%F %H:%M")]\' $RRD_PARAMETERS
   ;;
   *)
     echo "Please specify $0 [daily|weekly|monthly|yearly|2years|5years|10years]"

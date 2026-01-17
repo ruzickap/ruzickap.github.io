@@ -103,7 +103,7 @@ hardstatus alwayslastline '%{= kG}[ %{G}%H %{g}][%= %{= kw}%?%-Lw%?%{r}(%{W}%n*%
 vbell off
 EOF
 
-IP=`ip a s br1169 | sed -n 's@[[:space:]]*inet \([^/]*\)/.*@\1@p'`
+IP=$(ip a s br1169 | sed -n 's@[[:space:]]*inet \([^/]*\)/.*@\1@p')
 echo -e "${IP}\t\t$HOSTNAME" >> /etc/hosts
 
 sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=1/;s/quiet//;s/rhgb//' /etc/default/grub

@@ -74,7 +74,7 @@ sed -i.orig 's/^DHCPDARGS=.*/DHCPDARGS="eth0"/' /etc/sysconfig/dhcpd
 SPP_INITRD=$(ls /data/hp/HP_Service_Pack_for_Proliant/pxe/spp*/initrd.img)
 SPP_KERNEL=$(ls /data/hp/HP_Service_Pack_for_Proliant/pxe/spp*/vmlinuz)
 cobbler distro add --name=hp-sos --arch=i386 --kernel="$SPP_KERNEL" --initrd="$SPP_INITRD" \
- --kopts '!kssendmac !ksdevice !lang !text rw root=/dev/ram0 init=/bin/init loglevel=3 splash=verbose showopts media=net iso1=nfs://10.29.49.7/data/hp/HPSPP.iso iso1mnt=/mnt/bootdevice iso1opts=nolock,timeo=600 d3bug'
+  --kopts '!kssendmac !ksdevice !lang !text rw root=/dev/ram0 init=/bin/init loglevel=3 splash=verbose showopts media=net iso1=nfs://10.29.49.7/data/hp/HPSPP.iso iso1mnt=/mnt/bootdevice iso1opts=nolock,timeo=600 d3bug'
 
 cobbler profile add --name="Firmware_Upgrade-Automatic" --distro=hp-sos --kopts="TYPE=AUTOMATIC AUTOPOWEROFFONSUCCESS=no AUTOREBOOTONSUCCESS=yes" --kickstart=""
 cobbler profile add --name="Firmware_Upgrade-Interactive" --distro=hp-sos --kopts="TYPE=MANUAL AUTOPOWEROFFONSUCCESS=no" --kickstart=""

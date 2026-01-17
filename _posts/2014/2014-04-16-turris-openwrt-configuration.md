@@ -93,7 +93,7 @@ echo "dhcp-script=/etc/dnsmasq-script.sh" >> /etc/dnsmasq.conf
 cat > /etc/dnsmasq-script.sh << \EOF
 #!/bin/sh
 
-/bin/echo `/bin/date +"%F %T"` $* >> /etc/dnsmasq.script.log
+/bin/echo $(/bin/date +"%F %T") $* >> /etc/dnsmasq.script.log
 
 if [ "$1" == "add" ] && ! grep -iq "$2" /etc/config/dhcp; then
   echo -e "Subject: New MAC on $(uci get system.@system[0].hostname).$(uci get dhcp.@dnsmasq[0].domain)\\n\\n$(/bin/date +"%F %T") $*" | sendmail petr.ruzicka@gmail.com
@@ -242,7 +242,7 @@ EOF
 sed -i 's/^export PS1.*/export PS1='\''\\\[\\033\[01;31m\\\]\\h\\\[\\033\[01;34m\\\] \\w #\\\[\\033\[00m\\\] '\''/' /etc/profile
 
 #Make outgoing emails to reach the SMTP server:
-sed -i "s/^mailhub=.*/mailhub=mail.upcmail.cz/;s/^rewriteDomain=.*/rewriteDomain=xvx.cz/;s/^hostname.*/hostname=`uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`/" /etc/ssmtp/ssmtp.conf
+sed -i "s/^mailhub=.*/mailhub=mail.upcmail.cz/;s/^rewriteDomain=.*/rewriteDomain=xvx.cz/;s/^hostname.*/hostname=$(uci get system.@system[0].hostname).$(uci get dhcp.@dnsmasq[0].domain)/" /etc/ssmtp/ssmtp.conf
 
 #Reboot email
 # shellcheck disable=SC2016 # Single quotes intentional - backticks expand on router, not locally
@@ -426,7 +426,7 @@ cat > /etc/graphs-vnstat.sh << \EOF
 # Source:  https://code.google.com/p/x-wrt/source/browse/package/webif/files/www/cgi-bin/webif/graphs-vnstat.sh
 
 WWW_D=/www3/myadmin/vnstat # output images to here
-LIB_D=`awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf` # db location
+LIB_D=$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf) # db location
 BIN=/usr/bin/vnstati  # which vnstati
 
 outputs="s h d t m"   # what images to generate

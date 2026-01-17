@@ -99,7 +99,7 @@ service xinetd restart
 
 # Add distro and profiles to Cobbler
 cobbler distro add --name=sstk --arch=i386 --kernel=/data/hp/ss-scripting-toolkit-linux/boot_files/vmlinuz --initrd=/data/hp/ss-scripting-toolkit-linux/boot_files/initrd.img \
---kopts '!kssendmac !ksdevice !lang !text root=/dev/ram0 rw ramdisk_size=396452 network=1 sstk_mount=10.29.49.4:/data/hp/ss-scripting-toolkit-linux sstk_mount_type=nfs sstk_mount_options=rw,nolock sstk_script=/shell.sh console=ttyS0,115200n8'
+  --kopts '!kssendmac !ksdevice !lang !text root=/dev/ram0 rw ramdisk_size=396452 network=1 sstk_mount=10.29.49.4:/data/hp/ss-scripting-toolkit-linux sstk_mount_type=nfs sstk_mount_options=rw,nolock sstk_script=/shell.sh console=ttyS0,115200n8'
 
 cobbler profile add --name="SSTK-Capture_and_save_system_hardware_settings" --distro=sstk --kopts="sstk_script=/capture.sh img=test_hostname" --kickstart=""
 cobbler profile add --name="SSTK-Reset_system_to_factory_defaults" --distro=sstk --kopts="sstk_script=/systemreset.sh img=test_hostname" --kickstart=""
