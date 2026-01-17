@@ -175,7 +175,7 @@ service libvirtd start
 virsh net-autostart --disable default
 
 for VLAN in 1169 1170 1261; do
-cat > /tmp/br$VLAN.xml << EOF
+  cat > /tmp/br$VLAN.xml << EOF
 <network>
   <name>br$VLAN</name>
   <forward mode='bridge'/>
@@ -183,8 +183,8 @@ cat > /tmp/br$VLAN.xml << EOF
 </network>
 EOF
 
-virsh net-define /tmp/br$VLAN.xml
-virsh net-autostart br$VLAN
+  virsh net-define /tmp/br$VLAN.xml
+  virsh net-autostart br$VLAN
 done
 
 cat >> /etc/libvirt/libvirtd.conf << EOF
@@ -284,7 +284,7 @@ tmsh modify auth password admin # my_secret_password
 tmsh modify auth user admin shell bash
 mkdir /home/admin/.ssh && chmod 700 /home/admin/.ssh
 cp -L /root/.ssh/authorized_keys /home/admin/.ssh/
-tmsh modify auth password root  # my_secret_password2
+tmsh modify auth password root # my_secret_password2
 
 tmsh install /sys license registration-key ZXXXX-XXXXX-XXXXX-XXXXX-XXXXXXL
 
@@ -298,14 +298,14 @@ tmsh show sys software status
 tmsh reboot volume HD1.2
 mount -o rw,remount /usr
 rpm -Uvh --nodeps \
-http://vault.centos.org/5.8/os/i386/CentOS/yum-3.2.22-39.el5.centos.noarch.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/python-elementtree-1.2.6-5.i386.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/python-iniparse-0.2.3-4.el5.noarch.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/python-sqlite-1.1.7-1.2.1.i386.rpm \
-http://vault.centos.org/5.8/updates/i386/RPMS/rpm-python-4.4.2.3-28.el5_8.i386.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/python-urlgrabber-3.1.0-6.el5.noarch.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/yum-fastestmirror-1.1.16-21.el5.centos.noarch.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/yum-metadata-parser-1.1.2-3.el5.centos.i386.rpm
+  http://vault.centos.org/5.8/os/i386/CentOS/yum-3.2.22-39.el5.centos.noarch.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/python-elementtree-1.2.6-5.i386.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/python-iniparse-0.2.3-4.el5.noarch.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/python-sqlite-1.1.7-1.2.1.i386.rpm \
+  http://vault.centos.org/5.8/updates/i386/RPMS/rpm-python-4.4.2.3-28.el5_8.i386.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/python-urlgrabber-3.1.0-6.el5.noarch.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/yum-fastestmirror-1.1.16-21.el5.centos.noarch.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/yum-metadata-parser-1.1.2-3.el5.centos.i386.rpm
 
 cat > /etc/yum.repos.d/CentOS-Base.repo << \EOF
 [base]
@@ -397,7 +397,7 @@ tmsh modify ltm virtual dns-ext-vip1_53.app/dns-ext-vip1_53_dns_udp description 
 tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_tcp_pool description "DNS VIP - External - NS1 TCP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
 tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_udp_pool description "DNS VIP - External - NS1 UDP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
 
-tmsh create sys application service dns-ext-vip2_53 { \
+tmsh create sys application service dns-ext-vip2_53 '{ \
     description "DNS VIP - External - NS2 53" \
     strict-updates disabled \
     tables add { \
@@ -420,7 +420,7 @@ tmsh create sys application service dns-ext-vip2_53 { \
         vs_pool__vs_addr { value 10.0.1.17 } \
         vs_pool__vs_port { value 53 } \
     } \
-}
+}'
 
 tmsh modify ltm virtual dns-ext-vip2_53.app/dns-ext-vip2_53_dns_tcp description "DNS VIP - External - NS2 TCP 53"
 tmsh modify ltm virtual dns-ext-vip2_53.app/dns-ext-vip2_53_dns_udp description "DNS VIP - External - NS2 UDP 53"

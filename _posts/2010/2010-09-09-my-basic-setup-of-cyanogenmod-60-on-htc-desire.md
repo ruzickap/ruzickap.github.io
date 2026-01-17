@@ -49,7 +49,7 @@ cp /sdcard/authorized_keys /data/dropbear/.ssh/
 chmod 755 /data/dropbear /data/dropbear/.ssh
 chmod 644 /data/dropbear/dropbear*host_key /data/dropbear/.ssh/authorized_keys
 
-echo "export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/system/sbin:/system/bin:/system/xbin:/system/xbin/bb:/data/local/bin" >>/data/dropbear/.profile
+echo "export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/system/sbin:/system/bin:/system/xbin:/system/xbin/bb:/data/local/bin" >> /data/dropbear/.profile
 
 dropbear
 ```
@@ -72,19 +72,19 @@ Backup directories under `/data`:
 ```bash
 BACKUP_DESTINATION="/sdcard/mybackup"
 cd /data
-mkdir -p $BACKUP_DESTINATION/data/ && \
-cp -R `ls /data | egrep -v "dalvik-cache|lost\+found"` $BACKUP_DESTINATION/data/
+mkdir -p "$BACKUP_DESTINATION/data/" && \
+  cp -R $(ls /data | egrep -v "dalvik-cache|lost\+found") "$BACKUP_DESTINATION/data/"
 ```
 
 Move applications to sdcard:
 
 ```bash
 for APK in ApplicationsProvider.apk CarHomeGoogle.apk CarHomeLauncher.apk com.amazon.mp3.apk Development.apk Email.apk Facebook.apk GenieWidget.apk googlevoice.apk Maps.apk PicoTts.apk Protips.apk RomManager.apk SetupWizard.apk SpeechRecorder.apk Stk.apk Street.apk Talk.apk TtsService.apk Twitter.apk VoiceDialer.apk YouTube.apk; do
-echo "*** $APK"
-mkdir $BACKUP_DESTINATION/$APK && \
-mv /system/app/$APK $BACKUP_DESTINATION/$APK/ && \
-mv /data/data/`awk -F \" '/'$APK'/ { print $2 }' /data/system/packages.xml` $BACKUP_DESTINATION/$APK/
-#/system/bin/pm uninstall `awk -F \" '/'package.apk'/ { print $2 }' /data/system/packages.xml`
+  echo "*** $APK"
+  mkdir $BACKUP_DESTINATION/$APK && \
+  mv /system/app/$APK $BACKUP_DESTINATION/$APK/ && \
+  mv /data/data/`awk -F \" '/'$APK'/ { print $2 }' /data/system/packages.xml` $BACKUP_DESTINATION/$APK/
+  #/system/bin/pm uninstall `awk -F \" '/'package.apk'/ { print $2 }' /data/system/packages.xml`
 done
 ```
 

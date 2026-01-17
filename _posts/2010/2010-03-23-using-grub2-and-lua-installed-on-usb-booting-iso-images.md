@@ -91,12 +91,12 @@ working fine for me:
 ```bash
 mkdir -v /mnt/sdb1/isos
 wget -c --directory-prefix=/mnt/sdb1/isos \
-http://ftp.heanet.ie/pub/linuxmint.com/testing/LinuxMint-8-x64-RC1.iso \
-http://gd.tuwien.ac.at/opsys/linux/grml/grml64_2009.10.iso \
-http://ftp.cc.uoc.gr/mirrors/linux/slax/SLAX-6.x/slax-6.1.2.iso \
-http://downloads.sourceforge.net/project/systemrescuecd/sysresccd-x86/1.5.0/systemrescuecd-x86-1.5.0.iso \
-http://releases.ubuntu.com/karmic/ubuntu-9.10-desktop-amd64.iso \
-http://xpud.googlecode.com/files/xpud-0.9.2.iso
+  http://ftp.heanet.ie/pub/linuxmint.com/testing/LinuxMint-8-x64-RC1.iso \
+  http://gd.tuwien.ac.at/opsys/linux/grml/grml64_2009.10.iso \
+  http://ftp.cc.uoc.gr/mirrors/linux/slax/SLAX-6.x/slax-6.1.2.iso \
+  http://downloads.sourceforge.net/project/systemrescuecd/sysresccd-x86/1.5.0/systemrescuecd-x86-1.5.0.iso \
+  http://releases.ubuntu.com/karmic/ubuntu-9.10-desktop-amd64.iso \
+  http://xpud.googlecode.com/files/xpud-0.9.2.iso
 ```
 
 The following code is taken from [Ubuntu Forums](https://ubuntuforums.org)
@@ -111,18 +111,18 @@ Save following text as 3 files:
   insmod vbeinfo
   insmod font
 
-  if loadfont /boot/grub/unifont.pf2 ; then
+  if loadfont /boot/grub/unifont.pf2; then
     set gfxmode="1024x768x32,800x600x32,640x480x32,1024x768,800x600,640x480"
-  #  set gfxpayload=keep
+    # set gfxpayload=keep
     insmod gfxterm
-  #  insmod vbe
+    # insmod vbe
     if terminal_output gfxterm; then true ; else
        terminal gfxterm
     fi
   fi
 
   insmod jpeg
-  if background_image /boot/grub/linux.jpg ; then
+  if background_image /boot/grub/linux.jpg; then
     set menu_color_normal=black/black
     set color_highlight=red/blue
   else

@@ -26,9 +26,9 @@ downloads mov files from the Apple site into directories:
 RESOLUTION=480
 
 wget --recursive --level=2  --accept *${RESOLUTION}p.mov \
---span-hosts --domains=movies.apple.com,www.hd-trailers.net \
---no-host-directories --cut-dirs=2 --exclude-directories=/blog \
-http://www.hd-trailers.net/
+  --span-hosts --domains=movies.apple.com,www.hd-trailers.net \
+  --no-host-directories --cut-dirs=2 --exclude-directories=/blog \
+  http://www.hd-trailers.net/
 ```
 
 Enjoy ;-)

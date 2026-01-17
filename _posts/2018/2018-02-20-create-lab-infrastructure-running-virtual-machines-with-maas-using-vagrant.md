@@ -51,12 +51,18 @@ ssh-keygen -P "" -f /root/.ssh/id_rsa -C "admin@example.com"
 
 # Check the VMs
 VIRSH_VMS=$(virsh list | awk '/_kvm/ { print $2 }')
-for VIRSH_VM in $VIRSH_VMS; do echo "*** $VIRSH_VM"; virsh dumpxml $VIRSH_VM | grep 'mac address' | sort; done
+for VIRSH_VM in $VIRSH_VMS; do
+  echo "*** $VIRSH_VM"
+  virsh dumpxml $VIRSH_VM | grep 'mac address' | sort
+done
 
 # Check the subnets
 virsh net-list --all | grep network
 VIRSH_NETWORKS=$(virsh net-list | awk '/network|vagrant/ { print $1 }')
-for VIRSH_NETWORK in $VIRSH_NETWORKS; do echo "*** $VIRSH_NETWORK"; virsh net-dumpxml $VIRSH_NETWORK; done
+for VIRSH_NETWORK in $VIRSH_NETWORKS; do
+  echo "*** $VIRSH_NETWORK"
+  virsh net-dumpxml $VIRSH_NETWORK
+done
 
 # Create Vagrantfile
 mkdir /var/tmp/test
@@ -149,7 +155,8 @@ ssh -o StrictHostKeyChecking=no kvm01
 ip a
 
 # Configure the NICs
-apt update; apt install -y ifenslave
+apt update
+apt install -y ifenslave
 cat >> /etc/network/interfaces << EOF
 auto eth1
 iface eth1 inet static
@@ -187,7 +194,6 @@ iface bond1 inet static
     bond_mode active-backup
 EOF
 service networking restart
-
 
 # Install MAAS
 apt install -y jq libvirt-bin maas

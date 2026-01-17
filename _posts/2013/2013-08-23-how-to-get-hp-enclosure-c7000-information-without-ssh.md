@@ -44,7 +44,7 @@ cat > /tmp/hpoa.xml << EOF
   </SOAP-ENV:Envelope>
 EOF
 
-OASESSIONKEY=`curl --noproxy '*' --silent --data @/tmp/hpoa.xml --insecure https://$IP/hpoa | sed -n 's@.*<hpoa:oaSessionKey>\(.*\)</hpoa:oaSessionKey>.*@\1@p'`
+OASESSIONKEY=$(curl --noproxy '*' --silent --data @/tmp/hpoa.xml --insecure https://$IP/hpoa | sed -n 's@.*<hpoa:oaSessionKey>\(.*\)</hpoa:oaSessionKey>.*@\1@p')
 curl --noproxy '*' --cookie "encLocalKey=$OASESSIONKEY; encLocalUser=$USER" --insecure https://$IP/cgi-bin/showAll -o $DESTINATION/$IP-showAll
 curl --noproxy '*' --cookie "encLocalKey=$OASESSIONKEY; encLocalUser=$USER" --insecure https://$IP/cgi-bin/getConfigScript -o $DESTINATION/$IP-getConfigScript
 

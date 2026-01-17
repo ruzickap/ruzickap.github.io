@@ -466,7 +466,7 @@ cat > /www3/myadmin/vnstat/index.html << EOF
 EOF
 
 for IFCE in "$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf)"/*; do
-cat >> /www3/myadmin/vnstat/index.html << EOF
+  cat >> /www3/myadmin/vnstat/index.html << EOF
     <h2>Traffic of Interface $IFCE</h2>
     <table>
         <tbody>

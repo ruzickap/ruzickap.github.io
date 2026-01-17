@@ -91,7 +91,7 @@ chmod 600 /data/dropbear/.ssh/authorized_keys
 dropbearkey -t rsa -f /data/dropbear/dropbear_rsa_host_key
 dropbearkey -t dss -f /data/dropbear/dropbear_dss_host_key
 
-#echo "export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/system/sbin:/system/bin:/system/xbin:/system/xbin/bb:/data/local/bin" >>/data/dropbear/.profile
+#echo "export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/system/sbin:/system/bin:/system/xbin:/system/xbin/bb:/data/local/bin" >> /data/dropbear/.profile
 
 cat >> /etc/init.local.rc << EOF
 
