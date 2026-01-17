@@ -27,13 +27,11 @@ Here is the SVG:
 Here is the TeX:
 [systemd_cheatsheet.tex](https://raw.githubusercontent.com/ruzickap/cheatsheet-systemd/master/systemd_cheatsheet.tex)
 
-All source files can be found here: [GitHub -
-cheatsheet-systemd](https://github.com/ruzickap/cheatsheet-systemd)
+All source files can be found here: [GitHub - cheatsheet-systemd](https://github.com/ruzickap/cheatsheet-systemd)
 
-I used the following sources: [Arch Linux Wiki -
-systemd](https://wiki.archlinux.org/index.php/systemd),
+I used the following sources:
+[Arch Linux Wiki - systemd](https://wiki.archlinux.org/index.php/systemd),
 [SysVinit_to_Systemd_Cheatsheet](https://fedoraproject.org/wiki/SysVinit_to_Systemd_Cheatsheet),
-[RHEL7 -
-System_Administrators_Guide](https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/index.html).
+[RHEL7 - System_Administrators_Guide](https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/index.html).
 
 Enjoy ;-)

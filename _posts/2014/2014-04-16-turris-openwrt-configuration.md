@@ -16,7 +16,7 @@ command outputs in my previous blog post
 Now I would like to describe how I configured it according to the network
 diagram:
 
-![image](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/openwrt/wifi_openwrt3.svg)
+![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt3.svg)
 
 I will also need my own web pages, transmission torrent client, microsd card,
 Dynamic DNS and extend the luci interface to add some more stats + graphs. Here
@@ -353,7 +353,7 @@ alias.url += (
 EOF
 ```
 
-Watchcat is used to monitor network connection "pingability" to 8.8.8.8
+Watchcat is used to monitor network connection "pingability" to `8.8.8.8`
 otherwise the router is rebooted. Set the checking time for watchcat for 1 hour:
 
 ```bash
@@ -364,7 +364,8 @@ uci set system.@watchcat[0].period=1h
 /etc/init.d/watchcat enable
 ```
 
-Add a few more stats to the [LuCi](https://web.archive.org/web/20140107020756/http://luci.subsignal.org/trac) interface:
+Add a few more stats to the [LuCi](https://web.archive.org/web/20140107020756/http://luci.subsignal.org/trac)
+interface:
 
 ```bash
 opkg install collectd-mod-conntrack collectd-mod-cpu collectd-mod-df collectd-mod-disk collectd-mod-dns collectd-mod-irq collectd-mod-memory collectd-mod-ping collectd-mod-processes collectd-mod-syslog collectd-mod-tcpconns collectd-mod-uptime
@@ -404,8 +405,8 @@ EOF
 chmod 644 /etc/config/luci_statistics
 ```
 
-Configure [vnstat](https://humdi.net/vnstat/) - software for monitoring /
-graphing network throughput:
+Configure [vnstat](https://humdi.net/vnstat/) - software for monitoring/graphing
+network throughput:
 
 ```bash
 opkg install luci-app-vnstat vnstati

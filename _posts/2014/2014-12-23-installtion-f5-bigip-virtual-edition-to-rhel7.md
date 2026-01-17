@@ -12,14 +12,12 @@ tags: [nmcli, LTM, Local Traffic Manager, iapp, bond, bigip, BIG-IP, vlan, bridg
 
 The physical hardware running the F5 BIG-IP Local Traffic Manager load balancing
 software is powerful, but also quite expensive. For a lab environment you do
-not need to buy new hardware, but you can get the [F5 BIG-IP Local Traffic
-Manager Virtual
-Edition](https://www.f5.com/trial/big-ip-ltm-virtual-edition.php) and install it
-as virtual machine.
+not need to buy new hardware, but you can get the
+[F5 BIG-IP Local Traffic Manager Virtual Edition](https://www.f5.com/trial/big-ip-ltm-virtual-edition.php)
+and install it as virtual machine.
 
-That is the way I would like to describe here. I had one spare [HP ProLiant
-DL380p
-Gen8](https://web.archive.org/web/20150207155049/http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=5177957)
+That is the way I would like to describe here. I had one spare
+[HP ProLiant DL380p Gen8](https://web.archive.org/web/20150207155049/http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=5177957)
 so [RHEL7](https://en.wikipedia.org/wiki/Red_Hat_Enterprise_Linux#RHEL_7)
 virtualization ([KVM](https://www.linux-kvm.org/)) was the first choice.
 
@@ -27,7 +25,7 @@ In short I had to deal with bonding (two cables going to the 2 separate
 switches), trunk containing 3 vlans, bridges and finally with the F5
 configuration itself.
 
-![image](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/f5_kvm/f5_kvm.svg)
+![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/f5_kvm/f5_kvm.svg)
 
 Here are some notes about it...
 
@@ -66,8 +64,7 @@ echo "VLAN=yes" >> /etc/sysconfig/network-scripts/ifcfg-bond0.1261
 reboot
 ```
 
-Do some basic RHEL7 customizations + [HP
-SPP](https://web.archive.org/web/20141231041952/http://h17007.www1.hp.com/us/en/enterprise/servers/products/service_pack/spp/index.aspx)
+Do some basic RHEL7 customizations + [HP SPP](https://web.archive.org/web/20141231041952/http://h17007.www1.hp.com/us/en/enterprise/servers/products/service_pack/spp/index.aspx)
 installation:
 
 ```bash
@@ -212,21 +209,21 @@ reboot
 
 # http://support.f5.com/kb/en-us/products/big-ip_ltm/manuals/product/bigip-ve-kvm-setup-11-3-0/2.html#conceptid
 virt-install \
---name=F5-BIGIP \
---description="BIG-IP Local Traffic Manager (LTM) Virtual Edition (VE)" \
---disk path=/var/lib/libvirt/images/BIGIP-11.6.0.0.0.401.qcow2,bus=virtio,format=qcow2 \
---disk path=/var/lib/libvirt/images/BIGIP-11.6.0.0.0.401.DATASTOR.ALL.qcow2,bus=virtio,format=qcow2 \
---network=bridge=br1261,model=virtio \
---network=bridge=br1169,model=virtio \
---network=bridge=br1170,model=virtio \
---network=type=direct,source=eno3,source_mode=bridge,model=virtio \
---network=type=direct,source=eno4,source_mode=bridge,model=virtio \
---graphics vnc,password=admin123,listen=0.0.0.0,port=5900 \
---serial tcp,host=:2222,mode=bind,protocol=telnet \
---vcpus=4 --cpu host --ram=12288 \
---os-type=linux \
---os-variant=rhel6 \
---import --autostart --noautoconsole
+  --name=F5-BIGIP \
+  --description="BIG-IP Local Traffic Manager (LTM) Virtual Edition (VE)" \
+  --disk path=/var/lib/libvirt/images/BIGIP-11.6.0.0.0.401.qcow2,bus=virtio,format=qcow2 \
+  --disk path=/var/lib/libvirt/images/BIGIP-11.6.0.0.0.401.DATASTOR.ALL.qcow2,bus=virtio,format=qcow2 \
+  --network=bridge=br1261,model=virtio \
+  --network=bridge=br1169,model=virtio \
+  --network=bridge=br1170,model=virtio \
+  --network=type=direct,source=eno3,source_mode=bridge,model=virtio \
+  --network=type=direct,source=eno4,source_mode=bridge,model=virtio \
+  --graphics vnc,password=admin123,listen=0.0.0.0,port=5900 \
+  --serial tcp,host=:2222,mode=bind,protocol=telnet \
+  --vcpus=4 --cpu host --ram=12288 \
+  --os-type=linux \
+  --os-variant=rhel6 \
+  --import --autostart --noautoconsole
 ```
 
 ## BIGIP F5 Virtual Edition

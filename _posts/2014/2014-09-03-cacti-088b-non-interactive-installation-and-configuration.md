@@ -11,8 +11,7 @@ tags: [cacti, openstack, configuration, installation]
 {: .prompt-info }
 
 It may happen that you need to install Cacti without any user interaction.
-Usually
-after you install Cacti you need to finish the installation using Web
+Usually after you install Cacti you need to finish the installation using Web
 installation wizard where you need to specify some details.
 
 I would like to share the details on how to install Cacti 0.8.8b the automated
@@ -24,7 +23,6 @@ Cacti Installation:
 
 ```bash
 yum install -y cacti mysql-server
-
 
 # MySQL configuration
 service mysqld start
@@ -119,7 +117,7 @@ wget https://git.openstack.org/cgit/openstack-infra/config/plain/modules/opensta
 wget https://git.openstack.org/cgit/openstack-infra/config/plain/modules/openstack_project/files/cacti/net-snmp_devio.xml -P /usr/local/share/cacti/resource/snmp_queries/
 ```
 
-Then you can easily run "/root/create_graphs.sh my_host" to add the "linux" host
+Then you can easily run `/root/create_graphs.sh my_host` to add the `linux` host
 into the Cacti. (You will need to setup the SNMP daemon on the client machine
 first)
 

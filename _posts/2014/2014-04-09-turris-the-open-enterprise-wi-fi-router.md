@@ -85,11 +85,110 @@ Screenshots from wizard are in the photo gallery at the end.
 Here are some outputs of the commands executed on the fresh router, which may be
 interesting:
 
+```console
+root@turris:~# ifconfig -a
+br-lan    Link encap:Ethernet  HWaddr D8:58:D7:00:02:DC
+          inet addr:192.168.1.1  Bcast:192.168.1.255  Mask:255.255.255.0
+          inet6 addr: fe80::da58:d7ff:fe00:2dc/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:475 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:389 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:41385 (40.4 KiB)  TX bytes:155374 (151.7 KiB)
+
+eth0      Link encap:Ethernet  HWaddr D8:58:D7:00:02:DC
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:7 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:0 (0.0 B)  TX bytes:892 (892.0 B)
+          Base address:0xa000
+
+eth1      Link encap:Ethernet  HWaddr D8:58:D7:00:02:DD
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:6 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:0 (0.0 B)  TX bytes:742 (742.0 B)
+          Base address:0xc000
+
+eth2      Link encap:Ethernet  HWaddr D8:58:D7:00:02:DE
+          inet addr:89.102.175.10  Bcast:89.102.175.255  Mask:255.255.255.0
+          inet6 addr: fe80::da58:d7ff:fe00:2de/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:648 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:346 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:194087 (189.5 KiB)  TX bytes:35119 (34.2 KiB)
+          Base address:0xe000
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:104 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:104 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:8610 (8.4 KiB)  TX bytes:8610 (8.4 KiB)
+
+teql0     Link encap:UNSPEC  HWaddr 00-00-00-00-00-00-00-00-00-00-00-00-00-00-00-00
+          NOARP  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:100
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+wlan0     Link encap:Ethernet  HWaddr 60:02:B4:7D:85:CD
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:474 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:393 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:48015 (46.8 KiB)  TX bytes:163832 (159.9 KiB)
+```
+
 Compared to the cheap routers there is much more disk space:
+
+```console
+root@turris:~# df -h
+Filesystem                Size      Used Available Use% Mounted on
+rootfs                  249.0M     31.6M    217.4M  13% /
+/dev/root               249.0M     31.6M    217.4M  13% /
+tmpfs                  1013.9M    312.0K   1013.6M   0% /tmp
+tmpfs                   512.0K      4.0K    508.0K   1% /dev
+```
 
 The same applies to the memory used by applications:
 
+```console
+root@turris:~# free
+             total         used         free       shared      buffers
+Mem:       2076428        67700      2008728            0            0
+-/+ buffers:              67700      2008728
+Swap:            0            0            0
+```
+
 A two-core processor can be handy as well:
+
+```console
+root@turris:~# cat /proc/cpuinfo
+processor       : 0
+cpu             : e500v2
+clock           : 1200.000000MHz
+revision        : 5.1 (pvr 8021 1051)
+bogomips        : 150.00
+
+processor       : 1
+cpu             : e500v2
+clock           : 1200.000000MHz
+revision        : 5.1 (pvr 8021 1051)
+bogomips        : 150.00
+
+total bogomips  : 300.00
+timebase        : 75000000
+platform        : P2020 RDB
+model           : Turris
+Memory          : 2048 MB
+```
 
 The rest of the commands can be seen in my GitHub
 [repository](https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/turris).

@@ -115,9 +115,8 @@ Here is the example:
 I'm using two external thermometers to monitor temperature around router + in
 the room. These were built according to the following descriptions:
 
-[DS18S20 article](https://web.archive.org/web/20130219033601/http://www.linuxfocus.org/English/November2003/article315.shtml)
-
-[https://martybugs.net/electronics/tempsensor/hardware.cgi](https://martybugs.net/electronics/tempsensor/hardware.cgi)
+* [DS18S20 article](https://web.archive.org/web/20130219033601/http://www.linuxfocus.org/English/November2003/article315.shtml)
+* [Serial Port Temperature Sensors - Serial Hardware Interface](https://martybugs.net/electronics/tempsensor/hardware.cgi)
 
 I used the serial to USB converter and it works nicely with
 [Digitemp](https://www.digitemp.com/):

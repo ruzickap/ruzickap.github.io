@@ -11,11 +11,9 @@ tags: [server, upgrade, hp, hp spp, nfs, cobbler, pxe, firmware, pxe boot]
 {: .prompt-info }
 
 If you have to upgrade the firmware (iLO, BIOS, Disk firmware, NIC firmware,
-...)
-inside many HP servers and for this task it's useful to use [HP Service Pack for
-ProLiant](https://web.archive.org/web/20140102225926/http://www8.hp.com/us/en/products/server-software/product-detail.html?oid=5104018)
-([HP
-SPP](https://web.archive.org/web/20140103153853/http://h17007.www1.hp.com/us/en/enterprise/servers/products/service_pack/spp/index.aspx)).
+...) inside many HP servers and for this task it's useful to use
+[HP Service Pack for ProLiant](https://web.archive.org/web/20140102225926/http://www8.hp.com/us/en/products/server-software/product-detail.html?oid=5104018)
+([HP SPP](https://web.archive.org/web/20140103153853/http://h17007.www1.hp.com/us/en/enterprise/servers/products/service_pack/spp/index.aspx)).
 
 This iso file contains the firmware for all supported HP servers. The easiest
 way is to boot from the ISO file and upgrade the server where it is running.
@@ -47,8 +45,8 @@ echo "/data/hp/HPSPP.iso /data/hp/HP_Service_Pack_for_Proliant iso9660 ro,loop,a
 mount /data/hp/HP_Service_Pack_for_Proliant
 ```
 
-Now install and configure [Cobbler](https://www.cobblerd.org/) to boot the HP SPP
-using PXE:
+Now install and configure [Cobbler](https://www.cobblerd.org/) to boot the
+HP SPP using PXE:
 
 ```bash
 # Install EPEL
@@ -101,6 +99,8 @@ servers. If the networking is working fine you should at least get the IP from
 the DHCP server and the main "Cobbler blue" menu.
 
 You can see the full video recorded during "test" firmware upgrade below:
+
+{% include embed/youtube.html id='KwiPs225agc' %}
 
 (some parts of the video are accelerated)
 

@@ -15,362 +15,361 @@ few weeks ago. A lot has been written about this topic, but I was not able to
 find a guide describing pgpool-II and repmgr. After reading some documents I
 built the solution which I'm going to describe.
 
-In short it contains the Master/Slave DB [Streaming
-replication](https://wiki.postgresql.org/wiki/Streaming_Replication) and
-[pgpool](https://www.pgpool.net/) load distribution and HA. The replication
+In short it contains the Master/Slave DB [Streaming replication](https://wiki.postgresql.org/wiki/Streaming_Replication)
+and [pgpool](https://www.pgpool.net/) load distribution and HA. The replication
 "part" is managed by [repmgr](https://www.repmgr.org/).
 
 Here is the network diagram:
 
-![image](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/postgresql_pgpool_repmgr/diagram.svg)
+![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram.svg)
 
-- Master PostgreSQL database installation - cz01-psql01:
+- Master PostgreSQL database installation - `cz01-psql01`:
 
-```bash
-#PostgreSQL installation
-yum localinstall -y http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
-yum install -y postgresql93-server repmgr
-yum install -y --enablerepo=centos-base postgresql93-contrib
-service postgresql-9.3 initdb
-chkconfig postgresql-9.3 on
+  ```bash
+  #PostgreSQL installation
+  yum localinstall -y http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
+  yum install -y postgresql93-server repmgr
+  yum install -y --enablerepo=centos-base postgresql93-contrib
+  service postgresql-9.3 initdb
+  chkconfig postgresql-9.3 on
 
-sed -i.orig \
--e "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/" \
--e "s/^#shared_preload_libraries = ''/shared_preload_libraries = 'repmgr_funcs'/" \
--e "s/^#wal_level = minimal/wal_level = hot_standby/" \
--e "s/^#archive_mode = off/archive_mode = on/" \
--e "s@^#archive_command = ''@archive_command = 'cd .'@" \
--e "s/^#max_wal_senders = 0/max_wal_senders = 1/" \
--e "s/^#wal_keep_segments = 0/wal_keep_segments = 5000/" \
--e "s/^#\(wal_sender_timeout =.*\)/\1/" \
--e "s/^#hot_standby = off/hot_standby = on/" \
--e "s/^#log_min_duration_statement = -1/log_min_duration_statement = 0/" \
--e "s/^log_line_prefix = '< %m >'/log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d '/" \
--e "s/^#log_checkpoints =.*/log_checkpoints = on/" \
--e "s/^#log_connections =.*/log_connections = on/" \
--e "s/^#log_disconnections =.*/log_disconnections = on/" \
--e "s/^#log_lock_waits = off/log_lock_waits = on/" \
--e "s/^#log_statement = 'none'/log_statement = 'all'/" \
--e "s/^#log_temp_files = -1/log_temp_files = 0/" \
-/var/lib/pgsql/9.3/data/postgresql.conf
+  sed -i.orig \
+  -e "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/" \
+  -e "s/^#shared_preload_libraries = ''/shared_preload_libraries = 'repmgr_funcs'/" \
+  -e "s/^#wal_level = minimal/wal_level = hot_standby/" \
+  -e "s/^#archive_mode = off/archive_mode = on/" \
+  -e "s@^#archive_command = ''@archive_command = 'cd .'@" \
+  -e "s/^#max_wal_senders = 0/max_wal_senders = 1/" \
+  -e "s/^#wal_keep_segments = 0/wal_keep_segments = 5000/" \
+  -e "s/^#\(wal_sender_timeout =.*\)/\1/" \
+  -e "s/^#hot_standby = off/hot_standby = on/" \
+  -e "s/^#log_min_duration_statement = -1/log_min_duration_statement = 0/" \
+  -e "s/^log_line_prefix = '< %m >'/log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d '/" \
+  -e "s/^#log_checkpoints =.*/log_checkpoints = on/" \
+  -e "s/^#log_connections =.*/log_connections = on/" \
+  -e "s/^#log_disconnections =.*/log_disconnections = on/" \
+  -e "s/^#log_lock_waits = off/log_lock_waits = on/" \
+  -e "s/^#log_statement = 'none'/log_statement = 'all'/" \
+  -e "s/^#log_temp_files = -1/log_temp_files = 0/" \
+  /var/lib/pgsql/9.3/data/postgresql.conf
 
-cat >> /var/lib/pgsql/9.3/data/pg_hba.conf << EOF
-host    all             admin           0.0.0.0/0               md5
-host    all             all             10.32.243.0/24          md5
-# cz01-psql01
-host    repmgr          repmgr          10.32.243.147/32        trust
-host    replication     repmgr          10.32.243.147/32        trust
-# cz01-psql02
-host    repmgr          repmgr          10.32.243.148/32        trust
-host    replication     repmgr          10.32.243.148/32        trust
-EOF
+  cat >> /var/lib/pgsql/9.3/data/pg_hba.conf << EOF
+  host    all             admin           0.0.0.0/0               md5
+  host    all             all             10.32.243.0/24          md5
+  # cz01-psql01
+  host    repmgr          repmgr          10.32.243.147/32        trust
+  host    replication     repmgr          10.32.243.147/32        trust
+  # cz01-psql02
+  host    repmgr          repmgr          10.32.243.148/32        trust
+  host    replication     repmgr          10.32.243.148/32        trust
+  EOF
 
-for SERVER in cz01-psql01 cz01-psql02 cz01-pgpool-ha cz01-pgpool01 cz01-pgpool02; do
-  echo "$SERVER.example.com:5432:postgres:admin:password123" >> ~/.pgpass
-  echo "$SERVER.example.com:5432:repmgr:repmgr:repmgr_password" >> ~/.pgpass
-done
-chmod 0600 ~/.pgpass
-cp ~/.pgpass /var/lib/pgsql/
+  for SERVER in cz01-psql01 cz01-psql02 cz01-pgpool-ha cz01-pgpool01 cz01-pgpool02; do
+    echo "$SERVER.example.com:5432:postgres:admin:password123" >> ~/.pgpass
+    echo "$SERVER.example.com:5432:repmgr:repmgr:repmgr_password" >> ~/.pgpass
+  done
+  chmod 0600 ~/.pgpass
+  cp ~/.pgpass /var/lib/pgsql/
 
-#Configure repmgr
-mkdir /var/lib/pgsql/repmgr
+  #Configure repmgr
+  mkdir /var/lib/pgsql/repmgr
 
-cat > /var/lib/pgsql/repmgr/repmgr.conf << EOF
-cluster=pgsql_cluster
-node=1
-node_name=cz01-psql01
-conninfo='host=cz01-psql01.example.com user=repmgr dbname=repmgr'
-pg_bindir=/usr/pgsql-9.3/bin/
-master_response_timeout=5
-reconnect_attempts=2
-reconnect_interval=2
-failover=manual
-promote_command='/usr/pgsql-9.3/bin/repmgr standby promote -f /var/lib/pgsql/repmgr/repmgr.conf'
-follow_command='/usr/pgsql-9.3/bin/repmgr standby follow -f /var/lib/pgsql/repmgr/repmgr.conf'
-EOF
+  cat > /var/lib/pgsql/repmgr/repmgr.conf << EOF
+  cluster=pgsql_cluster
+  node=1
+  node_name=cz01-psql01
+  conninfo='host=cz01-psql01.example.com user=repmgr dbname=repmgr'
+  pg_bindir=/usr/pgsql-9.3/bin/
+  master_response_timeout=5
+  reconnect_attempts=2
+  reconnect_interval=2
+  failover=manual
+  promote_command='/usr/pgsql-9.3/bin/repmgr standby promote -f /var/lib/pgsql/repmgr/repmgr.conf'
+  follow_command='/usr/pgsql-9.3/bin/repmgr standby follow -f /var/lib/pgsql/repmgr/repmgr.conf'
+  EOF
 
-cp -r /root/.ssh /var/lib/pgsql/
-chown -R postgres:postgres /var/lib/pgsql/.ssh /var/lib/pgsql/.pgpass /var/lib/pgsql/repmgr
+  cp -r /root/.ssh /var/lib/pgsql/
+  chown -R postgres:postgres /var/lib/pgsql/.ssh /var/lib/pgsql/.pgpass /var/lib/pgsql/repmgr
 
-echo 'PATH=/usr/pgsql-9.3/bin:$PATH' >> /var/lib/pgsql/.bash_profile
-service postgresql-9.3 start
+  echo 'PATH=/usr/pgsql-9.3/bin:$PATH' >> /var/lib/pgsql/.bash_profile
+  service postgresql-9.3 start
 
-#Add users
-sudo -u postgres psql -c "CREATE ROLE admin SUPERUSER CREATEDB CREATEROLE INHERIT REPLICATION LOGIN ENCRYPTED PASSWORD 'password123';"
-sudo -u postgres psql -c "CREATE USER repmgr SUPERUSER LOGIN ENCRYPTED PASSWORD 'repmgr_password';"
-sudo -u postgres psql -c "CREATE DATABASE repmgr OWNER repmgr;"
+  #Add users
+  sudo -u postgres psql -c "CREATE ROLE admin SUPERUSER CREATEDB CREATEROLE INHERIT REPLICATION LOGIN ENCRYPTED PASSWORD 'password123';"
+  sudo -u postgres psql -c "CREATE USER repmgr SUPERUSER LOGIN ENCRYPTED PASSWORD 'repmgr_password';"
+  sudo -u postgres psql -c "CREATE DATABASE repmgr OWNER repmgr;"
 
-#Register DB instance as master
-su - postgres -c "repmgr -f /var/lib/pgsql/repmgr/repmgr.conf --verbose master register"
+  #Register DB instance as master
+  su - postgres -c "repmgr -f /var/lib/pgsql/repmgr/repmgr.conf --verbose master register"
 
-#Configure SSL Layer for PostgreSQL
-sed -i.orig \
--e 's@\$dir/cacert.pem@\$dir/example.com-ca.crt @' \
--e 's@\$dir/crl.pem@\$dir/example.com-ca.crl @' \
--e 's@\$dir/private/cakey.pem@\$dir/private/example.com-ca.key @' \
--e 's/^\(crlnumber\)/#\1/' \
--e 's/= XX/= CZ/' \
--e 's/^#\(stateOrProvinceName_default.*\) Default Province/\1 Czech Republic/' \
--e 's/= Default City/= Brno/' \
--e 's/= Default Company Ltd/= Example, Inc\./' \
--e 's/= policy_match/= policy_anything/' \
--e 's/^#\(unique_subject\)/\1/' /etc/pki/tls/openssl.cnf
+  #Configure SSL Layer for PostgreSQL
+  sed -i.orig \
+  -e 's@\$dir/cacert.pem@\$dir/example.com-ca.crt @' \
+  -e 's@\$dir/crl.pem@\$dir/example.com-ca.crl @' \
+  -e 's@\$dir/private/cakey.pem@\$dir/private/example.com-ca.key @' \
+  -e 's/^\(crlnumber\)/#\1/' \
+  -e 's/= XX/= CZ/' \
+  -e 's/^#\(stateOrProvinceName_default.*\) Default Province/\1 Czech Republic/' \
+  -e 's/= Default City/= Brno/' \
+  -e 's/= Default Company Ltd/= Example, Inc\./' \
+  -e 's/= policy_match/= policy_anything/' \
+  -e 's/^#\(unique_subject\)/\1/' /etc/pki/tls/openssl.cnf
 
-touch /etc/pki/CA/index.txt
-echo 01 > /etc/pki/CA/serial
-cd /etc/pki/CA
+  touch /etc/pki/CA/index.txt
+  echo 01 > /etc/pki/CA/serial
+  cd /etc/pki/CA
 
-# Private key for CA
-(
-umask 077
-openssl genrsa -passout pass:password123 -out private/example.com-ca.key 1024
-openssl pkey -text -passout pass:password123 -in private/example.com-ca.key > private/example.com-ca.key.info
-)
+  # Private key for CA
+  (
+  umask 077
+  openssl genrsa -passout pass:password123 -out private/example.com-ca.key 1024
+  openssl pkey -text -passout pass:password123 -in private/example.com-ca.key > private/example.com-ca.key.info
+  )
 
-SUBJ="
-C=CZ
-ST=Czech Republic
-O=Example, Inc.
-localityName=Brno
-commonName=example.com Certificate Authority
-"
+  SUBJ="
+  C=CZ
+  ST=Czech Republic
+  O=Example, Inc.
+  localityName=Brno
+  commonName=example.com Certificate Authority
+  "
 
-openssl req -passin pass:password123 -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -new -x509 -key private/example.com-ca.key -days 3650 -out example.com-ca.crt
-openssl x509 -noout -text -in example.com-ca.crt > example.com-ca.crt.info
+  openssl req -passin pass:password123 -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -new -x509 -key private/example.com-ca.key -days 3650 -out example.com-ca.crt
+  openssl x509 -noout -text -in example.com-ca.crt > example.com-ca.crt.info
 
-# cz01-psql01 Certificate
-openssl genrsa -passout pass:password123 -des3 -out cz01-psql01.example.com_priv_encrypted.key 2048
-openssl rsa -passin pass:password123 -in cz01-psql01.example.com_priv_encrypted.key -out cz01-psql01.example.com_priv.key
+  # cz01-psql01 Certificate
+  openssl genrsa -passout pass:password123 -des3 -out cz01-psql01.example.com_priv_encrypted.key 2048
+  openssl rsa -passin pass:password123 -in cz01-psql01.example.com_priv_encrypted.key -out cz01-psql01.example.com_priv.key
 
-SUBJ="
-C=CZ
-ST=Czech Republic
-O=Example
-OU=Deployment
-L=Brno
-CN=cz01-psql01.example.com
-emailAddress=root@example.com
-"
-openssl req -passin pass:password123 -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -days 3650 -key cz01-psql01.example.com_priv_encrypted.key -out cz01-psql01.example.com.csr
+  SUBJ="
+  C=CZ
+  ST=Czech Republic
+  O=Example
+  OU=Deployment
+  L=Brno
+  CN=cz01-psql01.example.com
+  emailAddress=root@example.com
+  "
+  openssl req -passin pass:password123 -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -days 3650 -key cz01-psql01.example.com_priv_encrypted.key -out cz01-psql01.example.com.csr
 
-openssl ca -passin pass:password123 -batch -in cz01-psql01.example.com.csr -out cz01-psql01.example.com.crt
-openssl x509 -noout -text -in cz01-psql01.example.com.crt > cz01-psql01.example.com.crt.info
+  openssl ca -passin pass:password123 -batch -in cz01-psql01.example.com.csr -out cz01-psql01.example.com.crt
+  openssl x509 -noout -text -in cz01-psql01.example.com.crt > cz01-psql01.example.com.crt.info
 
-cp /etc/pki/CA/cz01-psql01.example.com.crt /var/lib/pgsql/9.3/server.crt
-cp /etc/pki/CA/cz01-psql01.example.com_priv.key /var/lib/pgsql/9.3/server.key
-chown postgres:postgres /var/lib/pgsql/9.3/server.*
-chmod 0600 /var/lib/pgsql/9.3/server.key
+  cp /etc/pki/CA/cz01-psql01.example.com.crt /var/lib/pgsql/9.3/server.crt
+  cp /etc/pki/CA/cz01-psql01.example.com_priv.key /var/lib/pgsql/9.3/server.key
+  chown postgres:postgres /var/lib/pgsql/9.3/server.*
+  chmod 0600 /var/lib/pgsql/9.3/server.key
 
-sed -i \
--e "s/#ssl = off/ssl = on/" \
--e "s@#ssl_cert_file = 'server.crt'@ssl_cert_file = '../server.crt'@" \
--e "s@#ssl_key_file = 'server.key'@ssl_key_file = '../server.key'@" \
-/var/lib/pgsql/9.3/data/postgresql.conf
+  sed -i \
+  -e "s/#ssl = off/ssl = on/" \
+  -e "s@#ssl_cert_file = 'server.crt'@ssl_cert_file = '../server.crt'@" \
+  -e "s@#ssl_key_file = 'server.key'@ssl_key_file = '../server.key'@" \
+  /var/lib/pgsql/9.3/data/postgresql.conf
 
-service postgresql-9.3 restart
+  service postgresql-9.3 restart
 
-# Quick Test
-export PGSSLMODE=require
-psql --host cz01-psql01.example.com --username=fuzeme --dbname=fuzers -w -l
-```
+  # Quick Test
+  export PGSSLMODE=require
+  psql --host cz01-psql01.example.com --username=fuzeme --dbname=fuzers -w -l
+  ```
 
-- Slave PostgreSQL database installation - cz01-psql02:
+- Slave PostgreSQL database installation - `cz01-psql02`:
 
-```bash
-#PostgreSQL installation
-yum localinstall -y http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
-yum install -y postgresql93-server repmgr
-yum install -y --enablerepo=centos-base postgresql93-contrib
-chkconfig postgresql-9.3 on
+  ```bash
+  #PostgreSQL installation
+  yum localinstall -y http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
+  yum install -y postgresql93-server repmgr
+  yum install -y --enablerepo=centos-base postgresql93-contrib
+  chkconfig postgresql-9.3 on
 
-echo 'PATH=/usr/pgsql-9.3/bin:$PATH' >> /var/lib/pgsql/.bash_profile
+  echo 'PATH=/usr/pgsql-9.3/bin:$PATH' >> /var/lib/pgsql/.bash_profile
 
-scp -r cz01-psql01.example.com:/root/{.pgpass,.ssh} /root/
-cp -r /root/{.pgpass,.ssh} /var/lib/pgsql/
-chown -R postgres:postgres /var/lib/pgsql/.pgpass /var/lib/pgsql/.ssh
+  scp -r cz01-psql01.example.com:/root/{.pgpass,.ssh} /root/
+  cp -r /root/{.pgpass,.ssh} /var/lib/pgsql/
+  chown -R postgres:postgres /var/lib/pgsql/.pgpass /var/lib/pgsql/.ssh
 
-#Check the connection to primary node
-su - postgres -c "psql --username=repmgr --dbname=repmgr --host cz01-psql01.example.com -w -l"
+  #Check the connection to primary node
+  su - postgres -c "psql --username=repmgr --dbname=repmgr --host cz01-psql01.example.com -w -l"
 
-#Replicate the DB from the master mode
-su - postgres -c "repmgr -D /var/lib/pgsql/9.3/data -d repmgr -p 5432 -U repmgr -R postgres --verbose standby clone cz01-psql01.example.com"
+  #Replicate the DB from the master mode
+  su - postgres -c "repmgr -D /var/lib/pgsql/9.3/data -d repmgr -p 5432 -U repmgr -R postgres --verbose standby clone cz01-psql01.example.com"
 
-#Configure the repmgr
-mkdir /var/lib/pgsql/repmgr
-cat > /var/lib/pgsql/repmgr/repmgr.conf << EOF
-cluster=pgsql_cluster
-node=2
-node_name=cz01-psql02
-conninfo='host=cz01-psql02.example.com user=repmgr dbname=repmgr'
-pg_bindir=/usr/pgsql-9.3/bin/
-master_response_timeout=5
-reconnect_attempts=2
-reconnect_interval=2
-failover=manual
-promote_command='/usr/pgsql-9.3/bin/repmgr standby promote -f /var/lib/pgsql/repmgr/repmgr.conf'
-follow_command='/usr/pgsql-9.3/bin/repmgr standby follow -f /var/lib/pgsql/repmgr/repmgr.conf'
-EOF
+  #Configure the repmgr
+  mkdir /var/lib/pgsql/repmgr
+  cat > /var/lib/pgsql/repmgr/repmgr.conf << EOF
+  cluster=pgsql_cluster
+  node=2
+  node_name=cz01-psql02
+  conninfo='host=cz01-psql02.example.com user=repmgr dbname=repmgr'
+  pg_bindir=/usr/pgsql-9.3/bin/
+  master_response_timeout=5
+  reconnect_attempts=2
+  reconnect_interval=2
+  failover=manual
+  promote_command='/usr/pgsql-9.3/bin/repmgr standby promote -f /var/lib/pgsql/repmgr/repmgr.conf'
+  follow_command='/usr/pgsql-9.3/bin/repmgr standby follow -f /var/lib/pgsql/repmgr/repmgr.conf'
+  EOF
 
-chown -R postgres:postgres /var/lib/pgsql/repmgr
+  chown -R postgres:postgres /var/lib/pgsql/repmgr
 
-# cz01-psql02 Certificate
-cd /etc/pki/CA
-openssl genrsa -passout pass:password123 -des3 -out cz01-psql02.example.com_priv_encrypted.key 2048
-openssl rsa -passin pass:password123 -in cz01-psql02.example.com_priv_encrypted.key -out cz01-psql02.example.com_priv.key
+  # cz01-psql02 Certificate
+  cd /etc/pki/CA
+  openssl genrsa -passout pass:password123 -des3 -out cz01-psql02.example.com_priv_encrypted.key 2048
+  openssl rsa -passin pass:password123 -in cz01-psql02.example.com_priv_encrypted.key -out cz01-psql02.example.com_priv.key
 
-SUBJ="
-C=CZ
-ST=Czech Republic
-O=Example
-OU=Deployment
-L=Brno
-CN=cz01-psql02.example.com
-emailAddress=root@example.com
-"
+  SUBJ="
+  C=CZ
+  ST=Czech Republic
+  O=Example
+  OU=Deployment
+  L=Brno
+  CN=cz01-psql02.example.com
+  emailAddress=root@example.com
+  "
 
-openssl req -passin pass:password123 -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -days 3650 -key cz01-psql02.example.com_priv_encrypted.key -out cz01-psql02.example.com.csr
+  openssl req -passin pass:password123 -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -days 3650 -key cz01-psql02.example.com_priv_encrypted.key -out cz01-psql02.example.com.csr
 
-scp /etc/pki/CA/cz01-psql02.example.com.csr root@cz01-psql01.example.com:/etc/pki/CA/
+  scp /etc/pki/CA/cz01-psql02.example.com.csr root@cz01-psql01.example.com:/etc/pki/CA/
 
-ssh root@cz01-psql01.example.com << EOF
-cd /etc/pki/CA
-openssl ca -passin pass:password123 -batch -in cz01-psql02.example.com.csr -out cz01-psql02.example.com.crt
-openssl x509 -noout -text -in cz01-psql02.example.com.crt > cz01-psql02.example.com.crt.info
-EOF
+  ssh root@cz01-psql01.example.com << EOF
+  cd /etc/pki/CA
+  openssl ca -passin pass:password123 -batch -in cz01-psql02.example.com.csr -out cz01-psql02.example.com.crt
+  openssl x509 -noout -text -in cz01-psql02.example.com.crt > cz01-psql02.example.com.crt.info
+  EOF
 
-scp root@cz01-psql01.example.com:/etc/pki/CA/cz01-psql02.example.com.crt /etc/pki/CA/
+  scp root@cz01-psql01.example.com:/etc/pki/CA/cz01-psql02.example.com.crt /etc/pki/CA/
 
-cp /etc/pki/CA/cz01-psql02.example.com.crt /var/lib/pgsql/9.3/server.crt
-cp /etc/pki/CA/cz01-psql02.example.com_priv.key /var/lib/pgsql/9.3/server.key
-chown postgres:postgres /var/lib/pgsql/9.3/server.*
+  cp /etc/pki/CA/cz01-psql02.example.com.crt /var/lib/pgsql/9.3/server.crt
+  cp /etc/pki/CA/cz01-psql02.example.com_priv.key /var/lib/pgsql/9.3/server.key
+  chown postgres:postgres /var/lib/pgsql/9.3/server.*
 
-chmod 0600 /var/lib/pgsql/9.3/server.key
+  chmod 0600 /var/lib/pgsql/9.3/server.key
 
-service postgresql-9.3 start
+  service postgresql-9.3 start
 
-#Register the DB instance as slave
-su - postgres -c "repmgr -f /var/lib/pgsql/repmgr/repmgr.conf --verbose standby register"
-```
+  #Register the DB instance as slave
+  su - postgres -c "repmgr -f /var/lib/pgsql/repmgr/repmgr.conf --verbose standby register"
+  ```
 
 - pgpool server installation (common for primary/secondary node) -
-cz01-pgpool0{1,2}:
+`cz01-pgpool0{1,2}`:
 
-```bash
-#pgpool installation
-yum localinstall -y http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
-yum install -y pgpool-II-93 postgresql93
+  ```bash
+  #pgpool installation
+  yum localinstall -y http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
+  yum install -y pgpool-II-93 postgresql93
 
-scp -r cz01-psql01.example.com:/root/{.ssh,.pgpass} /root/
-scp cz01-psql01.example.com:/root/.pgpass /root/
+  scp -r cz01-psql01.example.com:/root/{.ssh,.pgpass} /root/
+  scp cz01-psql01.example.com:/root/.pgpass /root/
 
-cp /etc/pgpool-II-93/pcp.conf.sample /etc/pgpool-II-93/pcp.conf
-echo "admin:`pg_md5 password123`" >> /etc/pgpool-II-93/pcp.conf
+  cp /etc/pgpool-II-93/pcp.conf.sample /etc/pgpool-II-93/pcp.conf
+  echo "admin:`pg_md5 password123`" >> /etc/pgpool-II-93/pcp.conf
 
-sed \
--e "s/^listen_addresses = .localhost./listen_addresses = '*'/" \
--e "s/^log_destination = .stderr./log_destination = 'syslog'/" \
--e "s/^port = .*/port = 5432/" \
--e "s/^backend_hostname0 =.*/backend_hostname0 = 'cz01-psql01.example.com'/" \
--e "s/^#backend_flag0/backend_flag0/" \
--e "s/^#backend_hostname1 =.*/backend_hostname1 = 'cz01-psql02.example.com'/" \
--e "s/^#backend_port1 = 5433/backend_port1 = 5432/" \
--e "s/^#backend_weight1/backend_weight1/" \
--e "s/^#backend_data_directory1 =.*/backend_data_directory1 = '\/var\/lib\/pgsql\/9.3\/data'/" \
--e "s/^#backend_flag1/backend_flag1/" \
--e "s/^log_hostname =.*/log_hostname = on/" \
--e "s/^syslog_facility =.*/syslog_facility = 'daemon.info'/" \
--e "s/^sr_check_user =.*/sr_check_user = 'admin'/" \
--e "s/^sr_check_password =.*/sr_check_password = 'password123'/" \
--e "s/^health_check_period =.*/health_check_period = 10/" \
--e "s/^health_check_user =.*/health_check_user = 'admin'/" \
--e "s/^health_check_password =.*/health_check_password = 'password123'/" \
--e "s/^use_watchdog =.*/use_watchdog = on/" \
--e "s/^delegate_IP =.*/delegate_IP = '10.32.243.250'/" \
--e "s/^netmask 255.255.255.0/netmask 255.255.255.128/" \
--e "s/^heartbeat_device0 =.*/heartbeat_device0 = 'eth0'/" \
--e "s/^#other_pgpool_port0 =.*/other_pgpool_port0 = 5432/" \
--e "s/^#other_wd_port0 = 9000/other_wd_port0 = 9000/" \
--e "s/^load_balance_mode = off/load_balance_mode = on/" \
--e "s/^master_slave_mode = off/master_slave_mode = on/" \
--e "s/^master_slave_sub_mode =.*/master_slave_sub_mode = 'stream'/" \
--e "s@^failover_command = ''@failover_command = '/etc/pgpool-II-93/failover_stream.sh %d %H'@" \
--e "s/^recovery_user = 'nobody'/recovery_user = 'admin'/" \
--e "s/^recovery_password = ''/recovery_password = 'password123'/" \
--e "s/^recovery_1st_stage_command = ''/recovery_1st_stage_command = 'basebackup.sh'/" \
--e "s/^sr_check_period = 0/sr_check_period = 10/" \
--e "s/^delay_threshold = 0/delay_threshold = 10000000/" \
--e "s/^log_connections = off/log_connections = on/" \
--e "s/^log_statement = off/log_statement = on/" \
--e "s/^log_per_node_statement = off/log_per_node_statement = on/" \
--e "s/^log_standby_delay = 'none'/log_standby_delay = 'always'/" \
--e "s/^enable_pool_hba = off/enable_pool_hba = on/" \
-/etc/pgpool-II-93/pgpool.conf.sample > /etc/pgpool-II-93/pgpool.conf
+  sed \
+  -e "s/^listen_addresses = .localhost./listen_addresses = '*'/" \
+  -e "s/^log_destination = .stderr./log_destination = 'syslog'/" \
+  -e "s/^port = .*/port = 5432/" \
+  -e "s/^backend_hostname0 =.*/backend_hostname0 = 'cz01-psql01.example.com'/" \
+  -e "s/^#backend_flag0/backend_flag0/" \
+  -e "s/^#backend_hostname1 =.*/backend_hostname1 = 'cz01-psql02.example.com'/" \
+  -e "s/^#backend_port1 = 5433/backend_port1 = 5432/" \
+  -e "s/^#backend_weight1/backend_weight1/" \
+  -e "s/^#backend_data_directory1 =.*/backend_data_directory1 = '\/var\/lib\/pgsql\/9.3\/data'/" \
+  -e "s/^#backend_flag1/backend_flag1/" \
+  -e "s/^log_hostname =.*/log_hostname = on/" \
+  -e "s/^syslog_facility =.*/syslog_facility = 'daemon.info'/" \
+  -e "s/^sr_check_user =.*/sr_check_user = 'admin'/" \
+  -e "s/^sr_check_password =.*/sr_check_password = 'password123'/" \
+  -e "s/^health_check_period =.*/health_check_period = 10/" \
+  -e "s/^health_check_user =.*/health_check_user = 'admin'/" \
+  -e "s/^health_check_password =.*/health_check_password = 'password123'/" \
+  -e "s/^use_watchdog =.*/use_watchdog = on/" \
+  -e "s/^delegate_IP =.*/delegate_IP = '10.32.243.250'/" \
+  -e "s/^netmask 255.255.255.0/netmask 255.255.255.128/" \
+  -e "s/^heartbeat_device0 =.*/heartbeat_device0 = 'eth0'/" \
+  -e "s/^#other_pgpool_port0 =.*/other_pgpool_port0 = 5432/" \
+  -e "s/^#other_wd_port0 = 9000/other_wd_port0 = 9000/" \
+  -e "s/^load_balance_mode = off/load_balance_mode = on/" \
+  -e "s/^master_slave_mode = off/master_slave_mode = on/" \
+  -e "s/^master_slave_sub_mode =.*/master_slave_sub_mode = 'stream'/" \
+  -e "s@^failover_command = ''@failover_command = '/etc/pgpool-II-93/failover_stream.sh %d %H'@" \
+  -e "s/^recovery_user = 'nobody'/recovery_user = 'admin'/" \
+  -e "s/^recovery_password = ''/recovery_password = 'password123'/" \
+  -e "s/^recovery_1st_stage_command = ''/recovery_1st_stage_command = 'basebackup.sh'/" \
+  -e "s/^sr_check_period = 0/sr_check_period = 10/" \
+  -e "s/^delay_threshold = 0/delay_threshold = 10000000/" \
+  -e "s/^log_connections = off/log_connections = on/" \
+  -e "s/^log_statement = off/log_statement = on/" \
+  -e "s/^log_per_node_statement = off/log_per_node_statement = on/" \
+  -e "s/^log_standby_delay = 'none'/log_standby_delay = 'always'/" \
+  -e "s/^enable_pool_hba = off/enable_pool_hba = on/" \
+  /etc/pgpool-II-93/pgpool.conf.sample > /etc/pgpool-II-93/pgpool.conf
 
-cat > /etc/pgpool-II-93/failover_stream.sh << \EOF
-#!/bin/sh
-# Failover command for streaming replication.
-#
-# Arguments: $1: failed node id. $2: new master hostname.
+  cat > /etc/pgpool-II-93/failover_stream.sh << \EOF
+  #!/bin/sh
+  # Failover command for streaming replication.
+  #
+  # Arguments: $1: failed node id. $2: new master hostname.
 
-failed_node=$1
-new_master=$2
+  failed_node=$1
+  new_master=$2
 
-(
-date
-echo "Failed node: $failed_node"
-set -x
+  (
+  date
+  echo "Failed node: $failed_node"
+  set -x
 
-# Promote standby/slave to be a new master (old master failed)
-/usr/bin/ssh -T -l postgres $new_master "/usr/pgsql-9.3/bin/repmgr -f /var/lib/pgsql/repmgr/repmgr.conf standby promote 2>/dev/null 1>/dev/null <&-"
+  # Promote standby/slave to be a new master (old master failed)
+  /usr/bin/ssh -T -l postgres $new_master "/usr/pgsql-9.3/bin/repmgr -f /var/lib/pgsql/repmgr/repmgr.conf standby promote 2>/dev/null 1>/dev/null <&-"
 
-exit 0;
-) 2>&1 | tee -a /tmp/failover_stream.sh.log
-EOF
-chmod 755 /etc/pgpool-II-93/failover_stream.sh
+  exit 0;
+  ) 2>&1 | tee -a /tmp/failover_stream.sh.log
+  EOF
+  chmod 755 /etc/pgpool-II-93/failover_stream.sh
 
-cp /etc/pgpool-II-93/pool_hba.conf.sample /etc/pgpool-II-93/pool_hba.conf
-echo "host    all         all         0.0.0.0/0             md5" >> /etc/pgpool-II-93/pool_hba.conf
+  cp /etc/pgpool-II-93/pool_hba.conf.sample /etc/pgpool-II-93/pool_hba.conf
+  echo "host    all         all         0.0.0.0/0             md5" >> /etc/pgpool-II-93/pool_hba.conf
 
-mkdir -p /var/lib/pgsql/9.3/data
-groupadd -g 26 -o -r postgres
-useradd -M -n -g postgres -o -r -d /var/lib/pgsql -s /bin/bash -c "PostgreSQL Server" -u 26 postgres
+  mkdir -p /var/lib/pgsql/9.3/data
+  groupadd -g 26 -o -r postgres
+  useradd -M -n -g postgres -o -r -d /var/lib/pgsql -s /bin/bash -c "PostgreSQL Server" -u 26 postgres
 
-cp -R /root/.ssh /var/lib/pgsql/
-sed -i '/^User /d' /var/lib/pgsql/.ssh/config
+  cp -R /root/.ssh /var/lib/pgsql/
+  sed -i '/^User /d' /var/lib/pgsql/.ssh/config
 
-pg_md5 -m -u admin password123
+  pg_md5 -m -u admin password123
 
-chown -R postgres:postgres /var/lib/pgsql /etc/pgpool-II-93/pool_passwd
+  chown -R postgres:postgres /var/lib/pgsql /etc/pgpool-II-93/pool_passwd
 
-chmod 6755 /sbin/ifconfig
-chmod 6755 /sbin/arping
+  chmod 6755 /sbin/ifconfig
+  chmod 6755 /sbin/arping
 
-chkconfig pgpool-II-93 on
-```
+  chkconfig pgpool-II-93 on
+  ```
 
-- Primary pgpool server installation - cz01-pgpool01:
+- Primary pgpool server installation - `cz01-pgpool01`:
 
-```bash
-sed \
--e "s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool01.example.com'/" \
--e "s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool02.example.com'/" \
--e "s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool02.example.com'/" \
--i /etc/pgpool-II-93/pgpool.conf
+  ```bash
+  sed \
+  -e "s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool01.example.com'/" \
+  -e "s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool02.example.com'/" \
+  -e "s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool02.example.com'/" \
+  -i /etc/pgpool-II-93/pgpool.conf
 
-service pgpool-II-93 start
-```
+  service pgpool-II-93 start
+  ```
 
-- Secondary pgpool server installation - cz01-pgpool02:
+- Secondary pgpool server installation - `cz01-pgpool02`:
 
-```bash
-sed \
--e "s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool02.example.com'/" \
--e "s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool01.example.com'/" \
--e "s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool01.example.com'/" \
--i /etc/pgpool-II-93/pgpool.conf
+  ```bash
+  sed \
+  -e "s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool02.example.com'/" \
+  -e "s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool01.example.com'/" \
+  -e "s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool01.example.com'/" \
+  -i /etc/pgpool-II-93/pgpool.conf
 
-service pgpool-II-93 start
-```
+  service pgpool-II-93 start
+  ```
 
 Now the all 4 server should be configured according the picture mentioned above.
 To be sure everything is working properly I decided to do various tests by
@@ -380,14 +379,13 @@ handy for troubleshooting in the future and which will test the proper
 configuration.
 
 All the files modified and used for the configuration above can be found in the
-[postgresql_pgpool_repmgr
-repository](https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/postgresql_pgpool_repmgr).
+[postgresql_pgpool_repmgr repository](https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/postgresql_pgpool_repmgr).
 
 ## Testing
 
 ### Check the cluster status
 
-```bash
+```console
 cz01-pgpool02 ~ # ssh postgres@cz01-psql02.example.com "/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"
 Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
 
@@ -406,7 +404,7 @@ cz01-psql02.example.com 5432 1 0.500000
 
 ### Check if the replication is working
 
-```bash
+```console
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -c "create database mydb"
 CREATE DATABASE
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -l | grep mydb
@@ -417,9 +415,9 @@ cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-psql02.exa
  mydb | admin | UTF8 | en_US.UTF-8 | en_US.UTF-8 |
 ```
 
-### Check what is the primapry pgpool (it has 2 IPs)
+### Check what is the primary pgpool (it has 2 IPs)
 
-```bash
+```console
 cz01-pgpool02 ~ # ssh -q cz01-pgpool01 "ip a s"
 1: lo: mtu 16436 qdisc noqueue state UNKNOWN
  link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
@@ -432,7 +430,7 @@ cz01-pgpool02 ~ # ssh -q cz01-pgpool01 "ip a s"
 
 ### Stop the Master DB
 
-```bash
+```console
 cz01-pgpool02 ~ # date && ssh root@cz01-psql01.example.com "service postgresql-9.3 stop"
 Thu Oct 23 14:43:09 CEST 2014
 Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
@@ -440,18 +438,18 @@ Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the 
 Stopping postgresql-9.3 service: [ OK ]
 ```
 
-- The pgpool is monitoring both master and slave databases if they are
+The pgpool is monitoring both master and slave databases if they are
 responding. If one of them is not responding the pgpool executes the
-"failover_stream.sh" file. This script is responsible for promoting the slave to
+`failover_stream.sh` file. This script is responsible for promoting the slave to
 be a new master. The result is that the read-only slave will become read/write
 master. In the diagram below I used the red colour to see the changes which were
 done when slave was promoted to master.
 
-![image](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/postgresql_pgpool_repmgr/diagram_master_down.svg)
+![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_master_down.svg)
 
-### pgpool01 logs right after the master was stopped
+### `pgpool01` logs right after the master was stopped
 
-```bash
+```console
 cz01-pgpool01 ~ # cat /var/log/local0
 ...
 2014-10-23T14:43:11.547651+02:00 cz01-pgpool01 pgpool[23301]: connect_inet_domain_socket: getsockopt() detected error: Connection refused
@@ -483,9 +481,9 @@ cz01-pgpool01 ~ # cat /var/log/local0
 2014-10-23T14:43:18.065907+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 26165
 ```
 
-### psql01 (masted db) logs right after the master was stopped
+### `psql01` (masted db) logs right after the master was stopped
 
-```bash
+```console
 cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 ...
 2014-10-23 14:43:10 CEST [18254]: [6-1] user=,db= LOG: received fast shutdown request
@@ -502,9 +500,9 @@ cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 14:43:11 CEST [18438]: [3-1] user=repmgr,db=[unknown] LOG: disconnection: session time: 0:48:37.268 user=repmgr database= host=10.32.243.148 port=50909
 ```
 
-### psql02 (slave db) logs right after the master was stopped
+### `psql02` (slave db) logs right after the master was stopped
 
-```bash
+```console
 cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 ...
 2014-10-23 14:43:11 CEST [18031]: [2-1] user=,db= LOG: replication terminated by primary server
@@ -562,20 +560,144 @@ cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 14:43:15 CEST [24149]: [5-1] user=repmgr,db=repmgr LOG: disconnection: session time: 0:00:00.030 user=repmgr database=repmgr host=10.32.243.148 port=54335
 ```
 
-### failover_stream.sh output log from primary pgpool
+### `failover_stream.sh` output log from primary pgpool
 
-```bash
+```console
 cz01-pgpool01 / # cat /tmp/failover_stream.sh.log
 Thu Oct 23 14:43:13 CEST 2014
 Failed node: 0
 + /usr/bin/ssh -T -l postgres cz01-psql02.example.com '/usr/pgsql-9.3/bin/repmgr -f /var/lib/pgsql/repmgr/repmgr.conf standby promote 2>/dev/null 1>/dev/null
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
++ exit 0
 ```
 
-![Diagram: Failed master become slave](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/postgresql_pgpool_repmgr/diagram_failed_master_become_slave.svg)
+### Check the cluster status after master failure
 
-### Logs right after the new slave (cz01-psql01) was configured+started
+```console
+cz01-pgpool02 ~ # ssh postgres@cz01-psql02.example.com "/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
 
-```bash
+[2014-10-23 14:49:07] [INFO] repmgr connecting to database
+[2014-10-23 14:49:07] [ERROR] Connection to database failed: could not connect to server: Connection refused
+        Is the server running on host "cz01-psql01.example.com" (10.32.243.147) and accepting
+        TCP/IP connections on port 5432?
+
+Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
+Role      | Connection String
+  FAILED  | host=cz01-psql01.example.com user=repmgr dbname=repmgr
+* master  | host=cz01-psql02.example.com user=repmgr dbname=repmgr
+
+cz01-pgpool02 ~ # pcp_node_info 1 localhost 9898 admin password123 0
+cz01-psql01.example.com 5432 3 0.500000
+cz01-pgpool02 ~ # pcp_node_info 1 localhost 9898 admin password123 1
+cz01-psql02.example.com 5432 1 0.500000
+```
+
+### Check if everything is working
+
+```console
+cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -c "drop database mydb"
+DROP DATABASE
+cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -l | grep mydb
+cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-psql02.example.com -w -l | grep mydb
+```
+
+### Make the "old master" to be a "new slave" `cz01-psql01`
+
+```console
+cz01-pgpool02 ~ # ssh cz01-psql01.example.com 'service postgresql-9.3 stop; su - postgres -c "repmgr -D /var/lib/pgsql/9.3/data -d repmgr -p 5432 -U repmgr -R postgres --verbose --force standby clone cz01-psql02.example.com"; service postgresql-9.3 start;'
+Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+Stopping postgresql-9.3 service: [  OK  ]
+[2014-10-23 14:52:08] [ERROR] Did not find the configuration file './repmgr.conf', continuing
+[2014-10-23 14:52:08] [NOTICE] repmgr Destination directory /var/lib/pgsql/9.3/data provided, try to clone everything in it.
+[2014-10-23 14:52:08] [INFO] repmgr connecting to master database
+[2014-10-23 14:52:08] [INFO] repmgr connected to master, checking its state
+[2014-10-23 14:52:09] [INFO] Successfully connected to primary. Current installation size is 188 MB
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+[2014-10-23 14:52:09] [NOTICE] Starting backup...
+[2014-10-23 14:52:09] [WARNING] directory "/var/lib/pgsql/9.3/data" exists but is not empty
+[2014-10-23 14:52:09] [INFO] standby clone: master control file '/var/lib/pgsql/9.3/data/global/pg_control'
+[2014-10-23 14:52:09] [INFO] standby clone: master control file '/var/lib/pgsql/9.3/data/global/pg_control'
+[2014-10-23 14:52:09] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/global/pg_control /var/lib/pgsql/9.3/data/global'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+pg_control
+        8192 100%    7.81MB/s    0:00:00 (xfer#1, to-check=0/1)
+
+sent 102 bytes  received 236 bytes  676.00 bytes/sec
+total size is 8192  speedup is 24.24
+[2014-10-23 14:52:09] [INFO] standby clone: master data directory '/var/lib/pgsql/9.3/data'
+[2014-10-23 14:52:09] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete --exclude=pg_xlog* --exclude=pg_log* --exclude=pg_control --exclude=*.pid postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/* /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+deleting base/16528/pg_filenode.map
+deleting base/16528/PG_VERSION
+deleting base/16528/12890
+deleting base/16528/12888
+...
+...
+...
+pg_stat_tmp/db_16413.stat
+        6089 100%  849.47kB/s    0:00:00 (xfer#16, to-check=2/1542)
+pg_stat_tmp/global.stat
+        1026 100%  125.24kB/s    0:00:00 (xfer#17, to-check=1/1542)
+
+sent 3810 bytes  received 94096 bytes  39162.40 bytes/sec
+total size is 198017139  speedup is 2022.52
+[2014-10-23 14:52:11] [INFO] standby clone: master config file '/var/lib/pgsql/9.3/data/postgresql.conf'
+[2014-10-23 14:52:11] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/postgresql.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes  received 80 bytes  60.67 bytes/sec
+total size is 20561  speedup is 225.95
+[2014-10-23 14:52:12] [INFO] standby clone: master hba file '/var/lib/pgsql/9.3/data/pg_hba.conf'
+[2014-10-23 14:52:12] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/pg_hba.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes  received 76 bytes  174.00 bytes/sec
+total size is 4812  speedup is 55.31
+[2014-10-23 14:52:12] [INFO] standby clone: master ident file '/var/lib/pgsql/9.3/data/pg_ident.conf'
+[2014-10-23 14:52:12] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/pg_ident.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes  received 78 bytes  178.00 bytes/sec
+total size is 1636  speedup is 18.38
+[2014-10-23 14:52:12] [NOTICE] Finishing backup...
+NOTICE:  pg_stop_backup complete, all required WAL segments have been archived
+[2014-10-23 14:52:13] [INFO] repmgr requires primary to keep WAL files 000000010000000000000062 until at least 000000010000000000000062
+[2014-10-23 14:52:13] [NOTICE] repmgr standby clone complete
+[2014-10-23 14:52:13] [NOTICE] HINT: You can now start your postgresql server
+[2014-10-23 14:52:13] [NOTICE] for example : pg_ctl -D /var/lib/pgsql/9.3/data start
+Opening configuration file: ./repmgr.conf
+Starting postgresql-9.3 service: [  OK  ]
+```
+
+Once the slave has been promoted to master, the DB administrator should check
+exactly what happened to the failed master database. Once the problem has been
+analyzed, the administrator should not simply restart the "failed" database but
+instead reconfigure it as a slave. There is currently a master DB; therefore,
+every other database needs to be a slave. The command above sets up a new slave
+with data replication from the running master. Pgpool also needs to be notified
+that the "new" slave is up and running and ready for read-only queries
+(the commands will follow). The diagram below shows the current status, and the
+red color indicates the additional changes.
+
+![Diagram: Failed master become slave](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_failed_master_become_slave.svg)
+
+### Logs right after the new slave `cz01-psql01` was configured+started
+
+```console
 cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 ...
 2014-10-23 14:52:14 CEST [26707]: [1-1] user=,db= LOG: database system was interrupted; last known up at 2014-10-23 14:52:09 CEST
@@ -586,7 +708,7 @@ cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 14:52:14 CEST [26698]: [5-1] user=,db= LOG: database system is ready to accept read only connections
 ```
 
-### Logs from cz01-psql02 after the new slave was configured
+### Logs from `cz01-psql02` after the new slave was configured
 
 ```bash
 cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
@@ -634,13 +756,13 @@ cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 
 ### There is nothing new in pgpool after the new slave was configured
 
-```bash
+```console
 cz01-pgpool01 / # tail -f /var/log/local0
 ```
 
 ### Check the cluster status after failover
 
-```bash
+```console
 cz01-pgpool02 ~ # ssh postgres@cz01-psql02.example.com "/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"
 Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
 
@@ -655,9 +777,9 @@ cz01-pgpool02 ~ # pcp_node_info 1 localhost 9898 admin password123 1
 cz01-psql02.example.com 5432 1 0.500000
 ```
 
-### Check if everything is working
+### Check if everything is working after reinitialization
 
-```bash
+```console
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -c "create database mydb"
 CREATE DATABASE
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -l | grep mydb
@@ -670,14 +792,14 @@ cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-psql02.exa
 
 ### Reinitialize the slave in pgpool to be ready for read only queries
 
-```bash
+```console
 cz01-pgpool02 ~ # pcp_detach_node 0 localhost 9898 admin password123 0
 cz01-pgpool02 ~ # pcp_attach_node 0 localhost 9898 admin password123 0
 ```
 
-### logfile right after the slave was enabled for RO queries
+### Logfile right after the slave was enabled for RO queries
 
-```bash
+```console
 cz01-pgpool01 / # cat /var/log/local0
 ...
 2014-10-23T15:55:38.440946+02:00 cz01-pgpool01 pgpool[23264]: send_failback_request: fail back 0 th node request from pid 23264
@@ -700,9 +822,9 @@ cz01-pgpool01 / # cat /var/log/local0
 2014-10-23T15:55:41.057839+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 1393
 ```
 
-### Check pgpool stratus the slave should have a good value now
+### Check pgpool status the slave should have a good value now
 
-```bash
+```console
 cz01-pgpool02 ~ # pcp_node_info 1 localhost 9898 admin password123 0
 cz01-psql01.example.com 5432 1 0.500000
 cz01-pgpool02 ~ # pcp_node_info 1 localhost 9898 admin password123 1
@@ -711,7 +833,7 @@ cz01-psql02.example.com 5432 1 0.500000
 
 ### Check if everything is working fine
 
-```bash
+```console
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -c "drop database mydb"
 DROP DATABASE
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -l | grep mydb
@@ -721,23 +843,23 @@ cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-psql02.exa
 
 ### Stop the master DB (original slave) - new master should be promoted
 
-```bash
+```console
 cz01-pgpool02 ~ # ssh cz01-psql02.example.com 'service postgresql-9.3 stop'
 Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
 
 Stopping postgresql-9.3 service: [ OK ]
 ```
 
-- Here is another example what may happen if original slave server, promoted to
+Here is another example what may happen if original slave server, promoted to
 new master fails. Again the slave is automatically promoted by pgpool to the new
 master and "original master" (later slave) is master again. Changes are using
 blue color in the diagram below.
 
-![image](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/postgresql_pgpool_repmgr/diagram_new_slave-original_master-become_master_again.svg)
+![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_new_slave-original_master-become_master_again.svg)
 
-### logs right after the master (original slave) was stopped
+### Logs right after the master (original slave) was stopped
 
-```bash
+```console
 cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 ...
 2014-10-23 16:01:30 CEST [24133]: [6-1] user=,db= LOG: received fast shutdown request
@@ -754,9 +876,9 @@ cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 16:01:31 CEST [25524]: [3-1] user=repmgr,db=[unknown] LOG: disconnection: session time: 1:09:17.350 user=repmgr database= host=10.32.243.147 port=52484
 ```
 
-### Logs from pgpool01 after the master was stopped
+### Logs from `pgpool01` after the master was stopped
 
-```bash
+```console
 cz01-pgpool01 / # cat /var/log/local0
 ...
 2014-10-23T16:01:33.199817+02:00 cz01-pgpool01 pgpool[23257]: connect_inet_domain_socket: getsockopt() detected error: Connection refused
@@ -785,9 +907,9 @@ cz01-pgpool01 / # cat /var/log/local0
 2014-10-23T16:01:38.345899+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 2518
 ```
 
-### Logs from psql01 after the master was stopped
+### Logs from `psql01` after the master was stopped
 
-```bash
+```console
 cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 ...
 2014-10-23 16:01:31 CEST [26708]: [2-1] user=,db= LOG: replication terminated by primary server
@@ -798,7 +920,7 @@ cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 
 ### Check status
 
-```bash
+```console
 cz01-pgpool02 ~ # ssh -q postgres@cz01-psql01.example.com "/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"
 [2014-10-23 16:05:16] [INFO] repmgr connecting to database
 Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
@@ -812,7 +934,7 @@ Role | Connection String
 
 ### Check the functionality
 
-```bash
+```console
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -c "drop database mydb"
 DROP DATABASE
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.example.com -w -l | grep mydb
@@ -821,7 +943,7 @@ cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-psql01.exa
 
 ### Reinitialize the stopped master to be slave again
 
-```bash
+```console
 cz01-pgpool02 ~ # ssh cz01-psql02.example.com 'service postgresql-9.3 stop; su - postgres -c "repmgr -D /var/lib/pgsql/9.3/data -d repmgr -p 5432 -U repmgr -R postgres --verbose --force standby clone cz01-psql01.example.com"; service postgresql-9.3 start;'
 Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
 
@@ -945,17 +1067,16 @@ Opening configuration file: ./repmgr.conf
 Starting postgresql-9.3 service: [ OK ]
 ```
 
-- Again - after the db administrator find out the cause why master went down he
+Again - after the db administrator find out the cause why master went down he
 needs to initialize the failed master as a slave (by running command above).
-
 Then everything is like before the testing - original master/slave state. The
 green color is used for showing up the changes in the diagram.
 
-![image](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/postgresql_pgpool_repmgr/diagram_make_original_slave-failed_master-to_become_slave_again.svg)
+![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_make_original_slave-failed_master-to_become_slave_again.svg)
 
 ### Check cluster status after recovery
 
-```bash
+```console
 cz01-pgpool02 ~ # ssh -q postgres@cz01-psql02.example.com "/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"
 [2014-10-23 16:08:23] [INFO] repmgr connecting to database
 Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
@@ -970,14 +1091,14 @@ cz01-psql02.example.com 5432 3 0.500000
 
 ### Re-enable the slave to be able to receive read-only requests
 
-```bash
+```console
 cz01-pgpool02 ~ # pcp_detach_node 0 localhost 9898 admin password123 1
 cz01-pgpool02 ~ # pcp_attach_node 0 localhost 9898 admin password123 1
 ```
 
 ### Logs right after reenabling the slave again
 
-```bash
+```console
 cz01-pgpool01 / # cat /var/log/local0
 ...
 2014-10-23T16:09:06.675035+02:00 cz01-pgpool01 pgpool[23264]: send_failback_request: fail back 1 th node request from pid 23264
@@ -1002,7 +1123,7 @@ cz01-pgpool01 / # cat /var/log/local0
 
 ### Final cluster status verification
 
-```bash
+```console
 cz01-pgpool02 ~ # ssh -q postgres@cz01-psql02.example.com "/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"
 [2014-10-23 16:10:33] [INFO] repmgr connecting to database
 Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf

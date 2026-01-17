@@ -11,8 +11,7 @@ tags: [appliance, ovftool, vmware, command line, vcenter, ssh]
 {: .prompt-info }
 
 Here you can find some notes about installing VMware vCenter Appliance from
-command line directly from ESXi using [OVF
-Tool](https://web.archive.org/web/20140715092309/https://www.vmware.com/support/developer/ovf/).
+command line directly from ESXi using [OVF Tool](https://web.archive.org/web/20140715092309/https://www.vmware.com/support/developer/ovf/).
 
 ![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiP6NriLRFRljobZpIo3_jYdIn_rXRTKjJflK4TTFwK7sH3aHdQPrgCF6hhgOBqMFm-8fo_L8HRq9kZWdYXFnhRV3UjslgAtlGS4m-Lgx9giB_wFgA10vC-g9Cof3pTuRmaLdbgPMPWU90/s640/vcenter.png)
 
@@ -32,7 +31,7 @@ sed -i 's@^#!/bin/bash@#!/bin/sh@' /vmfs/volumes/My_Datastore/vmware-ovftool/ovf
 ```
 
 Provision VMware vCenter Server 5.x Appliance using OVFtool directly to ESXi and
-then configure it via SSH
+then configure it via SSH:
 
 ```bash
 # Deploy OVF from remote HTTP source
@@ -97,9 +96,7 @@ sed -i 's@/usr/bin/mc@/usr/bin/mc --nomouse@' /usr/share/mc/bin/mc-wrapper.sh
 
 Then you can automatically register the ESXi servers to the vCenter using
 "[joinvCenter.py](https://github.com/lamw/vghetto-scripts/blob/master/python/joinvCenter.py)".
-
-Details here
-[https://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html](https://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html).
+Details here [https://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html](https://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html).
 
 Thank you guys from the [virtuallyGhetto](https://www.virtuallyghetto.com/) for
 their awesome blog full of great "VMware ideas".

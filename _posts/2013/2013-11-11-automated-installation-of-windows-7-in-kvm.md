@@ -76,18 +76,15 @@ rm -rvf $PWD/cd
 rm $ISO
 ```
 
-Another screenshot showing the second CD-ROM with the autostart.iso:
+Another screenshot showing the second CD-ROM with the `autostart.iso`:
 
 ![image](https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhVqJxi_xPmKDPUq73vuBj5CI9pAHJa8e-LwL2XvtKQ1HMfvxgPrMvtj1w4Z4FS5mzCxV7D2ZVl7U4W9uVJLL6FZMzIj3uOMW07ZeBs3vqz5SaT0Mq3XOYmNuquT_6BRg2cm0pd15bwKwg/s640/win03.png)
 
 Once the installation of the Windows 7 is completed you should run the
-"autostart.bat" using the "Run as administrator" option.
+`autostart.bat` using the "Run as administrator" option.
 
-It will download the [win7-admin.bat][admin] and download+run
-[win7-user.bat][user].
-
-[admin]: https://gist.github.com/ruzickap/7395426
-[user]: https://gist.github.com/ruzickap/7395075
+It will download the [win7-admin.bat](https://gist.github.com/ruzickap/7395426)
+and download+run [win7-user.bat](https://gist.github.com/ruzickap/7395075).
 
 You can see the content of the [win7-user.bat](https://gist.github.com/ruzickap/7395075) here:
 
@@ -214,8 +211,9 @@ shutdown /r /t 0
 move c:\win7-user.bat c:\windows\temp\
 ```
 
-After the restart you should login as Administrator (with password "xxxx")
-and complete installation by running `c:\win7-admin.bat` shown here:
+After the restart you should login as Administrator (with password `xxxx`)
+and complete installation by running [win7-admin.bat](https://gist.github.com/ruzickap/7395426)
+shown here:
 
 ```bash
 :: Tested on Windows 7
@@ -383,5 +381,7 @@ move c:\win7-admin.bat c:\windows\temp\
 
 Feel free to see the whole installation procedure on this video (some parts
 are accelerated):
+
+{% include embed/youtube.html id='0Tnqj8ZYKB0' %}
 
 :-)

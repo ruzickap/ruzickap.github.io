@@ -12,17 +12,16 @@ tags: [router, wifi, turris, nic.cz, nic, captive portal, open, hardware]
 
 In my previous blog post "[Turris - OpenWrt configuration]({% post_url /2014/2014-04-16-turris-openwrt-configuration %})"
 I described how to configure the [Turris](https://www.turris.cz/en/) router for my
-[home network](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/openwrt/wifi_openwrt4.svg).
+[home network](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt4.svg).
 I decided to extend the configuration and create the Guest WiFi for other people
 who want to access the "Internet". In my solution I'm using the
 [nodogsplash](https://web.archive.org/web/20140210131130/http://kokoro.ucsd.edu/nodogsplash/) captive portal solution which
 offers a simple way to provide restricted access to an Internet connection. Here
 is the extended network diagram:
 
-![image](https://rawgithub.com/ruzickap/linux.xvx.cz/gh-pages/pics/openwrt/wifi_openwrt4.svg)
+![image](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt4.svg)
 
-Start with creating the Guest WiFi
-([OpenWrt Guest WLAN](https://web.archive.org/web/20140825150515/http://wiki.openwrt.org/doc/recipes/guest-wlan)):
+Start with creating the Guest WiFi - [OpenWrt Guest WLAN](https://web.archive.org/web/20140825150515/http://wiki.openwrt.org/doc/recipes/guest-wlan):
 
 ```bash
 uci set network.wifi_open=interface
@@ -142,8 +141,9 @@ sed -i 's/=65/=99/' /etc/init.d/nodogsplash
 
 Here is the video how the Captive portal will looks like:
 
-The full OpenWrt router configs can be found here:
+{% include embed/youtube.html id='NJlMKMSdAPM' %}
 
+The full OpenWrt router configs can be found here:
 [https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/turris_configured/etc](https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/turris_configured/etc)
 
 Enjoy :-)

@@ -16,11 +16,10 @@ Because there was no operating system I had no idea how the RAID or BIOS was
 configured. Obviously I want to have it configured the same and I really don't
 want to go through all of them one by one and configure it manually.
 
-Luckily for me there is an [HP Scripting
-Toolkit](https://web.archive.org/web/20131201071814/http://www8.hp.com/us/en/products/server-software/product-detail.html?oid=5219389)
+Luckily for me there is an
+[HP Scripting Toolkit](https://web.archive.org/web/20131201071814/http://www8.hp.com/us/en/products/server-software/product-detail.html?oid=5219389)
 (or HP SmartStart Scripting Toolkit) which can boot over PXE and get/set the
 BIOS/RAID configuration.
-
 It is especially handy if you have new servers without OS installed.
 
 Let's see how you can install and configure Cobbler, NFS, PXE, tftpboot and HP
@@ -118,6 +117,8 @@ servers. If the networking is working fine you should at least see getting the
 IP from the DHCP server and the main "blue" menu.
 
 The full video can be seen here:
+
+{% include embed/youtube.html id='07-0wZGKtW8' %}
 
 You can find the examples of files modified by sed in the scripts in
 [GitHub](https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/cobbler-ss_scripting_toolkit_linux).
