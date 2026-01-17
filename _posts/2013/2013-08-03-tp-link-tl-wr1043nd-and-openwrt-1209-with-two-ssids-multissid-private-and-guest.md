@@ -347,7 +347,7 @@ sed -i '/^exit 0/i echo -e "Subject: Reboot `uci get system.@system[0].hostname`
 sed -i 's/HISTORY=3/HISTORY=30/' /etc/sysstat/config
 
 mkdir /home
-useradd --shell /bin/ash --password $(openssl passwd -1 xxxx) --create-home --comment "Petr Ruzicka" ruzickap
+useradd --shell /bin/ash --password "$(openssl passwd -1 xxxx)" --create-home --comment "Petr Ruzicka" ruzickap
 mkdir /home/ruzickap/.ssh
 cp /etc/dropbear/authorized_keys /home/ruzickap/.ssh/
 chown -R ruzickap:ruzickap /home/ruzickap/.ssh
@@ -396,7 +396,7 @@ digitemp_DS9097 -a -i -c /etc/digitemp.conf -s /dev/ttyUSB0
 
 cat > /etc/digitemp.script << EOF
 #!/bin/sh
-/usr/bin/digitemp_DS9097 -c/etc/digitemp.conf -a -n0 -d10 -q -s/dev/ttyUSB0 -o"PUTVAL `uci get system.@system[0].hostname`/temp/temperature-%s interval=10 %N:%.2C"
+/usr/bin/digitemp_DS9097 -c/etc/digitemp.conf -a -n0 -d10 -q -s/dev/ttyUSB0 -o"PUTVAL $(uci get system.@system[0].hostname)/temp/temperature-%s interval=10 %N:%.2C"
 EOF
 chmod a+x /etc/digitemp.script
 ```

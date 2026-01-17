@@ -63,19 +63,19 @@ Now install and configure [Cobbler](https://www.cobblerd.org/):
 
 ```bash
 # Install EPEL
-MAJOR_RELEASE=`sed 's/.* \([0-9]*\)\.[0-9] .*/\1/' /etc/redhat-release`
-cd /tmp/
+MAJOR_RELEASE=$(sed 's/.* \([0-9]*\)\.[0-9] .*/\1/' /etc/redhat-release)
+cd /tmp/ || exit
 lftp -e "mget /pub/linux/fedora/epel/6/x86_64/epel-release*.noarch.rpm; quit;" http://ftp.fi.muni.cz/
-rpm -Uvh ./epel*${MAJOR_RELEASE}*.noarch.rpm
+rpm -Uvh ./epel*"${MAJOR_RELEASE}"*.noarch.rpm
 
 # Install Cobbler
 yum install -y cobbler-web fence-agents git hardlink ipmitool dhcp
 
 sed -i.orig 's/module = authn_denyall/module = authn_configfile/' /etc/cobbler/modules.conf
-HTDIGEST_HASH=`printf admin:Cobbler:admin123 | md5sum -`
+HTDIGEST_HASH=$(printf admin:Cobbler:admin123 | md5sum -)
 echo "admin:Cobbler:${HTDIGEST_HASH:0:32}" >> /etc/cobbler/users.digest
 
-PASSWORD_HASH=`openssl passwd -1 'admin123'`
+PASSWORD_HASH=$(openssl passwd -1 'admin123')
 sed -i.orig "s/^\(anamon_enabled:\).*/\1 1/;s@^\(default_password_crypted:\).*@\1 \"$PASSWORD_HASH\"@;s/^\(manage_dhcp:\).*/\1 1/;s/^\(next_server:\).*/\1 10.29.49.4/;s/^\(pxe_just_once:\).*/\1 1/;s/^\(server:\).*/\1 10.29.49.4/;s/^\(scm_track_enabled:\).*/\1 1/;s/^power_management_default_type:.*/power_management_default_type: 'ilo'/" /etc/cobbler/settings
 
 # Change DHCPd template
