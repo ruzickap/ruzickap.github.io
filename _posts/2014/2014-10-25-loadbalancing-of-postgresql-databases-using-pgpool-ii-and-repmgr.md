@@ -91,7 +91,7 @@ Here is the network diagram:
   cp -r /root/.ssh /var/lib/pgsql/
   chown -R postgres:postgres /var/lib/pgsql/.ssh /var/lib/pgsql/.pgpass /var/lib/pgsql/repmgr
 
-  echo 'PATH=/usr/pgsql-9.3/bin:$PATH' >> /var/lib/pgsql/.bash_profile
+  echo "PATH=/usr/pgsql-9.3/bin:$PATH" >> /var/lib/pgsql/.bash_profile
   service postgresql-9.3 start
 
   #Add users
@@ -103,6 +103,7 @@ Here is the network diagram:
   su - postgres -c "repmgr -f /var/lib/pgsql/repmgr/repmgr.conf --verbose master register"
 
   #Configure SSL Layer for PostgreSQL
+  # shellcheck disable=SC2016
   sed -i.orig \
     -e 's@\$dir/cacert.pem@\$dir/example.com-ca.crt @' \
     -e 's@\$dir/crl.pem@\$dir/example.com-ca.crl @' \
@@ -117,7 +118,7 @@ Here is the network diagram:
 
   touch /etc/pki/CA/index.txt
   echo 01 > /etc/pki/CA/serial
-  cd /etc/pki/CA
+  cd /etc/pki/CA || exit
 
   # Private key for CA
   (
@@ -182,7 +183,7 @@ Here is the network diagram:
   yum install -y --enablerepo=centos-base postgresql93-contrib
   chkconfig postgresql-9.3 on
 
-  echo 'PATH=/usr/pgsql-9.3/bin:$PATH' >> /var/lib/pgsql/.bash_profile
+  echo "PATH=/usr/pgsql-9.3/bin:$PATH" >> /var/lib/pgsql/.bash_profile
 
   scp -r cz01-psql01.example.com:/root/{.pgpass,.ssh} /root/
   cp -r /root/{.pgpass,.ssh} /var/lib/pgsql/
@@ -213,7 +214,7 @@ Here is the network diagram:
   chown -R postgres:postgres /var/lib/pgsql/repmgr
 
   # cz01-psql02 Certificate
-  cd /etc/pki/CA
+  cd /etc/pki/CA || exit
   openssl genrsa -passout pass:password123 -des3 -out cz01-psql02.example.com_priv_encrypted.key 2048
   openssl rsa -passin pass:password123 -in cz01-psql02.example.com_priv_encrypted.key -out cz01-psql02.example.com_priv.key
 
@@ -560,7 +561,7 @@ cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 14:43:15 CEST [24149]: [5-1] user=repmgr,db=repmgr LOG: disconnection: session time: 0:00:00.030 user=repmgr database=repmgr host=10.32.243.148 port=54335
 ```
 
-### `failover_stream.sh` output log from primary pgpool
+### failover_stream.sh output log from primary pgpool
 
 ```console
 cz01-pgpool01 / # cat /tmp/failover_stream.sh.log
@@ -710,7 +711,7 @@ cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 
 ### Logs from cz01-psql02 after the new slave was configured
 
-```bash
+```console
 cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 ...
 2014-10-23 14:52:08 CEST [25481]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.147 port=52477
@@ -754,7 +755,7 @@ cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 14:52:14 CEST [25524]: [2-1] user=repmgr,db=[unknown] LOG: replication connection authorized: user=repmgr
 ```
 
-### There is nothing new in pgpool after the new slave was configured
+### No pgpool changes after the new slave cz01-psql01 was configured+started
 
 ```console
 cz01-pgpool01 / # tail -f /var/log/local0
