@@ -22,6 +22,8 @@ AWS Console
 
 Here is the playbook:
 
+{% raw %}
+
 ```yaml
 ---
 - name: Create Instance in AWS
@@ -193,6 +195,8 @@ Here is the playbook:
       tags:
         - ssh_keys
 ```
+
+{% endraw %}
 
 You can easily run it using:
 
