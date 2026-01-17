@@ -39,7 +39,7 @@ Here you can find the files:
 
 {% raw %}
 
-  ```bash
+  ```yaml
   ansible_winrm_operation_timeout_sec: 100
   ansible_winrm_read_timeout_sec: 120
 
