@@ -42,7 +42,7 @@ Here are the steps to configure your Raspberry Pi to use Grafana Cloud:
 
 - Then continue by "Test integration and finish installation":
 
-  ![Test Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/test-integration.avif)
+  ![Test Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/test-integration.avif){:width="200"}
 
 After these steps the Grafana Agent should be configured and should start
 sending data to Grafana Cloud.
