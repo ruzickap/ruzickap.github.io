@@ -68,9 +68,9 @@ apt-get install -y -qq docker.io kubelet=${KUBERNETES_VERSION}-00 kubeadm=${KUBE
 kubeadm init --pod-network-cidr=$POD_NETWORK_CIDR --kubernetes-version v${KUBERNETES_VERSION}
 
 # Copy the "kubectl" config files to the home directory:
-test -d $HOME/.kube || mkdir $HOME/.kube
-cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-chown -R $USER:$USER $HOME/.kube
+test -d "$HOME/.kube" || mkdir "$HOME/.kube"
+cp -i /etc/kubernetes/admin.conf "$HOME/.kube/config"
+chown -R "$USER:$USER" "$HOME/.kube"
 
 # Install CNI:
 export KUBECONFIG=/etc/kubernetes/admin.conf
@@ -78,7 +78,6 @@ kubectl apply -f $CNI_URL
 
 # Your Kuberenets Master node should be ready now. You can check it using this command:
 kubectl get nodes
-
 
 ### Worker nodes installation
 
