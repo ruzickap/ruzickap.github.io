@@ -3,8 +3,8 @@ title: Using Grub2 and LUA installed on USB booting ISO images
 author: Petr Ruzicka
 date: 2010-03-23
 description: ""
-categories: [Linux, Debian]
-tags: [GRUB, Lua, USB, PXE, live-CD]
+categories: [Linux, linux-old.xvx.cz]
+tags: [grub, pxe, debian]
 ---
 
 > <https://linux-old.xvx.cz/2010/03/using-grub2-and-lua-installed-on-usb-booting-iso-images-2/>
@@ -41,10 +41,10 @@ dpkg-source -x grub2_1.98-1.dsc
 
 bzr branch http://bzr.savannah.gnu.org/r/grub-extras/lua ./grub2-1.98/debian/grub-extras/lua
 
-cd grub2-1.98
-dpkg-buildpackage -rfakeroot -b
-
-cd ..
+(
+  cd grub2-1.98 || exit
+  dpkg-buildpackage -rfakeroot -b
+)
 dpkg -r grub-pc grub-common
 dpkg -i ./grub-common_1.98-1_amd64.deb ./grub-pc_1.98-1_amd64.deb
 ```
@@ -58,12 +58,14 @@ mkdir ./grub/grub-extras
 bzr branch http://bzr.savannah.gnu.org/r/grub-extras/lua ./grub/grub-extras/lua
 #bzr branch http://bzr.savannah.gnu.org/r/grub-extras/gpxe ./grub/grub-extras/gpxe
 
-cd grub
-export GRUB_CONTRIB=./grub-extras/
-./autogen.sh
-./configure --prefix=/tmp/grub
-make
-make install
+(
+  cd grub || exit
+  export GRUB_CONTRIB=./grub-extras/
+  ./autogen.sh
+  ./configure --prefix=/tmp/grub
+  make
+  make install
+)
 ```
 
 Mount USB to some directory (in my case `/mnt/sdb1`) and install grub with Lua
@@ -91,12 +93,12 @@ working fine for me:
 ```bash
 mkdir -v /mnt/sdb1/isos
 wget -c --directory-prefix=/mnt/sdb1/isos \
-http://ftp.heanet.ie/pub/linuxmint.com/testing/LinuxMint-8-x64-RC1.iso \
-http://gd.tuwien.ac.at/opsys/linux/grml/grml64_2009.10.iso \
-http://ftp.cc.uoc.gr/mirrors/linux/slax/SLAX-6.x/slax-6.1.2.iso \
-http://downloads.sourceforge.net/project/systemrescuecd/sysresccd-x86/1.5.0/systemrescuecd-x86-1.5.0.iso \
-http://releases.ubuntu.com/karmic/ubuntu-9.10-desktop-amd64.iso \
-http://xpud.googlecode.com/files/xpud-0.9.2.iso
+  http://ftp.heanet.ie/pub/linuxmint.com/testing/LinuxMint-8-x64-RC1.iso \
+  http://gd.tuwien.ac.at/opsys/linux/grml/grml64_2009.10.iso \
+  http://ftp.cc.uoc.gr/mirrors/linux/slax/SLAX-6.x/slax-6.1.2.iso \
+  http://downloads.sourceforge.net/project/systemrescuecd/sysresccd-x86/1.5.0/systemrescuecd-x86-1.5.0.iso \
+  http://releases.ubuntu.com/karmic/ubuntu-9.10-desktop-amd64.iso \
+  http://xpud.googlecode.com/files/xpud-0.9.2.iso
 ```
 
 The following code is taken from [Ubuntu Forums](https://ubuntuforums.org)
@@ -107,22 +109,22 @@ Save following text as 3 files:
 
 - `/mnt/sdb1/boot/grub/grub.cfg`:
 
-  ```bash
+  ```lua
   insmod vbeinfo
   insmod font
 
-  if loadfont /boot/grub/unifont.pf2 ; then
+  if loadfont /boot/grub/unifont.pf2; then
     set gfxmode="1024x768x32,800x600x32,640x480x32,1024x768,800x600,640x480"
-  #  set gfxpayload=keep
+    # set gfxpayload=keep
     insmod gfxterm
-  #  insmod vbe
+    # insmod vbe
     if terminal_output gfxterm; then true ; else
        terminal gfxterm
     fi
   fi
 
   insmod jpeg
-  if background_image /boot/grub/linux.jpg ; then
+  if background_image /boot/grub/linux.jpg; then
     set menu_color_normal=black/black
     set color_highlight=red/blue
   else

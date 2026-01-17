@@ -3,8 +3,8 @@ title: Nvidia proprietary drivers and RHEL6
 author: Petr Ruzicka
 date: 2011-01-20
 description: ""
-categories: [Linux, RHEL]
-tags: [Nvidia, GRUB, drivers, yum]
+categories: [Linux, linux-old.xvx.cz]
+tags: [rhel, grub]
 ---
 
 > <https://linux-old.xvx.cz/2011/01/nvidia-proprietary-drivers-and-rhel6/>

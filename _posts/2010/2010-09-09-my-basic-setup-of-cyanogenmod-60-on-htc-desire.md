@@ -3,8 +3,8 @@ title: My basic setup of CyanogenMod-6.0 on HTC Desire
 author: Petr Ruzicka
 date: 2010-09-09
 description: ""
-categories: [Linux, Android]
-tags: [HTC-Desire, CyanogenMod, adb, SSH]
+categories: [Android, linux-old.xvx.cz]
+tags: [htc-desire, cyanogenmod, adb]
 ---
 
 > <https://linux-old.xvx.cz/2010/09/my-basic-setup-of-cyanogenmod-6-0-on-htc-desire/>
@@ -49,7 +49,7 @@ cp /sdcard/authorized_keys /data/dropbear/.ssh/
 chmod 755 /data/dropbear /data/dropbear/.ssh
 chmod 644 /data/dropbear/dropbear*host_key /data/dropbear/.ssh/authorized_keys
 
-echo "export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/system/sbin:/system/bin:/system/xbin:/system/xbin/bb:/data/local/bin" >>/data/dropbear/.profile
+echo "export PATH=/usr/bin:/usr/sbin:/bin:/sbin:/system/sbin:/system/bin:/system/xbin:/system/xbin/bb:/data/local/bin" >> /data/dropbear/.profile
 
 dropbear
 ```
@@ -71,30 +71,34 @@ Backup directories under `/data`:
 
 ```bash
 BACKUP_DESTINATION="/sdcard/mybackup"
-cd /data
-mkdir -p $BACKUP_DESTINATION/data/ && \
-cp -R `ls /data | egrep -v "dalvik-cache|lost\+found"` $BACKUP_DESTINATION/data/
+cd /data || exit
+mkdir -p "$BACKUP_DESTINATION/data/"
+for item in *; do
+  case "$item" in
+    dalvik-cache | lost+found) ;;
+    *) cp -R "$item" "$BACKUP_DESTINATION/data/" ;;
+  esac
+done
 ```
 
 Move applications to sdcard:
 
 ```bash
 for APK in ApplicationsProvider.apk CarHomeGoogle.apk CarHomeLauncher.apk com.amazon.mp3.apk Development.apk Email.apk Facebook.apk GenieWidget.apk googlevoice.apk Maps.apk PicoTts.apk Protips.apk RomManager.apk SetupWizard.apk SpeechRecorder.apk Stk.apk Street.apk Talk.apk TtsService.apk Twitter.apk VoiceDialer.apk YouTube.apk; do
-echo "*** $APK"
-mkdir $BACKUP_DESTINATION/$APK && \
-mv /system/app/$APK $BACKUP_DESTINATION/$APK/ && \
-mv /data/data/`awk -F \" '/'$APK'/ { print $2 }' /data/system/packages.xml` $BACKUP_DESTINATION/$APK/
-#/system/bin/pm uninstall `awk -F \" '/'package.apk'/ { print $2 }' /data/system/packages.xml`
+  echo "*** $APK"
+  mkdir "$BACKUP_DESTINATION/$APK" &&
+    mv "/system/app/$APK" "$BACKUP_DESTINATION/$APK/" &&
+    mv "/data/data/$(awk -F \" "/$APK/ { print \$2 }" /data/system/packages.xml)" "$BACKUP_DESTINATION/$APK/"
+  #/system/bin/pm uninstall $(awk -F \" '/package.apk/ { print $2 }' /data/system/packages.xml)
 done
 ```
 
 Remove unused audio files:
 
 ```bash
-for AUDIO in `find /system/media/audio -type f|egrep -v "ui|Alarm_Buzzer.ogg|SpaceSeed.ogg|Doink.ogg|SpaceSeed.ogg|CrayonRock.ogg"`; do
-for AUDIO in `find /system/media/audio -type f|egrep -v "ui|pixiedust.ogg"`; do
-    echo "*** Removing $AUDIO"
-    rm $AUDIO
+for AUDIO in $(find /system/media/audio -type f | grep -Ev "ui|Alarm_Buzzer.ogg|SpaceSeed.ogg|Doink.ogg|SpaceSeed.ogg|CrayonRock.ogg"); do
+  echo "*** Removing $AUDIO"
+  rm "$AUDIO"
 done
 ```
 

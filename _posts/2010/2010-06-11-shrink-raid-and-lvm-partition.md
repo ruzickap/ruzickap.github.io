@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2010-06-11
 description: ""
 categories: [Linux, Storage]
-tags: [RAID, LVM, mdadm, ext4]
+tags: [raid, lvm, storage]
 ---
 
 > Not completed...

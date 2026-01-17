@@ -3,8 +3,8 @@ title: Amazon EKS and Grafana stack
 author: Petr Ruzicka
 date: 2026-01-13
 description: Build secure Amazon EKS cluster with Grafana stack
-categories: [Kubernetes, Amazon EKS, Security, Grafana stack]
-tags: [amazon eks, k8s, kubernetes, security, eksctl, cert-manager, external-dns, prometheus, sso, oauth2-proxy, grafana stack]
+categories: [Kubernetes, Cloud, Security]
+tags: [amazon-eks, kubernetes, security, eksctl, cert-manager, external-dns, prometheus, grafana, sso]
 image: https://raw.githubusercontent.com/grafana/.github/12fb002302b5efad6251075f45ce5ac22db69a3f/LGTM_wallpaper_1920x1080.png
 ---
 

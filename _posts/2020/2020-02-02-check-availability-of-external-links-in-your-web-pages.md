@@ -3,8 +3,8 @@ title: Check availability of external links in your web pages
 author: Petr Ruzicka
 date: 2020-02-02
 description: Check availability of external links in your web pages
-categories: [GitHub, DevOps]
-tags: [GitHub Actions, CI/CD, link checker, muffet, automation]
+categories: [DevOps, linux.xvx.cz]
+tags: [github-actions, automation]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2020/02/check-availability-of-external-links-in.html)

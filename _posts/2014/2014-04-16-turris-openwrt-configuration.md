@@ -3,8 +3,8 @@ title: Turris - OpenWrt configuration
 author: Petr Ruzicka
 date: 2014-04-16
 description: Turris - OpenWrt configuration
-categories: [OpenWrt]
-tags: [wifi, router, turris, nic.cz, nic, open, hardware]
+categories: [OpenWrt, Networking, linux.xvx.cz]
+tags: [turris, router, wifi]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/04/turris-openwrt-configuration.html)
@@ -466,7 +466,7 @@ cat > /www3/myadmin/vnstat/index.html << EOF
 EOF
 
 for IFCE in "$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf)"/*; do
-cat >> /www3/myadmin/vnstat/index.html << EOF
+  cat >> /www3/myadmin/vnstat/index.html << EOF
     <h2>Traffic of Interface $IFCE</h2>
     <table>
         <tbody>

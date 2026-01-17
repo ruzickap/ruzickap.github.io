@@ -3,8 +3,8 @@ title: Atom editor (atom.io)
 author: Petr Ruzicka
 date: 2015-12-24
 description: Atom editor (atom.io)
-categories: [Linux, Desktop]
-tags: [Atom, editor, cheatsheet, shortcuts, IDE]
+categories: [Linux, linux.xvx.cz]
+tags: [cheatsheet]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2015/12/atom-editor-atomio.html)

@@ -3,8 +3,8 @@ title: How I began with Darktable
 author: Petr Ruzicka
 date: 2018-01-20
 description: How I began with Darktable
-categories: [Photography]
-tags: [youtube, darktable, beginner, photo, training, tutorial, video]
+categories: [Photography, linux.xvx.cz]
+tags: [photo-editing]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2018/01/how-i-begin-with-darktable.html)

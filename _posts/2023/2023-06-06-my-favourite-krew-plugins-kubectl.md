@@ -3,8 +3,8 @@ title: My favourite krew plugins for kubectl
 author: Petr Ruzicka
 date: 2023-06-06
 description: My favourite krew plugins for kubectl command-line tool
-categories: [Kubernetes, krew, kubectl, plugins, plugin-manager]
-tags: [kubernetes, krew, kubectl, plugins, plugin-manager]
+categories: [Kubernetes]
+tags: [kubernetes, kubectl]
 image: https://raw.githubusercontent.com/kubernetes-sigs/krew/4ec386cc021b4a7896de95d91c5d8025d98eaa4f/assets/logo/stacked/color/krew-stacked-color.svg
 ---
 

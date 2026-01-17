@@ -3,8 +3,8 @@ title: IPA (CentOS7) integration with Active Directory (W2K8)
 author: Petr Ruzicka
 date: 2015-07-21
 description: IPA (CentOS7) integration with Active Directory (W2K8)
-categories: [Linux, Windows]
-tags: [ad, firefox, winscp, kerberos, freeipa, sso, active directory, putty, provisioning, ipa, w2k8, gssapi]
+categories: [Linux, Windows, linux.xvx.cz]
+tags: [rhel, freeipa, active-directory, sso]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2015/07/ipa-centos7-integration-with-active.html)

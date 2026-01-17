@@ -3,8 +3,8 @@ title: HD Trailers downloaded by wget
 author: Petr Ruzicka
 date: 2009-03-05
 description: ""
-categories: [Linux, Scripting]
-tags: [bash, wget]
+categories: [Linux, linux-old.xvx.cz]
+tags: [bash]
 ---
 
 > <https://linux-old.xvx.cz/2009/03/hd-trailers-downloaded-by-wget/>
@@ -25,10 +25,10 @@ downloads mov files from the Apple site into directories:
 #480, 720, 1080
 RESOLUTION=480
 
-wget --recursive --level=2  --accept *${RESOLUTION}p.mov \
---span-hosts --domains=movies.apple.com,www.hd-trailers.net \
---no-host-directories --cut-dirs=2 --exclude-directories=/blog \
-http://www.hd-trailers.net/
+wget --recursive --level=2 --accept "*${RESOLUTION}p.mov" \
+  --span-hosts --domains=movies.apple.com,www.hd-trailers.net \
+  --no-host-directories --cut-dirs=2 --exclude-directories=/blog \
+  http://www.hd-trailers.net/
 ```
 
 Enjoy ;-)

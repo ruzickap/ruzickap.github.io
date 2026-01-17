@@ -3,8 +3,8 @@ title: Create Kubernetes Multinode Cluster using multiple VMs
 author: Petr Ruzicka
 date: 2018-04-18
 description: Create Kubernetes Multinode Cluster using multiple VMs
-categories: [Kubernetes]
-tags: [multinode, cluster, installation, kubespray, kubeadm]
+categories: [Kubernetes, Virtualization, linux.xvx.cz]
+tags: [kubernetes, kubespray]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2018/04/create-kubernetes-multinode-cluster.html)
@@ -101,7 +101,8 @@ EOF2
 # Install necessary packages:
 apt-get update -qq
 apt-get install -y -qq docker.io kubelet=${KUBERNETES_VERSION}-00 kubeadm=${KUBERNETES_VERSION}-00 kubectl=${KUBERNETES_VERSION}-00
-exit
+
+# Exit SSH session on worker nodes and return to local machine
 
 # All the worker nodes are prepared now - let's connect them to master node.
 # SSH to the master node again and generate the "joining" command:

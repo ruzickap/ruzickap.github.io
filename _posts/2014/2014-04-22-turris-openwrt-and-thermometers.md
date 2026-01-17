@@ -3,8 +3,8 @@ title: Turris - OpenWRT and thermometers
 author: Petr Ruzicka
 date: 2014-04-22
 description: Turris - OpenWRT and thermometers
-categories: [OpenWrt]
-tags: [temperature, rrdtool, thermometer, turris]
+categories: [OpenWrt, linux.xvx.cz]
+tags: [turris, monitoring]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/04/turris-openwrt-and-thermometers.html)
@@ -23,12 +23,12 @@ Here is how you can create graphs from the data using [RRDtool](https://oss.oeti
 ```bash
 mkdir -p /data/temperature_sensors /www3/temperature_sensors
 #The graphs can be accessed: http://192.168.1.1/myadmin/temperature_sensors
-ln -s /www3/temperature_sensors  /www3/myadmin/temperature_sensors
+ln -s /www3/temperature_sensors /www3/myadmin/temperature_sensors
 
 #Create RRDtool database to store the values every 10 minutes (600 seconds) for 10 years (525600 * 600 seconds)
 rrdtool create /data/temperature_sensors/temperature_sensors.rrd --step 600 \
-DS:temp0:GAUGE:1000:-273:5000 DS:temp1:GAUGE:1000:-273:5000 RRA:AVERAGE:0.5:1:525600 \
-RRA:MIN:0.5:1:525600 RRA:MAX:0.5:1:525600
+  DS:temp0:GAUGE:1000:-273:5000 DS:temp1:GAUGE:1000:-273:5000 RRA:AVERAGE:0.5:1:525600 \
+  RRA:MIN:0.5:1:525600 RRA:MAX:0.5:1:525600
 
 #Add cron entry to put the temperatures into the database
 cat >> /etc/crontabs/root << \EOF

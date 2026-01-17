@@ -3,8 +3,8 @@ title: Other posts...
 author: Petr Ruzicka
 date: 2019-10-21
 description: Other posts...
-categories: [Kubernetes]
-tags: [Istio, Harbor, Flux, GitLab, Jenkins X, Amazon EKS]
+categories: [Kubernetes, Cloud, linux.xvx.cz]
+tags: [kubernetes, istio, harbor, flux, amazon-eks]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2019/10/other-posts.html)

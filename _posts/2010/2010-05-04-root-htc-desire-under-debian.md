@@ -3,8 +3,8 @@ title: Root HTC Desire under Debian
 author: Petr Ruzicka
 date: 2010-05-04
 description: ""
-categories: [Linux, Android]
-tags: [HTC-Desire, rooting, adb]
+categories: [Android, linux-old.xvx.cz]
+tags: [htc-desire, adb]
 ---
 
 > <https://linux-old.xvx.cz/2010/05/root-htc-desire-under-debian/>
@@ -20,7 +20,7 @@ Here you can find out how to get root on the HTC Desire using Debian.
 
   ```bash
   mkdir -v /var/tmp/android
-  cd /var/tmp/android
+  cd /var/tmp/android || exit
   wget http://www.romraid.com/paul/bravo/r4-desire-root.zip
   unzip r4-desire-root.zip
   ```

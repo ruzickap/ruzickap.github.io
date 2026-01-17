@@ -3,8 +3,8 @@ title: Trim margins from PDF document
 author: Petr Ruzicka
 date: 2009-06-02
 description: ""
-categories: [Linux, Desktop]
-tags: [bash, PDF]
+categories: [Linux, linux-old.xvx.cz]
+tags: [bash]
 ---
 
 > <https://linux-old.xvx.cz/2009/06/trim-margins-from-pdf-document/>

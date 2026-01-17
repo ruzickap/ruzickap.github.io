@@ -3,8 +3,8 @@ title: MCP Servers running on Kubernetes
 author: Petr Ruzicka
 date: 2025-05-27
 description:
-categories: [Kubernetes, Amazon EKS Auto Mode, MCP]
-tags: [amazon eks auto mode, amazon eks, k8s, kubernetes, mcp]
+categories: [Kubernetes, Cloud]
+tags: [amazon-eks, eks-auto-mode, kubernetes, mcp]
 image: https://raw.githubusercontent.com/lobehub/lobe-icons/2889d303d4d0a3a7082fd9ff56e3df80b0b0c7d3/packages/static-png/dark/mcp.png
 ---
 

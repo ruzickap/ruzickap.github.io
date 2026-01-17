@@ -3,9 +3,9 @@ title: TrueNAS CE 25.04 with Plex and qBittorrent
 author: Petr Ruzicka
 date: 2025-02-18
 description: Install TrueNAS Community Edition 25.04 with Plex and qBittorrent
-categories: [ qbittorrent, plex, truenas ]
+categories: [Linux, Storage]
 mermaid: true
-tags: [ qbittorrent, plex, truenas ]
+tags: [storage, torrent]
 image: https://raw.githubusercontent.com/truenas/documentation/3abfe90c0491c6944d0608c8913b596b03d2678a/static/images/TrueNAS_Community_Edition.png
 ---
 

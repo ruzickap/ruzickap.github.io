@@ -3,8 +3,8 @@ title: Monitor your Raspberry Pi using Grafana Cloud
 author: Petr Ruzicka
 date: 2022-01-06
 description: Monitor your Raspberry Pi using Grafana Cloud
-categories: [Linux, Monitoring]
-tags: [Raspberry Pi, Grafana Cloud, Prometheus, Loki, monitoring, dashboard]
+categories: [Linux, DevOps, linux.xvx.cz]
+tags: [raspberry-pi, grafana, prometheus, monitoring]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2022/01/monitor-your-raspberry-pi-using-grafana.html)

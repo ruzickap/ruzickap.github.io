@@ -3,8 +3,8 @@ title: Build secure Amazon EKS with Cilium and network encryption
 author: Petr Ruzicka
 date: 2023-08-03
 description: Build "cheap and secure" Amazon EKS with Karpenter and Cilium
-categories: [Kubernetes, Amazon EKS, Cilium, Security]
-tags: [Amazon EKS, k8s, kubernetes, security, karpenter, eksctl, cert-manager, external-dns, podinfo, cilium, prometheus, sso, oauth2-proxy, metrics-server]
+categories: [Kubernetes, Cloud, Security]
+tags: [amazon-eks, kubernetes, security, cilium, karpenter, eksctl, cert-manager, prometheus]
 image: https://raw.githubusercontent.com/cncf/artwork/ac38e11ed57f017a06c9dcb19013bcaed92115a9/projects/cilium/icon/color/cilium_icon-color.svg
 ---
 

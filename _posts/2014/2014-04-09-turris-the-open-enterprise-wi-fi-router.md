@@ -3,8 +3,8 @@ title: Turris - The Open Enterprise Wi-Fi Router
 author: Petr Ruzicka
 date: 2014-04-09
 description: Turris - The Open Enterprise Wi-Fi Router
-categories: [OpenWrt]
-tags: [wifi, router, turris, nic.cz, nic, open, hardware]
+categories: [OpenWrt, Networking, linux.xvx.cz]
+tags: [turris, router, wifi]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/04/turris-open-enterprise-wi-fi-router.html)

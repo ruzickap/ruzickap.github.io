@@ -3,8 +3,8 @@ title: BOINC managed from command line - boinc_cmd
 author: Petr Ruzicka
 date: 2009-02-20
 description: ""
-categories: [Linux, Server]
-tags: [bash, BOINC]
+categories: [Linux, linux-old.xvx.cz]
+tags: [boinc, bash]
 ---
 
 > <https://linux-old.xvx.cz/2009/02/boinc-managed-from-command-line-boinc_cmd/>
@@ -44,7 +44,7 @@ That's time for `boinc_cmd` and here are a few tips on how to use it.
 - Attach to the project:
 
   ```bash
-  boinc_cmd --passwd my_password --project_attach http://abcathome.com/  project_id
+  boinc_cmd --passwd my_password --project_attach http://abcathome.com/ project_id
   ```
 
 - Update project preferences:

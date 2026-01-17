@@ -3,8 +3,8 @@ title: How to get HP enclosure c7000 information without ssh
 author: Petr Ruzicka
 date: 2013-08-23
 description: How to get HP enclosure c7000 information without ssh
-categories: [Linux]
-tags: [hp, c7000, enclosure, script, command line]
+categories: [Linux, linux.xvx.cz]
+tags: [hp-server, bash]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2013/08/how-to-get-hp-enclosure-c7000.html)
@@ -44,7 +44,7 @@ cat > /tmp/hpoa.xml << EOF
   </SOAP-ENV:Envelope>
 EOF
 
-OASESSIONKEY=`curl --noproxy '*' --silent --data @/tmp/hpoa.xml --insecure https://$IP/hpoa | sed -n 's@.*<hpoa:oaSessionKey>\(.*\)</hpoa:oaSessionKey>.*@\1@p'`
+OASESSIONKEY=$(curl --noproxy '*' --silent --data @/tmp/hpoa.xml --insecure https://$IP/hpoa | sed -n 's@.*<hpoa:oaSessionKey>\(.*\)</hpoa:oaSessionKey>.*@\1@p')
 curl --noproxy '*' --cookie "encLocalKey=$OASESSIONKEY; encLocalUser=$USER" --insecure https://$IP/cgi-bin/showAll -o $DESTINATION/$IP-showAll
 curl --noproxy '*' --cookie "encLocalKey=$OASESSIONKEY; encLocalUser=$USER" --insecure https://$IP/cgi-bin/getConfigScript -o $DESTINATION/$IP-getConfigScript
 

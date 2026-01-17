@@ -3,8 +3,8 @@ title: Systemd Cheatsheet
 author: Petr Ruzicka
 date: 2014-06-16
 description: Systemd Cheatsheet
-categories: [Linux]
-tags: [print, cheatsheet, pdf, systemd]
+categories: [Linux, linux.xvx.cz]
+tags: [bash, cheatsheet]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/06/systemd-cheatsheet.html)

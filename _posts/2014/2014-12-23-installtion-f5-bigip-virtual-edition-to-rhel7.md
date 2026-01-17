@@ -3,8 +3,8 @@ title: Installation F5 BIGIP Virtual Edition to RHEL7
 author: Petr Ruzicka
 date: 2014-12-23
 description: Installation F5 BIGIP Virtual Edition to RHEL7
-categories: [Virtualization, Networking]
-tags: [nmcli, LTM, Local Traffic Manager, iapp, bond, bigip, BIG-IP, vlan, bridge]
+categories: [Virtualization, Networking, linux.xvx.cz]
+tags: [load-balancer, rhel]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/12/installtion-f5-bigip-virtual-edition-to.html)
@@ -92,7 +92,7 @@ yum install -y http://ftp.fi.muni.cz/pub/linux/fedora/epel/7/x86_64/e/epel-relea
 yum install -y bash-completion bind-utils bridge-utils dstat htop httpd ipmitool iotop lftp lsof mailx man mc mlocate mutt net-snmp net-snmp-utils net-tools nmap ntp ntpdate openssh-clients postfix rsync sos smartmontools screen strace sysstat telnet tcpdump traceroute unzip vim wget wireshark xz yum-utils
 
 sed -i 's@^\*/10 \*@\*/1 \*@' /etc/cron.d/sysstat
-echo "PS1='\[\033[01;31m\]\h\[\033[01;34m\] \w #\[\033[00m\] '" >> /root/.bashrc
+printf '%s\n' "PS1='\[\033[01;31m\]\h\[\033[01;34m\] \w #\[\033[00m\] '" >> /root/.bashrc
 echo -e "\nalias sar='LANG=C sar'" >> /etc/bashrc
 
 cat >> /etc/screenrc << EOF
@@ -151,7 +151,7 @@ gpgcheck=0
 EOF
 
 yum install -y hponcfg hp-snmp-agents hp-ams hpssacli hp-smh-templates hpsmh
-hpsnmpconfig --a --rws my_write --ros my_read --rwmips 127.0.0.1 my_write --romips 127.0.0.1 my_read --tcs private --tdips 127.0.0.1 public --sci $HOSTNAME --sli My_Servers
+hpsnmpconfig --a --rws my_write --ros my_read --rwmips 127.0.0.1 my_write --romips 127.0.0.1 my_read --tcs private --tdips 127.0.0.1 public --sci "$HOSTNAME" --sli My_Servers
 /opt/hp/hpsmh/sbin/smhconfig --autostart=true
 
 postconf -e 'relayhost = yum.example.com'
@@ -175,7 +175,7 @@ service libvirtd start
 virsh net-autostart --disable default
 
 for VLAN in 1169 1170 1261; do
-cat > /tmp/br$VLAN.xml << EOF
+  cat > /tmp/br$VLAN.xml << EOF
 <network>
   <name>br$VLAN</name>
   <forward mode='bridge'/>
@@ -183,8 +183,8 @@ cat > /tmp/br$VLAN.xml << EOF
 </network>
 EOF
 
-virsh net-define /tmp/br$VLAN.xml
-virsh net-autostart br$VLAN
+  virsh net-define /tmp/br$VLAN.xml
+  virsh net-autostart br$VLAN
 done
 
 cat >> /etc/libvirt/libvirtd.conf << EOF
@@ -239,25 +239,25 @@ tmsh create sys management-route default gateway 10.0.0.1
 #(or you can use "config" command - to speed it up)
 
 #DNS
-tmsh modify sys dns name-servers add { 10.0.0.141 10.0.0.142 }
-tmsh modify sys dns search add { cloud.example.com }
+tmsh modify sys dns name-servers add '{ 10.0.0.141 10.0.0.142 }'
+tmsh modify sys dns search add '{ cloud.example.com }'
 #Hostname
 tmsh modify sys glob hostname lb01.cloud.example.com
 #NTP
-tmsh modify sys ntp servers add { 0.rhel.pool.ntp.org 1.rhel.pool.ntp.org }
+tmsh modify sys ntp servers add '{ 0.rhel.pool.ntp.org 1.rhel.pool.ntp.org }'
 tmsh modify sys ntp timezone "UTC"
 #Session timeout
 tmsh modify sys sshd inactivity-timeout 120000
 tmsh modify sys http auth-pam-idle-timeout 120000
 #SNMP allow from "all"
-tmsh modify sys snmp allowed-addresses add { 10.0.0.0/8 }
+tmsh modify sys snmp allowed-addresses add '{ 10.0.0.0/8 }'
 #SNMP traps
-tmsh modify /sys snmp traps add { my_trap_destination { host monitor.cloud.example.com community public version 2c } }
+tmsh modify /sys snmp traps add '{ my_trap_destination { host monitor.cloud.example.com community public version 2c } }'
 # Network configuration...
-tmsh create net vlan External interfaces add { 1.2 }
-tmsh create net vlan Internal interfaces add { 1.1 }
+tmsh create net vlan External interfaces add '{ 1.2 }'
+tmsh create net vlan Internal interfaces add '{ 1.1 }'
 #SMTP
-tmsh create sys smtp-server yum.cloud.example.com { from-address root@lb01.cloud.example.com local-host-name lb01.cloud.example.com smtp-server-host-name yum.cloud.example.com }
+tmsh create sys smtp-server yum.cloud.example.com '{ from-address root@lb01.cloud.example.com local-host-name lb01.cloud.example.com smtp-server-host-name yum.cloud.example.com }'
 tmsh create net self 10.0.0.224/24 vlan Internal allow-service all
 tmsh create net self 10.0.1.224/24 vlan External allow-service all
 #https://support.f5.com/kb/en-us/solutions/public/13000/100/sol13180.html
@@ -284,7 +284,7 @@ tmsh modify auth password admin # my_secret_password
 tmsh modify auth user admin shell bash
 mkdir /home/admin/.ssh && chmod 700 /home/admin/.ssh
 cp -L /root/.ssh/authorized_keys /home/admin/.ssh/
-tmsh modify auth password root  # my_secret_password2
+tmsh modify auth password root # my_secret_password2
 
 tmsh install /sys license registration-key ZXXXX-XXXXX-XXXXX-XXXXX-XXXXXXL
 
@@ -298,14 +298,14 @@ tmsh show sys software status
 tmsh reboot volume HD1.2
 mount -o rw,remount /usr
 rpm -Uvh --nodeps \
-http://vault.centos.org/5.8/os/i386/CentOS/yum-3.2.22-39.el5.centos.noarch.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/python-elementtree-1.2.6-5.i386.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/python-iniparse-0.2.3-4.el5.noarch.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/python-sqlite-1.1.7-1.2.1.i386.rpm \
-http://vault.centos.org/5.8/updates/i386/RPMS/rpm-python-4.4.2.3-28.el5_8.i386.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/python-urlgrabber-3.1.0-6.el5.noarch.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/yum-fastestmirror-1.1.16-21.el5.centos.noarch.rpm \
-http://vault.centos.org/5.8/os/i386/CentOS/yum-metadata-parser-1.1.2-3.el5.centos.i386.rpm
+  http://vault.centos.org/5.8/os/i386/CentOS/yum-3.2.22-39.el5.centos.noarch.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/python-elementtree-1.2.6-5.i386.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/python-iniparse-0.2.3-4.el5.noarch.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/python-sqlite-1.1.7-1.2.1.i386.rpm \
+  http://vault.centos.org/5.8/updates/i386/RPMS/rpm-python-4.4.2.3-28.el5_8.i386.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/python-urlgrabber-3.1.0-6.el5.noarch.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/yum-fastestmirror-1.1.16-21.el5.centos.noarch.rpm \
+  http://vault.centos.org/5.8/os/i386/CentOS/yum-metadata-parser-1.1.2-3.el5.centos.i386.rpm
 
 cat > /etc/yum.repos.d/CentOS-Base.repo << \EOF
 [base]
@@ -367,7 +367,7 @@ tmsh install /sys crypto cert cloud.example.com_self-signed_2014.crt from-local-
 ### DNS VIP iApp
 
 ```bash
-tmsh create sys application service dns-ext-vip1_53 { \
+tmsh create sys application service dns-ext-vip1_53 '{ \
     description "DNS VIP - External - NS1 53" \
     strict-updates disabled \
     tables add { \
@@ -390,14 +390,14 @@ tmsh create sys application service dns-ext-vip1_53 { \
         vs_pool__vs_addr { value 10.0.1.16 } \
         vs_pool__vs_port { value 53 } \
     } \
-}
+}'
 
 tmsh modify ltm virtual dns-ext-vip1_53.app/dns-ext-vip1_53_dns_tcp description "DNS VIP - External - NS1 TCP 53"
 tmsh modify ltm virtual dns-ext-vip1_53.app/dns-ext-vip1_53_dns_udp description "DNS VIP - External - NS1 UDP 53"
-tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_tcp_pool description "DNS VIP - External - NS1 TCP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
-tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_udp_pool description "DNS VIP - External - NS1 UDP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
+tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_tcp_pool description "DNS VIP - External - NS1 TCP 53" members modify '{ 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }'
+tmsh modify ltm pool dns-ext-vip1_53.app/dns-ext-vip1_53_udp_pool description "DNS VIP - External - NS1 UDP 53" members modify '{ 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }'
 
-tmsh create sys application service dns-ext-vip2_53 { \
+tmsh create sys application service dns-ext-vip2_53 '{ \
     description "DNS VIP - External - NS2 53" \
     strict-updates disabled \
     tables add { \
@@ -420,12 +420,12 @@ tmsh create sys application service dns-ext-vip2_53 { \
         vs_pool__vs_addr { value 10.0.1.17 } \
         vs_pool__vs_port { value 53 } \
     } \
-}
+}'
 
 tmsh modify ltm virtual dns-ext-vip2_53.app/dns-ext-vip2_53_dns_tcp description "DNS VIP - External - NS2 TCP 53"
 tmsh modify ltm virtual dns-ext-vip2_53.app/dns-ext-vip2_53_dns_udp description "DNS VIP - External - NS2 UDP 53"
-tmsh modify ltm pool dns-ext-vip2_53.app/dns-ext-vip2_53_tcp_pool description "DNS VIP - External - NS2 TCP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
-tmsh modify ltm pool dns-ext-vip2_53.app/dns-ext-vip2_53_udp_pool description "DNS VIP - External - NS2 UDP 53" members modify { 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }
+tmsh modify ltm pool dns-ext-vip2_53.app/dns-ext-vip2_53_tcp_pool description "DNS VIP - External - NS2 TCP 53" members modify '{ 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }'
+tmsh modify ltm pool dns-ext-vip2_53.app/dns-ext-vip2_53_udp_pool description "DNS VIP - External - NS2 UDP 53" members modify '{ 10.0.1.10:domain { description "Public DNS Master" } 10.0.1.20:domain { description "Public DNS Slave" } }'
 tmsh modify ltm node 10.0.1.10 description "Public DNS Master"
 tmsh modify ltm node 10.0.1.20 description "Public DNS Slave"
 ```
@@ -433,7 +433,7 @@ tmsh modify ltm node 10.0.1.20 description "Public DNS Slave"
 ### LDAP VIP iApp
 
 ```bash
-tmsh create sys application service ds-vip_389 { \
+tmsh create sys application service ds-vip_389 '{ \
     description "Directory Server VIP 389" \
     strict-updates disabled \
     lists add { irules__irules { } } \
@@ -464,11 +464,11 @@ tmsh create sys application service ds-vip_389 { \
         vs_pool__vs_addr { value 10.0.0.203 } \
         vs_pool__vs_port { value 389 } \
     } \
-}
+}'
 
 tmsh modify ltm virtual ds-vip_389.app/ds-vip_389_vs description "Directory Server VIP 389 tcp"
 
-tmsh modify ltm pool ds-vip_389.app/ds-vip_389_pool description "Directory Server VIP 389" members modify { 10.0.0.150:ldap { description "Directory server - primary" } 10.0.0.151:ldap { description "Directory server - secondary" } }
+tmsh modify ltm pool ds-vip_389.app/ds-vip_389_pool description "Directory Server VIP 389" members modify '{ 10.0.0.150:ldap { description "Directory server - primary" } 10.0.0.151:ldap { description "Directory server - secondary" } }'
 
 tmsh modify ltm node 10.0.0.150 description "Directory server - primary"
 tmsh modify ltm node 10.0.0.151 description "Directory server - secondary"
@@ -477,7 +477,7 @@ tmsh modify ltm node 10.0.0.151 description "Directory server - secondary"
 ### HTTPS VIP iApp
 
 ```bash
-tmsh create sys application service https-vip_443 { \
+tmsh create sys application service https-vip_443 '{ \
     description "HTTPS Server VIP 443" \
     strict-updates disabled \
     tables add { \
@@ -511,10 +511,10 @@ tmsh create sys application service https-vip_443 { \
         ssl__client_ssl_profile { value \"/#create_new#\" } \
         ssl__key { value /Common/cloud.example.com_self-signed_2014.key } \
     } \
-}
+}'
 
 tmsh modify ltm virtual https-vip_443.app/https-vip_443_vs description "HTTPS Server VIP"
-tmsh modify ltm pool https-vip_443.app/https-vip_443_pool description "HTTPS Server VIP 443" members modify { 10.0.1.140:http { description "HTTPS Server 01" } 10.0.1.150:http { description "HTTPS Server 02" } }
+tmsh modify ltm pool https-vip_443.app/https-vip_443_pool description "HTTPS Server VIP 443" members modify '{ 10.0.1.140:http { description "HTTPS Server 01" } 10.0.1.150:http { description "HTTPS Server 02" } }'
 tmsh modify ltm node 10.0.1.140 description "HTTPS Server 01"
 tmsh modify ltm node 10.0.1.150 description "HTTPS Server 02"
 ```
