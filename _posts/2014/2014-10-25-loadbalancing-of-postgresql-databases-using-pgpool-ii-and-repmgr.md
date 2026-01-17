@@ -34,24 +34,24 @@ Here is the network diagram:
   chkconfig postgresql-9.3 on
 
   sed -i.orig \
-  -e "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/" \
-  -e "s/^#shared_preload_libraries = ''/shared_preload_libraries = 'repmgr_funcs'/" \
-  -e "s/^#wal_level = minimal/wal_level = hot_standby/" \
-  -e "s/^#archive_mode = off/archive_mode = on/" \
-  -e "s@^#archive_command = ''@archive_command = 'cd .'@" \
-  -e "s/^#max_wal_senders = 0/max_wal_senders = 1/" \
-  -e "s/^#wal_keep_segments = 0/wal_keep_segments = 5000/" \
-  -e "s/^#\(wal_sender_timeout =.*\)/\1/" \
-  -e "s/^#hot_standby = off/hot_standby = on/" \
-  -e "s/^#log_min_duration_statement = -1/log_min_duration_statement = 0/" \
-  -e "s/^log_line_prefix = '< %m >'/log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d '/" \
-  -e "s/^#log_checkpoints =.*/log_checkpoints = on/" \
-  -e "s/^#log_connections =.*/log_connections = on/" \
-  -e "s/^#log_disconnections =.*/log_disconnections = on/" \
-  -e "s/^#log_lock_waits = off/log_lock_waits = on/" \
-  -e "s/^#log_statement = 'none'/log_statement = 'all'/" \
-  -e "s/^#log_temp_files = -1/log_temp_files = 0/" \
-  /var/lib/pgsql/9.3/data/postgresql.conf
+    -e "s/^#listen_addresses = 'localhost'/listen_addresses = '*'/" \
+    -e "s/^#shared_preload_libraries = ''/shared_preload_libraries = 'repmgr_funcs'/" \
+    -e "s/^#wal_level = minimal/wal_level = hot_standby/" \
+    -e "s/^#archive_mode = off/archive_mode = on/" \
+    -e "s@^#archive_command = ''@archive_command = 'cd .'@" \
+    -e "s/^#max_wal_senders = 0/max_wal_senders = 1/" \
+    -e "s/^#wal_keep_segments = 0/wal_keep_segments = 5000/" \
+    -e "s/^#\(wal_sender_timeout =.*\)/\1/" \
+    -e "s/^#hot_standby = off/hot_standby = on/" \
+    -e "s/^#log_min_duration_statement = -1/log_min_duration_statement = 0/" \
+    -e "s/^log_line_prefix = '< %m >'/log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d '/" \
+    -e "s/^#log_checkpoints =.*/log_checkpoints = on/" \
+    -e "s/^#log_connections =.*/log_connections = on/" \
+    -e "s/^#log_disconnections =.*/log_disconnections = on/" \
+    -e "s/^#log_lock_waits = off/log_lock_waits = on/" \
+    -e "s/^#log_statement = 'none'/log_statement = 'all'/" \
+    -e "s/^#log_temp_files = -1/log_temp_files = 0/" \
+    /var/lib/pgsql/9.3/data/postgresql.conf
 
   cat >> /var/lib/pgsql/9.3/data/pg_hba.conf << EOF
   host    all             admin           0.0.0.0/0               md5
@@ -104,16 +104,16 @@ Here is the network diagram:
 
   #Configure SSL Layer for PostgreSQL
   sed -i.orig \
-  -e 's@\$dir/cacert.pem@\$dir/example.com-ca.crt @' \
-  -e 's@\$dir/crl.pem@\$dir/example.com-ca.crl @' \
-  -e 's@\$dir/private/cakey.pem@\$dir/private/example.com-ca.key @' \
-  -e 's/^\(crlnumber\)/#\1/' \
-  -e 's/= XX/= CZ/' \
-  -e 's/^#\(stateOrProvinceName_default.*\) Default Province/\1 Czech Republic/' \
-  -e 's/= Default City/= Brno/' \
-  -e 's/= Default Company Ltd/= Example, Inc\./' \
-  -e 's/= policy_match/= policy_anything/' \
-  -e 's/^#\(unique_subject\)/\1/' /etc/pki/tls/openssl.cnf
+    -e 's@\$dir/cacert.pem@\$dir/example.com-ca.crt @' \
+    -e 's@\$dir/crl.pem@\$dir/example.com-ca.crl @' \
+    -e 's@\$dir/private/cakey.pem@\$dir/private/example.com-ca.key @' \
+    -e 's/^\(crlnumber\)/#\1/' \
+    -e 's/= XX/= CZ/' \
+    -e 's/^#\(stateOrProvinceName_default.*\) Default Province/\1 Czech Republic/' \
+    -e 's/= Default City/= Brno/' \
+    -e 's/= Default Company Ltd/= Example, Inc\./' \
+    -e 's/= policy_match/= policy_anything/' \
+    -e 's/^#\(unique_subject\)/\1/' /etc/pki/tls/openssl.cnf
 
   touch /etc/pki/CA/index.txt
   echo 01 > /etc/pki/CA/serial
@@ -266,44 +266,44 @@ Here is the network diagram:
   echo "admin:$(pg_md5 password123)" >> /etc/pgpool-II-93/pcp.conf
 
   sed \
-  -e "s/^listen_addresses = .localhost./listen_addresses = '*'/" \
-  -e "s/^log_destination = .stderr./log_destination = 'syslog'/" \
-  -e "s/^port = .*/port = 5432/" \
-  -e "s/^backend_hostname0 =.*/backend_hostname0 = 'cz01-psql01.example.com'/" \
-  -e "s/^#backend_flag0/backend_flag0/" \
-  -e "s/^#backend_hostname1 =.*/backend_hostname1 = 'cz01-psql02.example.com'/" \
-  -e "s/^#backend_port1 = 5433/backend_port1 = 5432/" \
-  -e "s/^#backend_weight1/backend_weight1/" \
-  -e "s/^#backend_data_directory1 =.*/backend_data_directory1 = '\/var\/lib\/pgsql\/9.3\/data'/" \
-  -e "s/^#backend_flag1/backend_flag1/" \
-  -e "s/^log_hostname =.*/log_hostname = on/" \
-  -e "s/^syslog_facility =.*/syslog_facility = 'daemon.info'/" \
-  -e "s/^sr_check_user =.*/sr_check_user = 'admin'/" \
-  -e "s/^sr_check_password =.*/sr_check_password = 'password123'/" \
-  -e "s/^health_check_period =.*/health_check_period = 10/" \
-  -e "s/^health_check_user =.*/health_check_user = 'admin'/" \
-  -e "s/^health_check_password =.*/health_check_password = 'password123'/" \
-  -e "s/^use_watchdog =.*/use_watchdog = on/" \
-  -e "s/^delegate_IP =.*/delegate_IP = '10.32.243.250'/" \
-  -e "s/^netmask 255.255.255.0/netmask 255.255.255.128/" \
-  -e "s/^heartbeat_device0 =.*/heartbeat_device0 = 'eth0'/" \
-  -e "s/^#other_pgpool_port0 =.*/other_pgpool_port0 = 5432/" \
-  -e "s/^#other_wd_port0 = 9000/other_wd_port0 = 9000/" \
-  -e "s/^load_balance_mode = off/load_balance_mode = on/" \
-  -e "s/^master_slave_mode = off/master_slave_mode = on/" \
-  -e "s/^master_slave_sub_mode =.*/master_slave_sub_mode = 'stream'/" \
-  -e "s@^failover_command = ''@failover_command = '/etc/pgpool-II-93/failover_stream.sh %d %H'@" \
-  -e "s/^recovery_user = 'nobody'/recovery_user = 'admin'/" \
-  -e "s/^recovery_password = ''/recovery_password = 'password123'/" \
-  -e "s/^recovery_1st_stage_command = ''/recovery_1st_stage_command = 'basebackup.sh'/" \
-  -e "s/^sr_check_period = 0/sr_check_period = 10/" \
-  -e "s/^delay_threshold = 0/delay_threshold = 10000000/" \
-  -e "s/^log_connections = off/log_connections = on/" \
-  -e "s/^log_statement = off/log_statement = on/" \
-  -e "s/^log_per_node_statement = off/log_per_node_statement = on/" \
-  -e "s/^log_standby_delay = 'none'/log_standby_delay = 'always'/" \
-  -e "s/^enable_pool_hba = off/enable_pool_hba = on/" \
-  /etc/pgpool-II-93/pgpool.conf.sample > /etc/pgpool-II-93/pgpool.conf
+    -e "s/^listen_addresses = .localhost./listen_addresses = '*'/" \
+    -e "s/^log_destination = .stderr./log_destination = 'syslog'/" \
+    -e "s/^port = .*/port = 5432/" \
+    -e "s/^backend_hostname0 =.*/backend_hostname0 = 'cz01-psql01.example.com'/" \
+    -e "s/^#backend_flag0/backend_flag0/" \
+    -e "s/^#backend_hostname1 =.*/backend_hostname1 = 'cz01-psql02.example.com'/" \
+    -e "s/^#backend_port1 = 5433/backend_port1 = 5432/" \
+    -e "s/^#backend_weight1/backend_weight1/" \
+    -e "s/^#backend_data_directory1 =.*/backend_data_directory1 = '\/var\/lib\/pgsql\/9.3\/data'/" \
+    -e "s/^#backend_flag1/backend_flag1/" \
+    -e "s/^log_hostname =.*/log_hostname = on/" \
+    -e "s/^syslog_facility =.*/syslog_facility = 'daemon.info'/" \
+    -e "s/^sr_check_user =.*/sr_check_user = 'admin'/" \
+    -e "s/^sr_check_password =.*/sr_check_password = 'password123'/" \
+    -e "s/^health_check_period =.*/health_check_period = 10/" \
+    -e "s/^health_check_user =.*/health_check_user = 'admin'/" \
+    -e "s/^health_check_password =.*/health_check_password = 'password123'/" \
+    -e "s/^use_watchdog =.*/use_watchdog = on/" \
+    -e "s/^delegate_IP =.*/delegate_IP = '10.32.243.250'/" \
+    -e "s/^netmask 255.255.255.0/netmask 255.255.255.128/" \
+    -e "s/^heartbeat_device0 =.*/heartbeat_device0 = 'eth0'/" \
+    -e "s/^#other_pgpool_port0 =.*/other_pgpool_port0 = 5432/" \
+    -e "s/^#other_wd_port0 = 9000/other_wd_port0 = 9000/" \
+    -e "s/^load_balance_mode = off/load_balance_mode = on/" \
+    -e "s/^master_slave_mode = off/master_slave_mode = on/" \
+    -e "s/^master_slave_sub_mode =.*/master_slave_sub_mode = 'stream'/" \
+    -e "s@^failover_command = ''@failover_command = '/etc/pgpool-II-93/failover_stream.sh %d %H'@" \
+    -e "s/^recovery_user = 'nobody'/recovery_user = 'admin'/" \
+    -e "s/^recovery_password = ''/recovery_password = 'password123'/" \
+    -e "s/^recovery_1st_stage_command = ''/recovery_1st_stage_command = 'basebackup.sh'/" \
+    -e "s/^sr_check_period = 0/sr_check_period = 10/" \
+    -e "s/^delay_threshold = 0/delay_threshold = 10000000/" \
+    -e "s/^log_connections = off/log_connections = on/" \
+    -e "s/^log_statement = off/log_statement = on/" \
+    -e "s/^log_per_node_statement = off/log_per_node_statement = on/" \
+    -e "s/^log_standby_delay = 'none'/log_standby_delay = 'always'/" \
+    -e "s/^enable_pool_hba = off/enable_pool_hba = on/" \
+    /etc/pgpool-II-93/pgpool.conf.sample > /etc/pgpool-II-93/pgpool.conf
 
   cat > /etc/pgpool-II-93/failover_stream.sh << \EOF
   #!/bin/sh
@@ -351,10 +351,10 @@ Here is the network diagram:
 
   ```bash
   sed \
-  -e "s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool01.example.com'/" \
-  -e "s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool02.example.com'/" \
-  -e "s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool02.example.com'/" \
-  -i /etc/pgpool-II-93/pgpool.conf
+    -e "s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool01.example.com'/" \
+    -e "s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool02.example.com'/" \
+    -e "s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool02.example.com'/" \
+    -i /etc/pgpool-II-93/pgpool.conf
 
   service pgpool-II-93 start
   ```
@@ -363,10 +363,10 @@ Here is the network diagram:
 
   ```bash
   sed \
-  -e "s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool02.example.com'/" \
-  -e "s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool01.example.com'/" \
-  -e "s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool01.example.com'/" \
-  -i /etc/pgpool-II-93/pgpool.conf
+    -e "s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool02.example.com'/" \
+    -e "s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool01.example.com'/" \
+    -e "s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool01.example.com'/" \
+    -i /etc/pgpool-II-93/pgpool.conf
 
   service pgpool-II-93 start
   ```
@@ -447,7 +447,7 @@ done when slave was promoted to master.
 
 ![PostgreSQL failover diagram - master down](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_master_down.svg)
 
-### `pgpool01` logs right after the master was stopped
+### pgpool01 logs right after the master was stopped
 
 ```console
 cz01-pgpool01 ~ # cat /var/log/local0
@@ -481,7 +481,7 @@ cz01-pgpool01 ~ # cat /var/log/local0
 2014-10-23T14:43:18.065907+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 26165
 ```
 
-### `psql01` (masted db) logs right after the master was stopped
+### psql01 (masted db) logs right after the master was stopped
 
 ```console
 cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
@@ -500,7 +500,7 @@ cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 14:43:11 CEST [18438]: [3-1] user=repmgr,db=[unknown] LOG: disconnection: session time: 0:48:37.268 user=repmgr database= host=10.32.243.148 port=50909
 ```
 
-### `psql02` (slave db) logs right after the master was stopped
+### psql02 (slave db) logs right after the master was stopped
 
 ```console
 cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
@@ -603,7 +603,7 @@ cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-pgpool-ha.
 cz01-pgpool02 ~ # psql --username=admin --dbname=postgres --host cz01-psql02.example.com -w -l | grep mydb
 ```
 
-### Make the "old master" to be a "new slave" `cz01-psql01`
+### Make the "old master" to be a "new slave" cz01-psql01
 
 ```console
 cz01-pgpool02 ~ # ssh cz01-psql01.example.com 'service postgresql-9.3 stop; su - postgres -c "repmgr -D /var/lib/pgsql/9.3/data -d repmgr -p 5432 -U repmgr -R postgres --verbose --force standby clone cz01-psql02.example.com"; service postgresql-9.3 start;'
@@ -695,7 +695,7 @@ red color indicates the additional changes.
 
 ![Diagram: Failed master become slave](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_failed_master_become_slave.svg)
 
-### Logs right after the new slave `cz01-psql01` was configured+started
+### Logs right after the new slave cz01-psql01 was configured+started
 
 ```console
 cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
@@ -708,7 +708,7 @@ cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 14:52:14 CEST [26698]: [5-1] user=,db= LOG: database system is ready to accept read only connections
 ```
 
-### Logs from `cz01-psql02` after the new slave was configured
+### Logs from cz01-psql02 after the new slave was configured
 
 ```bash
 cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
@@ -876,7 +876,7 @@ cz01-psql02 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
 2014-10-23 16:01:31 CEST [25524]: [3-1] user=repmgr,db=[unknown] LOG: disconnection: session time: 1:09:17.350 user=repmgr database= host=10.32.243.147 port=52484
 ```
 
-### Logs from `pgpool01` after the master was stopped
+### Logs from pgpool01 after the master was stopped
 
 ```console
 cz01-pgpool01 / # cat /var/log/local0
@@ -907,7 +907,7 @@ cz01-pgpool01 / # cat /var/log/local0
 2014-10-23T16:01:38.345899+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 2518
 ```
 
-### Logs from `psql01` after the master was stopped
+### Logs from psql01 after the master was stopped
 
 ```console
 cz01-psql01 / # cat /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log

@@ -88,7 +88,10 @@ zypper install -y mc
 # Disable mouse support in MC
 sed -i 's@/usr/bin/mc@/usr/bin/mc --nomouse@' /usr/share/mc/bin/mc-wrapper.sh
 
-( sleep 10; reboot ) &
+(
+  sleep 10
+  reboot
+) &
 
 # Set static IP
 /opt/vmware/share/vami/vami_set_network eth0 STATICV4 10.0.0.99 255.255.255.128 10.0.0.1
