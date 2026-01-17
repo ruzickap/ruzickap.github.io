@@ -14,10 +14,10 @@ Sometimes it's handy to replicate the physical environment on a single server to
 do some testing.
 
 In my case I replicated the environment containing 3 VMs where
-[MAAS](https://www.ubuntu.com/server/maas) was installed on the first VM (kvm01)
-and the other two VMs (kvm02, kvm03) were provisioned by MAAS. I also defined a
-few networks with IP ranges: deploy_network 192.168.25.0/24, control_network
-192.168.26.0/24, tenant_network 192.168.27.0/24.
+[MAAS](https://www.ubuntu.com/server/maas) was installed on the first VM (`kvm01`)
+and the other two VMs (`kvm02`, `kvm03`) were provisioned by MAAS. I also
+defined a few networks with IP ranges: `deploy_network` `192.168.25.0/24`,
+`control_network` `192.168.26.0/24`, `tenant_network` `192.168.27.0/24`.
 
 Here is the network diagram of the lab:
 
@@ -27,12 +27,13 @@ You can see the commands I used and descriptive video...
 
 It's better to see the video with lab description:
 
+{% include embed/youtube.html id='ms9lx_QUmCw' %}
+
 Here are the commands I used:
 
 ```bash
 # Install Vagrant and virsh command
 dnf install -y libvirt-client vagrant-hostmanager vagrant-libvirt
-
 
 # Allow to manage VMs via libvirt remotely (using TCP connection)
 cat >> /etc/libvirt/libvirtd.conf << EOF
@@ -45,10 +46,8 @@ EOF
 echo 'LIBVIRTD_ARGS="--listen --config /etc/libvirt/libvirtd.conf"' >> /etc/sysconfig/libvirtd
 service libvirtd restart
 
-
 # Generate ssh key used for accessing the VMs
 ssh-keygen -P "" -f /root/.ssh/id_rsa -C "admin@example.com"
-
 
 # Check the VMs
 VIRSH_VMS=$(virsh list | awk '/_kvm/ { print $2 }')
@@ -59,7 +58,6 @@ virsh net-list --all | grep network
 VIRSH_NETWORKS=$(virsh net-list | awk '/network|vagrant/ { print $1 }')
 for VIRSH_NETWORK in $VIRSH_NETWORKS; do echo "*** $VIRSH_NETWORK"; virsh net-dumpxml $VIRSH_NETWORK; done
 
-
 # Create Vagrantfile
 mkdir /var/tmp/test
 cat > /var/tmp/test/Vagrantfile << \EOF
@@ -67,7 +65,6 @@ cat > /var/tmp/test/Vagrantfile << \EOF
 box_image = "peru/my_ubuntu-16.04-server-amd64"
 node_count = 3
 ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
-
 
 Vagrant.configure(2) do |config|
   config.hostmanager.enabled = true
@@ -199,18 +196,14 @@ apt install -y jq libvirt-bin maas
 maas-region local_config_set --maas-url http://192.168.25.11:5240/MAAS
 systemctl restart maas-regiond
 
-
 # Register a rack controller with the MAAS
 maas-rack register --url http://192.168.25.11:5240/MAAS --secret `cat /var/lib/maas/secret`
-
 
 # Create administrator (MAAS "superuser")
 maas createadmin --username=admin --email=admin@example.com --password admin123
 
-
 # Export API key that was generated when the MAAS account was created
 maas-region apikey --username=admin > /root/api_key
-
 
 # Create a short script which will help you to login to MAAS quickly
 cat > /root/maas-login.sh << \EOF
@@ -230,20 +223,17 @@ chmod a+x /root/maas-login.sh
 # Login to MAAS
 /root/maas-login.sh
 
-
 # Generate SSH key which will be imported in the next command
 ssh-keygen -P "" -f /root/.ssh/id_rsa -C "admin@example.com"
 
 # Import the admin SSH key
 maas admin sshkeys create "key=`cat /root/.ssh/id_rsa.pub`"
 
-
 # Turn OFF all VMs except the first one running MAAS
 # This will also test if the libvirtd daemon is properly configured allowing MAAS to manage the VMs
 virsh -c qemu+tcp://192.168.25.1/system destroy test_kvm02
 virsh -c qemu+tcp://192.168.25.1/system destroy test_kvm03
 virsh -c qemu+tcp://192.168.25.1/system list --all
-
 
 SUBNET_CIDR="192.168.25.0/24"
 SUBNET_PREFIX=$(echo $SUBNET_CIDR | sed -r 's/(([0-9]{1,3}\.){2}.[0-9]{1,3}).*/\1/')
@@ -258,7 +248,6 @@ maas admin subnet update cidr:${SUBNET_CIDR} gateway_ip=${SUBNET_PREFIX}.1
 maas admin ipranges create type=dynamic start_ip=${SUBNET_PREFIX}.200 end_ip=${SUBNET_PREFIX}.250 comment='This is a reserved dynamic range'
 maas admin vlan update $VLAN_FABRIC_ID $VLAN_VID dhcp_on=True primary_rack=$PRIMARY_RACK_CONTROLLER
 
-
 # Define node by specifying the libvirt VM management and start commissioning
 for INDEX in {2..3}; do
   MAC="52:54:00:00:25:1${INDEX}"
@@ -267,7 +256,6 @@ done
 
 # All the machines should be in commissioning state right now
 virsh -c qemu+tcp://192.168.25.1/system list --all
-
 
 # Set static IPs, create bonds and deploy the Ubuntu Xenial
 for INDEX in {2..3}; do
@@ -320,16 +308,16 @@ for INDEX in {2..3}; do
   maas admin machine deploy $SYSTEM_ID
 done
 
-
 # All machines should be installed + deployed...
 virsh -c qemu+tcp://192.168.25.1/system list --all
-
 
 ssh ubuntu@192.168.25.12 -o StrictHostKeyChecking=no
 ssh ubuntu@192.168.25.13 -o StrictHostKeyChecking=no
 ```
 
 Asciinema if needed:
+
+[![asciicast](https://asciinema.org/a/163897.svg)](https://asciinema.org/a/163897)
 
 I hope it's helpful for somebody...
 

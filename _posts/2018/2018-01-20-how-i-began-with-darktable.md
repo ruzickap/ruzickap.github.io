@@ -24,13 +24,12 @@ very easy.
 Here are a few steps on how I started to use Darktable.
 
 - Start watching the tutorials on YouTube to see how others are using Darktable
-when editing the photos:
-[https://www.youtube.com/results?search_query=darktable](https://www.youtube.com/results?search_query=darktable)
+  when editing the photos: [https://www.youtube.com/results?search_query=darktable](https://www.youtube.com/results?search_query=darktable)
 
 - Try to learn the techniques used for correcting/improving photos
 
 - Try to find the photos in your collection similar to the ones which are shown
-on the video and try to follow similar steps to learn them
+  on the video and try to follow similar steps to learn them
 
 - Practice what you learn from the videos...
 
@@ -45,8 +44,6 @@ edited in specific YouTube Darktable tutorials.
 
 It's handy for finding similar photos in your collection to practice and learn.
 
-Here is the link...
-
-<https://github.com/ruzickap/darktable_video_tutorials_list>
+Here is the link: <https://github.com/ruzickap/darktable_video_tutorials_list>
 
 Enjoy ;-)

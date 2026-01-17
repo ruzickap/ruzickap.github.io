@@ -55,11 +55,11 @@ Kubespray-cli.
   service libvirtd start
 
   # Create ssh key if it doesn't exist
-  test -f ~/.ssh/id_rsa.pub || ssh-keygen -f $HOME/.ssh/id_rsa -N ''
+  test -f ~/.ssh/id_rsa.pub || ssh-keygen -f "$HOME/.ssh/id_rsa" -N ''
 
   # Create directory structure
   mkdir /var/tmp/kubernetes_cluster
-  cd /var/tmp/kubernetes_cluster
+  cd /var/tmp/kubernetes_cluster || exit
 
   # Create Vagrantfile
   cat > Vagrantfile << EOF
@@ -111,7 +111,7 @@ Kubespray-cli.
   EOF
 
   # Prepare kubespray for deployment
-  kubespray prepare --assumeyes --path $PWD/kubespray --nodes kubernetes_cluster_kube01 kubernetes_cluster_kube02 kubernetes_cluster_kube03 kubernetes_cluster_kube04
+  kubespray prepare --assumeyes --path "$PWD/kubespray" --nodes kubernetes_cluster_kube01 kubernetes_cluster_kube02 kubernetes_cluster_kube03 kubernetes_cluster_kube04
 
   cat > kubespray/inventory/inventory.cfg << EOF
   [kube-master]
