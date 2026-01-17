@@ -3,7 +3,7 @@ title: Create Windows image using Packer and Ansible and then run it in Vagrant 
 author: Petr Ruzicka
 date: 2017-10-24
 description: Create Windows image using Packer and Ansible and then run it in Vagrant (libvirt)
-categories: [Virtualization, DevOps]
+categories: [Virtualization, DevOps, linux.xvx.cz]
 tags: [packer, ansible, vagrant, kvm, windows]
 ---
 

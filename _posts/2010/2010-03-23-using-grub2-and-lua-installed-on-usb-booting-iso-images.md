@@ -3,7 +3,7 @@ title: Using Grub2 and LUA installed on USB booting ISO images
 author: Petr Ruzicka
 date: 2010-03-23
 description: ""
-categories: [Linux]
+categories: [Linux, linux-old.xvx.cz]
 tags: [grub, pxe, debian]
 ---
 

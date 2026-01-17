@@ -3,7 +3,7 @@ title: Cacti 0.8.8b non-interactive installation and configuration
 author: Petr Ruzicka
 date: 2014-09-03
 description: Cacti 0.8.8b non-interactive installation and configuration
-categories: [Linux, DevOps]
+categories: [Linux, DevOps, linux.xvx.cz]
 tags: [monitoring, automation]
 ---
 

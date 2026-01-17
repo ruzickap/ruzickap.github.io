@@ -3,7 +3,7 @@ title: Setup production ready Kubernetes cluster using Kubespray and Vagrant run
 author: Petr Ruzicka
 date: 2017-11-02
 description: Setup production ready Kubernetes cluster using Kubespray and Vagrant running on the libvirt KVMs
-categories: [Kubernetes, Virtualization]
+categories: [Kubernetes, Virtualization, linux.xvx.cz]
 tags: [kubernetes, kubespray, vagrant, kvm]
 ---
 

@@ -3,7 +3,7 @@ title: Debian Wi-Fi hotspot using CoovaChilli, FreeRadius, MySQL and daloRADIUS
 author: Petr Ruzicka
 date: 2010-03-24
 description: ""
-categories: [Linux, Networking]
+categories: [Linux, Networking, linux-old.xvx.cz]
 tags: [wifi, hotspot, database]
 ---
 

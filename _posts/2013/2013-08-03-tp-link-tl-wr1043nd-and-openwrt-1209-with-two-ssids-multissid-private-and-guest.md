@@ -3,7 +3,7 @@ title: TP-Link TL-WR1043ND and OpenWrt 12.09 with two SSIDs (MultiSSID) - privat
 author: Petr Ruzicka
 date: 2013-08-03
 description: TP-Link TL-WR1043ND and OpenWrt 12.09 with two SSIDs (MultiSSID) - private and guest
-categories: [OpenWrt, Networking]
+categories: [OpenWrt, Networking, linux.xvx.cz]
 tags: [tp-link, router, wifi]
 ---
 

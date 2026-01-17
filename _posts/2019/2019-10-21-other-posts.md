@@ -3,7 +3,7 @@ title: Other posts...
 author: Petr Ruzicka
 date: 2019-10-21
 description: Other posts...
-categories: [Kubernetes, Cloud]
+categories: [Kubernetes, Cloud, linux.xvx.cz]
 tags: [kubernetes, istio, harbor, flux, amazon-eks]
 ---
 

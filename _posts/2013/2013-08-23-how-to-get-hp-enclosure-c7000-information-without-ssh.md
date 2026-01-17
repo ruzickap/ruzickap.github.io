@@ -3,7 +3,7 @@ title: How to get HP enclosure c7000 information without ssh
 author: Petr Ruzicka
 date: 2013-08-23
 description: How to get HP enclosure c7000 information without ssh
-categories: [Linux]
+categories: [Linux, linux.xvx.cz]
 tags: [hp-server, bash]
 ---
 

@@ -3,7 +3,7 @@ title: Turris - OpenWRT and thermometers
 author: Petr Ruzicka
 date: 2014-04-22
 description: Turris - OpenWRT and thermometers
-categories: [OpenWrt]
+categories: [OpenWrt, linux.xvx.cz]
 tags: [turris, monitoring]
 ---
 

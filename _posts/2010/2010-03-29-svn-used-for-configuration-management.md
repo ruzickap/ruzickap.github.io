@@ -3,7 +3,7 @@ title: SVN used for configuration management
 author: Petr Ruzicka
 date: 2010-03-29
 description: ""
-categories: [Linux, DevOps]
+categories: [Linux, DevOps, linux-old.xvx.cz]
 tags: [automation]
 ---
 

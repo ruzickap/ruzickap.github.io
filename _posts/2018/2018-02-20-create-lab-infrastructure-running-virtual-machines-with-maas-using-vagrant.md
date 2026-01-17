@@ -3,7 +3,7 @@ title: Create lab infrastructure running Virtual machines with MAAS using Vagran
 author: Petr Ruzicka
 date: 2018-02-20
 description: Create lab infrastructure running Virtual machines with MAAS using Vagrant
-categories: [Linux, Virtualization]
+categories: [Linux, Virtualization, linux.xvx.cz]
 tags: [maas, vagrant, kvm]
 ---
 

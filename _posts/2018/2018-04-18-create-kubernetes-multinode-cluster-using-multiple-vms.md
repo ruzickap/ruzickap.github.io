@@ -3,7 +3,7 @@ title: Create Kubernetes Multinode Cluster using multiple VMs
 author: Petr Ruzicka
 date: 2018-04-18
 description: Create Kubernetes Multinode Cluster using multiple VMs
-categories: [Kubernetes, Virtualization]
+categories: [Kubernetes, Virtualization, linux.xvx.cz]
 tags: [kubernetes, kubespray]
 ---
 

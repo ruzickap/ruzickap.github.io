@@ -3,7 +3,7 @@ title: Another OpenWrt configuration
 author: Petr Ruzicka
 date: 2012-01-28
 description: ""
-categories: [OpenWrt, Networking]
+categories: [OpenWrt, Networking, linux-old.xvx.cz]
 tags: [tp-link, wifi, pxe, dnsmasq]
 ---
 

@@ -3,7 +3,7 @@ title: How-to build PXE Fedora 26 live image
 author: Petr Ruzicka
 date: 2017-07-16
 description: How-to build PXE Fedora 26 live image
-categories: [Linux, Networking]
+categories: [Linux, Networking, linux.xvx.cz]
 tags: [pxe]
 ---
 

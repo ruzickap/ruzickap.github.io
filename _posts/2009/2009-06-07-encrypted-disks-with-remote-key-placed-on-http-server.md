@@ -3,7 +3,7 @@ title: Encrypted disks with remote key placed on http server
 author: Petr Ruzicka
 date: 2009-06-07
 description: ""
-categories: [Linux, Storage, Security]
+categories: [Linux, Storage, Security, linux-old.xvx.cz]
 tags: [lvm, bash, security]
 ---
 

@@ -3,7 +3,7 @@ title: CKA - Kubernetes Certified Administrator exam tips
 author: Petr Ruzicka
 date: 2018-04-19
 description: CKA - Kubernetes Certified Administrator exam tips
-categories: [Kubernetes]
+categories: [Kubernetes, linux.xvx.cz]
 tags: [kubernetes, cka, kubectl]
 ---
 

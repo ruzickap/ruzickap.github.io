@@ -3,7 +3,7 @@ title: HD Trailers downloaded by wget
 author: Petr Ruzicka
 date: 2009-03-05
 description: ""
-categories: [Linux]
+categories: [Linux, linux-old.xvx.cz]
 tags: [bash]
 ---
 

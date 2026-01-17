@@ -3,7 +3,7 @@ title: Cobbler and yum in RHEL 4.6
 author: Petr Ruzicka
 date: 2009-06-06
 description: ""
-categories: [Linux, Networking]
+categories: [Linux, Networking, linux-old.xvx.cz]
 tags: [rhel, cobbler, pxe]
 ---
 

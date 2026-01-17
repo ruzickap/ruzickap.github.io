@@ -3,7 +3,7 @@ title: Systemd Cheatsheet
 author: Petr Ruzicka
 date: 2014-06-16
 description: Systemd Cheatsheet
-categories: [Linux]
+categories: [Linux, linux.xvx.cz]
 tags: [bash, cheatsheet]
 ---
 

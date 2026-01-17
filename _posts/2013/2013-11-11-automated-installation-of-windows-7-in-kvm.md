@@ -3,7 +3,7 @@ title: Automated installation of Windows 7 in KVM
 author: Petr Ruzicka
 date: 2013-11-11
 description: Automated installation of Windows 7 in KVM
-categories: [Virtualization, Windows]
+categories: [Virtualization, Windows, linux.xvx.cz]
 tags: [kvm, windows, automation]
 ---
 

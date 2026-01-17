@@ -3,7 +3,7 @@ title: Atom editor (atom.io)
 author: Petr Ruzicka
 date: 2015-12-24
 description: Atom editor (atom.io)
-categories: [Linux]
+categories: [Linux, linux.xvx.cz]
 tags: [cheatsheet]
 ---
 

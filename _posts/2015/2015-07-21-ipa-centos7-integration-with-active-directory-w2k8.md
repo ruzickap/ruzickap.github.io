@@ -3,7 +3,7 @@ title: IPA (CentOS7) integration with Active Directory (W2K8)
 author: Petr Ruzicka
 date: 2015-07-21
 description: IPA (CentOS7) integration with Active Directory (W2K8)
-categories: [Linux, Windows]
+categories: [Linux, Windows, linux.xvx.cz]
 tags: [rhel, freeipa, active-directory, sso]
 ---
 

@@ -3,7 +3,7 @@ title: Turris - OpenWRT and guest access
 author: Petr Ruzicka
 date: 2014-05-08
 description: Turris - OpenWRT and guest access
-categories: [OpenWrt, Networking]
+categories: [OpenWrt, Networking, linux.xvx.cz]
 tags: [turris, router, wifi, hotspot]
 ---
 

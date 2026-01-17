@@ -3,7 +3,7 @@ title: Loadbalancing of PostgreSQL databases using pgpool-II and repmgr
 author: Petr Ruzicka
 date: 2014-10-25
 description: Loadbalancing of PostgreSQL databases using pgpool-II and repmgr
-categories: [Linux, Storage]
+categories: [Linux, Storage, linux.xvx.cz]
 tags: [database, load-balancer]
 ---
 

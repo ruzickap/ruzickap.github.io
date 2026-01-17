@@ -3,7 +3,7 @@ title: Debian with GRUB2 and serial connection
 author: Petr Ruzicka
 date: 2009-08-05
 description: ""
-categories: [Linux]
+categories: [Linux, linux-old.xvx.cz]
 tags: [debian, grub]
 ---
 

@@ -3,7 +3,7 @@ title: Android bootanimation
 author: Petr Ruzicka
 date: 2010-06-17
 description: ""
-categories: [Android]
+categories: [Android, linux-old.xvx.cz]
 tags: [htc-desire, adb]
 ---
 

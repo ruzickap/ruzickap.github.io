@@ -3,7 +3,7 @@ title: OpenWrt (Backfire 10.03) and TL-WR1043ND
 author: Petr Ruzicka
 date: 2011-12-13
 description: ""
-categories: [OpenWrt, Networking]
+categories: [OpenWrt, Networking, linux-old.xvx.cz]
 tags: [tp-link, wifi, dnsmasq]
 ---
 

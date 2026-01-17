@@ -3,7 +3,7 @@ title: My basic setup of CyanogenMod-6.0 on HTC Desire
 author: Petr Ruzicka
 date: 2010-09-09
 description: ""
-categories: [Android]
+categories: [Android, linux-old.xvx.cz]
 tags: [htc-desire, cyanogenmod, adb]
 ---
 
@@ -92,9 +92,8 @@ Remove unused audio files:
 
 ```bash
 for AUDIO in `find /system/media/audio -type f|egrep -v "ui|Alarm_Buzzer.ogg|SpaceSeed.ogg|Doink.ogg|SpaceSeed.ogg|CrayonRock.ogg"`; do
-for AUDIO in `find /system/media/audio -type f|egrep -v "ui|pixiedust.ogg"`; do
-    echo "*** Removing $AUDIO"
-    rm $AUDIO
+  echo "*** Removing $AUDIO"
+  rm $AUDIO
 done
 ```
 

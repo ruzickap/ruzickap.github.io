@@ -3,7 +3,7 @@ title: Update offline CentOS-RHEL server
 author: Petr Ruzicka
 date: 2011-02-02
 description: ""
-categories: [Linux]
+categories: [Linux, linux-old.xvx.cz]
 tags: [rhel, security]
 ---
 

@@ -3,7 +3,7 @@ title: How I began with Darktable
 author: Petr Ruzicka
 date: 2018-01-20
 description: How I began with Darktable
-categories: [Photography]
+categories: [Photography, linux.xvx.cz]
 tags: [photo-editing]
 ---
 

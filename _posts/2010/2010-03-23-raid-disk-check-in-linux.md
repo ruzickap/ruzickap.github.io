@@ -3,7 +3,7 @@ title: RAID disk check in Linux
 author: Petr Ruzicka
 date: 2010-03-23
 description: ""
-categories: [Linux, Storage]
+categories: [Linux, Storage, linux-old.xvx.cz]
 tags: [raid, storage]
 ---
 

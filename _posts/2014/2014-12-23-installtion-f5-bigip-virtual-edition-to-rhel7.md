@@ -3,7 +3,7 @@ title: Installation F5 BIGIP Virtual Edition to RHEL7
 author: Petr Ruzicka
 date: 2014-12-23
 description: Installation F5 BIGIP Virtual Edition to RHEL7
-categories: [Virtualization, Networking]
+categories: [Virtualization, Networking, linux.xvx.cz]
 tags: [load-balancer, rhel]
 ---
 
@@ -239,25 +239,25 @@ tmsh create sys management-route default gateway 10.0.0.1
 #(or you can use "config" command - to speed it up)
 
 #DNS
-tmsh modify sys dns name-servers add { 10.0.0.141 10.0.0.142 }
-tmsh modify sys dns search add { cloud.example.com }
+tmsh modify sys dns name-servers add '{ 10.0.0.141 10.0.0.142 }'
+tmsh modify sys dns search add '{ cloud.example.com }'
 #Hostname
 tmsh modify sys glob hostname lb01.cloud.example.com
 #NTP
-tmsh modify sys ntp servers add { 0.rhel.pool.ntp.org 1.rhel.pool.ntp.org }
+tmsh modify sys ntp servers add '{ 0.rhel.pool.ntp.org 1.rhel.pool.ntp.org }'
 tmsh modify sys ntp timezone "UTC"
 #Session timeout
 tmsh modify sys sshd inactivity-timeout 120000
 tmsh modify sys http auth-pam-idle-timeout 120000
 #SNMP allow from "all"
-tmsh modify sys snmp allowed-addresses add { 10.0.0.0/8 }
+tmsh modify sys snmp allowed-addresses add '{ 10.0.0.0/8 }'
 #SNMP traps
-tmsh modify /sys snmp traps add { my_trap_destination { host monitor.cloud.example.com community public version 2c } }
+tmsh modify /sys snmp traps add '{ my_trap_destination { host monitor.cloud.example.com community public version 2c } }'
 # Network configuration...
-tmsh create net vlan External interfaces add { 1.2 }
-tmsh create net vlan Internal interfaces add { 1.1 }
+tmsh create net vlan External interfaces add '{ 1.2 }'
+tmsh create net vlan Internal interfaces add '{ 1.1 }'
 #SMTP
-tmsh create sys smtp-server yum.cloud.example.com { from-address root@lb01.cloud.example.com local-host-name lb01.cloud.example.com smtp-server-host-name yum.cloud.example.com }
+tmsh create sys smtp-server yum.cloud.example.com '{ from-address root@lb01.cloud.example.com local-host-name lb01.cloud.example.com smtp-server-host-name yum.cloud.example.com }'
 tmsh create net self 10.0.0.224/24 vlan Internal allow-service all
 tmsh create net self 10.0.1.224/24 vlan External allow-service all
 #https://support.f5.com/kb/en-us/solutions/public/13000/100/sol13180.html
@@ -367,7 +367,7 @@ tmsh install /sys crypto cert cloud.example.com_self-signed_2014.crt from-local-
 ### DNS VIP iApp
 
 ```bash
-tmsh create sys application service dns-ext-vip1_53 { \
+tmsh create sys application service dns-ext-vip1_53 '{ \
     description "DNS VIP - External - NS1 53" \
     strict-updates disabled \
     tables add { \
@@ -390,7 +390,7 @@ tmsh create sys application service dns-ext-vip1_53 { \
         vs_pool__vs_addr { value 10.0.1.16 } \
         vs_pool__vs_port { value 53 } \
     } \
-}
+}'
 
 tmsh modify ltm virtual dns-ext-vip1_53.app/dns-ext-vip1_53_dns_tcp description "DNS VIP - External - NS1 TCP 53"
 tmsh modify ltm virtual dns-ext-vip1_53.app/dns-ext-vip1_53_dns_udp description "DNS VIP - External - NS1 UDP 53"
@@ -433,7 +433,7 @@ tmsh modify ltm node 10.0.1.20 description "Public DNS Slave"
 ### LDAP VIP iApp
 
 ```bash
-tmsh create sys application service ds-vip_389 { \
+tmsh create sys application service ds-vip_389 '{ \
     description "Directory Server VIP 389" \
     strict-updates disabled \
     lists add { irules__irules { } } \
@@ -464,7 +464,7 @@ tmsh create sys application service ds-vip_389 { \
         vs_pool__vs_addr { value 10.0.0.203 } \
         vs_pool__vs_port { value 389 } \
     } \
-}
+}'
 
 tmsh modify ltm virtual ds-vip_389.app/ds-vip_389_vs description "Directory Server VIP 389 tcp"
 
@@ -477,7 +477,7 @@ tmsh modify ltm node 10.0.0.151 description "Directory server - secondary"
 ### HTTPS VIP iApp
 
 ```bash
-tmsh create sys application service https-vip_443 { \
+tmsh create sys application service https-vip_443 '{ \
     description "HTTPS Server VIP 443" \
     strict-updates disabled \
     tables add { \
@@ -511,10 +511,10 @@ tmsh create sys application service https-vip_443 { \
         ssl__client_ssl_profile { value \"/#create_new#\" } \
         ssl__key { value /Common/cloud.example.com_self-signed_2014.key } \
     } \
-}
+}'
 
 tmsh modify ltm virtual https-vip_443.app/https-vip_443_vs description "HTTPS Server VIP"
-tmsh modify ltm pool https-vip_443.app/https-vip_443_pool description "HTTPS Server VIP 443" members modify { 10.0.1.140:http { description "HTTPS Server 01" } 10.0.1.150:http { description "HTTPS Server 02" } }
+tmsh modify ltm pool https-vip_443.app/https-vip_443_pool description "HTTPS Server VIP 443" members modify '{ 10.0.1.140:http { description "HTTPS Server 01" } 10.0.1.150:http { description "HTTPS Server 02" } }'
 tmsh modify ltm node 10.0.1.140 description "HTTPS Server 01"
 tmsh modify ltm node 10.0.1.150 description "HTTPS Server 02"
 ```

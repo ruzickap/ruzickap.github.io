@@ -3,7 +3,7 @@ title: Server RAID/BIOS changes using HP Scripting toolkit and Cobbler
 author: Petr Ruzicka
 date: 2013-11-27
 description: Server RAID/BIOS changes using HP Scripting toolkit and Cobbler
-categories: [Linux, Networking]
+categories: [Linux, Networking, linux.xvx.cz]
 tags: [hp-server, cobbler, raid, pxe]
 ---
 
