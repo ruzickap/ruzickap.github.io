@@ -42,7 +42,6 @@ So I decided to write some more fresh stuff from the April 2018.
   will be running all the `kubectl` commands. This handy autocomplete will speed
   up your work significantly - you can enable it by running:
   `<(kubectl completion bash)` ([https://kubernetes.io/docs/reference/kubectl/cheatsheet/](https://kubernetes.io/docs/reference/kubectl/cheatsheet/))
-
   Examples can be found here: [https://blog.heptio.com/kubectl-shell-autocomplete-heptioprotip-48dd023e0bf3](https://blog.heptio.com/kubectl-shell-autocomplete-heptioprotip-48dd023e0bf3)
 
 - Web console used on the exam has some limitations so be prepared that it's not
