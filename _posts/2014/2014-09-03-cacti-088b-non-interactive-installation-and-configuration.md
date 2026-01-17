@@ -53,17 +53,17 @@ GRANT ALL ON cacti.* TO cacti@localhost IDENTIFIED BY 'admin123';
 FLUSH privileges;
 EOF
 
-mysql -u cacti --password=admin123 cacti < `rpm -ql cacti | grep cacti.sql`
+mysql -u cacti --password=admin123 cacti < "$(rpm -ql cacti | grep cacti.sql)"
 
 mysql -u root --password=admin123 -v  << EOF
 USE cacti;
 UPDATE user_auth SET password = md5('admin123') WHERE username = 'admin';
 UPDATE user_auth SET must_change_password = '' WHERE username = 'admin';
-UPDATE version SET cacti = '`rpm -q cacti --queryformat "%{VERSION}"`';
+UPDATE version SET cacti = '$(rpm -q cacti --queryformat "%{VERSION}")';
 #UPDATE host SET snmp_version = '2' WHERE hostname = '127.0.0.1';
 UPDATE host SET availability_method = '2' WHERE hostname = '127.0.0.1';
-INSERT INTO settings (name,value) VALUES ('path_rrdtool', '`which rrdtool`'), ('path_snmpget', '`which snmpget`'), ('path_php_binary', '`which php`'), ('path_snmpwalk','`which snmpwalk`'),
-('path_snmpbulkwalk', '`which snmpbulkwalk`'), ('path_snmpgetnext', '`which snmpgetnext`'), ('path_cactilog', '`rpm -ql cacti | grep cacti\\\.log$`'), ('snmp_version', 'net-snmp'),
+INSERT INTO settings (name,value) VALUES ('path_rrdtool', '$(which rrdtool)'), ('path_snmpget', '$(which snmpget)'), ('path_php_binary', '$(which php)'), ('path_snmpwalk','$(which snmpwalk)'),
+('path_snmpbulkwalk', '$(which snmpbulkwalk)'), ('path_snmpgetnext', '$(which snmpgetnext)'), ('path_cactilog', '$(rpm -ql cacti | grep cacti\\\.log$)'), ('snmp_version', 'net-snmp'),
 ('rrdtool_version', 'rrd-1.3.x');
 INSERT INTO settings_graphs (user_id, name, value) VALUES (1, 'treeview_graphs_per_page', '100');
 EOF
