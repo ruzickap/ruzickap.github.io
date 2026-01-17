@@ -481,7 +481,7 @@ Configure TFTPboot and dnsmasq script:
 ```bash
 mkdir /tftpboot
 
-wget -P /tftpboot <http://static.netboot.me/gpxe/netbootme.kpxe>
+wget -P /tftpboot http://static.netboot.me/gpxe/netbootme.kpxe
 uci set dhcp.@dnsmasq[0].enable_tftp=1
 uci set dhcp.@dnsmasq[0].tftp_root=/tftpboot
 uci set dhcp.@dnsmasq[0].dhcp_boot=netbootme.kpxe

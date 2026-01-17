@@ -38,7 +38,7 @@ be visible.
 
 I decided to create my own iso image which I used as the second CD-ROM
 drive. This has two advantages - I can put there the VirtIO drivers and the
-"autostart.bat" script which needs to be executed manually after first boot.
+`autostart.bat` script which needs to be executed manually after first boot.
 
 Here is a short script to create such an ISO:
 
