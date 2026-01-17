@@ -147,7 +147,7 @@ rm /etc/issue
 
 Run the "livemedia-creator":
 
-```bash
+```console
 # livemedia-creator --make-pxe-live --live-rootfs-keep-size --image-name=my_fedora_img --tmp=/var/tmp/a --ks fedora26-my.ks --iso=/home/ruzickap/data2/iso/Fedora-Workstation-netinst-x86_64-26-1.5.iso --resultdir=/var/tmp/a/result
 /usr/lib64/python3.5/optparse.py:999: PendingDeprecationWarning: The KSOption class is deprecated and will be removed in pykickstart-3.  Use the argparse module instead.
   option = self.option_class(*args, **kwargs)
@@ -177,7 +177,7 @@ Run the "livemedia-creator":
 
 Then you should see the following file in `/var/tmp/a` directory:
 
-```bash
+```console
 $ find /var/tmp/a
 /var/tmp/a
 /var/tmp/a/result
