@@ -24,25 +24,25 @@ Here are the steps to configure your Raspberry Pi to use Grafana Cloud:
 ## Grafana Cloud Setup
 
 - Go to [Grafana Cloud](https://grafana.com/products/cloud/) and create a new
-account.
+  account.
 - Select your "Team URL" and region:
 
-![Grafana Cloud Team URL](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-team-url.avif)
+  ![Grafana Cloud Team URL](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-team-url.avif)
 
 - Then select the "Linux Server" and click "Install integration"
 
-![Linux Server Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/linux-server-integration.avif)
+  ![Linux Server Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/linux-server-integration.avif)
 
 - I left the "Debian - based" as a default and changed the "Architecture" to
-"Armv7"
+  "Armv7"
 - Copy the content from the Grafana Agent field and paste it to your shell
-connected to RPi
+  connected to RPi
 
-![Grafana Agent Configuration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-agent-configuration.avif)
+  ![Grafana Agent Configuration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-agent-configuration.avif)
 
 - Then continue by "Test integration and finish installation":
 
-![Test Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/test-integration.avif)
+  ![Test Integration](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/test-integration.avif)
 
 After these steps the Grafana Agent should be configured and should start
 sending data to Grafana Cloud.
@@ -157,7 +157,6 @@ server:
   http_listen_port: 12345
 EOF
 
-
 # Change the grafana agent config file /etc/prometheus/blackbox.yml and add preferred protocol
 cat > /etc/prometheus/blackbox.yml << EOF
 modules:
@@ -184,40 +183,42 @@ Then go to the Grafana Cloud again...
 
 - Login to Grafana Cloud again and click on Grafana:
 
-![Grafana Cloud Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-dashboard.avif)
+  ![Grafana Cloud Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-dashboard.avif)
 
 - Click on Import:
 
-![Import Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/import-dashboard.avif)
+  ![Import Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/import-dashboard.avif)
 
 - Import these Dashboards with numbers
 
-- [13659](https://grafana.com/grafana/dashboards/13659) - [Blackbox Exporter (HTTP prober)](https://grafana.com/grafana/dashboards/13659)
-- [9719](https://grafana.com/grafana/dashboards/9719) - [Decentralized Blackbox Exporter](https://grafana.com/grafana/dashboards/9719)
-- [12412](https://grafana.com/grafana/dashboards/12412) - [ICMP exporter](https://grafana.com/grafana/dashboards/12412)
-- [7587](https://grafana.com/grafana/dashboards/7587) - [Prometheus Blackbox Exporter](https://grafana.com/grafana/dashboards/7587)
-- [4202](https://grafana.com/grafana/dashboards/4202) - [Named processes by host](https://grafana.com/grafana/dashboards/4202)
-- [715](https://grafana.com/grafana/dashboards/715) - [Named processes stacked](https://grafana.com/grafana/dashboards/715)
-- [8378](https://grafana.com/grafana/dashboards/8378) - [System Processes Metrics](https://grafana.com/grafana/dashboards/8378)
-- [5984](https://grafana.com/grafana/dashboards/5984) - [Alerts - Linux Nodes](https://grafana.com/grafana/dashboards/5984)
-- [1860](https://grafana.com/grafana/dashboards/1860) - [Node Exporter Full](https://grafana.com/grafana/dashboards/1860)
-- [405](https://grafana.com/grafana/dashboards/405) - [Node Exporter Server Metrics](https://grafana.com/grafana/dashboards/405)
+  - [13659](https://grafana.com/grafana/dashboards/13659) - [Blackbox Exporter (HTTP prober)](https://grafana.com/grafana/dashboards/13659)
+  - [9719](https://grafana.com/grafana/dashboards/9719) - [Decentralized Blackbox Exporter](https://grafana.com/grafana/dashboards/9719)
+  - [12412](https://grafana.com/grafana/dashboards/12412) - [ICMP exporter](https://grafana.com/grafana/dashboards/12412)
+  - [7587](https://grafana.com/grafana/dashboards/7587) - [Prometheus Blackbox Exporter](https://grafana.com/grafana/dashboards/7587)
+  - [4202](https://grafana.com/grafana/dashboards/4202) - [Named processes by host](https://grafana.com/grafana/dashboards/4202)
+  - [715](https://grafana.com/grafana/dashboards/715) - [Named processes stacked](https://grafana.com/grafana/dashboards/715)
+  - [8378](https://grafana.com/grafana/dashboards/8378) - [System Processes Metrics](https://grafana.com/grafana/dashboards/8378)
+  - [5984](https://grafana.com/grafana/dashboards/5984) - [Alerts - Linux Nodes](https://grafana.com/grafana/dashboards/5984)
+  - [1860](https://grafana.com/grafana/dashboards/1860) - [Node Exporter Full](https://grafana.com/grafana/dashboards/1860)
+  - [405](https://grafana.com/grafana/dashboards/405) - [Node Exporter Server Metrics](https://grafana.com/grafana/dashboards/405)
 
 - Do not forget to select the proper prometheus datasource (ends with "-prom"):
 
-![Prometheus Datasource](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/prometheus-datasource.avif)
+  ![Prometheus Datasource](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/prometheus-datasource.avif)
 
 - After you import the Dashboard you should see them by going to
   "Dashboards -> Browse":
 
-![Dashboards Browse](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/dashboards-browse.avif)
+  ![Dashboards Browse](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/dashboards-browse.avif)
 
-![Node Exporter Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/node-exporter-dashboard.avif)
+  ![Node Exporter Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/node-exporter-dashboard.avif)
 
 - You can also see the logs from your RPi collected by Loki:
 
-![Loki Logs](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/loki-logs.avif)
+  ![Loki Logs](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/loki-logs.avif)
 
 The YouTube video showing all the steps can be found here:
+
+{% include embed/youtube.html id='Vx9MaBP1Uuo' %}
 
 Enjoy 😉

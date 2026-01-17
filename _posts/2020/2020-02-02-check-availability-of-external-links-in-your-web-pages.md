@@ -41,7 +41,7 @@ file defining which URLs should be checked/verified:
 
 ```bash
 git clone git@github.com:ruzickap/check_urls.git
-cd check_urls
+cd check_urls || true
 mkdir -p .github/workflows
 
 cat > .github/workflows/periodic-broken-link-checks.yml << \EOF
