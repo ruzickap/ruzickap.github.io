@@ -491,7 +491,7 @@ echo "dhcp-script=/etc/dnsmasq-script.sh" >> /etc/dnsmasq.conf
 cat > /etc/dnsmasq-script.sh > /etc/dnsmasq.script.log
 
 if [ "$1" == "add" ] && ! grep -iq $2 /etc/config/dhcp; then
- echo -e "Subject: New MAC on `uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`\\n\\n`/bin/date +"%F %T"` $*" | sendmail <petr.ruzicka@gmail.com>
+ echo -e "Subject: New MAC on `uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`\\n\\n`/bin/date +"%F %T"` $*" | sendmail petr.ruzicka@gmail.com
 fi
 EOF
 
@@ -742,7 +742,7 @@ cat > /etc/torrent-done.sh << \EOF
 
 ## !/bin/sh
 
-echo -e "Subject: $TR_TORRENT_NAME finished.\n\nTransmission finished downloading \"$TR_TORRENT_NAME\" on $TR_TIME_LOCALTIME" | /usr/sbin/ssmtp <petr.ruzicka@gmail.com>
+echo -e "Subject: $TR_TORRENT_NAME finished.\n\nTransmission finished downloading \"$TR_TORRENT_NAME\" on $TR_TIME_LOCALTIME" | /usr/sbin/ssmtp petr.ruzicka@gmail.com
 EOF
 chmod a+x /etc/torrent-done.sh
 

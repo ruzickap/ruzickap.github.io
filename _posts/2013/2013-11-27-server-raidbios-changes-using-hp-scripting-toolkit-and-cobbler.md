@@ -120,10 +120,10 @@ The full video can be seen here:
 
 {% include embed/youtube.html id='07-0wZGKtW8' %}
 
-You can find the examples of files modified by sed in the scripts in
+You can find the examples of files modified by `sed` in the scripts in
 [GitHub](https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/cobbler-ss_scripting_toolkit_linux).
 
-See also: [Example configuration files][example] - the configuration
+[Example configuration files][example] - the configuration
 "extracted" from the BL685c blade as shown in the video above.
 
 [example]: https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/cobbler-ss_scripting_toolkit_linux/data/hp/ss-scripting-toolkit-linux/blade_configs/test_hostname/data_files
