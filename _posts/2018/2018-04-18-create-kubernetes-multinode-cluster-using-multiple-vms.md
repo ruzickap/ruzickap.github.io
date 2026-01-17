@@ -22,12 +22,11 @@ There are many ways to install a Kubernetes Multinode Cluster but I chose
 these projects [kubeadm](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/)
 and [kubespray](https://kubespray.io/).
 
-![Kubernetes logo](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png)
+![Kubernetes logo](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png){:width="200"}
 
 - Kubespray is handy for enterprise installations where HA is a must, but it
   can be used for standard testing if you have [Ansible](https://www.ansible.com/)
   installed.
-
 - Kubeadm is the official tool for Kubernetes installation, but it needs more
   love when you want to use it in enterprise to configure HA.
 

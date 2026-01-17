@@ -98,6 +98,7 @@ Kubespray-cli.
   ```bash
   # Create Virtual env for Kubespray and make it active
   virtualenv --system-site-packages kubespray_virtenv
+  # shellcheck source=/dev/null
   source kubespray_virtenv/bin/activate
 
   # Install Ansible and Kubespray to virtualenv
