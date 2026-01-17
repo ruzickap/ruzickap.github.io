@@ -3,8 +3,8 @@ title: Using keep-sorted to organize Terraform objects
 author: Petr Ruzicka
 date: 2024-12-12
 description: Use keep-sorted to organize your Terraform objects in sorted order within your code
-categories: [Terraform, OpenTofu, keep-sorted, sort, iac, code]
-tags: [Terraform, OpenTofu, keep-sorted, sort, iac, code]
+categories: [DevOps]
+tags: [terraform]
 image: https://opengraph.githubassets.com/main/google/keep-sorted
 ---
 

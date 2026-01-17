@@ -3,8 +3,8 @@ title: digiKam thumbnails and Albums with photos stored on remote shares
 author: Petr Ruzicka
 date: 2009-03-22
 description: ""
-categories: [Linux, Desktop]
-tags: [bash, digiKam, KDE]
+categories: [Linux, Photography]
+tags: [photo-editing, bash]
 ---
 
 > <https://linux-old.xvx.cz/2009/03/digikam-thumbnails-and-albums-with-photos-stored-on-remote-shares/>

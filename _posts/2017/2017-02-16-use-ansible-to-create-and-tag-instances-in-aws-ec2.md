@@ -3,8 +3,8 @@ title: Use Ansible to create and tag Instances in AWS (EC2)
 author: Petr Ruzicka
 date: 2017-02-16
 description: Use Ansible to create and tag Instances in AWS (EC2)
-categories: [AWS, Linux]
-tags: [ec2, tag]
+categories: [Cloud, DevOps]
+tags: [ec2, ansible]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2017/02/use-ansible-to-create-and-tag-instances.html)

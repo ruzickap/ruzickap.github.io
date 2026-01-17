@@ -3,8 +3,8 @@ title: Perl Oracle client manual installation to home directory in Debian
 author: Petr Ruzicka
 date: 2010-03-17
 description: ""
-categories: [Linux, Debian]
-tags: [perl, Oracle, database]
+categories: [Linux, Storage]
+tags: [database, debian]
 ---
 
 > <https://linux-old.xvx.cz/2010/03/perl-oracle-client-manual-installation-to-home-directory-in-debian/>

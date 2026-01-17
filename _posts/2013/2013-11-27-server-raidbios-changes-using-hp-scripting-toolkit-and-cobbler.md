@@ -3,8 +3,8 @@ title: Server RAID/BIOS changes using HP Scripting toolkit and Cobbler
 author: Petr Ruzicka
 date: 2013-11-27
 description: Server RAID/BIOS changes using HP Scripting toolkit and Cobbler
-categories: [Linux]
-tags: [hp, SmartStart Scripting Toolkit, cobbler, RAID, Proliant, pxe boot, BL685c, BIOS, HP Scripting Toolkit, BL460c, nfs, dhcp]
+categories: [Linux, Networking]
+tags: [hp-server, cobbler, raid, pxe]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2013/11/server-raidbios-changes-using-hp.html)

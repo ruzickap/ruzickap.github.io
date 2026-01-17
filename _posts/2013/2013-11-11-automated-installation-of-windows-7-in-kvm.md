@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2013-11-11
 description: Automated installation of Windows 7 in KVM
 categories: [Virtualization, Windows]
-tags: [unattended, virtio, batch, script, scis, automated, bat, Red Hat VirtIO]
+tags: [kvm, windows, automation]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2013/11/automated-installation-of-windows-7-in.html)

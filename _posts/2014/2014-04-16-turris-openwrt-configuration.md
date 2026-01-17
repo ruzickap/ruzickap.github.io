@@ -3,8 +3,8 @@ title: Turris - OpenWrt configuration
 author: Petr Ruzicka
 date: 2014-04-16
 description: Turris - OpenWrt configuration
-categories: [OpenWrt]
-tags: [wifi, router, turris, nic.cz, nic, open, hardware]
+categories: [OpenWrt, Networking]
+tags: [turris, router, wifi]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/04/turris-openwrt-configuration.html)

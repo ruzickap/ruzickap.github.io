@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2010-03-23
 description: ""
 categories: [Linux, Storage]
-tags: [RAID, SMART, mdadm, GRUB]
+tags: [raid, storage]
 ---
 
 > <https://linux-old.xvx.cz/2010/03/raid-disk-check-in-linux/>

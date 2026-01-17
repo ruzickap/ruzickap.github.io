@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2014-04-22
 description: Turris - OpenWRT and thermometers
 categories: [OpenWrt]
-tags: [temperature, rrdtool, thermometer, turris]
+tags: [turris, monitoring]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/04/turris-openwrt-and-thermometers.html)

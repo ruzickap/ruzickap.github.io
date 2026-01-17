@@ -3,8 +3,8 @@ title: Notes about upgrade from CyanogenMod 7.0 to 7.2
 author: Petr Ruzicka
 date: 2013-05-27
 description: ""
-categories: [Linux, Android]
-tags: [HTC-Desire, CyanogenMod, adb, backup]
+categories: [Android]
+tags: [htc-desire, cyanogenmod, adb]
 ---
 
 > Not completed...

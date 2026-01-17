@@ -3,8 +3,8 @@ title: Encrypted disks with remote key placed on http server
 author: Petr Ruzicka
 date: 2009-06-07
 description: ""
-categories: [Linux, Storage]
-tags: [bash, LVM, USB, wget, encryption, dm-crypt]
+categories: [Linux, Storage, Security]
+tags: [lvm, bash, security]
 ---
 
 > <https://linux-old.xvx.cz/2009/06/crypted-disks-with-remote-key-placed-on-http-server/>

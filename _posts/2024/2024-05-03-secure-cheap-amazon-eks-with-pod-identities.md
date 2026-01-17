@@ -3,8 +3,8 @@ title: Build secure and cheap Amazon EKS with Pod Identities
 author: Petr Ruzicka
 date: 2024-05-03
 description: Build "cheap and secure" Amazon EKS with Pod Identities, network policies, cluster encryption and logging
-categories: [Kubernetes, Amazon EKS, Security, EKS Pod Identities]
-tags: [amazon eks, k8s, kubernetes, security, eksctl, cert-manager, external-dns, podinfo, prometheus, sso, oauth2-proxy, metrics-server, eks pod identities]
+categories: [Kubernetes, Cloud, Security]
+tags: [amazon-eks, kubernetes, security, eksctl, cert-manager, external-dns, prometheus]
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 

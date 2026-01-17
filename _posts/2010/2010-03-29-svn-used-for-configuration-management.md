@@ -3,8 +3,8 @@ title: SVN used for configuration management
 author: Petr Ruzicka
 date: 2010-03-29
 description: ""
-categories: [Linux, Server]
-tags: [SVN, Apache, configuration-management, WebSVN]
+categories: [Linux, DevOps]
+tags: [automation]
 ---
 
 > <https://linux-old.xvx.cz/2010/03/svn-used-for-configuration-management/>

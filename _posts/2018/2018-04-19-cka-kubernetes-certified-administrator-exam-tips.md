@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2018-04-19
 description: CKA - Kubernetes Certified Administrator exam tips
 categories: [Kubernetes]
-tags: [exam, cka, kubectl, mutinode, screen, bash completion, tips]
+tags: [kubernetes, cka, kubectl]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2018/04/cka-kubernetes-certified-administrator.html)

@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2014-12-23
 description: Installation F5 BIGIP Virtual Edition to RHEL7
 categories: [Virtualization, Networking]
-tags: [nmcli, LTM, Local Traffic Manager, iapp, bond, bigip, BIG-IP, vlan, bridge]
+tags: [load-balancer, rhel]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/12/installtion-f5-bigip-virtual-edition-to.html)

@@ -3,8 +3,8 @@ title: Secrets Store CSI Driver and Reloader
 author: Petr Ruzicka
 date: 2023-04-01
 description: Deploy Trivy Operator and Grafana Dashboard
-categories: [Kubernetes, Amazon EKS, secrets-store-csi-driver, Reloader, AWS Secrets Manager]
-tags: [Amazon EKS, k8s, kubernetes, secrets-store-csi-driver, reloader, AWS Secrets Manager]
+categories: [Kubernetes, Cloud, Security]
+tags: [amazon-eks, kubernetes, security]
 image: https://raw.githubusercontent.com/kubernetes/community/487f994c013ea61d92cf9a341af7620037abbce3/icons/svg/resources/unlabeled/secret.svg
 ---
 

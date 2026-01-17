@@ -3,8 +3,8 @@ title: Running Kubernetes on AppVeyor with minikube
 author: Petr Ruzicka
 date: 2018-04-20
 description: Running Kubernetes on AppVeyor with minikube
-categories: [Kubernetes]
-tags: [.appveyor.yml, appveyor, ci, minikube, travis]
+categories: [Kubernetes, DevOps]
+tags: [kubernetes, automation]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2018/04/running-kubernetes-on-appveyor-with.html)

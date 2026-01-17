@@ -3,8 +3,8 @@ title: OpenWrt with Transmission, Samba and vsftpd
 author: Petr Ruzicka
 date: 2010-12-01
 description: ""
-categories: [Linux, OpenWrt]
-tags: [Transmission, Samba, vsftpd, WiFi, USB, TP-Link]
+categories: [OpenWrt, Networking]
+tags: [tp-link, torrent]
 ---
 
 > <https://linux-old.xvx.cz/2010/12/openwrt-with-transmission-samba-and-vsftpd/>

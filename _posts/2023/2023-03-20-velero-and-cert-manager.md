@@ -3,8 +3,8 @@ title: Velero and cert-manager
 author: Petr Ruzicka
 date: 2023-03-20
 description: Velero and cert-manager
-categories: [Kubernetes, Amazon EKS, Velero, cert-manager]
-tags: [Amazon EKS, k8s, kubernetes, velero, cert-manager, certificates]
+categories: [Kubernetes, Cloud]
+tags: [amazon-eks, kubernetes, velero, cert-manager]
 image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg
 ---
 

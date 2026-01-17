@@ -3,8 +3,8 @@ title: Disable IPv6 in Debian
 author: Petr Ruzicka
 date: 2009-12-29
 description: ""
-categories: [Linux, Debian]
-tags: [GRUB, IPv6, networking]
+categories: [Linux, Networking]
+tags: [debian, grub]
 ---
 
 > <https://linux-old.xvx.cz/2009/12/disable-ipv6-in-debian/>

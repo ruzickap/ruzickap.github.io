@@ -3,8 +3,8 @@ title: Amazon EKS - Karpenter tests
 author: Petr Ruzicka
 date: 2022-12-24
 description: Run Amazon EKS and create workloads for Karpenter
-categories: [Kubernetes, Amazon EKS, Karpenter]
-tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl]
+categories: [Kubernetes, Cloud]
+tags: [amazon-eks, kubernetes, karpenter, eksctl]
 image: https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png
 ---
 

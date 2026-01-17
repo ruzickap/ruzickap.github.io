@@ -3,8 +3,8 @@ title: How-to build PXE Fedora 26 live image
 author: Petr Ruzicka
 date: 2017-07-16
 description: How-to build PXE Fedora 26 live image
-categories: [Linux]
-tags: [lorax, tftp, pxe, dhcp, live, pxe boot]
+categories: [Linux, Networking]
+tags: [pxe]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html)

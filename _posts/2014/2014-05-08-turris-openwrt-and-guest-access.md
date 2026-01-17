@@ -3,8 +3,8 @@ title: Turris - OpenWRT and guest access
 author: Petr Ruzicka
 date: 2014-05-08
 description: Turris - OpenWRT and guest access
-categories: [OpenWrt]
-tags: [router, wifi, turris, nic.cz, nic, captive portal, open, hardware]
+categories: [OpenWrt, Networking]
+tags: [turris, router, wifi, hotspot]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/05/turris-openwrt-and-guest-access.html)

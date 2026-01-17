@@ -3,8 +3,8 @@ title: VMware vCenter Server 5.x Appliance installation and configuration using 
 author: Petr Ruzicka
 date: 2014-09-27
 description: VMware vCenter Server 5.x Appliance installation and configuration using ssh command line
-categories: [Linux]
-tags: [appliance, ovftool, vmware, command line, vcenter, ssh]
+categories: [Virtualization]
+tags: [vmware]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2014/09/vmware-vcenter-server-5x-appliance.html)

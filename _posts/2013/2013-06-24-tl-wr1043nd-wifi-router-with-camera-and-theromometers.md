@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2013-06-24
 description: TL-WR1043ND wifi router with camera and thermometers
 categories: [OpenWrt]
-tags: [TL-WR1043ND, WiFi, router, webcam, temperature, digitemp]
+tags: [tp-link, router, monitoring]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2013/06/tl-wr1043nd-wifi-router-with-camera-and.html)

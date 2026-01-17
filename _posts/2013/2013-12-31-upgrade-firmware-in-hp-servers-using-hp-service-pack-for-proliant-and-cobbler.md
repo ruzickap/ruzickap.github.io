@@ -3,8 +3,8 @@ title: Upgrade firmware in HP servers using HP Service Pack for ProLiant and Cob
 author: Petr Ruzicka
 date: 2013-12-31
 description: Upgrade firmware in HP servers using HP Service Pack for ProLiant and Cobbler
-categories: [Linux]
-tags: [server, upgrade, hp, hp spp, nfs, cobbler, pxe, firmware, pxe boot]
+categories: [Linux, Networking]
+tags: [hp-server, cobbler, pxe]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2013/12/upgrade-firmware-in-hp-servers-using-hp.html)

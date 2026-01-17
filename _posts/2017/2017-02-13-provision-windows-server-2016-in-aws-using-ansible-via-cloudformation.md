@@ -3,8 +3,8 @@ title: Provision Windows Server 2016 in AWS using Ansible via CloudFormation
 author: Petr Ruzicka
 date: 2017-02-13
 description: Provision Windows Server 2016 in AWS using Ansible via CloudFormation
-categories: [AWS, Ansible]
-tags: [jinja2, cloudformation]
+categories: [Cloud, DevOps, Windows]
+tags: [ec2, ansible, windows]
 ---
 
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2017/02/provision-windows-server-2016-in-aws.html)

@@ -3,8 +3,8 @@ title: BOINC managed from command line - boinc_cmd
 author: Petr Ruzicka
 date: 2009-02-20
 description: ""
-categories: [Linux, Server]
-tags: [bash, BOINC]
+categories: [Linux]
+tags: [boinc, bash]
 ---
 
 > <https://linux-old.xvx.cz/2009/02/boinc-managed-from-command-line-boinc_cmd/>

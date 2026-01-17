@@ -3,8 +3,8 @@ title: Run the cheapest Amazon EKS
 author: Petr Ruzicka
 date: 2022-11-27
 description: Start the cheapest Amazon EKS using eksctl
-categories: [Kubernetes, Amazon EKS]
-tags: [Amazon EKS, k8s, kubernetes, karpenter, eksctl, cert-manager, external-dns, podinfo]
+categories: [Kubernetes, Cloud]
+tags: [amazon-eks, kubernetes, karpenter, eksctl, cert-manager, external-dns]
 image: https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/icon-aws-amazon-eks.svg
 ---
 

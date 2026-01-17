@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2010-04-11
 description: ""
 categories: [Linux, Networking]
-tags: [PXE, Dnsmasq, TFTP, SystemRescueCD, GRUB]
+tags: [pxe, dnsmasq, grub]
 ---
 
 > <https://linux-old.xvx.cz/2010/04/pxe-server-using-dnsmasq-and-systemrescuecd-with-minimal-effort/>
