@@ -18,7 +18,7 @@ through some CI to be sure they are correct.
 I was looking for a way to run Kubernetes via
 [minikube](https://github.com/kubernetes/minikube) in [Travis
 CI](https://travis-ci.org/) and there are "some" ways:
-[https://blog.travis-ci.com/2017-10-26-running-kubernetes-on-travis-ci-with-minikube](https://blog.travis-ci.com/2017-10-26-running-kubernetes-on-travis-ci-with-minikube)
+[Running Kubernetes on Travis CI with minikube](https://web.archive.org/web/20171213061419/https://blog.travis-ci.com/2017-10-26-running-kubernetes-on-travis-ci-with-minikube)
 
 Unfortunately I didn't have much luck with the latest minikube (0.26) and the
 latest Kubernetes (1.10) when I tried to make it work on Travis.

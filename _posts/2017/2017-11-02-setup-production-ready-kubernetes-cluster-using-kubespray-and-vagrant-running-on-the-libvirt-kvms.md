@@ -33,9 +33,7 @@ there.
 ![image](https://github.com/kubernetes/kubernetes/raw/master/logo/logo.png)
 
 I'll use 3 VMs, all 3 have etcd installed, all 3 are nodes (running pods), 2 of
-them run master components:
-
-![image](https://s32.postimg.org/8q7gns8ut/3nodes.png)
+them run master components.
 
 (you can use more VMs with more advanced setup:
 <https://github.com/kubespray/kubespray-cli>)

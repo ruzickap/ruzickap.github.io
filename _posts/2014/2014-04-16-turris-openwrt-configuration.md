@@ -196,9 +196,6 @@ uci set rainbow.@led[-1].color=FFFF00
 uci set rainbow.@led[-1].status=auto
 ```
 
-Another configuration of the LED (Knight Rider) can bee seen in this
-[video](https://www.youtube.com/watch?v=ndbqqNOe4Ek&feature=youtu.be).
-
 Add favorite packages and configure [Midnight
 Commander](https://www.midnight-commander.org/),
 [screen](https://www.gnu.org/software/screen/) and email.

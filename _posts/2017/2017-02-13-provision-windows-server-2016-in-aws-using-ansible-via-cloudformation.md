@@ -46,6 +46,8 @@ Here you can find the files:
 
 - group_vars/all
 
+{% raw %}
+
 ```bash
 ansible_winrm_operation_timeout_sec: 100
 ansible_winrm_read_timeout_sec: 120
@@ -79,7 +81,11 @@ aws_cf_instance_tags:
   Environment: "{{ aws_cf_tags.Environment }}"
 ```
 
+{% endraw %}
+
 - tasks/create_cf_stack.yml
+
+{% raw %}
 
 ```yaml
 - name: Search for the latest Windows Server 2016 AMI
@@ -185,6 +191,8 @@ aws_cf_instance_tags:
     label: "{{ item.1.id }} - {{ item.1.private_ip_address }} - {{ item.1.tags.Name }}"
 ```
 
+{% endraw %}
+
 - tasks/win.yml
 
 ```yaml
@@ -214,6 +222,8 @@ aws_cf_instance_tags:
 ```
 
 - templates/aws_cf_stack.yml.j2
+
+{% raw %}
 
 ```bash
 ---
@@ -328,6 +338,8 @@ Outputs:
     Value: !Join [ ' ', [ win01, !GetAtt win01.PrivateIp ] ]
     Description: Windows Servers
 ```
+
+{% endraw %}
 
 - site_aws.yml
 

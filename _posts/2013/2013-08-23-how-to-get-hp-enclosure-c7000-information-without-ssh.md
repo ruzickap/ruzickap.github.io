@@ -51,8 +51,4 @@ curl --noproxy '*' --cookie "encLocalKey=$OASESSIONKEY; encLocalUser=$USER" --in
 $WGET https://$IP/xmldata?item=all -O $DESTINATION/$IP.xml
 ```
 
-Here is the external link:
-
-[http://h20000.www2.hp.com/bizsupport/TechSupport/Document.jsp?lang=en&cc=us&objectID=c02843807](http://h20000.www2.hp.com/bizsupport/TechSupport/Document.jsp?lang=en&cc=us&objectID=c02843807)
-
 Enjoy :-)

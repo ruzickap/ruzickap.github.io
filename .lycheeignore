@@ -11,6 +11,7 @@ https://(grafana|oauth2-proxy|ollama-vulnerable|open-webui|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090
 kubernetes-sigs\.github\.io/aws-ebs-csi-driver
 kubernetes\.io
+medium\.com
 mylabs\.dev
 smartmontools\.sourceforge\.net
 stefanprodan\.github\.io

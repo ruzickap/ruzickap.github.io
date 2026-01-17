@@ -27,9 +27,7 @@ Let's see how you can install and configure Cobbler, NFS, PXE, tftpboot and HP
 Scripting Toolkit to modify the BIOS/RAID information on the server.
 
 Start with installing the latest [CentOS](https://www.centos.org/), getting the
-[SmartStart Scripting
-Toolkit](https://h20565.www2.hp.com/portal/site/hpsc/template.PAGE/public/psi/swdDetails/?lang=en&cc=us&sp4ts.oid=3884320&swItem=MTX_0f89a85c349f4a1497cd967b58)
-and basic [NFS](https://en.wikipedia.org/wiki/Network_File_System)
+SmartStart Scripting Toolkit and basic [NFS](https://en.wikipedia.org/wiki/Network_File_System)
 configuration:
 
 ```bash
