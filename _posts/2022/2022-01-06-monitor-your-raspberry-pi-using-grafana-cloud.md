@@ -182,7 +182,7 @@ Then go to the Grafana Cloud again...
 
 - Login to Grafana Cloud again and click on Grafana:
 
-  ![Grafana Cloud Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-dashboard.avif){:width="400"}
+  ![Grafana Cloud Dashboard](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-dashboard.avif){:width="600"}
 
 - Click on Import:
 
