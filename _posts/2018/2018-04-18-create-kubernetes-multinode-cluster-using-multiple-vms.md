@@ -111,7 +111,7 @@ exit
 ssh root@node1 "kubeadm token create --print-join-command"
 
 # You should see something like:
--> kubeadm join <master-ip>:<master-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+# -> kubeadm join <master-ip>:<master-port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
 
 # Execute the generated command on all worker nodes...
 ssh -t root@node2 "kubeadm join --token ... ... ... ... ... ..."
