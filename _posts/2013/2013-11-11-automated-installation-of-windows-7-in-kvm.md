@@ -46,20 +46,20 @@ Here is a short script to create such an ISO:
 #!/bin/bash -x
 
 URL="http://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-65.iso"
-ISO=$(basename $URL)
+ISO=$(basename "$URL")
 
 sudo rm autostart.iso
-wget --continue $URL
+wget --continue "$URL"
 
-sudo mount -o loop ./$ISO /mnt/iso
+sudo mount -o loop "./$ISO" /mnt/iso
 
 mkdir -v cd
 #32 bit
-cp -v /mnt/iso/win7/x86/* $PWD/cd/
+cp -v /mnt/iso/win7/x86/* "$PWD/cd/"
 #64 bit
-#cp -v -r /mnt/iso/win7/amd64/* $PWD/cd/
+#cp -v -r /mnt/iso/win7/amd64/* "$PWD/cd/"
 
-cat > $PWD/cd/autorun.bat << \EOF
+cat > "$PWD/cd/autorun.bat" << \EOF
 :: Tested on Windows Win7
 
 powershell -command "$client = new-object System.Net.WebClient; $client.DownloadFile(\"https://gist.github.com/ruzickap/7395426/raw/win7-admin.bat\", \"c:\win7-admin.bat\")"
@@ -68,12 +68,12 @@ powershell -command "$client = new-object System.Net.WebClient; $client.Download
 c:\win7-user.bat
 EOF
 
-chmod 644 $PWD/cd/*
+chmod 644 "$PWD/cd/"*
 genisoimage -v -V AUTOSTART -J -r -o autostart.iso cd/*
 
 sudo umount /mnt/iso
-rm -rvf $PWD/cd
-rm $ISO
+rm -rvf "$PWD/cd"
+rm "$ISO"
 ```
 
 Another screenshot showing the second CD-ROM with the `autostart.iso`:
@@ -88,7 +88,7 @@ and download+run [win7-user.bat](https://gist.github.com/ruzickap/7395075).
 
 You can see the content of the [win7-user.bat](https://gist.github.com/ruzickap/7395075) here:
 
-```bash
+```powershell
 :: Tested on Windows 7
 
 echo on
@@ -215,7 +215,7 @@ After the restart you should login as Administrator (with password `xxxx`)
 and complete installation by running [win7-admin.bat](https://gist.github.com/ruzickap/7395426)
 shown here:
 
-```bash
+```powershell
 :: Tested on Windows 7
 
 

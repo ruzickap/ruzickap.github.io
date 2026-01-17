@@ -95,7 +95,7 @@ sed -i 's@/usr/bin/mc@/usr/bin/mc --nomouse@' /usr/share/mc/bin/mc-wrapper.sh
 ```
 
 Then you can automatically register the ESXi servers to the vCenter using
-"[joinvCenter.py](https://github.com/lamw/vghetto-scripts/blob/master/python/joinvCenter.py)".
+[joinvCenter.py](https://github.com/lamw/vghetto-scripts/blob/master/python/joinvCenter.py).
 Details here [https://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html](https://www.virtuallyghetto.com/2011/03/how-to-automatically-add-esxi-host-to.html).
 
 Thank you guys from the [virtuallyGhetto](https://www.virtuallyghetto.com/) for
