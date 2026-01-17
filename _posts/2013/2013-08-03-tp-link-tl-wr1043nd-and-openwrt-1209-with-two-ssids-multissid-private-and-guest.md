@@ -17,7 +17,7 @@ I decided to change my home network to match the following "network diagram":
 The core part of the design is [TP-Link
 TL-WR1043ND](https://www.tp-link.com/en/products/details/?model=TL-WR1043ND) wifi
 router running [OpenWrt](https://openwrt.org/) with a small 16GB USB stick
-[/dev/sda1] containing ext3 partition with OpenWrt configuration + swap.
+`/dev/sda1` containing ext3 partition with OpenWrt configuration + swap.
 
 There is also a 16GB USB stick and 2 thermometers connected using USB Serial
 connector (bought on eBay):
@@ -272,7 +272,7 @@ uci set dhcp.@host[-1].mac=00:1f:c6:e9:f5:14
 Configure the ssh to enable autologin:
 
 ```bash
-scp $HOME/.ssh/id_rsa.pub root@192.168.1.1:/tmp/authorized_keys
+scp "$HOME/.ssh/id_rsa.pub" root@192.168.1.1:/tmp/authorized_keys
 ssh root@192.168.1.1
 cp /tmp/authorized_keys /etc/dropbear/authorized_keys
 chmod 600 /etc/dropbear/authorized_keys
@@ -386,9 +386,8 @@ uci set 'ddns.myddns.update_url=http://www.duckdns.org/update?domains=[DOMAIN]&t
 
 Here are some details about thermometers:
 
-[DS18S20 article](https://web.archive.org/web/20130219033601/http://www.linuxfocus.org/English/November2003/article315.shtml)
-
-[https://martybugs.net/electronics/tempsensor/hardware.cgi](https://martybugs.net/electronics/tempsensor/hardware.cgi)
+* [DS18S20 article](https://web.archive.org/web/20130219033601/http://www.linuxfocus.org/English/November2003/article315.shtml)
+* [https://martybugs.net/electronics/tempsensor/hardware.cgi](https://martybugs.net/electronics/tempsensor/hardware.cgi)
 
 Configure thermometers:
 
