@@ -92,7 +92,7 @@ yum install -y http://ftp.fi.muni.cz/pub/linux/fedora/epel/7/x86_64/e/epel-relea
 yum install -y bash-completion bind-utils bridge-utils dstat htop httpd ipmitool iotop lftp lsof mailx man mc mlocate mutt net-snmp net-snmp-utils net-tools nmap ntp ntpdate openssh-clients postfix rsync sos smartmontools screen strace sysstat telnet tcpdump traceroute unzip vim wget wireshark xz yum-utils
 
 sed -i 's@^\*/10 \*@\*/1 \*@' /etc/cron.d/sysstat
-echo "PS1='\[\033[01;31m\]\h\[\033[01;34m\] \w #\[\033[00m\] '" >> /root/.bashrc
+printf '%s\n' "PS1='\[\033[01;31m\]\h\[\033[01;34m\] \w #\[\033[00m\] '" >> /root/.bashrc
 echo -e "\nalias sar='LANG=C sar'" >> /etc/bashrc
 
 cat >> /etc/screenrc << EOF

@@ -137,7 +137,10 @@ vagrant up
 
 # Check the VMs - all should be running
 VIRSH_VMS=$(virsh list | awk '/_kvm/ { print $2 }')
-for VIRSH_VM in $VIRSH_VMS; do echo "*** $VIRSH_VM"; virsh dumpxml "$VIRSH_VM" | grep 'mac address' | sort; done
+for VIRSH_VM in $VIRSH_VMS; do
+  echo "*** $VIRSH_VM"
+  virsh dumpxml "$VIRSH_VM" | grep 'mac address' | sort
+done
 
 # Check the subnets
 virsh net-list --all | grep network

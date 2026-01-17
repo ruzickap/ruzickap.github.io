@@ -75,7 +75,7 @@ cd /data || exit
 mkdir -p "$BACKUP_DESTINATION/data/"
 for item in *; do
   case "$item" in
-    dalvik-cache|lost+found) ;;
+    dalvik-cache | lost+found) ;;
     *) cp -R "$item" "$BACKUP_DESTINATION/data/" ;;
   esac
 done
@@ -86,9 +86,9 @@ Move applications to sdcard:
 ```bash
 for APK in ApplicationsProvider.apk CarHomeGoogle.apk CarHomeLauncher.apk com.amazon.mp3.apk Development.apk Email.apk Facebook.apk GenieWidget.apk googlevoice.apk Maps.apk PicoTts.apk Protips.apk RomManager.apk SetupWizard.apk SpeechRecorder.apk Stk.apk Street.apk Talk.apk TtsService.apk Twitter.apk VoiceDialer.apk YouTube.apk; do
   echo "*** $APK"
-  mkdir "$BACKUP_DESTINATION/$APK" && \
-  mv "/system/app/$APK" "$BACKUP_DESTINATION/$APK/" && \
-  mv "/data/data/$(awk -F \" "/$APK/ { print \$2 }" /data/system/packages.xml)" "$BACKUP_DESTINATION/$APK/"
+  mkdir "$BACKUP_DESTINATION/$APK" &&
+    mv "/system/app/$APK" "$BACKUP_DESTINATION/$APK/" &&
+    mv "/data/data/$(awk -F \" "/$APK/ { print \$2 }" /data/system/packages.xml)" "$BACKUP_DESTINATION/$APK/"
   #/system/bin/pm uninstall $(awk -F \" '/package.apk/ { print $2 }' /data/system/packages.xml)
 done
 ```
