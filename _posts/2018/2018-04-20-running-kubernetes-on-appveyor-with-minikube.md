@@ -32,11 +32,9 @@ advantages:
 
 - Your build environment is running in VM with 2 x CPU and 8GB of RAM and it can
   be running for 1 hour (can be extended to 1:30).
-
 - It supports [Ubuntu Xenial 16.04](https://www.appveyor.com/docs/getting-started-with-appveyor-for-linux/#running-your-build-on-linux)
   and [Windows](https://www.appveyor.com/docs/build-environment/#build-worker-images)
   images (both with a lot of software preinstalled).
-
 - You can access the Linux VM via SSH: [https://www.appveyor.com/docs/getting-started-with-appveyor-for-linux/#accessing-build-vm-via-ssh](https://www.appveyor.com/docs/getting-started-with-appveyor-for-linux/#accessing-build-vm-via-ssh).
   You can also [access Windows build](https://www.appveyor.com/docs/how-to/rdp-to-build-worker/)
   (via RDP).
