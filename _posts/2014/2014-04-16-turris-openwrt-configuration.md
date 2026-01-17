@@ -95,8 +95,8 @@ cat > /etc/dnsmasq-script.sh << \EOF
 
 /bin/echo `/bin/date +"%F %T"` $* >> /etc/dnsmasq.script.log
 
-if [ "$1" == "add" ] && ! grep -iq $2 /etc/config/dhcp; then
-  echo -e "Subject: New MAC on `uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`\\n\\n`/bin/date +"%F %T"` $*" | sendmail petr.ruzicka@gmail.com
+if [ "$1" == "add" ] && ! grep -iq "$2" /etc/config/dhcp; then
+  echo -e "Subject: New MAC on $(uci get system.@system[0].hostname).$(uci get dhcp.@dnsmasq[0].domain)\\n\\n$(/bin/date +"%F %T") $*" | sendmail petr.ruzicka@gmail.com
 fi
 EOF
 
@@ -245,6 +245,7 @@ sed -i 's/^export PS1.*/export PS1='\''\\\[\\033\[01;31m\\\]\\h\\\[\\033\[01;34m
 sed -i "s/^mailhub=.*/mailhub=mail.upcmail.cz/;s/^rewriteDomain=.*/rewriteDomain=xvx.cz/;s/^hostname.*/hostname=`uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`/" /etc/ssmtp/ssmtp.conf
 
 #Reboot email
+# shellcheck disable=SC2016 # Single quotes intentional - backticks expand on router, not locally
 sed -i '/^exit 0/i echo -e "Subject: Reboot `uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`\\n\\nOpenwrt rebooted: `date; uptime`\\n" | sendmail petr.ruzicka@gmail.com' /etc/rc.local
 
 #Disable IPv6 in Unbound (and flooding the logs by ipv6 error messages)
@@ -464,7 +465,7 @@ cat > /www3/myadmin/vnstat/index.html << EOF
   <body>
 EOF
 
-for IFCE in $(ls -1 `awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf`); do
+for IFCE in "$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf)"/*; do
 cat >> /www3/myadmin/vnstat/index.html << EOF
     <h2>Traffic of Interface $IFCE</h2>
     <table>

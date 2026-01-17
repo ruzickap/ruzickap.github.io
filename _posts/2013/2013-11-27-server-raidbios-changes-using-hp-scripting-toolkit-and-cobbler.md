@@ -44,18 +44,21 @@ EOF
 
 wget --no-verbose http://ftp.hp.com/pub/softlib2/software1/pubsw-linux/p1221080004/v63551/ss-scripting-toolkit-linux-8.70.tar.gz -P /data/hp/
 
-cd /data/hp/
+cd /data/hp/ || exit
 tar xzf ss-scripting-toolkit-linux*.tar.gz
 ln -s ss-scripting-toolkit-linux-8.70 ss-scripting-toolkit-linux
 mkdir /data/hp/ss-scripting-toolkit-linux/blade_configs
 
 sed -i.orig 's/export TZ=.*/export TZ=MET-1METDST/;s@export TOOLKIT_WRITE_DIR=.*@export TOOLKIT_WRITE_DIR=/data/hp/ss-scripting-toolkit-linux@;' /data/hp/ss-scripting-toolkit-linux/scripts/includes
 
+# shellcheck disable=SC2016 # Single quotes intentional - preserving ${VARIABLE} literals in target files
 sed -i.orig 's/partimage/#partimage/;s@\${PROFILE_MNT}/\${PROFILENAME}@\${PROFILE_MNT}/blade_configs/\${PROFILENAME}@;s@^\${TOOLKIT}/reboot@poweroff -f@;/Mounting Storage/a mkdir \${PROFILE_MNT}' /data/hp/ss-scripting-toolkit-linux/scripts/capture.sh /data/hp/ss-scripting-toolkit-linux/scripts/deploy.sh
 
+# shellcheck disable=SC2016 # Single quotes intentional - preserving ${VARIABLE} literals in target files
 sed -i 's@\${PROFILE_MNT}/\$PROFILENAME@\${PROFILE_MNT}/blade_configs/\$PROFILENAME@' /data/hp/ss-scripting-toolkit-linux/scripts/capture.sh
 
-sed  's@/mnt/main/scripts/includes@/TOOLKIT/includes@;s@cp -a \${RAM_TOOLKIT_DIR}@#&@;s@./rbsureset -reset@./rbsureset #-reset@;s/^reboot/poweroff -f/' /data/hp/ss-scripting-toolkit-linux/contrib/LinuxCOE/scripts/systemreset.sh > /data/hp/ss-scripting-toolkit-linux/scripts/systemreset.sh
+# shellcheck disable=SC2016 # Single quotes intentional - preserving ${VARIABLE} literals in target files
+sed 's@/mnt/main/scripts/includes@/TOOLKIT/includes@;s@cp -a \${RAM_TOOLKIT_DIR}@#&@;s@./rbsureset -reset@./rbsureset #-reset@;s/^reboot/poweroff -f/' /data/hp/ss-scripting-toolkit-linux/contrib/LinuxCOE/scripts/systemreset.sh > /data/hp/ss-scripting-toolkit-linux/scripts/systemreset.sh
 chmod a+x /data/hp/ss-scripting-toolkit-linux/scripts/systemreset.sh
 ```
 

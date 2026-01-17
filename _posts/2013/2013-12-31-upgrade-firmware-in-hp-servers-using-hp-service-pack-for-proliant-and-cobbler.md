@@ -36,7 +36,7 @@ cat > /etc/exports << EOF
 /data                                   0.0.0.0/0.0.0.0(ro,no_root_squash,no_subtree_check,async,crossmnt,fsid=0)
 EOF
 
-cd /data/hp/
+cd /data/hp/ || exit
 wget http://ftp.okhysing.is/hp/spp/2013-09/HP_Service_Pack_for_Proliant_2013.09.0-0_744345-001_spp_2013.09.0-SPP2013090.2013_0830.30.iso
 
 ln -s HP_Service_Pack_for_Proliant_2013.09.0-0_744345-001_spp_2013.09.0-SPP2013090.2013_0830.30.iso HPSPP.iso
@@ -71,10 +71,10 @@ sed -i.orig 's/192.168.1.0/10.29.49.0/;s/192.168.1.5;/10.29.49.1;/;s/192.168.1.1
 # Configure DHCPd
 sed -i.orig 's/^DHCPDARGS=.*/DHCPDARGS="eth0"/' /etc/sysconfig/dhcpd
 
-SPP_INITRD=`ls /data/hp/HP_Service_Pack_for_Proliant/pxe/spp*/initrd.img`
-SPP_KERNEL=`ls /data/hp/HP_Service_Pack_for_Proliant/pxe/spp*/vmlinuz`
-cobbler distro add --name=hp-sos --arch=i386 --kernel=$SPP_KERNEL --initrd=$SPP_INITRD \
---kopts '!kssendmac !ksdevice !lang !text rw root=/dev/ram0 init=/bin/init loglevel=3 splash=verbose showopts media=net iso1=nfs://10.29.49.7/data/hp/HPSPP.iso iso1mnt=/mnt/bootdevice iso1opts=nolock,timeo=600 d3bug'
+SPP_INITRD=$(ls /data/hp/HP_Service_Pack_for_Proliant/pxe/spp*/initrd.img)
+SPP_KERNEL=$(ls /data/hp/HP_Service_Pack_for_Proliant/pxe/spp*/vmlinuz)
+cobbler distro add --name=hp-sos --arch=i386 --kernel="$SPP_KERNEL" --initrd="$SPP_INITRD" \
+ --kopts '!kssendmac !ksdevice !lang !text rw root=/dev/ram0 init=/bin/init loglevel=3 splash=verbose showopts media=net iso1=nfs://10.29.49.7/data/hp/HPSPP.iso iso1mnt=/mnt/bootdevice iso1opts=nolock,timeo=600 d3bug'
 
 cobbler profile add --name="Firmware_Upgrade-Automatic" --distro=hp-sos --kopts="TYPE=AUTOMATIC AUTOPOWEROFFONSUCCESS=no AUTOREBOOTONSUCCESS=yes" --kickstart=""
 cobbler profile add --name="Firmware_Upgrade-Interactive" --distro=hp-sos --kopts="TYPE=MANUAL AUTOPOWEROFFONSUCCESS=no" --kickstart=""

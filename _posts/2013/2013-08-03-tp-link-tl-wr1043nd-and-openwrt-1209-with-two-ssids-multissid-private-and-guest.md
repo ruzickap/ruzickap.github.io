@@ -342,6 +342,7 @@ fi
 alias ssh='ssh -y -i $HOME/.ssh/id_rsa'
 EOF
 
+# shellcheck disable=SC2016 # Single quotes intentional - backticks expand on router, not locally
 sed -i '/^exit 0/i echo -e "Subject: Reboot `uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`\\n\\nOpenwrt rebooted: `date; uptime`\\n\\n`grep -B 50 \\"syslogd started\\" /etc/messages`" | sendmail petr.ruzicka@gmail.com' /etc/rc.local
 
 sed -i 's/HISTORY=3/HISTORY=30/' /etc/sysstat/config
@@ -488,10 +489,11 @@ uci set dhcp.@dnsmasq[0].dhcp_boot=netbootme.kpxe
 
 echo "dhcp-script=/etc/dnsmasq-script.sh" >> /etc/dnsmasq.conf
 
-cat > /etc/dnsmasq-script.sh > /etc/dnsmasq.script.log
+cat > /etc/dnsmasq-script.sh << \EOF
+#!/bin/sh
 
-if [ "$1" == "add" ] && ! grep -iq $2 /etc/config/dhcp; then
- echo -e "Subject: New MAC on `uci get system.@system[0].hostname`.`uci get dhcp.@dnsmasq[0].domain`\\n\\n`/bin/date +"%F %T"` $*" | sendmail petr.ruzicka@gmail.com
+if [ "$1" == "add" ] && ! grep -iq "$2" /etc/config/dhcp; then
+  echo -e "Subject: New MAC on $(uci get system.@system[0].hostname).$(uci get dhcp.@dnsmasq[0].domain)\\n\\n$(/bin/date +"%F %T") $*" | sendmail petr.ruzicka@gmail.com
 fi
 EOF
 
@@ -504,7 +506,7 @@ otherwise the router is rebooted.
 Configure QoS:
 
 ```bash
-uci set qos.wan.upload=500 # Upload speed in kBits/s
+uci set qos.wan.upload=500    # Upload speed in kBits/s
 uci set qos.wan.download=5000 # Download speed in kBits/s
 uci set qos.wan.enabled=1
 sed -i "s/'22,53'/'22,2222,53'/" /etc/config/qos
@@ -542,7 +544,7 @@ uci add luci_statistics collectd_exec_input
 uci set luci_statistics.@collectd_exec_input[-1].cmdline="/etc/digitemp.script"
 
 cat > /etc/collectd/conf.d/my_collectd.conf
- LogLevel "info"
+LogLevel "info"
 
 EOF
 ```
@@ -604,7 +606,7 @@ cat > /www/myadmin/vnstat/index.html << EOF
   <body>
 EOF
 
-for IFCE in $(ls -1 `awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf`); do
+for IFCE in "$(awk -F \" '/^DatabaseDir/ { print $2 }' /etc/vnstat.conf)"/*; do
 cat >> /www/myadmin/vnstat/index.html << EOF
     <h2>Traffic of Interface $IFCE</h2>
     <table>
