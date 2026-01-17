@@ -24,7 +24,7 @@ temperature using [digitemp](https://www.digitemp.com/).
 
 All that time it was running:
 
-```bash
+```console
 BusyBox v1.15.3 (2011-04-30 19:48:15 CEST) built-in shell (ash)
 Enter 'help' for a list of built-in commands.
 
