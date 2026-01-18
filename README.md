@@ -124,17 +124,7 @@ Chirpy:
 
 ## Building / Testing Locally
 
-On Ubuntu / Intel-based Mac:
-
 ```bash
-bundle install
-bundle exec jekyll s
-```
-
-Using Docker:
-
-```bash
-# Build the site
 docker run --rm -it --volume="${PWD}:/mnt" --workdir /mnt ubuntu bash -c 'set -x && \
   apt update && \
   apt install build-essential git ruby-bundler ruby-dev -y && \
