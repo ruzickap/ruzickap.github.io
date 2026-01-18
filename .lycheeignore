@@ -3,6 +3,7 @@
 \.elb\.amazonaws\.com
 \.local
 cdn\.com
+eko\.one\.pl
 ftp\.xvx\.cz
 github\.com/ruzickap
 helm\.sh
@@ -20,6 +21,7 @@ websvn\.xvx\.cz
 www\.conventionalcommits\.org
 www\.cvedetails\.com
 www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
+www\.gnu\.org
 www\.mysql\.com
 www\.reddit\.com/submit\?url=
 # keep-sorted end
