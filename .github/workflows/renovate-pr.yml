@@ -48,6 +48,8 @@ jobs:
         uses: tj-actions/changed-files@e0021407031f5be11a464abee9a0776171c79891 # v47.0.1
         with:
           files: "_posts/**"
+          # Use comma separator for Renovate's RENOVATE_INCLUDE_PATHS (expects comma-separated or JSON array)
+          separator: ","
 
       - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
         if: steps.changed-files.outputs.any_changed == 'true'
