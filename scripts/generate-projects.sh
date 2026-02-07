@@ -3,6 +3,7 @@
 set -euo pipefail
 
 DESTINATION_FILE="${1:-projects.md}"
+GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token)}"
 
 cat > "${DESTINATION_FILE}" << 'EOF'
 ---
@@ -27,11 +28,16 @@ order: 4
 
 ## Websites
 
-- [awsug.cz](https://awsug.cz/)
-- [linux-old.xvx.cz](https://linux-old.xvx.cz/)
-- [linux.xvx.cz](https://linux.xvx.cz/)
-- [petr.ruzicka.dev](https://petr.ruzicka.dev/)
-- [xvx.cz](https://xvx.cz/)
+- [awsug.cz](https://awsug.cz/) - Prague AWS User Group community website
+- [linux-old.xvx.cz](https://linux-old.xvx.cz/) - Old WordPress-based
+  personal blog about Linux
+- [linux.xvx.cz](https://linux.xvx.cz/) - Old Blogger-based personal blog
+  about Linux
+- [petr.ruzicka.dev](https://petr.ruzicka.dev/) - Personal homepage
+- [ruzickap.github.io](https://ruzickap.github.io/) - Personal blog about
+  Linux, CNCF  and cloud technologies
+- [xvx.cz](https://xvx.cz/) - Personal domain landing page with links to
+  all sites
 
 ## Vibe Coding Projects
 
