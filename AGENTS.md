@@ -67,7 +67,7 @@ Blog posts contain executable code blocks. Use `mise` to test them:
 mise run create:YYYY-MM-DD-post-title
 
 # Test with dependencies (runs prerequisites first)
-mise run create:2023-04-01-post|2022-11-27-prerequisite
+mise run "create:2023-04-01-post|2022-11-27-prerequisite"
 
 # Clean up resources
 mise run delete:YYYY-MM-DD-post-title
