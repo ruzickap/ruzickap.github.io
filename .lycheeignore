@@ -7,6 +7,7 @@ eko\.one\.pl
 ftp\.xvx\.cz
 github\.com/ruzickap
 helm\.sh
+heptio\.com
 hexrev\.soaa\.me
 https://(grafana|oauth2-proxy|ollama-vulnerable|open-webui|prometheus)/
 kube-prometheus-stack-prometheus\.kube-prometheus-stack:9090

@@ -52,7 +52,7 @@ values with your actual credentials:
 Variables used in the following steps:
 
 ```bash
-export AWS_REGION="${AWS_REGION:-us-east-1}"
+export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export MY_EMAIL="petr.ruzicka@gmail.com"
@@ -157,7 +157,7 @@ spec:
           values: ["spot", "on-demand"]
         - key: topology.kubernetes.io/zone
           operator: In
-          values: ["${AWS_REGION}a"]
+          values: ["${AWS_DEFAULT_REGION}a"]
         - key: kubernetes.io/arch
           operator: In
           values: ["amd64"]
@@ -203,7 +203,7 @@ spec:
           values: ["spot", "on-demand"]
         - key: topology.kubernetes.io/zone
           operator: In
-          values: ["${AWS_REGION}a"]
+          values: ["${AWS_DEFAULT_REGION}a"]
         - key: kubernetes.io/arch
           operator: In
           values: ["amd64"]

@@ -4,15 +4,50 @@ set -euo pipefail
 
 DESTINATION_FILE="${1:-projects.md}"
 
-cat > "${DESTINATION_FILE}" << EOF
+cat > "${DESTINATION_FILE}" << 'EOF'
 ---
 # https://www.w3schools.com/icons/icons_reference.asp
 icon: fas fa-project-diagram
 order: 4
 ---
 
-- Legacy Blog: [linux.xvx.cz](https://linux.xvx.cz/)
-- List of my GitHub projects: [https://github.com/ruzickap/](https://github.com/ruzickap/)
+[![Homepage](https://img.shields.io/badge/Homepage-4285F4?style=plastic&logo=homeadvisor&logoColor=white)](https://ruzickap.github.io/)
+[![Email](https://img.shields.io/badge/Email-005FF9?style=plastic&logo=maildotru&logoColor=white)](mailto:petr.ruzicka@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=plastic&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/petrruzicka/)
+[![Facebook](https://img.shields.io/badge/Facebook-%231877F2.svg?style=plastic&logo=Facebook&logoColor=white)](https://www.facebook.com/petr.ruzicka)
+[![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?style=plastic&logo=Instagram&logoColor=white)](https://www.instagram.com/petr.ruzicka_cz/)
+[![X](https://img.shields.io/badge/X-%23000000.svg?style=plastic&logo=X&logoColor=white)](https://x.com/Ruzicka_Petr)
+[![Mastodon](https://img.shields.io/badge/Mastodon-%236364FF.svg?style=plastic&logo=mastodon&logoColor=white)](https://mastodon.social/@petr_ruzicka)
+[![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=plastic&logo=YouTube&logoColor=white)](https://www.youtube.com/@PetrRuzicka)
+[![Medium](https://img.shields.io/badge/Medium-12100E?style=plastic&logo=medium&logoColor=white)](https://medium.com/@petr.ruzicka)
+[![Unsplash](https://img.shields.io/badge/Unsplash-000000?style=plastic&logo=unsplash&logoColor=white)](https://unsplash.com/@ruzickap/)
+[![Pixabay](https://img.shields.io/badge/Pixabay-2EC66D?style=plastic&logo=pixabay&logoColor=white)](https://pixabay.com/users/ruzickap-7967890/)
+[![Flickr](https://img.shields.io/badge/Flickr-0063DC?style=plastic&logo=flickr&logoColor=white)](https://www.flickr.com/photos/petrruzicka/)
+[![500px](https://img.shields.io/badge/500px-0099E5?style=plastic&logo=500px&logoColor=white)](https://500px.com/p/petrruzicka)
+
+## Websites
+
+- [awsug.cz](https://awsug.cz/)
+- [linux-old.xvx.cz](https://linux-old.xvx.cz/)
+- [linux.xvx.cz](https://linux.xvx.cz/)
+- [petr.ruzicka.dev](https://petr.ruzicka.dev/)
+- [xvx.cz](https://xvx.cz/)
+
+## Vibe Coding Projects
+
+- [brewwatch](https://brewwatch.lovable.app/) - A modern web app to discover
+  and track newly added Homebrew packages and casks
+
+## [GitHub Projects](https://github.com/ruzickap/)
+
+<!-- rumdl-disable MD013 MD033 -->
+<a href="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats?user_id=1434387" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=dark" width="771" height="auto">
+    <img alt="Dashboard stats of @ruzickap" src="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=light" width="771" height="auto">
+  </picture>
+</a>
+<!-- rumdl-enable MD013 MD033 -->
 EOF
 
 while read -r GITHUB_REPOSITORY_TITLE_TMP; do
@@ -28,7 +63,7 @@ while read -r GITHUB_REPOSITORY_TITLE_TMP; do
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGEURL}" ]]; then echo -e "\n- Website: <${GITHUB_REPOSITORY_HOMEPAGEURL}>"; fi)
   cat << EOF >> "${DESTINATION_FILE}"
 
-## [${GITHUB_REPOSITORY_NAME##*/}](${GITHUB_REPOSITORY_URL})
+### [${GITHUB_REPOSITORY_NAME##*/}](${GITHUB_REPOSITORY_URL})
 
 - Description: ${GITHUB_REPOSITORY_DESCRIPTION}${GITHUB_REPOSITORY_URL_STRING}
 - Topics: ${GITHUB_REPOSITORY_TOPICS}

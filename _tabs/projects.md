@@ -4,11 +4,45 @@ icon: fas fa-project-diagram
 order: 4
 ---
 
-- Legacy Blog: [linux.xvx.cz](https://linux.xvx.cz/)
-- List of my GitHub projects:
-  [https://github.com/ruzickap/](https://github.com/ruzickap/)
+[![Homepage](https://img.shields.io/badge/Homepage-4285F4?style=plastic&logo=homeadvisor&logoColor=white)](https://ruzickap.github.io/)
+[![Email](https://img.shields.io/badge/Email-005FF9?style=plastic&logo=maildotru&logoColor=white)](mailto:petr.ruzicka@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-%230077B5.svg?style=plastic&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/petrruzicka/)
+[![Facebook](https://img.shields.io/badge/Facebook-%231877F2.svg?style=plastic&logo=Facebook&logoColor=white)](https://www.facebook.com/petr.ruzicka)
+[![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?style=plastic&logo=Instagram&logoColor=white)](https://www.instagram.com/petr.ruzicka_cz/)
+[![X](https://img.shields.io/badge/X-%23000000.svg?style=plastic&logo=X&logoColor=white)](https://x.com/Ruzicka_Petr)
+[![Mastodon](https://img.shields.io/badge/Mastodon-%236364FF.svg?style=plastic&logo=mastodon&logoColor=white)](https://mastodon.social/@petr_ruzicka)
+[![YouTube](https://img.shields.io/badge/YouTube-%23FF0000.svg?style=plastic&logo=YouTube&logoColor=white)](https://www.youtube.com/@PetrRuzicka)
+[![Medium](https://img.shields.io/badge/Medium-12100E?style=plastic&logo=medium&logoColor=white)](https://medium.com/@petr.ruzicka)
+[![Unsplash](https://img.shields.io/badge/Unsplash-000000?style=plastic&logo=unsplash&logoColor=white)](https://unsplash.com/@ruzickap/)
+[![Pixabay](https://img.shields.io/badge/Pixabay-2EC66D?style=plastic&logo=pixabay&logoColor=white)](https://pixabay.com/users/ruzickap-7967890/)
+[![Flickr](https://img.shields.io/badge/Flickr-0063DC?style=plastic&logo=flickr&logoColor=white)](https://www.flickr.com/photos/petrruzicka/)
+[![500px](https://img.shields.io/badge/500px-0099E5?style=plastic&logo=500px&logoColor=white)](https://500px.com/p/petrruzicka)
 
-## [awsug.cz](https://github.com/awsugcz/awsug.cz)
+## Websites
+
+- [awsug.cz](https://awsug.cz/)
+- [linux-old.xvx.cz](https://linux-old.xvx.cz/)
+- [linux.xvx.cz](https://linux.xvx.cz/)
+- [petr.ruzicka.dev](https://petr.ruzicka.dev/)
+- [xvx.cz](https://xvx.cz/)
+
+## Vibe Coding Projects
+
+- [brewwatch](https://brewwatch.lovable.app/) - A modern web app to discover and
+  track newly added Homebrew packages and casks
+
+## [GitHub Projects](https://github.com/ruzickap/)
+
+<!-- rumdl-disable MD013 MD033 -->
+<a href="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats?user_id=1434387" target="_blank" style="display: block" align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=dark" width="771" height="auto">
+    <img alt="Dashboard stats of @ruzickap" src="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=light" width="771" height="auto">
+  </picture>
+</a>
+<!-- rumdl-enable MD013 MD033 -->
+
+### [awsug.cz](https://github.com/awsugcz/awsug.cz)
 
 - Description: Prague AWS User Group Web Pages
 - Website: <https://awsug.cz>
@@ -41,7 +75,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz)
 
-## [action-my-broken-link-checker](https://github.com/ruzickap/action-my-broken-link-checker)
+### [action-my-broken-link-checker](https://github.com/ruzickap/action-my-broken-link-checker)
 
 - Description: A GitHub Action for checking broken links
 - Topics: broken-links, github-actions, github-action, actions, website,
@@ -83,7 +117,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker)
 
-## [action-my-markdown-link-checker](https://github.com/ruzickap/action-my-markdown-link-checker)
+### [action-my-markdown-link-checker](https://github.com/ruzickap/action-my-markdown-link-checker)
 
 - Description: A GitHub Action for checking broken links in Markdown files
 - Topics: markdown, github-action, github-actions, actions, website, checker,
@@ -125,7 +159,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker)
 
-## [action-my-markdown-linter](https://github.com/ruzickap/action-my-markdown-linter)
+### [action-my-markdown-linter](https://github.com/ruzickap/action-my-markdown-linter)
 
 - Description: Style checking and linting for Markdown files
 - Topics: markdown, linter, lint, github-actions, github-action, linters,
@@ -166,7 +200,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter)
 
-## [ansible-my_workstation](https://github.com/ruzickap/ansible-my_workstation)
+### [ansible-my_workstation](https://github.com/ruzickap/ansible-my_workstation)
 
 - Description: Ansible playbooks to configure my workstation based on Fedora /
   macOS
@@ -207,7 +241,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation)
 
-## [ansible-openwrt](https://github.com/ruzickap/ansible-openwrt)
+### [ansible-openwrt](https://github.com/ruzickap/ansible-openwrt)
 
 - Description: Ansible playbooks configuring Openwrt devices (Wi-Fi routers)
 - Topics: ansible, openwrt, wifi, router, ansible-playbook, public
@@ -244,7 +278,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt)
 
-## [ansible-raspberry-pi-os](https://github.com/ruzickap/ansible-raspberry-pi-os)
+### [ansible-raspberry-pi-os](https://github.com/ruzickap/ansible-raspberry-pi-os)
 
 - Description: Configure Raspberry Pi OS (RPi) using Ansible
 - Topics: rpi, ansible, grafana, prometheus, node-exporter, kodi, public,
@@ -283,7 +317,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os)
 
-## [ansible-role-my_common_defaults](https://github.com/ruzickap/ansible-role-my_common_defaults)
+### [ansible-role-my_common_defaults](https://github.com/ruzickap/ansible-role-my_common_defaults)
 
 - Description: My Ansible role which sets some "favorite" defaults on the server
   (CentOS / Ubuntu / Windows)
@@ -321,7 +355,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults)
 
-## [ansible-role-proxy_settings](https://github.com/ruzickap/ansible-role-proxy_settings)
+### [ansible-role-proxy_settings](https://github.com/ruzickap/ansible-role-proxy_settings)
 
 - Description: Ansible role for configuring proxy settings for Linux based
   systems
@@ -362,7 +396,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings)
 
-## [ansible-role-virtio-win](https://github.com/ruzickap/ansible-role-virtio-win)
+### [ansible-role-virtio-win](https://github.com/ruzickap/ansible-role-virtio-win)
 
 - Description: Ansible role which installs VirtIO Drivers and SPICE Guest Tools
   for Windows
@@ -402,7 +436,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win)
 
-## [ansible-role-vmwaretools](https://github.com/ruzickap/ansible-role-vmwaretools)
+### [ansible-role-vmwaretools](https://github.com/ruzickap/ansible-role-vmwaretools)
 
 - Description: Ansible role will help you with installing original vmware-tools
   form Vmware or fallback to Open VMware Tools (open-vm-tools)
@@ -439,7 +473,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools)
 
-## [cheatsheet-atom](https://github.com/ruzickap/cheatsheet-atom)
+### [cheatsheet-atom](https://github.com/ruzickap/cheatsheet-atom)
 
 - Description: Atom Keyboard Shortcuts Cheatsheet
 - Topics: latex, cheatsheet, atom, public, cheatsheet-atom
@@ -477,7 +511,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom)
 
-## [cheatsheet-macos](https://github.com/ruzickap/cheatsheet-macos)
+### [cheatsheet-macos](https://github.com/ruzickap/cheatsheet-macos)
 
 - Description: MacOS Keyboard Shortcuts
 - Topics: cheatsheet, latex, macos, public, cheatsheet-mscos
@@ -515,7 +549,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos)
 
-## [cheatsheet-systemd](https://github.com/ruzickap/cheatsheet-systemd)
+### [cheatsheet-systemd](https://github.com/ruzickap/cheatsheet-systemd)
 
 - Description: Cheatsheet for systemd
 - Topics: latex, systemd, cheatsheet-systemd, cheatsheet, public
@@ -553,7 +587,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd)
 
-## [cks-notes](https://github.com/ruzickap/cks-notes)
+### [cks-notes](https://github.com/ruzickap/cks-notes)
 
 - Description: CKS Notes
 - Topics: cks, cks-exam, cks-exam-preparation, k8s, security, k8s-security,
@@ -591,7 +625,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes)
 
-## [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
+### [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
 - Description: Notes from Amazon EKS Bottlerocket and Fargate testing
 - Website: <https://ruzickap.github.io/k8s-eks-bottlerocket-fargate/>
@@ -629,7 +663,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
-## [k8s-eks-flux](https://github.com/ruzickap/k8s-eks-flux)
+### [k8s-eks-flux](https://github.com/ruzickap/k8s-eks-flux)
 
 - Description: Notes from using Amazon EKS and Flux
 - Website: <https://ruzickap.github.io/k8s-eks-flux/>
@@ -666,7 +700,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux)
 
-## [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux)
+### [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux)
 
 - Description: Blue Green deployment with Flagger, Flux and Istio
 - Website: <https://ruzickap.github.io/k8s-flagger-istio-flux/>
@@ -704,7 +738,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux)
 
-## [k8s-flux-istio-gitlab-harbor](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
+### [k8s-flux-istio-gitlab-harbor](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
 
 - Description: Install services using Flux + Istio + Gitlab + Harbor inside Kops
   cluster running on AWS
@@ -742,7 +776,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
 
-## [k8s-harbor](https://github.com/ruzickap/k8s-harbor)
+### [k8s-harbor](https://github.com/ruzickap/k8s-harbor)
 
 - Description: Harbor in Kubernetes
 - Website: <https://ruzickap.github.io/k8s-harbor/>
@@ -779,7 +813,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor)
 
-## [k8s-harbor-presentation](https://github.com/ruzickap/k8s-harbor-presentation)
+### [k8s-harbor-presentation](https://github.com/ruzickap/k8s-harbor-presentation)
 
 - Description: Presentation about Harbor project
 - Website: <https://ruzickap.github.io/k8s-harbor-presentation/>
@@ -813,7 +847,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation)
 
-## [k8s-istio-webinar](https://github.com/ruzickap/k8s-istio-webinar)
+### [k8s-istio-webinar](https://github.com/ruzickap/k8s-istio-webinar)
 
 - Description: Istio webinar
 - Website: <https://ruzickap.github.io/k8s-istio-webinar>
@@ -850,7 +884,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar)
 
-## [k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x)
+### [k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x)
 
 - Description: Kubernetes + Jenkins X + Sockshop
 - Website: <https://ruzickap.github.io/k8s-jenkins-x/>
@@ -886,7 +920,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x)
 
-## [k8s-knative-gitlab-harbor](https://github.com/ruzickap/k8s-knative-gitlab-harbor)
+### [k8s-knative-gitlab-harbor](https://github.com/ruzickap/k8s-knative-gitlab-harbor)
 
 - Description: Build container images with Knative + Gitlab + Harbor inside Kops
   cluster running on AWS
@@ -924,7 +958,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor)
 
-## [k8s-postgresql](https://github.com/ruzickap/k8s-postgresql)
+### [k8s-postgresql](https://github.com/ruzickap/k8s-postgresql)
 
 - Description: PostgreSQL on Kubernetes
 - Website: <https://ruzickap.github.io/k8s-postgresql/>
@@ -961,7 +995,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql)
 
-## [k8s-sockshop](https://github.com/ruzickap/k8s-sockshop)
+### [k8s-sockshop](https://github.com/ruzickap/k8s-sockshop)
 
 - Description: Build and deploy Sockshop application using Flagger + Flux
 - Website: <https://ruzickap.github.io/k8s-sockshop/>
@@ -998,7 +1032,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop)
 
-## [malware-cryptominer-container](https://github.com/ruzickap/malware-cryptominer-container)
+### [malware-cryptominer-container](https://github.com/ruzickap/malware-cryptominer-container)
 
 - Description: Container image with malware and crypto miner for testing
   purposes
@@ -1042,7 +1076,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container)
 
-## [packer-templates](https://github.com/ruzickap/packer-templates)
+### [packer-templates](https://github.com/ruzickap/packer-templates)
 
 - Description: Scripts and Templates used for generating Vagrant images
 - Topics: packer, templates, vagrant, libvirt, virtualbox, ansible,
@@ -1083,7 +1117,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates)
 
-## [packer-virt-sysprep](https://github.com/ruzickap/packer-virt-sysprep)
+### [packer-virt-sysprep](https://github.com/ruzickap/packer-virt-sysprep)
 
 - Description: Reproduce the functionality of virt-sysprep for use with Packer
   builds
@@ -1116,7 +1150,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep)
 
-## [petr.ruzicka.dev](https://github.com/ruzickap/petr.ruzicka.dev)
+### [petr.ruzicka.dev](https://github.com/ruzickap/petr.ruzicka.dev)
 
 - Description: Personal page
 - Website: <https://petr.ruzicka.dev/>
@@ -1156,7 +1190,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev)
 
-## [ruzickap.github.io](https://github.com/ruzickap/ruzickap.github.io)
+### [ruzickap.github.io](https://github.com/ruzickap/ruzickap.github.io)
 
 - Description: ruzickap.github.io - personal blog 🏠
 - Website: <https://ruzickap.github.io/>
@@ -1203,7 +1237,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io)
 
-## [xvx.cz](https://github.com/ruzickap/xvx.cz)
+### [xvx.cz](https://github.com/ruzickap/xvx.cz)
 
 - Description: xvx.cz
 - Website: <https://xvx.cz/>

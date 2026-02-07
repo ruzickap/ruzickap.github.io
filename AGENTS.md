@@ -1,123 +1,243 @@
 # AI Agent Guidelines
 
-## Overview
+Personal blog built with Jekyll and Chirpy theme. This guide helps AI agents
+work effectively with blog posts, infrastructure testing, and code quality.
 
-This document provides guidelines and best practices for AI agents working
-on this repository. Follow these standards to ensure consistency, quality,
-and maintainability across all contributions.
+## Quick Reference
 
-## Table of Contents
+```bash
+# Build Jekyll site
+bundle install && bundle exec jekyll build --destination public
 
-- [AI Agent Guidelines](#ai-agent-guidelines)
-  - [Overview](#overview)
-  - [Table of Contents](#table-of-contents)
-  - [Markdown Files](#markdown-files)
-    - [Linting and Formatting](#linting-and-formatting)
-    - [Markdown Best Practices](#markdown-best-practices)
-  - [Version Control](#version-control)
-    - [Commit Messages](#commit-messages)
-      - [Format Rules](#format-rules)
-      - [Commit Message Structure](#commit-message-structure)
-        - [Example](#example)
-    - [Branching](#branching)
-    - [Pull Requests](#pull-requests)
-  - [EKS Cluster Access](#eks-cluster-access)
-  - [Quality \& Best Practices](#quality--best-practices)
+# Test a single blog post (creates AWS resources)
+mise run create:2026-01-13-amazon-eks-grafana-stack
 
-## Markdown Files
+# Clean up test resources
+mise run delete:2026-01-13-amazon-eks-grafana-stack
 
-### Linting and Formatting
+# Get EKS cluster access (run once per session)
+eval "$(mise run a)"
 
-- **Markdown compliance**: Ensure all Markdown files pass `rumdl` checks
-- **Code blocks**: For `bash`/`shell` code blocks:
-  - Verify they pass `shellcheck` validation
-  - Format with `shfmt` for consistency
+# Run all linters locally
+mega-linter-runner --remove-container --env VALIDATE_ALL_CODEBASE=true
 
-### Markdown Best Practices
-
-- Use proper heading hierarchy (don't skip levels)
-- Wrap lines at 80 characters for readability
-- Use semantic HTML only when necessary
-- Prefer code fences over inline code for multi-line examples
-- Include language identifiers in code fences
-
-## Version Control
-
-### Commit Messages
-
-#### Format Rules
-
-- **Conventional commit format**: Use standard types (`feat`, `fix`, `docs`,
-  `chore`, `refactor`, `test`, `style`, `perf`, `ci`, `build`, `revert`)
-- **Line limits**: Subject ≤ 80 characters, body lines ≤ 80 characters
-- **Single blank line**: Between subject and body, between body paragraphs
-
-#### Commit Message Structure
-
-- **Subject line**:
-  - Imperative mood (e.g., "add" not "added" or "adds")
-  - Use lower case (except for proper nouns and abbreviations)
-  - No period at the end
-  - Maximum 80 characters
-  - Format: `<type>: <description>`
-
-- **Body** (optional but recommended for non-trivial changes):
-  - Explain **what** changed and **why**
-  - Wrap lines at 80 characters
-  - Use Markdown formatting
-  - Separate paragraphs with blank lines
-  - Reference issues using keywords: `Fixes`, `Closes`, `Resolves`
-
-##### Example
-
-```markdown
-feat: add automated dependency updates
-
-- Implement Dependabot configuration
-- Configure weekly security updates
-- Add auto-merge for patch/minor updates
-
-Resolves: #123
+# Run pre-commit hooks
+pre-commit run --all-files
 ```
 
-### Branching
+## Build & Development
 
-- **Naming convention**: Follow the
-  [Conventional Branch](https://conventional-branch.github.io/)
-  specification
+### Local Jekyll Build
 
-- **Naming guidelines**:
-  - Keep branch names concise and descriptive
-  - Use kebab-case (lower case with hyphens)
-  - Include issue number when applicable: `feat/123-add-feature-name`
+```bash
+# Install dependencies
+bundle install
 
-### Pull Requests
+# Build site
+bundle exec jekyll build --destination public
 
-- **Always create draft PR** - Create pull requests as drafts initially
-- **Title format** - Use conventional commit format (`feat: add new feature`)
-- **Description** - Include clear explanation of changes and motivation
-- **Link issues** - Reference related issues using keywords (Fixes, Closes,
-  Resolves)
+# Validate HTML
+bundle exec htmlproofer public --disable-external
+```
 
-## EKS Cluster Access
+### Docker Build
 
-When accessing the Kubernetes cluster, execute the following command **once**
-at the beginning of the session:
+```bash
+docker run --rm -it --volume="${PWD}:/mnt" --workdir /mnt ubuntu bash -c '
+  apt update && apt install build-essential git ruby-bundler ruby-dev -y &&
+  git config --global --add safe.directory /mnt &&
+  bundle install && jekyll build --destination public
+'
+```
+
+### Environment Requirements
+
+- Ruby 3.4.8
+- Jekyll theme: `jekyll-theme-chirpy ~> 7.4`
+- Dependencies: See `Gemfile`
+
+## Testing
+
+### Single Post Testing
+
+Blog posts contain executable code blocks. Use `mise` to test them:
+
+```bash
+# Test individual post
+mise run create:YYYY-MM-DD-post-title
+
+# Test with dependencies (runs prerequisites first)
+mise run "create:2023-04-01-post|2022-11-27-prerequisite"
+
+# Clean up resources
+mise run delete:YYYY-MM-DD-post-title
+```
+
+### Code Block Conventions (CRITICAL)
+
+Code block language identifiers determine test execution:
+
+- **`bash`** - Commands executed during resource **creation** (GitHub Actions)
+- **`sh`** - Commands executed during resource **deletion/cleanup**
+- **`shell`** - Display-only commands, **NOT executed** in tests
+
+Example:
+
+````markdown
+```bash
+# This RUNS during create tests
+export CLUSTER_NAME="test-cluster"
+```
+
+```shell
+# This is SHOWN but NOT executed
+kubectl get pods
+```
+
+```sh
+# This RUNS during delete tests
+eksctl delete cluster --name="${CLUSTER_NAME}"
+```
+````
+
+### EKS Access
+
+When testing EKS-related posts, get cluster access once per session:
 
 ```bash
 eval "$(mise run a)"
 ```
 
-This command sets up the necessary environment variables and configuration
-for Kubernetes cluster access. It should be run only once per session before
-any Kubernetes-related operations.
+This assumes AWS IAM role and configures `KUBECONFIG`.
 
-## Quality & Best Practices
+## Linting & Quality
 
-- Pass pre-commit hooks
-- Follow project coding standards
-- Include tests for new functionality
-- Update documentation for user-facing changes
-- Make atomic, focused commits
-- Explain reasoning behind changes
-- Maintain consistent formatting
+### Pre-commit Hooks
+
+All commits must pass (enforced with `fail_fast: true`):
+
+- **Markdown**: `rumdl` (Rust-based, MD041 disabled for frontmatter)
+- **Shell**: `shellcheck` (SC2317 excluded), `shfmt` (2-space indent)
+- **YAML**: `yamllint` (relaxed mode, no line-length limit)
+- **Security**: `gitleaks`, `wizcli-scan-dir-secrets`
+- **Formatting**: `prettier` (excludes `.md`, `_config.yml`)
+- **Commits**: `commitizen`, `gitlint` (conventional commits, 80 char limit)
+
+### MegaLinter
+
+Runs comprehensive validation:
+
+```bash
+mega-linter-runner --remove-container \
+  --container-name="mega-linter" \
+  --env VALIDATE_ALL_CODEBASE=true
+```
+
+**Enabled**: shellcheck, shfmt, rumdl, yamllint, jsonlint, prettier, lychee
+**Disabled**: markdownlint (using rumdl), cspell, jscpd, terrascan
+
+**Excluded files**: `CHANGELOG.md`
+
+## Code Style Guidelines
+
+### Blog Post Structure
+
+**Filename**: `_posts/YYYY/YYYY-MM-DD-kebab-case-title.md`
+
+**Required frontmatter**:
+
+```yaml
+---
+title: Post Title Here
+author: Petr Ruzicka
+date: YYYY-MM-DD
+description: SEO-friendly description
+categories: [Category1, Category2]
+tags: [lowercase-tag, another-tag]
+image: https://example.com/image.png  # Optional
+---
+```
+
+**Categories**: Title Case, broad domains (Kubernetes, Cloud, Security, Linux)
+**Tags**: lowercase, hyphen-separated (amazon-eks, cert-manager, bash)
+
+### Markdown Formatting
+
+- **Line length**: 80 characters max (prose wrapped with `--prose-wrap always`)
+- **Headings**: Proper hierarchy, no skipped levels, no trailing periods
+- **Code fences**: Always include language identifier
+- **Links**: Line breaks allowed in long URLs for readability
+
+### Shell Scripts
+
+**Header**:
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+```
+
+**Formatting** (enforced by `shfmt`):
+
+- 2-space indentation (`--indent 2`)
+- Space before redirects (`--space-redirects`)
+- Case indentation enabled (`--case-indent`)
+
+**Variable conventions**:
+
+```bash
+# Environment variables: UPPER_CASE
+export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+
+# Required variables
+: "${AWS_ACCESS_KEY_ID:?Error: AWS_ACCESS_KEY_ID not set!}"
+
+# Parameter expansion for defaults
+TMP_DIR="${TMP_DIR:-${PWD}}"
+```
+
+**Error handling**:
+
+```bash
+# Exit on error (set -e)
+# Fail on undefined variables (set -u)
+# Fail on pipe errors (set -o pipefail)
+
+# Conditional execution
+[[ "${CONDITION}" == "true" ]] && command
+
+# Directory checks
+[[ ! -d "${TMP_DIR}" ]] && mkdir -v "${TMP_DIR}"
+```
+
+## Version Control
+
+### Commit Messages
+
+Format: `<type>: <description>` (max 80 chars, imperative mood, lowercase)
+
+**Types**: feat, fix, docs, chore, refactor, test, style, perf, ci, build
+
+**Example**:
+
+```markdown
+feat: add eks auto mode testing guide
+
+- Implement automated cluster creation
+- Add cleanup procedures
+- Include cost optimization tips
+```
+
+### Branching
+
+Follow [Conventional Branch](https://conventional-branch.github.io/) spec:
+
+- `feat/123-add-feature-name`
+- `fix/456-resolve-bug`
+- Use kebab-case, include issue number when applicable
+
+### Pull Requests
+
+- Create as **draft** initially
+- Title: conventional commit format
+- Link issues: `Fixes #123`, `Closes #456`
