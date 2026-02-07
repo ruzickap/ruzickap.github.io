@@ -54,7 +54,7 @@ while read -r GITHUB_REPOSITORY_TITLE_TMP; do
   # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
   GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY_NAME}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGEURL}" ]]; then echo -e "\n- Website: <${GITHUB_REPOSITORY_HOMEPAGEURL}>"; fi)
-  cat <<EOF >>"${DESTINATION_FILE}"
+  cat << EOF >>"${DESTINATION_FILE}"
 
 ### [${GITHUB_REPOSITORY_NAME##*/}](${GITHUB_REPOSITORY_URL})
 
