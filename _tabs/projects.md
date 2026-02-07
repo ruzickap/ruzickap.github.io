@@ -33,14 +33,7 @@ order: 4
 
 ## [GitHub Projects](https://github.com/ruzickap/)
 
-<!-- rumdl-disable MD013 MD033 -->
-<a href="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats?user_id=1434387" target="_blank" style="display: block" align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=dark" width="771" height="auto">
-    <img alt="Dashboard stats of @ruzickap" src="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=light" width="771" height="auto">
-  </picture>
-</a>
-<!-- rumdl-enable MD013 MD033 -->
+[![Dashboard stats of @ruzickap](https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=dark)](https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats?user_id=1434387)
 
 ### [awsug.cz](https://github.com/awsugcz/awsug.cz)
 

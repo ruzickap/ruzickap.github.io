@@ -4,7 +4,7 @@ set -euo pipefail
 
 DESTINATION_FILE="${1:-projects.md}"
 
-cat > "${DESTINATION_FILE}" << 'EOF'
+cat >"${DESTINATION_FILE}" <<'EOF'
 ---
 # https://www.w3schools.com/icons/icons_reference.asp
 icon: fas fa-project-diagram
@@ -40,28 +40,21 @@ order: 4
 
 ## [GitHub Projects](https://github.com/ruzickap/)
 
-<!-- rumdl-disable MD013 MD033 -->
-<a href="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats?user_id=1434387" target="_blank" style="display: block" align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=dark" width="771" height="auto">
-    <img alt="Dashboard stats of @ruzickap" src="https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=light" width="771" height="auto">
-  </picture>
-</a>
-<!-- rumdl-enable MD013 MD033 -->
+[![Dashboard stats of @ruzickap](https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats/thumbnail.png?user_id=1434387&image_size=auto&color_scheme=dark)](https://next.ossinsight.io/widgets/official/compose-user-dashboard-stats?user_id=1434387)
 EOF
 
 while read -r GITHUB_REPOSITORY_TITLE_TMP; do
-  GITHUB_REPOSITORY_NAME=$(jq -r '.nameWithOwner' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
-  echo "*** ${GITHUB_REPOSITORY_NAME}"
-  GITHUB_REPOSITORY_DESCRIPTION=$(jq -r '.description' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
-  GITHUB_REPOSITORY_URL=$(jq -r '.url' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
-  GITHUB_REPOSITORY_TOPICS=$(jq -r '[.repositoryTopics[].name] | join(", ")' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
-  GITHUB_REPOSITORY_HOMEPAGEURL=$(jq -r '.homepageUrl' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
-  GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.defaultBranchRef.name' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
-  # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
-  GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY_NAME}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
-  GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGEURL}" ]]; then echo -e "\n- Website: <${GITHUB_REPOSITORY_HOMEPAGEURL}>"; fi)
-  cat << EOF >> "${DESTINATION_FILE}"
+	GITHUB_REPOSITORY_NAME=$(jq -r '.nameWithOwner' <<<"${GITHUB_REPOSITORY_TITLE_TMP}")
+	echo "*** ${GITHUB_REPOSITORY_NAME}"
+	GITHUB_REPOSITORY_DESCRIPTION=$(jq -r '.description' <<<"${GITHUB_REPOSITORY_TITLE_TMP}")
+	GITHUB_REPOSITORY_URL=$(jq -r '.url' <<<"${GITHUB_REPOSITORY_TITLE_TMP}")
+	GITHUB_REPOSITORY_TOPICS=$(jq -r '[.repositoryTopics[].name] | join(", ")' <<<"${GITHUB_REPOSITORY_TITLE_TMP}")
+	GITHUB_REPOSITORY_HOMEPAGEURL=$(jq -r '.homepageUrl' <<<"${GITHUB_REPOSITORY_TITLE_TMP}")
+	GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.defaultBranchRef.name' <<<"${GITHUB_REPOSITORY_TITLE_TMP}")
+	# Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
+	GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY_NAME}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
+	GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGEURL}" ]]; then echo -e "\n- Website: <${GITHUB_REPOSITORY_HOMEPAGEURL}>"; fi)
+	cat <<EOF >>"${DESTINATION_FILE}"
 
 ### [${GITHUB_REPOSITORY_NAME##*/}](${GITHUB_REPOSITORY_URL})
 
@@ -91,6 +84,6 @@ ${GITHUB_REPOSITORY_CI_CD_STATUS}
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME})
 EOF
-done <<< "$(gh repo list --visibility public --json defaultBranchRef,description,homepageUrl,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' awsugcz | jq -c && gh repo list --visibility public --topic public --limit 100 --json defaultBranchRef,description,homepageUrl,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' ruzickap | jq -c)"
+done <<<"$(gh repo list --visibility public --json defaultBranchRef,description,homepageUrl,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' awsugcz | jq -c && gh repo list --visibility public --topic public --limit 100 --json defaultBranchRef,description,homepageUrl,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' ruzickap | jq -c)"
 
 npx prettier -w --parser markdown --prose-wrap always --print-width 80 "${DESTINATION_FILE}"
