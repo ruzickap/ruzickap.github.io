@@ -52,7 +52,7 @@ I will cover only the necessary commands here, without detailed descriptions.
 ```bash
 # export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 # export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-export AWS_REGION="eu-central-1"
+export AWS_DEFAULT_REGION="eu-central-1"
 AWS_EC2_KEY_PAIR_NAME="wordpress-test"
 TMP_DIR="${TMP_DIR:-${PWD}}"
 WORDPRESS_USERNAME="wordpress"
@@ -533,7 +533,7 @@ Delete the Amazon EKS cluster, Kali Linux EC2 instance, EC2 Key Pair, and
 related CloudFormation stacks:
 
 ```sh
-export AWS_REGION="eu-central-1"
+export AWS_DEFAULT_REGION="eu-central-1"
 export AWS_EC2_KEY_PAIR_NAME="wordpress-test"
 export SOLUTION_KALI="KaliLinux-NICE-DCV"
 export SOLUTION_EC2_CONTAINER="Amazon-EC2-Container"

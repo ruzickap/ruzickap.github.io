@@ -59,7 +59,7 @@ few environment variables, such as:
 
 ```bash
 # AWS Region
-export AWS_REGION="${AWS_REGION:-us-east-1}"
+export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Base Domain: k8s.mylabs.dev
@@ -80,7 +80,7 @@ Confirm that all essential variables have been properly configured:
 
 ```bash
 : "${AWS_ACCESS_KEY_ID?}"
-: "${AWS_REGION?}"
+: "${AWS_DEFAULT_REGION?}"
 : "${AWS_SECRET_ACCESS_KEY?}"
 : "${AWS_ROLE_TO_ASSUME?}"
 : "${GOOGLE_CLIENT_ID?}"
@@ -353,12 +353,12 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
-  region: ${AWS_REGION}
+  region: ${AWS_DEFAULT_REGION}
   tags:
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
-  - ${AWS_REGION}a
-  - ${AWS_REGION}b
+  - ${AWS_DEFAULT_REGION}a
+  - ${AWS_DEFAULT_REGION}b
 accessConfig:
   accessEntries:
     - principalARN: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/admin
@@ -484,7 +484,7 @@ spec:
           values: ["spot", "on-demand"]
         - key: topology.kubernetes.io/zone
           operator: In
-          values: ["${AWS_REGION}a"]
+          values: ["${AWS_DEFAULT_REGION}a"]
         - key: kubernetes.io/arch
           operator: In
           values: ["arm64"]
