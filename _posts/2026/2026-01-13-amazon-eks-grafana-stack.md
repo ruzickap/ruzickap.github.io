@@ -1495,7 +1495,7 @@ does not index the trace data.
 ![Grafana Tempo](https://raw.githubusercontent.com/grafana/tempo/8dd75d18773d77149de8588f9dccbd680a03b00e/docs/sources/tempo/logo_and_name.png){:width="500"}
 
 Install the `tempo` [Helm chart](https://github.com/grafana/helm-charts/tree/main/charts/tempo)
-and customize its [default values](https://github.com/grafana/helm-charts/blob/main/charts/tempo/values.yaml)
+and customize its [default values](https://github.com/grafana/helm-charts/blob/tempo-distributed-1.61.3/charts/tempo/values.yaml)
 to fit your environment and storage requirements:
 
 ```bash

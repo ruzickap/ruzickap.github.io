@@ -15,7 +15,7 @@ on how to do things. Then I realized it may be handy to put those notes to
 Github and let them go through some CI to be sure they are correct.
 
 I was looking for a way to run Kubernetes via [minikube](https://github.com/kubernetes/minikube)
-in [Travis CI](https://travis-ci.org/) and there are "some" ways:
+in [Travis CI](https://www.travis-ci.com/) and there are "some" ways:
 [Running Kubernetes on Travis CI with minikube](https://web.archive.org/web/20171213061419/https://blog.travis-ci.com/2017-10-26-running-kubernetes-on-travis-ci-with-minikube)
 
 Unfortunately I didn't have much luck with the latest minikube (0.26) and the
