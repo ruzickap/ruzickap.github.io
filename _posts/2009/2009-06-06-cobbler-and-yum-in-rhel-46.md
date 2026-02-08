@@ -72,7 +72,7 @@ installation procedure). Disable firewall and SELinux.
 
 - Install necessary software from DVD:
 
-  ```bash
+  ```shell
   mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.orig
 
   yum -y install wget mc
