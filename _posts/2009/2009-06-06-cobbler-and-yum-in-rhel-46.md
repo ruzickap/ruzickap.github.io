@@ -72,12 +72,12 @@ installation procedure). Disable firewall and SELinux.
 
 - Install necessary software from DVD:
 
-  ```shell
+  ```bash
   mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo.orig
 
   yum -y install wget mc
   yum -y install httpd tftp-server mod_python python-devel createrepo rsync mkisofs
-  yum -y install perl-Digest-SHA1 perl-Digest-HMAC perl-Socket6 perl-Time-HiRes sysstat perl-libwww-perl
+  yum -y install perl-Digest-SHA1 perl-Digest-HMAC perl-Socket6 perl-Time-HiRes sysstat perl-libwww-perl # DevSkim: ignore DS126858,DS197836
   yum -y install libart_lgpl freetype libpng
   yum -y install logrotate perl-DateManip
   yum -y install cman
