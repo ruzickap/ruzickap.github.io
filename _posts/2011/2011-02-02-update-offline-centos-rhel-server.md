@@ -2,7 +2,7 @@
 title: Update offline CentOS-RHEL server
 author: Petr Ruzicka
 date: 2011-02-02
-description: ""
+description: Update an offline CentOS/RHEL server by downloading RPM packages on a connected machine using yum-downloadonly
 categories: [Linux, linux-old.xvx.cz]
 tags: [rhel, security]
 ---

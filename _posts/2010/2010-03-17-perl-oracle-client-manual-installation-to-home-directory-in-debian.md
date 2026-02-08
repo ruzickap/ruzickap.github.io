@@ -2,7 +2,7 @@
 title: Perl Oracle client manual installation to home directory in Debian
 author: Petr Ruzicka
 date: 2010-03-17
-description: ""
+description: Install Perl DBD::Oracle and Oracle Instant Client into a home directory on Debian without root access
 categories: [Linux, Storage, linux-old.xvx.cz]
 tags: [database, debian]
 ---

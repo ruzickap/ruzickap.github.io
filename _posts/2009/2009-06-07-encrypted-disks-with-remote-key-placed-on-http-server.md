@@ -2,7 +2,7 @@
 title: Encrypted disks with remote key placed on http server
 author: Petr Ruzicka
 date: 2009-06-07
-description: ""
+description: Set up LUKS-encrypted disks using dm-crypt with GPG-encrypted keys fetched from a remote HTTP server
 categories: [Linux, Storage, Security, linux-old.xvx.cz]
 tags: [lvm, bash, security]
 ---

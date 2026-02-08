@@ -2,7 +2,7 @@
 title: Debian with GRUB2 and serial connection
 author: Petr Ruzicka
 date: 2009-08-05
-description: ""
+description: Configure GRUB2 for serial console output on Debian
 categories: [Linux, linux-old.xvx.cz]
 tags: [debian, grub]
 ---

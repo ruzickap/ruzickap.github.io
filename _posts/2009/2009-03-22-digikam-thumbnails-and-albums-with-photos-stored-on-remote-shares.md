@@ -2,7 +2,7 @@
 title: digiKam thumbnails and Albums with photos stored on remote shares
 author: Petr Ruzicka
 date: 2009-03-22
-description: ""
+description: Clean unused digiKam thumbnails while preserving thumbnails for photos stored on remote network shares
 categories: [Linux, Photography, linux-old.xvx.cz]
 tags: [photo-editing, bash]
 ---

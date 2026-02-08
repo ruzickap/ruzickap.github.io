@@ -2,7 +2,7 @@
 title: OpenWrt (Backfire 10.03) and TL-WR1043ND
 author: Petr Ruzicka
 date: 2011-12-13
-description: ""
+description: Configure OpenWrt Backfire on TP-Link TL-WR1043ND with USB extroot, dual WiFi, webcam, and temperature sensors
 categories: [OpenWrt, Networking, linux-old.xvx.cz]
 tags: [tp-link, wifi, dnsmasq]
 ---

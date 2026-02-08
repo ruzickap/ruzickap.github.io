@@ -2,7 +2,7 @@
 title: My basic setup of CyanogenMod-6.0 on HTC Desire
 author: Petr Ruzicka
 date: 2010-09-09
-description: ""
+description: Set up CyanogenMod 6.0 on HTC Desire with SSH keys, app removal, OpenVPN, and backup
 categories: [Android, linux-old.xvx.cz]
 tags: [htc-desire, cyanogenmod, adb]
 ---

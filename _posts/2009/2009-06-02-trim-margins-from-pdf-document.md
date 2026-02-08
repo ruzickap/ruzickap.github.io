@@ -2,7 +2,7 @@
 title: Trim margins from PDF document
 author: Petr Ruzicka
 date: 2009-06-02
-description: ""
+description: Use pdfcrop to trim large margins from PDF documents
 categories: [Linux, linux-old.xvx.cz]
 tags: [bash]
 ---

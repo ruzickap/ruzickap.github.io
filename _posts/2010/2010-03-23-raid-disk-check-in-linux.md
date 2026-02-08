@@ -2,7 +2,7 @@
 title: RAID disk check in Linux
 author: Petr Ruzicka
 date: 2010-03-23
-description: ""
+description: Diagnose a failing RAID1 disk using S.M.A.R.T., badblocks, and mdadm, then replace it
 categories: [Linux, Storage, linux-old.xvx.cz]
 tags: [raid, storage]
 ---

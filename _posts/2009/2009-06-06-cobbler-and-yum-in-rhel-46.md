@@ -2,7 +2,7 @@
 title: Cobbler and yum in RHEL 4.6
 author: Petr Ruzicka
 date: 2009-06-06
-description: ""
+description: Install and configure Cobbler with yum on RHEL/CentOS 4.6 for PXE network provisioning
 categories: [Linux, Networking, linux-old.xvx.cz]
 tags: [rhel, cobbler, pxe]
 ---
@@ -77,7 +77,7 @@ installation procedure). Disable firewall and SELinux.
 
   yum -y install wget mc
   yum -y install httpd tftp-server mod_python python-devel createrepo rsync mkisofs
-  yum -y install perl-Digest-SHA1 perl-Digest-HMAC perl-Socket6 perl-Time-HiRes sysstat perl-libwww-perl
+  yum -y install perl-Digest-SHA1 perl-Digest-HMAC perl-Socket6 perl-Time-HiRes sysstat perl-libwww-perl # DevSkim: ignore DS126858,DS197836
   yum -y install libart_lgpl freetype libpng
   yum -y install logrotate perl-DateManip
   yum -y install cman

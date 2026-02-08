@@ -2,7 +2,7 @@
 title: Nvidia proprietary drivers and RHEL6
 author: Petr Ruzicka
 date: 2011-01-20
-description: ""
+description: Install Nvidia proprietary GPU drivers on RHEL 6 by blacklisting the nouveau driver
 categories: [Linux, linux-old.xvx.cz]
 tags: [rhel, grub]
 ---

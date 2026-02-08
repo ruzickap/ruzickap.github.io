@@ -2,7 +2,7 @@
 title: OpenWrt with Transmission, Samba and vsftpd
 author: Petr Ruzicka
 date: 2010-12-01
-description: ""
+description: Compile and configure OpenWrt on TP-Link TL-WR1043ND with Transmission, Samba, vsftpd, and monitoring
 categories: [OpenWrt, Networking, linux-old.xvx.cz]
 tags: [tp-link, torrent]
 ---

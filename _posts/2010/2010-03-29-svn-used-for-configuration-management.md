@@ -2,7 +2,7 @@
 title: SVN used for configuration management
 author: Petr Ruzicka
 date: 2010-03-29
-description: ""
+description: Use Subversion over SSH to version-control Linux server configuration files
 categories: [Linux, DevOps, linux-old.xvx.cz]
 tags: [automation]
 ---

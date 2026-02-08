@@ -2,7 +2,7 @@
 title: Notes about upgrade from CyanogenMod 7.0 to 7.2
 author: Petr Ruzicka
 date: 2013-05-27
-description: ""
+description: Back up and restore HTC Desire using adb when upgrading CyanogenMod 7.0 to 7.2
 categories: [Android]
 tags: [htc-desire, cyanogenmod, adb]
 ---

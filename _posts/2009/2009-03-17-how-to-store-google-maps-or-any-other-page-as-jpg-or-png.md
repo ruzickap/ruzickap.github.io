@@ -2,7 +2,7 @@
 title: How to store Google Maps (or any other page) as jpg or png
 author: Petr Ruzicka
 date: 2009-03-17
-description: ""
+description: Save large web pages like Google Maps as JPG or PNG images using KDE window settings and Firefox Abduction addon
 categories: [Linux, linux-old.xvx.cz]
 tags: []
 ---
