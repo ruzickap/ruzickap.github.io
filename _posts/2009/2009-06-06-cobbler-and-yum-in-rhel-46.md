@@ -2,7 +2,7 @@
 title: Cobbler and yum in RHEL 4.6
 author: Petr Ruzicka
 date: 2009-06-06
-description: ""
+description: Install and configure Cobbler with yum on RHEL/CentOS 4.6 for PXE network provisioning
 categories: [Linux, Networking, linux-old.xvx.cz]
 tags: [rhel, cobbler, pxe]
 ---

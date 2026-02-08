@@ -2,7 +2,7 @@
 title: Android bootanimation
 author: Petr Ruzicka
 date: 2010-06-17
-description: ""
+description: Create a custom Android boot animation from a movie clip using mplayer and ImageMagick
 categories: [Android, linux-old.xvx.cz]
 tags: [htc-desire, adb]
 ---

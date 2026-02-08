@@ -2,7 +2,7 @@
 title: MCP Servers running on Kubernetes
 author: Petr Ruzicka
 date: 2025-05-27
-description:
+description: Deploy MCP servers on Amazon EKS Auto Mode using ToolHive, vLLM, LibreChat, and Open WebUI for self-hosted AI chat
 categories: [Kubernetes, Cloud]
 tags: [amazon-eks, eks-auto-mode, kubernetes, mcp]
 image: https://raw.githubusercontent.com/lobehub/lobe-icons/2889d303d4d0a3a7082fd9ff56e3df80b0b0c7d3/packages/static-png/dark/mcp.png

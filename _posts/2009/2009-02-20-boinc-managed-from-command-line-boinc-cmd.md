@@ -2,7 +2,7 @@
 title: BOINC managed from command line - boinc_cmd
 author: Petr Ruzicka
 date: 2009-02-20
-description: ""
+description: Manage BOINC from the command line using boinc_cmd for proxy settings, run modes, and project management
 categories: [Linux, linux-old.xvx.cz]
 tags: [boinc, bash]
 ---

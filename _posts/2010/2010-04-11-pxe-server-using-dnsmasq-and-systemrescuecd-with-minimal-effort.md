@@ -2,7 +2,7 @@
 title: PXE server using Dnsmasq and SystemRescueCd with minimal effort
 author: Petr Ruzicka
 date: 2010-04-11
-description: ""
+description: Set up a minimal PXE boot server using only dnsmasq and a SystemRescueCd ISO image
 categories: [Linux, Networking, linux-old.xvx.cz]
 tags: [pxe, dnsmasq, grub]
 ---

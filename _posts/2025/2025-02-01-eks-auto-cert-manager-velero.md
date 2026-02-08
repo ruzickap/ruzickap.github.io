@@ -2,7 +2,7 @@
 title: Amazon EKS Auto Mode with cert-manager and Velero
 author: Petr Ruzicka
 date: 2025-02-01
-description:
+description: Back up and restore Let's Encrypt production certificates using Velero on Amazon EKS Auto Mode with S3 storage
 categories: [Kubernetes, Cloud]
 tags: [amazon-eks, eks-auto-mode, cert-manager, velero, eksctl, kubernetes]
 image: https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg

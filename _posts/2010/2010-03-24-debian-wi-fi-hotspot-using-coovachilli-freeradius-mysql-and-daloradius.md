@@ -2,7 +2,7 @@
 title: Debian Wi-Fi hotspot using CoovaChilli, FreeRadius, MySQL and daloRADIUS
 author: Petr Ruzicka
 date: 2010-03-24
-description: ""
+description: Build a Wi-Fi captive portal hotspot on Debian using CoovaChilli, FreeRadius, MySQL, and daloRADIUS
 categories: [Linux, Networking, linux-old.xvx.cz]
 tags: [wifi, hotspot, database]
 ---

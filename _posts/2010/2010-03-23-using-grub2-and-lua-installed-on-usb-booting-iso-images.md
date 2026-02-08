@@ -2,7 +2,7 @@
 title: Using Grub2 and LUA installed on USB booting ISO images
 author: Petr Ruzicka
 date: 2010-03-23
-description: ""
+description: Create a bootable USB drive with GRUB2 and LUA to auto-detect and boot multiple Linux live ISO images
 categories: [Linux, linux-old.xvx.cz]
 tags: [grub, pxe, debian]
 ---

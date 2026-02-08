@@ -2,7 +2,7 @@
 title: HD Trailers downloaded by wget
 author: Petr Ruzicka
 date: 2009-03-05
-description: ""
+description: Download HD movie trailers in .mov format from Apple trailers using a wget script
 categories: [Linux, linux-old.xvx.cz]
 tags: [bash]
 ---

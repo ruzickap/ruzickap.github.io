@@ -2,7 +2,7 @@
 title: Another OpenWrt configuration
 author: Petr Ruzicka
 date: 2012-01-28
-description: ""
+description: Configure OpenWrt with extroot, DDNS, iodine DNS tunneling, nodogsplash captive portal, and collectd monitoring
 categories: [OpenWrt, Networking, linux-old.xvx.cz]
 tags: [tp-link, wifi, pxe, dnsmasq]
 ---
