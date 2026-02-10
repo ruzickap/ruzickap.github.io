@@ -245,7 +245,7 @@ description = 'Delete: Amazon EKS and Grafana stack'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
-# Amazon EKS and Grafana stack
+# Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind
 #------------------------------------------------------------------------------
 [tasks."create:2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero"]
 description = 'Create: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind'

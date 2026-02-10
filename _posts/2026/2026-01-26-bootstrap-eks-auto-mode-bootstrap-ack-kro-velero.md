@@ -31,13 +31,12 @@ it self-managed.
 The bootstrap process follows these steps:
 
 1. Deploy Kind cluster locally
-2. Install ACK controllers, kro, and Velero on Kind cluster
-3. Use ACK + kro to create S3 bucket for Velero backups
-4. Use ACK + kro to provision EKS Auto Mode Cluster
-5. Install Velero, ACK, and kro on new EKS Auto Mode Cluster
-6. Backup kro and ACK resources from Kind cluster
-7. Restore resources to EKS Auto Mode Cluster
-8. Delete Kind cluster - EKS Auto Mode Cluster now manages itself
+2. Install kro and ACK controllers on Kind cluster
+3. Use ACK + kro to provision EKS Auto Mode Cluster and S3 bucket
+4. Install Velero on Kind cluster and backup kro + ACK resources
+5. Install kro, ACK controllers, and Velero on EKS Auto Mode Cluster
+6. Restore kro and ACK resources to EKS Auto Mode Cluster
+7. Delete Kind cluster - EKS Auto Mode Cluster now manages itself
 
 ```mermaid
 flowchart TD
@@ -46,29 +45,27 @@ flowchart TD
     end
 
     subgraph Kind["Kind Cluster"]
-        B[2. Install ACK + kro + Velero]
-        C[3. Create S3 Bucket]
-        D[4. Provision EKS Auto Mode Cluster]
-        F[6. Backup Resources]
+        B[2. Install kro + ACK]
+        C[3. Provision EKS Cluster + S3 Bucket]
+        D[4. Install Velero + Backup Resources]
     end
 
     subgraph AWS["AWS Cloud"]
         S3[(S3 Bucket)]
         subgraph EKS["EKS Auto Mode Cluster"]
-            E[5. Install Velero + ACK + kro]
-            G[7. Restore Resources]
+            E[5. Install kro + ACK + Velero]
+            F[6. Restore Resources]
         end
     end
 
     A --> B
     B --> C
     C --> S3
-    B --> D
-    D --> EKS
-    E --> G
-    F --> S3
-    S3 --> G
-    G -.-> Kind
+    C --> EKS
+    D -->|Backup| S3
+    E --> F
+    S3 -->|Restore| F
+    F -.->|7. Delete Kind| Kind
 
     style Local fill:#e8e8e8,stroke:#666,color:#333
     style Kind fill:#e8e8e8,stroke:#666,color:#333
