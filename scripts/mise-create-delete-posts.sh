@@ -2,14 +2,19 @@
 
 set -euo pipefail
 
+# AWS Region
+export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+# Hostname / FQDN definitions
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+# Cluster Name: k01
+export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
+export TMP_DIR="${TMP_DIR:-${PWD}}"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+
 : "${AWS_ACCESS_KEY_ID:?Error: AWS_ACCESS_KEY_ID environment variable is not set!}"
-: "${AWS_DEFAULT_REGION:?Error: AWS_DEFAULT_REGION environment variable is not set!}"
 : "${AWS_ROLE_TO_ASSUME:?Error: AWS_ROLE_TO_ASSUME environment variable is not set!}"
 : "${AWS_SECRET_ACCESS_KEY:?Error: AWS_SECRET_ACCESS_KEY environment variable is not set!}"
-: "${CLUSTER_FQDN:?Error: CLUSTER_FQDN environment variable is not set!}"
-: "${CLUSTER_NAME:?Error: CLUSTER_NAME environment variable is not set!}"
 : "${GITHUB_STEP_SUMMARY:="${TMP_DIR}/github_step_summary"}"
-: "${TMP_DIR:="${PWD}"}"
 : "${RUN_FILE:="${TMP_DIR}/${1//[:|]/_}.sh"}"
 
 eval "$(aws sts assume-role --role-arn "${AWS_ROLE_TO_ASSUME}" --role-session-name "$USER@${HOSTNAME}-$(date +%s)" --duration-seconds 7200 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
