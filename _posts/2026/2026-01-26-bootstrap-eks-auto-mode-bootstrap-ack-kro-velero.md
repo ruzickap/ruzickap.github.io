@@ -101,7 +101,7 @@ export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 # Cluster Name: k02
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export MY_EMAIL="petr.ruzicka@gmail.com"
-export TMP_DIR="${TMP_DIR:-${PWD}}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 # Tags used to tag the AWS resources
 export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID

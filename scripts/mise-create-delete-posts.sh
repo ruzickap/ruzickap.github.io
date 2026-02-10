@@ -8,7 +8,7 @@ export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Cluster Name: k01
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-export TMP_DIR="${TMP_DIR:-${PWD}}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
 : "${AWS_ACCESS_KEY_ID:?Error: AWS_ACCESS_KEY_ID environment variable is not set!}"
@@ -22,7 +22,7 @@ eval "$(aws sts assume-role --role-arn "${AWS_ROLE_TO_ASSUME}" --role-session-na
 
 echo "💡 *** $*"
 
-readarray -td\| POSTS <<< "${1##*:}|"
+readarray -td\| POSTS <<< "${1#*:}|"
 unset 'POSTS[-1]'
 
 [[ ! -d "${TMP_DIR}" ]] && mkdir -v "${TMP_DIR}"
