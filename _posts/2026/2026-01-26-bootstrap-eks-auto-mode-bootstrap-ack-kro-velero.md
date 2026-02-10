@@ -143,7 +143,7 @@ Install ACK controllers (S3, IAM, EKS, EC2, KMS, CloudWatch Logs):
 
 ```bash
 # renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart
-ACK_HELM_CHART_VERSION="46.73.0"
+ACK_HELM_CHART_VERSION="46.73.3"
 
 cat > "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/helm_values-ack.yml" << EOF
 eks:
@@ -1516,7 +1516,7 @@ Install ACK controllers (S3, IAM, EKS, EC2, KMS, CloudWatch Logs):
 
 ```bash
 # renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart
-ACK_HELM_CHART_VERSION="46.73.0"
+ACK_HELM_CHART_VERSION="46.73.3"
 
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ack.yml" << EOF
 eks:
