@@ -123,7 +123,7 @@ Install kro using Helm:
 
 ```bash
 # renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro
-KRO_HELM_CHART_VERSION="0.6.2"
+KRO_HELM_CHART_VERSION="0.8.5"
 helm upgrade --install --version=${KRO_HELM_CHART_VERSION} --namespace kro-system --create-namespace kro oci://registry.k8s.io/kro/charts/kro
 ```
 
@@ -1506,7 +1506,7 @@ Install kro on the EKS Auto Mode cluster:
 
 ```bash
 # renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro
-KRO_HELM_CHART_VERSION="0.6.2"
+KRO_HELM_CHART_VERSION="0.8.5"
 helm upgrade --install --namespace kro-system --create-namespace --version=${KRO_HELM_CHART_VERSION} kro oci://registry.k8s.io/kro/charts/kro
 ```
 
