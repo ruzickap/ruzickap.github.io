@@ -13,7 +13,7 @@ tags: [load-balancer, rhel]
 The physical hardware running the F5 BIG-IP Local Traffic Manager load balancing
 software is powerful, but also quite expensive. For a lab environment you do
 not need to buy new hardware, but you can get the
-[F5 BIG-IP Local Traffic Manager Virtual Edition](https://www.f5.com/trial/big-ip-ltm-virtual-edition.php)
+[F5 BIG-IP Local Traffic Manager Virtual Edition](https://web.archive.org/web/20150114015323/https://www.f5.com/trial/big-ip-ltm-virtual-edition.php)
 and install it as virtual machine.
 
 That is the way I would like to describe here. I had one spare
