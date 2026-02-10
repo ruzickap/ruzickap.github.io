@@ -1586,7 +1586,7 @@ Wait for the `kro-ack-backup` to appear in the Velero backup list (synced
 from the S3 bucket):
 
 ```bash
-while ! kubectl get backup -n velero kro-ack-backup 2>/dev/null; do
+while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
   echo "Waiting for kro-ack-backup to appear..."
   sleep 5
 done
@@ -1697,7 +1697,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}"/{${CLUSTER_FQDN}/{helm_values-ack.yml,helm_values-velero.yml,kubeconfig-${CLUSTER_NAME}.conf,velero-kro-ack-restore.yaml},kind-${CLUSTER_NAME}-bootstrap/{helm_values-ack.yml,helm_values-velero.yml,kro-eks-auto-mode-cluster-rgd.yaml,kro-eks-auto-mode-cluster.yaml,kro-ekscloudwatchloggroup-loggroup-rgd.yaml,kro-eksvpc-rgd.yaml,kro-kmskey-rgd.yaml,kro-podidentityassociations-rgd.yaml,kro-s3bucket-rgd.yaml,kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml,velero-kro-ack-backup.yaml}} ; do
+  for FILE in "${TMP_DIR}"/{${CLUSTER_FQDN}/{helm_values-ack.yml,helm_values-velero.yml,kubeconfig-${CLUSTER_NAME}.conf,velero-kro-ack-restore.yaml},kind-${CLUSTER_NAME}-bootstrap/{helm_values-ack.yml,helm_values-velero.yml,kro-eks-auto-mode-cluster-rgd.yaml,kro-eks-auto-mode-cluster.yaml,kro-ekscloudwatchloggroup-loggroup-rgd.yaml,kro-eksvpc-rgd.yaml,kro-kmskey-rgd.yaml,kro-podidentityassociations-rgd.yaml,kro-s3bucket-rgd.yaml,kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml,velero-kro-ack-backup.yaml}}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else
