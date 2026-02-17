@@ -1419,7 +1419,7 @@ spec:
     environment: dev
     cluster: ${CLUSTER_FQDN}
 EOF
-kubectl wait --for=condition=Ready eksautomodecluster/${CLUSTER_NAME} -n kro-system --timeout=30m
+kubectl wait --for=condition=Ready "eksautomodecluster/${CLUSTER_NAME}" -n kro-system --timeout=30m
 
 kubectl get resourcegraphdefinition
 for RESOURCE in $(kubectl api-resources --api-group kro.run --no-headers | awk '!/resourcegraphdefinition/{print $1}'); do
@@ -1695,7 +1695,7 @@ export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
-mkdir -pv "${TMP_DIR}"/{${CLUSTER_FQDN},kind-${CLUSTER_NAME}-cleanup}
+mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}" "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup"
 ```
 
 Create the Kind cluster:
@@ -1895,7 +1895,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
   for FILE in \
     "${TMP_DIR}/${CLUSTER_FQDN}"/{helm_values-ack.yml,helm_values-velero.yml,kubeconfig-${CLUSTER_NAME}.conf,velero-kro-ack-restore.yaml} \
-    "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap"/{helm_values-ack.yml,helm_values-velero.yml,kro-eks-auto-mode-cluster-rgd.yaml,kro-eks-auto-mode-cluster.yaml,kro-ekscloudwatchloggroup-loggroup-rgd.yaml,kro-eksvpc-rgd.yaml,kro-kmskey-rgd.yaml,kro-podidentityassociations-rgd.yaml,kro-s3bucket-rgd.yaml,kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml,velero-kro-ack-backup.yaml} \
+    "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap"/{helm_values-ack.yml,helm_values-velero.yml,kro-eks-auto-mode-cluster-rgd.yaml,kro-eks-auto-mode-cluster.yaml,kro-ekscloudwatchloggroup-loggroup-rgd.yaml,kro-eksvpc-rgd.yaml,kro-kmskey-rgd.yaml,kro-podidentityassociations-rgd.yaml,kro-s3bucket-rgd.yaml,"kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml",velero-kro-ack-backup.yaml} \
     "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup"/{kubeconfig-kind-${CLUSTER_NAME}-cleanup.yaml,helm_values-ack.yml,helm_values-velero.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
