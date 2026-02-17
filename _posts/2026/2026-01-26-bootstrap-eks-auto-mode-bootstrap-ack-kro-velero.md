@@ -133,11 +133,13 @@ Create namespace and configure AWS credentials for ACK:
 
 ```bash
 kubectl create namespace ack-system
+set +x
 kubectl -n ack-system create secret generic aws-credentials --from-literal=credentials="[default]
 aws_access_key_id=${AWS_ACCESS_KEY_ID}
 aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
 aws_session_token=${AWS_SESSION_TOKEN}
 aws_role_to_assume=${AWS_ROLE_TO_ASSUME}"
+set -x
 ```
 
 Install ACK controllers (S3, IAM, EKS, EC2, KMS, CloudWatch Logs):
@@ -1417,7 +1419,13 @@ spec:
     environment: dev
     cluster: ${CLUSTER_FQDN}
 EOF
-kubectl wait --for=jsonpath='{.status.clusterStatus}'=ACTIVE eksautomodecluster/${CLUSTER_NAME} -n kro-system --timeout=30m
+kubectl wait --for=condition=Ready eksautomodecluster/${CLUSTER_NAME} -n kro-system --timeout=30m
+
+kubectl get resourcegraphdefinition
+for RESOURCE in $(kubectl api-resources --api-group kro.run --no-headers | awk '!/resourcegraphdefinition/{print $1}'); do
+  echo -e "\n=== ${RESOURCE} ==="
+  kubectl get "${RESOURCE}" -A
+done
 ```
 
 ## Install Velero
@@ -1502,19 +1510,28 @@ aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAM
 
 ## Install kro on EKS Auto Mode Cluster
 
-Install kro on the EKS Auto Mode cluster:
+Install kro on the EKS Auto Mode cluster with zero replicas — the
+same approach used for ACK below. kro's CRDs are registered but the
+controller does not reconcile until after the Velero restore completes:
 
 ```bash
 # renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro
 KRO_HELM_CHART_VERSION="0.8.5"
-helm upgrade --install --namespace kro-system --create-namespace --version=${KRO_HELM_CHART_VERSION} kro oci://registry.k8s.io/kro/charts/kro
+helm upgrade --install --namespace kro-system --create-namespace --set deployment.replicaCount=0 --version=${KRO_HELM_CHART_VERSION} kro oci://registry.k8s.io/kro/charts/kro
 ```
 
 ## Install ACK Controllers on EKS Auto Mode Cluster
 
-Install ACK controllers on the EKS Auto Mode cluster:
-
-Install ACK controllers (S3, IAM, EKS, EC2, KMS, CloudWatch Logs):
+Install ACK controllers with `deployment.replicas: 0` so the
+controllers install their CRDs but do not start reconciling.
+This prevents a race condition during the Velero restore: Velero
+restores CRs in two steps (create without status, then patch
+`/status`). If ACK controllers are running during the create step,
+they see a CR with no ARN in `.status.ackResourceMetadata` and
+attempt to create new AWS resources - duplicating ones that already
+exist. Deploying with zero replicas eliminates this window; the
+controllers are scaled back up after the restore completes and all
+status fields are in place:
 
 ```bash
 # renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart
@@ -1523,26 +1540,38 @@ ACK_HELM_CHART_VERSION="46.73.3"
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ack.yml" << EOF
 eks:
   enabled: true
+  deployment:
+    replicas: 0
   aws:
     region: ${AWS_DEFAULT_REGION}
 ec2:
   enabled: true
+  deployment:
+    replicas: 0
   aws:
     region: ${AWS_DEFAULT_REGION}
 iam:
   enabled: true
+  deployment:
+    replicas: 0
   aws:
     region: ${AWS_DEFAULT_REGION}
 kms:
   enabled: true
+  deployment:
+    replicas: 0
   aws:
     region: ${AWS_DEFAULT_REGION}
 cloudwatchlogs:
   enabled: true
+  deployment:
+    replicas: 0
   aws:
     region: ${AWS_DEFAULT_REGION}
 s3:
   enabled: true
+  deployment:
+    replicas: 0
   aws:
     region: ${AWS_DEFAULT_REGION}
 EOF
@@ -1593,23 +1622,9 @@ done
 
 ## Restore kro and ACK Resources to EKS
 
-Before restoring, scale down kro and ACK controllers to prevent a
-race condition. Velero restores CRs in two steps: first it creates the
-object (without status), then patches the `/status` subresource.
-If ACK controllers are running during the create step, they see a
-CR with no ARN in `.status.ackResourceMetadata` and attempt to create
-new AWS resources — duplicating ones that already exist. Similarly,
-kro might try to re-create managed resources before the restore is
-complete. Scaling both down eliminates this window entirely:
-
-```bash
-kubectl scale deploy -n kro-system kro --replicas=0
-for DEPLOY in $(kubectl get deploy -n ack-system -o name); do
-  kubectl scale "${DEPLOY}" -n ack-system --replicas=0
-done
-kubectl rollout status deploy kro -n kro-system
-kubectl rollout status deploy -n ack-system
-```
+ACK controllers are already running with zero replicas (set during
+Helm install above), so no additional scaling is needed before the
+restore.
 
 Create restore from backup with `existingResourcePolicy: update`
 as a safety net for re-runs:
@@ -1628,16 +1643,15 @@ spec:
     includedResources:
       - "*"
 EOF
+kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero
 ```
 
-Wait for the restore to complete, then scale kro and ACK controllers
-back up. When the controllers start, every CR already has its ARN in
-`.status.ackResourceMetadata`, so they reconcile with existing AWS
-resources instead of creating duplicates:
+Scale kro and ACK controllers back up. When the controllers start,
+every CR already has its ARN in `.status.ackResourceMetadata`, so
+they reconcile with existing AWS resources instead of creating
+duplicates:
 
 ```bash
-kubectl wait --for=jsonpath='{.status.phase}'=Completed \
-  restore/kro-ack-restore -n velero
 kubectl scale deploy -n kro-system kro --replicas=1
 for DEPLOY in $(kubectl get deploy -n ack-system -o name); do
   kubectl scale "${DEPLOY}" -n ack-system --replicas=1
@@ -1656,8 +1670,20 @@ for RESOURCE in $(kubectl api-resources --api-group kro.run --no-headers | awk '
 done
 ```
 
+Delete the restore:
+
+```bash
+kubectl delete restore kro-ack-restore -n velero
+```
+
 The EKS Auto Mode cluster is now managing its own infrastructure through
-kro and ACK resources that were migrated from the Kind cluster!
+kro and ACK resources that were migrated from the Kind cluster.
+
+Remove the bootstrap kind cluster:
+
+```bash
+kind delete cluster --name "kind-${CLUSTER_NAME}-bootstrap"
+```
 
 ## Cleanup
 
@@ -1665,14 +1691,176 @@ To delete all resources, you must empty the S3 bucket before deletion since ACK
 does not support force-deleting non-empty buckets:
 
 ```sh
+export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
+mkdir -pv "${TMP_DIR}"/{${CLUSTER_FQDN},kind-${CLUSTER_NAME}-cleanup}
+```
 
-export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
-aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
-kubectl delete restore kro-ack-restore -n velero || true
+Create the Kind cluster:
 
-export KUBECONFIG="${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml"
+```sh
+kind create cluster --name "kind-${CLUSTER_NAME}-cleanup" --kubeconfig "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/kubeconfig-kind-${CLUSTER_NAME}-cleanup.yaml"
+export KUBECONFIG="${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/kubeconfig-kind-${CLUSTER_NAME}-cleanup.yaml"
+```
+
+Install kro using Helm:
+
+```sh
+# renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro
+KRO_HELM_CHART_VERSION="0.8.5"
+helm upgrade --install --version=${KRO_HELM_CHART_VERSION} --namespace kro-system --create-namespace --set deployment.replicas=0 kro oci://registry.k8s.io/kro/charts/kro
+```
+
+Create namespace and configure AWS credentials for ACK:
+
+```sh
+kubectl create namespace ack-system
+set +x
+kubectl -n ack-system create secret generic aws-credentials --from-literal=credentials="[default]
+aws_access_key_id=${AWS_ACCESS_KEY_ID}
+aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
+aws_session_token=${AWS_SESSION_TOKEN}
+aws_role_to_assume=${AWS_ROLE_TO_ASSUME}"
+set -x
+```
+
+Install ACK controllers with `deployment.replicas: 0` — CRDs are
+registered but controllers stay idle until the restore populates
+`.status` fields (same race-condition guard as the main cluster):
+
+```sh
+# renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart
+ACK_HELM_CHART_VERSION="46.73.3"
+
+cat > "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/helm_values-ack.yml" << EOF
+eks:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: ${AWS_DEFAULT_REGION}
+    credentials:
+      secretName: aws-credentials
+ec2:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: ${AWS_DEFAULT_REGION}
+    credentials:
+      secretName: aws-credentials
+iam:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: ${AWS_DEFAULT_REGION}
+    credentials:
+      secretName: aws-credentials
+kms:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: ${AWS_DEFAULT_REGION}
+    credentials:
+      secretName: aws-credentials
+cloudwatchlogs:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: ${AWS_DEFAULT_REGION}
+    credentials:
+      secretName: aws-credentials
+s3:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: ${AWS_DEFAULT_REGION}
+    credentials:
+      secretName: aws-credentials
+EOF
+helm upgrade --install --version=${ACK_HELM_CHART_VERSION} --namespace ack-system --values "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/helm_values-ack.yml" ack oci://public.ecr.aws/aws-controllers-k8s/ack-chart
+```
+
+Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
+and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.3.2/charts/velero/values.yaml):
+
+```sh
+# renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
+VELERO_HELM_CHART_VERSION="11.3.2"
+
+helm repo add --force-update vmware-tanzu https://vmware-tanzu.github.io/helm-charts
+cat > "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/helm_values-velero.yml" << EOF
+initContainers:
+  - name: velero-plugin-for-aws
+    # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?<version>.+)$
+    image: velero/velero-plugin-for-aws:v1.13.2
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+upgradeCRDs: false
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: ${CLUSTER_FQDN}
+      prefix: velero
+      config:
+        region: ${AWS_DEFAULT_REGION}
+credentials:
+  useSecret: true
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=${AWS_ACCESS_KEY_ID}
+      aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}
+      aws_session_token=${AWS_SESSION_TOKEN}
+snapshotsEnabled: false
+EOF
+helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/helm_values-velero.yml" velero vmware-tanzu/velero
+
+while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
+  echo "Waiting for kro-ack-backup to appear..."
+  sleep 5
+done
+```
+
+```sh
+tee "${TMP_DIR}/${CLUSTER_FQDN}/velero-kro-ack-restore.yaml" << EOF | kubectl apply -f -
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: kro-ack-restore
+  namespace: velero
+spec:
+  backupName: kro-ack-backup
+  existingResourcePolicy: update
+  restoreStatus:
+    includedResources:
+      - "*"
+EOF
+kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero
+
+kubectl get resourcegraphdefinition
+for RESOURCE in $(kubectl api-resources --api-group kro.run --no-headers | awk '!/resourcegraphdefinition/{print $1}'); do
+  echo -e "\n=== ${RESOURCE} ==="
+  kubectl get "${RESOURCE}" -A
+done
+```
+
+```sh
+kubectl scale deploy -n kro-system kro --replicas=1
+for DEPLOY in $(kubectl get deploy -n ack-system -o name); do
+  kubectl scale "${DEPLOY}" -n ack-system --replicas=1
+done
+```
+
+```sh
 kubectl apply -n velero -f - << EOF || true
 apiVersion: velero.io/v1
 kind: DeleteBackupRequest
@@ -1683,27 +1871,39 @@ spec:
   backupName: kro-ack-backup
 EOF
 
+kubectl delete restore kro-ack-restore -n velero
+
+echo "Waiting for Velero to delete backup data from S3..."
+while kubectl get deletebackuprequest -n velero kro-ack-backup-delete -o jsonpath='{.status.phase}' 2>/dev/null | grep -qv "Processed"; do
+  echo "  Backup deletion still in progress..."
+  sleep 1
+done
+
 kubectl delete eksautomodeclusters.kro.run -n kro-system "${CLUSTER_NAME}" || true
 ```
 
-Delete the kind cluster:
+Delete all the kind clusters:
 
 ```sh
 kind delete cluster --name "kind-${CLUSTER_NAME}-bootstrap"
+kind delete cluster --name "kind-${CLUSTER_NAME}-cleanup"
 ```
 
 Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}"/{${CLUSTER_FQDN}/{helm_values-ack.yml,helm_values-velero.yml,kubeconfig-${CLUSTER_NAME}.conf,velero-kro-ack-restore.yaml},kind-${CLUSTER_NAME}-bootstrap/{helm_values-ack.yml,helm_values-velero.yml,kro-eks-auto-mode-cluster-rgd.yaml,kro-eks-auto-mode-cluster.yaml,kro-ekscloudwatchloggroup-loggroup-rgd.yaml,kro-eksvpc-rgd.yaml,kro-kmskey-rgd.yaml,kro-podidentityassociations-rgd.yaml,kro-s3bucket-rgd.yaml,kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml,velero-kro-ack-backup.yaml}}; do
+  for FILE in \
+    "${TMP_DIR}/${CLUSTER_FQDN}"/{helm_values-ack.yml,helm_values-velero.yml,kubeconfig-${CLUSTER_NAME}.conf,velero-kro-ack-restore.yaml} \
+    "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap"/{helm_values-ack.yml,helm_values-velero.yml,kro-eks-auto-mode-cluster-rgd.yaml,kro-eks-auto-mode-cluster.yaml,kro-ekscloudwatchloggroup-loggroup-rgd.yaml,kro-eksvpc-rgd.yaml,kro-kmskey-rgd.yaml,kro-podidentityassociations-rgd.yaml,kro-s3bucket-rgd.yaml,kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml,velero-kro-ack-backup.yaml} \
+    "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup"/{kubeconfig-kind-${CLUSTER_NAME}-cleanup.yaml,helm_values-ack.yml,helm_values-velero.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else
       echo "❌ File not found: ${FILE}"
     fi
   done
-  rmdir "${TMP_DIR}/${CLUSTER_FQDN}" "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap"
+  rmdir "${TMP_DIR}/${CLUSTER_FQDN}" "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap" "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup"
 fi
 ```
 
