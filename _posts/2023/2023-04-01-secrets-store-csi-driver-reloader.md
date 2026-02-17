@@ -47,7 +47,7 @@ The following variables are used in the subsequent steps:
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-export TMP_DIR="${TMP_DIR:-${PWD}}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"

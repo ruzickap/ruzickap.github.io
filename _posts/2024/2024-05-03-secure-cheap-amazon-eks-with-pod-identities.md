@@ -69,7 +69,7 @@ export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 # Cluster Name: k01
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export MY_EMAIL="petr.ruzicka@gmail.com"
-export TMP_DIR="${TMP_DIR:-${PWD}}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 # Tags used to tag the AWS resources
 export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"

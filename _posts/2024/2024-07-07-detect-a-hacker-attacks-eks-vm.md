@@ -539,7 +539,7 @@ export SOLUTION_KALI="KaliLinux-NICE-DCV"
 export SOLUTION_EC2_CONTAINER="Amazon-EC2-Container"
 export SOLUTION_EC2="Amazon-EC2"
 export CLUSTER_NAME="Amazon-EKS"
-export TMP_DIR="${TMP_DIR:-${PWD}}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${TMP_DIR}/kubeconfig-${CLUSTER_NAME}.conf"
 
 aws cloudformation delete-stack --stack-name "${SOLUTION_KALI}"
