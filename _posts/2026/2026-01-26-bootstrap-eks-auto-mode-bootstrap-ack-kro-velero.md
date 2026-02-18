@@ -68,10 +68,10 @@ flowchart TD
     S3 -->|Restore| F
     F -.->|7. Delete Kind| Kind
 
-    style Local fill:#e8e8e8,stroke:#666,color:#333
-    style Kind fill:#e8e8e8,stroke:#666,color:#333
-    style AWS fill:#e8e8e8,stroke:#666,color:#333
-    style EKS fill:#e8e8e8,stroke:#666,color:#333
+    style Local fill:#326ce5,stroke:#fff,color:#fff
+    style Kind fill:#326ce5,stroke:#fff,color:#fff
+    style AWS fill:#ff9900,stroke:#fff,color:#fff
+    style EKS fill:#ff9900,stroke:#fff,color:#fff
 ```
 
 ACK provides Kubernetes CRDs for AWS services, while kro orchestrates
@@ -106,7 +106,7 @@ export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 # Tags used to tag the AWS resources
 export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID
-mkdir -pv "${TMP_DIR}"/{${CLUSTER_FQDN},kind-${CLUSTER_NAME}-bootstrap}
+mkdir -pv "${TMP_DIR}"/{"${CLUSTER_FQDN}","kind-${CLUSTER_NAME}-bootstrap"}
 ```
 
 ## Bootstrap Kind Cluster and Provision EKS Auto Mode with ACK and kro
@@ -1504,7 +1504,7 @@ EOF
 
 ## Migrate Bootstrap Resources to EKS Auto Mode Cluster
 
-![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="100"}
+![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="130"}
 
 At this point the Kind cluster has done its job: the EKS Auto Mode
 Cluster is running in AWS, the S3 bucket exists, and a Velero backup
