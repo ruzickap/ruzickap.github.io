@@ -6,7 +6,7 @@ description: Use Kind cluster with AWS Controllers for Kubernetes (ACK) and Kube
 categories: [Kubernetes, Cloud]
 tags: [ack, amazon-eks, eks-auto-mode, kind, kro, kubernetes, velero]
 mermaid: true
-image: https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png
+image: https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.png
 ---
 
 This post demonstrates how to use a temporary Kind cluster with [AWS Controllers
@@ -66,7 +66,6 @@ flowchart TD
     D -->|Backup| S3
     E --> F
     S3 -->|Restore| F
-    F -.->|7. Delete Kind| Kind
 
     style Local fill:#326ce5,stroke:#fff,color:#fff
     style Kind fill:#326ce5,stroke:#fff,color:#fff
@@ -138,7 +137,7 @@ helm upgrade --install --version=${KRO_HELM_CHART_VERSION} --namespace kro-syste
 
 ### Install ACK Controllers on Kind Cluster
 
-![AWS Controller for Kubernetes](https://raw.githubusercontent.com/aws-controllers-k8s/docs/2a125b0e041a480cc1d24eac0fe87e268ff6685b/website/static/img/ack-social.png){:width="400"}
+![ACK logo](https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png){:width="150"}
 
 Create namespace and configure AWS credentials for ACK:
 
@@ -1435,7 +1434,7 @@ kubectl wait --for=condition=Ready "eksautomodecluster/${CLUSTER_NAME}" -n kro-s
 
 ### Install Velero
 
-![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="500"}
+![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="400"}
 
 Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
 and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.3.2/charts/velero/values.yaml):
@@ -1504,7 +1503,7 @@ EOF
 
 ## Migrate Bootstrap Resources to EKS Auto Mode Cluster
 
-![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="130"}
+![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="150"}
 
 At this point the Kind cluster has done its job: the EKS Auto Mode
 Cluster is running in AWS, the S3 bucket exists, and a Velero backup
@@ -1542,8 +1541,6 @@ helm upgrade --install --namespace kro-system --create-namespace --set deploymen
 ```
 
 ### Install ACK Controllers on EKS Auto Mode Cluster
-
-![ACK logo](https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png){:width="150"}
 
 Install ACK controllers with `deployment.replicas: 0` so the
 controllers install their CRDs but do not start reconciling.
@@ -1709,6 +1706,8 @@ kind delete cluster --name "kind-${CLUSTER_NAME}-bootstrap"
 ```
 
 ## Cleanup
+
+![Cleanup](https://raw.githubusercontent.com/xprateek/Lazycons_Pro/e805250e2471efb1882f108086be779957469bbf/svgs/ram_cleanup.svg){:width="150"}
 
 To delete all resources, you must empty the S3 bucket before deletion since ACK
 does not support force-deleting non-empty buckets:
