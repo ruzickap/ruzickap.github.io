@@ -5,7 +5,8 @@ date: 2026-01-26
 description: Use Kind cluster with AWS Controllers for Kubernetes (ACK) and Kubernetes Resource Orchestrator (kro) to bootstrap self-managed EKS cluster
 categories: [Kubernetes, Cloud]
 tags: [ack, amazon-eks, eks-auto-mode, kind, kro, kubernetes, velero]
-image: https://raw.githubusercontent.com/aws-controllers-k8s/docs/2a125b0e041a480cc1d24eac0fe87e268ff6685b/website/static/img/ack-social.png
+mermaid: true
+image: https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png
 ---
 
 This post demonstrates how to use a temporary Kind cluster with [AWS Controllers
@@ -108,9 +109,15 @@ AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) &&
 mkdir -pv "${TMP_DIR}"/{${CLUSTER_FQDN},kind-${CLUSTER_NAME}-bootstrap}
 ```
 
-## Create Kind Cluster
+## Bootstrap Kind Cluster and Provision EKS Auto Mode with ACK and kro
 
-![Kind logo](https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg){:width="400"}
+This section covers creating a temporary Kind cluster, installing kro and ACK
+controllers, defining ResourceGraphDefinitions, and using them to provision
+the EKS Auto Mode Cluster along with all supporting AWS resources.
+
+### Create Kind Cluster
+
+![Kind logo](https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg){:width="300"}
 
 Create the Kind cluster:
 
@@ -119,7 +126,7 @@ kind create cluster --name "kind-${CLUSTER_NAME}-bootstrap" --kubeconfig "${TMP_
 export KUBECONFIG="${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml"
 ```
 
-## Install kro on Kind Cluster
+### Install kro on Kind Cluster
 
 Install kro using Helm:
 
@@ -129,9 +136,9 @@ KRO_HELM_CHART_VERSION="0.8.5"
 helm upgrade --install --version=${KRO_HELM_CHART_VERSION} --namespace kro-system --create-namespace kro oci://registry.k8s.io/kro/charts/kro
 ```
 
-## Install ACK Controllers on Kind Cluster
+### Install ACK Controllers on Kind Cluster
 
-![ACK logo](https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png){:width="150"}
+![AWS Controller for Kubernetes](https://raw.githubusercontent.com/aws-controllers-k8s/docs/2a125b0e041a480cc1d24eac0fe87e268ff6685b/website/static/img/ack-social.png){:width="400"}
 
 Create namespace and configure AWS credentials for ACK:
 
@@ -193,14 +200,14 @@ EOF
 helm upgrade --install --version=${ACK_HELM_CHART_VERSION} --namespace ack-system --values "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/helm_values-ack.yml" ack oci://public.ecr.aws/aws-controllers-k8s/ack-chart
 ```
 
-## Create EKS Auto Mode Cluster with ACK and kro
+### Create EKS Auto Mode Cluster with ACK and kro
 
 Create an EKS Auto Mode Cluster using kro
 ResourceGraphDefinitions. This approach uses
 ResourceGraphDefinitions for the EKS Auto Mode Cluster
 itself.
 
-### Add KMS Key ResourceGraphDefinition
+#### Add KMS Key ResourceGraphDefinition
 
 Define a KMS key used for encrypting EKS Auto Mode Cluster and S3 data:
 
@@ -308,7 +315,7 @@ spec:
 EOF
 ```
 
-## Create S3 Bucket with ACK and kro
+### Create S3 Bucket with ACK and kro
 
 First, create a ResourceGroup that defines how to create an S3 bucket with
 proper policies:
@@ -387,7 +394,7 @@ spec:
 EOF
 ```
 
-### Add CloudWatch LogGroup ResourceGraphDefinition
+#### Add CloudWatch LogGroup ResourceGraphDefinition
 
 Create a CloudWatch LogGroup for EKS Auto Mode Cluster logs:
 
@@ -430,7 +437,7 @@ spec:
 EOF
 ```
 
-### Add VPC ResourceGraphDefinition
+#### Add VPC ResourceGraphDefinition
 
 Create a VPC with networking resources for EKS Auto Mode Cluster:
 
@@ -688,7 +695,7 @@ spec:
 EOF
 ```
 
-### Add Pod Identity Associations ResourceGraphDefinition
+#### Add Pod Identity Associations ResourceGraphDefinition
 
 Create a ResourceGraphDefinition for Pod Identity Associations that sets up
 Velero and ACK controller permissions:
@@ -1122,7 +1129,7 @@ spec:
 EOF
 ```
 
-### Add EKS Auto Mode Cluster ResourceGraphDefinition
+#### Add EKS Auto Mode Cluster ResourceGraphDefinition
 
 Create the EKS Auto Mode Cluster ResourceGraphDefinition:
 
@@ -1400,7 +1407,7 @@ EOF
 kubectl wait --for=jsonpath='{.status.state}'=Active resourcegraphdefinition/eks-auto-mode-cluster -n kro-system --timeout=5m
 ```
 
-### Create EKS Auto Mode Cluster Instance
+#### Create EKS Auto Mode Cluster Instance
 
 Now create a single instance that provisions EKS cluster using the expanded
 combined ResourceGraphDefinition:
@@ -1426,9 +1433,9 @@ EOF
 kubectl wait --for=condition=Ready "eksautomodecluster/${CLUSTER_NAME}" -n kro-system --timeout=30m
 ```
 
-## Install Velero
+### Install Velero
 
-![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="600"}
+![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg){:width="500"}
 
 Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
 and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.3.2/charts/velero/values.yaml):
@@ -1495,7 +1502,9 @@ spec:
 EOF
 ```
 
----
+## Migrate Bootstrap Resources to EKS Auto Mode Cluster
+
+![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="100"}
 
 At this point the Kind cluster has done its job: the EKS Auto Mode
 Cluster is running in AWS, the S3 bucket exists, and a Velero backup
@@ -1511,9 +1520,7 @@ switch context to the new EKS cluster and make it self-managing:
    instead of creating duplicates
 5. Delete the Kind bootstrap cluster
 
-## Configure Access to EKS Auto Mode Cluster
-
-  ![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png)
+### Configure Access to EKS Auto Mode Cluster
 
 Update kubeconfig for the new EKS Auto Mode cluster:
 
@@ -1522,7 +1529,7 @@ export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
 aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
-## Install kro on EKS Auto Mode Cluster
+### Install kro on EKS Auto Mode Cluster
 
 Install kro on the EKS Auto Mode cluster with zero replicas — the
 same approach used for ACK below. kro's CRDs are registered but the
@@ -1534,7 +1541,9 @@ KRO_HELM_CHART_VERSION="0.8.5"
 helm upgrade --install --namespace kro-system --create-namespace --set deployment.replicaCount=0 --version=${KRO_HELM_CHART_VERSION} kro oci://registry.k8s.io/kro/charts/kro
 ```
 
-## Install ACK Controllers on EKS Auto Mode Cluster
+### Install ACK Controllers on EKS Auto Mode Cluster
+
+![ACK logo](https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png){:width="150"}
 
 Install ACK controllers with `deployment.replicas: 0` so the
 controllers install their CRDs but do not start reconciling.
@@ -1592,7 +1601,7 @@ EOF
 helm upgrade --install --version=${ACK_HELM_CHART_VERSION} --namespace ack-system --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ack.yml" ack oci://public.ecr.aws/aws-controllers-k8s/ack-chart
 ```
 
-## Install Velero on EKS Auto Mode Cluster
+### Install Velero on EKS Auto Mode Cluster
 
 Install the `velero` [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
 and modify its [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-11.3.2/charts/velero/values.yaml):
@@ -1634,7 +1643,7 @@ while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
 done
 ```
 
-## Restore kro and ACK Resources to EKS
+### Restore kro and ACK Resources to EKS
 
 ACK controllers are already running with zero replicas (set during
 Helm install above), so no additional scaling is needed before the
