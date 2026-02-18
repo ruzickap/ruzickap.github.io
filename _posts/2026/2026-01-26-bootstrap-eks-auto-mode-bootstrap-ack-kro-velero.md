@@ -110,6 +110,8 @@ mkdir -pv "${TMP_DIR}"/{${CLUSTER_FQDN},kind-${CLUSTER_NAME}-bootstrap}
 
 ## Create Kind Cluster
 
+![Kind logo](https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg){:width="400"}
+
 Create the Kind cluster:
 
 ```bash
@@ -128,6 +130,8 @@ helm upgrade --install --version=${KRO_HELM_CHART_VERSION} --namespace kro-syste
 ```
 
 ## Install ACK Controllers on Kind Cluster
+
+![ACK logo](https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png){:width="150"}
 
 Create namespace and configure AWS credentials for ACK:
 
@@ -1420,12 +1424,6 @@ spec:
     cluster: ${CLUSTER_FQDN}
 EOF
 kubectl wait --for=condition=Ready "eksautomodecluster/${CLUSTER_NAME}" -n kro-system --timeout=30m
-
-kubectl get resourcegraphdefinition
-for RESOURCE in $(kubectl api-resources --api-group kro.run --no-headers | awk '!/resourcegraphdefinition/{print $1}'); do
-  echo -e "\n=== ${RESOURCE} ==="
-  kubectl get "${RESOURCE}" -A
-done
 ```
 
 ## Install Velero
@@ -1499,7 +1497,23 @@ EOF
 
 ---
 
+At this point the Kind cluster has done its job: the EKS Auto Mode
+Cluster is running in AWS, the S3 bucket exists, and a Velero backup
+of all kro and ACK resources is stored in S3. The remaining steps
+switch context to the new EKS cluster and make it self-managing:
+
+1. Configure `kubectl` access to the EKS Auto Mode Cluster
+2. Install kro, ACK controllers, and Velero on the EKS cluster
+   (all with zero replicas to prevent premature reconciliation)
+3. Restore the Velero backup so that kro and ACK resources
+   appear with their existing AWS resource ARNs intact
+4. Scale controllers back up -- they adopt existing AWS resources
+   instead of creating duplicates
+5. Delete the Kind bootstrap cluster
+
 ## Configure Access to EKS Auto Mode Cluster
+
+  ![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png)
 
 Update kubeconfig for the new EKS Auto Mode cluster:
 
@@ -1830,6 +1844,8 @@ while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
 done
 ```
 
+Restore kro and ACK resources from the Velero backup:
+
 ```sh
 tee "${TMP_DIR}/${CLUSTER_FQDN}/velero-kro-ack-restore.yaml" << EOF | kubectl apply -f -
 apiVersion: velero.io/v1
@@ -1845,13 +1861,10 @@ spec:
       - "*"
 EOF
 kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero
-
-kubectl get resourcegraphdefinition
-for RESOURCE in $(kubectl api-resources --api-group kro.run --no-headers | awk '!/resourcegraphdefinition/{print $1}'); do
-  echo -e "\n=== ${RESOURCE} ==="
-  kubectl get "${RESOURCE}" -A
-done
 ```
+
+Scale kro and ACK controllers back up so they can reconcile the
+restored resources:
 
 ```sh
 kubectl scale deploy -n kro-system kro --replicas=1
@@ -1859,6 +1872,9 @@ for DEPLOY in $(kubectl get deploy -n ack-system -o name); do
   kubectl scale "${DEPLOY}" -n ack-system --replicas=1
 done
 ```
+
+Delete the Velero backup, remove the restore, and delete the EKS Auto
+Mode Cluster along with all kro-managed AWS resources:
 
 ```sh
 kubectl apply -n velero -f - << EOF || true
@@ -1872,14 +1888,23 @@ spec:
 EOF
 
 kubectl delete restore kro-ack-restore -n velero
+```
 
-echo "Waiting for Velero to delete backup data from S3..."
-while kubectl get deletebackuprequest -n velero kro-ack-backup-delete -o jsonpath='{.status.phase}' 2>/dev/null | grep -qv "Processed"; do
-  echo "  Backup deletion still in progress..."
-  sleep 1
-done
+Delete the EKS Auto Mode Cluster kro instance and all its
+kro-managed AWS resources. First, patch the S3Bucket CR to
+remove its finalizer — this is needed because a field-ownership
+conflict between Velero's restore and kro's Server-Side Apply
+prevents kro from cleaning it up automatically, which would
+cause the delete to hang indefinitely:
 
-kubectl delete eksautomodeclusters.kro.run -n kro-system "${CLUSTER_NAME}" || true
+```bash
+# Workaround: after Velero restore, Server-Side Apply field ownership prevents
+# KRO from removing its own finalizer from the S3Bucket CR. The finalizer is
+# owned by Velero's field manager, so KRO's SSA patch silently fails to remove
+# it, causing deletion to hang indefinitely.
+kubectl patch s3buckets k02-s3 -n kro-system --type=json -p='[{"op": "remove", "path": "/metadata/finalizers/0"}]'
+
+kubectl delete eksautomodeclusters.kro.run -n kro-system "${CLUSTER_NAME}" --timeout=10m || true
 ```
 
 Delete all the kind clusters:
