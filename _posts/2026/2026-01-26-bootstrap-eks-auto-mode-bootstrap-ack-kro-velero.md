@@ -6,7 +6,8 @@ description: Use Kind cluster with AWS Controllers for Kubernetes (ACK) and Kube
 categories: [Kubernetes, Cloud]
 tags: [ack, amazon-eks, eks-auto-mode, kind, kro, kubernetes, velero]
 mermaid: true
-image: https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.png
+# image: https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.png
+image: https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg
 ---
 
 This post demonstrates how to use a temporary Kind cluster with [AWS Controllers
@@ -1503,7 +1504,7 @@ EOF
 
 ## Migrate Bootstrap Resources to EKS Auto Mode Cluster
 
-![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="150"}
+![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="200"}
 
 At this point the Kind cluster has done its job: the EKS Auto Mode
 Cluster is running in AWS, the S3 bucket exists, and a Velero backup
