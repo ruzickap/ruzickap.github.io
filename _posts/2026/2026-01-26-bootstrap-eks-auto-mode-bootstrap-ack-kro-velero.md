@@ -12,11 +12,10 @@ image: https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b1
 This post demonstrates how to use a temporary Kind cluster with [AWS Controllers
 for Kubernetes (ACK)](https://aws-controllers-k8s.github.io/community/) and
 [Kubernetes Resource Orchestrator (kro)](https://kro.run/) to bootstrap
-a production EKS Auto Mode Cluster that manages itself. The process
-involves creating AWS resources including S3 bucket and EKS Auto Mode
-Clusters using native Kubernetes APIs, backing up those resources with Velero,
-and restoring them to the new EKS Auto Mode Cluster - effectively making
-it self-managed.
+a production EKS Auto Mode Cluster that manages itself. The process involves
+creating AWS resources including S3 bucket and EKS Auto Mode Clusters using
+native Kubernetes APIs, backing up those resources with Velero, and restoring
+them to the new EKS Auto Mode Cluster - effectively making it self-managed.
 
 ## Requirements
 
@@ -73,9 +72,8 @@ flowchart TD
     style EKS fill:#ff9900,stroke:#fff,color:#fff
 ```
 
-ACK provides Kubernetes CRDs for AWS services, while kro orchestrates
-complex resource dependencies, creating a powerful infrastructure
-management platform.
+ACK provides Kubernetes CRDs for AWS services, while kro orchestrates complex
+resource dependencies, creating a powerful infrastructure management platform.
 
 ## Prerequisites
 
@@ -90,8 +88,8 @@ export AWS_SESSION_TOKEN="xxxxxxxx"
 export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
 ```
 
-If you plan to follow this document and its tasks, you will need to set up a
-few environment variables, such as:
+If you plan to follow this document and its tasks, you will need to set up a few
+environment variables, such as:
 
 ```bash
 # AWS Region
@@ -152,7 +150,8 @@ aws_role_to_assume=${AWS_ROLE_TO_ASSUME}"
 set -x
 ```
 
-Install [ACK controllers](https://aws-controllers-k8s.github.io/docs/) (S3, IAM, EKS, EC2, KMS, CloudWatch Logs):
+Install [ACK controllers](https://aws-controllers-k8s.github.io/docs/)
+(S3, IAM, EKS, EC2, KMS, CloudWatch Logs):
 
 ```bash
 # renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart
@@ -202,8 +201,8 @@ helm upgrade --install --version=${ACK_HELM_CHART_VERSION} --namespace ack-syste
 ### Create EKS Auto Mode Cluster with ACK and kro
 
 Create an [EKS Auto Mode Cluster](https://aws.amazon.com/eks/auto-mode/) using
-kro ResourceGraphDefinitions. This approach uses ResourceGraphDefinitions
-for the EKS Auto Mode Cluster itself.
+kro ResourceGraphDefinitions. This approach uses ResourceGraphDefinitions for
+the EKS Auto Mode Cluster itself.
 
 #### Add KMS Key ResourceGraphDefinition
 
@@ -315,8 +314,8 @@ EOF
 
 ### Create S3 Bucket with ACK and kro
 
-First, create a RGD that defines how to create an S3
-bucket with proper policies:
+First, create a RGD that defines how to create an S3 bucket with proper
+policies:
 
 ```bash
 tee "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kro-s3bucket-rgd.yaml" << 'EOF' | kubectl apply -f -
@@ -1473,11 +1472,10 @@ EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/helm_values-velero.yml" velero vmware-tanzu/velero
 ```
 
-Create a Velero backup for kro and ACK resources. Use resource
-filtering with API group wildcards to capture `kro.run` objects
-(cluster-scoped RGDs and namespaced instances) and
-`services.k8s.aws` objects (ACK-managed AWS resources), scoped
-to `kro-system`:
+Create a Velero backup for kro and ACK resources. Use resource filtering with
+API group wildcards to capture `kro.run` objects (cluster-scoped RGDs and
+namespaced instances) and `services.k8s.aws` objects (ACK-managed AWS
+resources), scoped to `kro-system`:
 
 ```bash
 tee "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/velero-kro-ack-backup.yaml" << EOF | kubectl apply -f -
@@ -1504,19 +1502,19 @@ EOF
 
 ![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="350"}
 
-At this point the Kind cluster has done its job: the EKS Auto Mode
-Cluster is running in AWS, the S3 bucket exists, and a Velero backup
-of all kro and ACK resources is stored in S3. The remaining steps
-switch context to the new EKS cluster and make it self-managing:
+At this point the Kind cluster has done its job: the EKS Auto Mode Cluster is
+running in AWS, the S3 bucket exists, and a Velero backup of all kro and ACK
+resources is stored in S3. The remaining steps switch context to the new EKS
+cluster and make it self-managing:
 
 1. Configure `kubectl` access to the EKS Auto Mode Cluster
-2. Install kro, ACK controllers, and Velero on the EKS cluster
+1. Install kro, ACK controllers, and Velero on the EKS cluster
    (all with zero replicas to prevent premature reconciliation)
-3. Restore the Velero backup so that kro and ACK resources
-   appear with their existing AWS resource ARNs intact
-4. Scale controllers back up -- they adopt existing AWS resources
-   instead of creating duplicates
-5. Delete the Kind bootstrap cluster
+1. Restore the Velero backup so that kro and ACK resources appear with their
+   existing AWS resource ARNs intact
+1. Scale controllers back up -- they adopt existing AWS resources instead of
+   creating duplicates
+1. Delete the Kind bootstrap cluster
 
 ### Configure Access to EKS Auto Mode Cluster
 
@@ -1639,8 +1637,7 @@ done
 
 ### Restore kro and ACK Resources to EKS
 
-Create restore from backup with `existingResourcePolicy: update` as a safety net
-for re-runs:
+Create restore from backup:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/velero-kro-ack-restore.yaml" << EOF | kubectl apply -f -
@@ -1651,7 +1648,6 @@ metadata:
   namespace: velero
 spec:
   backupName: kro-ack-backup
-  #############3333333333333# existingResourcePolicy: update
   restoreStatus:
     includedResources:
       - "*"
@@ -1683,14 +1679,54 @@ for RESOURCE in $(kubectl api-resources --api-group kro.run --no-headers | awk '
 done
 ```
 
+```console
+NAME                      APIVERSION   KIND                      STATE    AGE
+eks-auto-mode-cluster     v1alpha1     EksAutoModeCluster        Active   9s
+ekscloudwatchloggroup     v1alpha1     EksCloudWatchLogGroup     Active   9s
+eksvpc                    v1alpha1     EksVpc                    Active   9s
+kmskey                    v1alpha1     KmsKey                    Active   9s
+podidentityassociations   v1alpha1     PodIdentityAssociations   Active   9s
+s3-velero-bucket          v1alpha1     S3Bucket                  Active   9s
+
+=== eksautomodeclusters ===
+NAMESPACE    NAME   STATE    READY   AGE
+kro-system   k02    ACTIVE   True    12s
+
+=== ekscloudwatchloggroups ===
+NAMESPACE    NAME       STATE    READY   AGE
+kro-system   k02-logs   ACTIVE   True    13s
+
+=== eksvpcs ===
+NAMESPACE    NAME      STATE    READY   AGE
+kro-system   k02-vpc   ACTIVE   True    14s
+
+=== kmskeys ===
+NAMESPACE    NAME      STATE    READY   AGE
+kro-system   k02-kms   ACTIVE   True    14s
+
+=== podidentityassociations ===
+NAMESPACE    NAME                                           CLUSTER   NAMESPACE    SERVICEACCOUNT                  SYNCED   AGE
+kro-system   k02-ack-system-ack-cloudwatchlogs-controller   k02       ack-system   ack-cloudwatchlogs-controller   True     15s
+kro-system   k02-ack-system-ack-ec2-controller              k02       ack-system   ack-ec2-controller              True     14s
+kro-system   k02-ack-system-ack-eks-controller              k02       ack-system   ack-eks-controller              True     14s
+kro-system   k02-ack-system-ack-iam-controller              k02       ack-system   ack-iam-controller              True     14s
+kro-system   k02-ack-system-ack-kms-controller              k02       ack-system   ack-kms-controller              True     14s
+kro-system   k02-ack-system-ack-s3-controller               k02       ack-system   ack-s3-controller               True     14s
+kro-system   k02-velero-velero                              k02       velero       velero-server                   True     14s
+
+=== s3buckets ===
+NAMESPACE    NAME     STATE    READY   AGE
+kro-system   k02-s3   ACTIVE   True    14s
+```
+
 Delete the restore:
 
 ```bash
 kubectl delete restore kro-ack-restore -n velero
 ```
 
-The EKS Auto Mode cluster is now managing its own infrastructure through
-kro and ACK resources that were migrated from the Kind cluster.
+The EKS Auto Mode cluster is now managing its own infrastructure through kro and
+ACK resources that were migrated from the Kind cluster.
 
 Remove the bootstrap kind cluster:
 
@@ -1741,9 +1777,9 @@ aws_role_to_assume=${AWS_ROLE_TO_ASSUME}"
 set -x
 ```
 
-Install ACK controllers with `deployment.replicas: 0` — CRDs are
-registered but controllers stay idle until the restore populates
-`.status` fields (same race-condition guard as the main cluster):
+Install ACK controllers with `deployment.replicas: 0` — CRDs are registered but
+controllers stay idle until the restore populates `.status` fields (same
+race-condition guard as the main cluster):
 
 ```sh
 # renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart
@@ -1864,8 +1900,8 @@ EOF
 kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero
 ```
 
-Scale kro and ACK controllers back up so they can reconcile the
-restored resources:
+Scale kro and ACK controllers back up so they can reconcile the restored
+resources:
 
 ```sh
 kubectl scale deploy -n kro-system kro --replicas=1
@@ -1874,8 +1910,8 @@ for DEPLOY in $(kubectl get deploy -n ack-system -o name); do
 done
 ```
 
-Delete the Velero backup, remove the restore, and delete the EKS Auto
-Mode Cluster along with all kro-managed AWS resources:
+Delete the Velero backup, remove the restore, and delete the EKS Auto Mode
+Cluster along with all kro-managed AWS resources:
 
 ```sh
 kubectl apply -n velero -f - << EOF || true
@@ -1891,11 +1927,10 @@ EOF
 kubectl delete restore kro-ack-restore -n velero
 ```
 
-Delete the EKS Auto Mode Cluster kro instance and all its
-kro-managed AWS resources. First, patch the S3Bucket CR to
-remove its finalizer — this is needed because a field-ownership
-conflict between Velero's restore and kro's Server-Side Apply
-prevents kro from cleaning it up automatically, which would
+Delete the EKS Auto Mode Cluster kro instance and all its kro-managed AWS
+resources. First, patch the S3Bucket CR to remove its finalizer — this is needed
+because a field-ownership conflict between Velero's restore and kro's
+Server-Side Apply prevents kro from cleaning it up automatically, which would
 cause the delete to hang indefinitely:
 
 ```sh
@@ -1935,4 +1970,4 @@ fi
 set -e
 ```
 
-Enjoy your self-managed EKS cluster with ACK and kro! 😉
+Enjoy your self-managed EKS cluster with ACK and kro... 😉
