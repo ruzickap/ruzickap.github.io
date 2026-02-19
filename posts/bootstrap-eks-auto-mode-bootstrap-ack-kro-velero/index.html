@@ -1,0 +1,3220 @@
+<!doctype html><html lang="en" data-mode="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f7"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1e"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="viewport" content="width=device-width, user-scalable=no initial-scale=1, shrink-to-fit=no, viewport-fit=cover" ><meta name="generator" content="Jekyll v4.4.1" /><meta property="og:title" content="Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind" /><meta name="author" content="Petr Ruzicka" /><meta property="og:locale" content="en" /><meta name="description" content="Use a Kind cluster with AWS Controllers for Kubernetes (ACK) and Kubernetes Resource Orchestrator (kro) to bootstrap a self-managed EKS cluster" /><meta property="og:description" content="Use a Kind cluster with AWS Controllers for Kubernetes (ACK) and Kubernetes Resource Orchestrator (kro) to bootstrap a self-managed EKS cluster" /><link rel="canonical" href="https://ruzickap.github.io/posts/bootstrap-eks-auto-mode-bootstrap-ack-kro-velero/" /><meta property="og:url" content="https://ruzickap.github.io/posts/bootstrap-eks-auto-mode-bootstrap-ack-kro-velero/" /><meta property="og:site_name" content="Petr’s Blog" /><meta property="og:image" content="https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2026-01-26T00:00:00+01:00" /><meta name="twitter:card" content="summary_large_image" /><meta property="twitter:image" content="https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg" /><meta property="twitter:title" content="Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind" /><meta name="twitter:site" content="@Ruzicka_Petr" /><meta name="twitter:creator" content="@Ruzicka_Petr" /><meta name="google-site-verification" content="4ugGShJoiB9veoPwFcMsMjzk-1BYbi5ozcSnovkBWtA" /><meta name="msvalidate.01" content="592AB158E3F9EF887F8DC8E69A2FF754" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Petr Ruzicka","url":"https://petr.ruzicka.dev"},"dateModified":"2026-01-26T00:00:00+01:00","datePublished":"2026-01-26T00:00:00+01:00","description":"Use a Kind cluster with AWS Controllers for Kubernetes (ACK) and Kubernetes Resource Orchestrator (kro) to bootstrap a self-managed EKS cluster","headline":"Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind","image":"https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg","mainEntityOfPage":{"@type":"WebPage","@id":"https://ruzickap.github.io/posts/bootstrap-eks-auto-mode-bootstrap-ack-kro-velero/"},"url":"https://ruzickap.github.io/posts/bootstrap-eks-auto-mode-bootstrap-ack-kro-velero/"}</script><title>Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind | Petr's Blog</title><link rel="icon" type="image/png" href="/assets/img/favicons/favicon-96x96.png" sizes="96x96"><link rel="icon" type="image/svg+xml" href="/assets/img/favicons/favicon.svg"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://fonts.gstatic.com" ><link rel="preconnect" href="https://cdn.jsdelivr.net" ><link rel="dns-prefetch" href="https://cdn.jsdelivr.net" ><link rel="stylesheet" href="/assets/css/jekyll-theme-chirpy.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Source+Sans+Pro:wght@400;600;700;900&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/loading-attribute-polyfill@2.1.1/dist/loading-attribute-polyfill.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css"> <script src="/assets/js/dist/theme.min.js"></script> <script defer src="https://cdn.jsdelivr.net/combine/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js,npm/loading-attribute-polyfill@2.1.1/dist/loading-attribute-polyfill.umd.min.js,npm/glightbox@3.3.0/dist/js/glightbox.min.js,npm/clipboard@2.0.11/dist/clipboard.min.js,npm/dayjs@1.11.18/dayjs.min.js,npm/dayjs@1.11.18/locale/en.js,npm/dayjs@1.11.18/plugin/relativeTime.js,npm/dayjs@1.11.18/plugin/localizedFormat.js,npm/tocbot@4.36.4/dist/tocbot.min.js,npm/mermaid@11.12.0/dist/mermaid.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script> document.addEventListener('DOMContentLoaded', () => { const pv = document.getElementById('pageviews'); if (pv !== null) { const uri = location.pathname.replace(/\/$/, ''); const url = `https://ruzickap-github-io.goatcounter.com/counter/${encodeURIComponent(uri)}.json`; fetch(url) .then((response) => response.json()) .then((data) => { const count = data.count.replace(/\D/g, ''); pv.innerText = new Intl.NumberFormat().format(count); }) .catch((error) => { pv.innerText = '1'; }); } }); </script> <script defer src="/app.min.js?baseurl=&register=true" ></script> <script defer src="https://www.googletagmanager.com/gtag/js?id=G-64WRCWDZM8"></script> <script> document.addEventListener('DOMContentLoaded', () => { window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-64WRCWDZM8'); }); </script> <script async src="https://gc.zgo.at/count.js" data-goatcounter="https://ruzickap-github-io.goatcounter.com/count" ></script> <script defer src="https://cloud.umami.is/script.js" data-website-id="380ea41a-7d5f-4423-8e13-03151bde195f" ></script> <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ad8c64404e1e41dba184019564cf11bb"}' ></script><body><aside aria-label="Sidebar" id="sidebar" class="d-flex flex-column align-items-end"><header class="profile-wrapper"> <a href="/" id="avatar" class="rounded-circle"><img src="https://0.gravatar.com/avatar/5484c0fd9f98e2ffd9212b158931bf4b?s=200" width="112" height="112" alt="avatar" onerror="this.style.display='none'"></a> <a class="site-title d-block" href="/">Petr's Blog</a><p class="site-subtitle fst-italic mb-0">DevOps • GitOps • K8s</p></header><nav class="flex-column flex-grow-1 w-100 ps-0"><ul class="nav"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home"></i> <span>HOME</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream"></i> <span>CATEGORIES</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tags"></i> <span>TAGS</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive"></i> <span>ARCHIVES</span> </a><li class="nav-item"> <a href="/projects/" class="nav-link"> <i class="fa-fw fas fa-project-diagram"></i> <span>PROJECTS</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle"></i> <span>ABOUT</span> </a></ul></nav><div class="sidebar-bottom d-flex flex-wrap align-items-center w-100"> <a href="https://github.com/ruzickap" aria-label="github" target="_blank" rel="noopener noreferrer" > <i class="fab fa-github"></i> </a> <a href="javascript:location.href = 'mailto:' + ['petr.ruzicka','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="https://petr.ruzicka.dev" aria-label="homepage" target="_blank" rel="noopener noreferrer" > <i class="fas fa-home"></i> </a> <a href="https://mastodon.social/@petr_ruzicka" aria-label="mastodon" target="_blank" rel="noopener noreferrer me" > <i class="fab fa-mastodon"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></aside><div id="main-wrapper" class="d-flex justify-content-center"><div class="container d-flex flex-column px-xxl-5"><header id="topbar-wrapper" class="flex-shrink-0" aria-label="Top Bar"><div id="topbar" class="d-flex align-items-center justify-content-between px-lg-3 h-100" ><nav id="breadcrumb" aria-label="Breadcrumb"> <span> <a href="/">Home</a> </span> <span>Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind</span></nav><button type="button" id="sidebar-trigger" class="btn btn-link" aria-label="Sidebar"> <i class="fas fa-bars fa-fw"></i> </button><div id="topbar-title"> Post</div><button type="button" id="search-trigger" class="btn btn-link" aria-label="Search"> <i class="fas fa-search fa-fw"></i> </button> <search id="search" class="align-items-center ms-3 ms-lg-0"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="Search..." > </search> <button type="button" class="btn btn-link text-decoration-none" id="search-cancel">Cancel</button></div></header><div class="row flex-grow-1"><main aria-label="Main Content" class="col-12 col-lg-11 col-xl-9 px-md-4"><article class="px-1" data-toc="true"><header><h1 data-toc-skip>Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind</h1><p class="post-desc fw-light mb-4">Use a Kind cluster with AWS Controllers for Kubernetes (ACK) and Kubernetes Resource Orchestrator (kro) to bootstrap a self-managed EKS cluster</p><div class="post-meta text-muted"> <span> Posted <time data-ts="1769382000" data-df="ll" data-bs-toggle="tooltip" data-bs-placement="bottom" > Jan 26, 2026 </time> </span><div class="mt-3 mb-3"> <a href="https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg" class="popup img-link preview-img shimmer"><img src="https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg" alt="Preview Image" width="1200" height="630" loading="lazy"></a></div><div class="d-flex justify-content-between"> <span> By <em> <a href="https://petr.ruzicka.dev">Petr Ruzicka</a> </em> </span><div> <span> <em id="pageviews"> <i class="fas fa-spinner fa-spin small"></i> </em> views </span> <span class="readtime" data-bs-toggle="tooltip" data-bs-placement="bottom" title="6241 words" > <em>34 min</em> read</span></div></div></div></header><div id="toc-bar" class="d-flex align-items-center justify-content-between invisible"> <span class="label text-truncate">Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind</span> <button type="button" class="toc-trigger btn me-1"> <i class="fa-solid fa-list-ul fa-fw"></i> </button></div><button id="toc-solo-trigger" type="button" class="toc-trigger btn btn-outline-secondary btn-sm"> <span class="label ps-2 pe-1">Contents</span> <i class="fa-solid fa-angle-right fa-fw"></i> </button> <dialog id="toc-popup" class="p-0"><div class="header d-flex flex-row align-items-center justify-content-between"><div class="label text-truncate py-2 ms-4">Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind</div><button id="toc-popup-close" type="button" class="btn mx-1 my-1 opacity-75"> <i class="fas fa-close"></i> </button></div><div id="toc-popup-content" class="px-4 py-3 pb-4"></div></dialog><div class="content"><p>This post demonstrates how to use a temporary Kind cluster with <a href="https://aws-controllers-k8s.github.io/community/">AWS Controllers for Kubernetes (ACK)</a> and <a href="https://kro.run/">Kubernetes Resource Orchestrator (kro)</a> to bootstrap a <a href="https://aws.amazon.com/eks/auto-mode/">EKS Auto Mode Cluster</a> that manages itself. The process involves creating AWS resources including an <a href="https://aws.amazon.com/s3/">S3 bucket</a> and an EKS Auto Mode Cluster using native Kubernetes APIs, backing up those resources with Velero, and restoring them to the new EKS Auto Mode Cluster — effectively making it self-managed.</p><h2 id="requirements"><span class="me-2">Requirements</span><a href="#requirements" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><ul><li><a href="https://aws.amazon.com/">AWS account</a> with appropriate permissions<li><a href="https://aws.amazon.com/cli/">AWS CLI</a><li><a href="https://kubernetes.io/docs/tasks/tools/">kubectl</a><li><a href="https://helm.sh/">Helm</a><li><a href="https://kind.sigs.k8s.io/">kind</a><li><a href="https://velero.io/docs/main/basic-install/#install-the-cli">Velero CLI</a></ul><h2 id="architecture-overview"><span class="me-2">Architecture Overview</span><a href="#architecture-overview" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>The bootstrap process follows these steps:</p><ol><li>Deploy Kind cluster locally<li>Install kro and ACK controllers on Kind cluster<li>Use ACK + kro to provision EKS Auto Mode Cluster and S3 bucket<li>Install Velero on Kind cluster and backup kro + ACK resources to S3 bucket<li>Install kro, ACK controllers, and Velero on EKS Auto Mode Cluster<li>Restore kro and ACK resources to EKS Auto Mode Cluster<li>Delete Kind cluster - EKS Auto Mode Cluster now manages itself</ol><pre><code class="language-mermaid">flowchart TD
+    subgraph Local["Local Machine"]
+        A[1. Deploy Kind Cluster]
+    end
+
+    subgraph Kind["Kind Cluster"]
+        B[2. Install kro + ACK]
+        C[3. Provision EKS Cluster + S3 Bucket]
+        D[4. Install Velero + Backup Resources]
+    end
+
+    subgraph AWS["AWS Cloud"]
+        S3[(S3 Bucket)]
+        subgraph EKS["EKS Auto Mode Cluster"]
+            E[5. Install kro + ACK + Velero]
+            F[6. Restore Resources]
+        end
+    end
+
+    A --&gt; B
+    B --&gt; C
+    C --&gt; S3
+    C --&gt; EKS
+    D --&gt;|Backup| S3
+    E --&gt; F
+    S3 --&gt;|Restore| F
+
+    style Local fill:#326ce5,stroke:#fff,color:#fff
+    style Kind fill:#326ce5,stroke:#fff,color:#fff
+    style AWS fill:#ff9900,stroke:#fff,color:#fff
+    style EKS fill:#ff9900,stroke:#fff,color:#fff
+</code></pre><p>ACK provides Kubernetes CRDs for AWS services, while kro orchestrates complex resource dependencies, creating a powerful infrastructure management platform.</p><h2 id="prerequisites"><span class="me-2">Prerequisites</span><a href="#prerequisites" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>You will need to configure the <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html">AWS CLI</a> and set up other necessary secrets and variables:</p><div class="language-shell highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="c"># AWS Credentials</span>
+<span class="nb">export </span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="o">=</span><span class="s2">"xxxxxxxxxxxxxxxxxx"</span>
+<span class="nb">export </span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="o">=</span><span class="s2">"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"</span>
+<span class="nb">export </span><span class="nv">AWS_SESSION_TOKEN</span><span class="o">=</span><span class="s2">"xxxxxxxx"</span>
+<span class="nb">export </span><span class="nv">AWS_ROLE_TO_ASSUME</span><span class="o">=</span><span class="s2">"arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"</span>
+</pre></table></code></div></div><p>If you plan to follow this document and its tasks, you will need to set up a few environment variables, such as:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="c"># AWS Region</span>
+<span class="nb">export </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">:-</span><span class="nv">us</span><span class="p">-east-1</span><span class="k">}</span><span class="s2">"</span>
+<span class="c"># Hostname / FQDN definitions</span>
+<span class="nb">export </span><span class="nv">CLUSTER_FQDN</span><span class="o">=</span><span class="s2">"k02.k8s.mylabs.dev"</span>
+<span class="c"># Cluster Name: k02</span>
+<span class="nb">export </span><span class="nv">CLUSTER_NAME</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="p">%%.*</span><span class="k">}</span><span class="s2">"</span>
+<span class="nb">export </span><span class="nv">MY_EMAIL</span><span class="o">=</span><span class="s2">"petr.ruzicka@gmail.com"</span>
+<span class="nb">export </span><span class="nv">TMP_DIR</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">:-${</span><span class="nv">PWD</span><span class="k">}</span><span class="p">/tmp</span><span class="k">}</span><span class="s2">"</span>
+<span class="c"># Tags used to tag the AWS resources</span>
+<span class="nb">export </span><span class="nv">TAGS</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">TAGS</span><span class="k">:-</span><span class="nv">Owner</span><span class="p">=</span><span class="k">${</span><span class="nv">MY_EMAIL</span><span class="k">}</span><span class="p">,Environment=dev,Cluster=</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}}</span><span class="s2">"</span>
+<span class="nv">AWS_ACCOUNT_ID</span><span class="o">=</span><span class="si">$(</span>aws sts get-caller-identity <span class="nt">--query</span> <span class="s2">"Account"</span> <span class="nt">--output</span> text<span class="si">)</span> <span class="o">&amp;&amp;</span> <span class="nb">export </span>AWS_ACCOUNT_ID
+<span class="nb">mkdir</span> <span class="nt">-pv</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">"</span>/<span class="o">{</span><span class="s2">"</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">"</span>,<span class="s2">"kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap"</span><span class="o">}</span>
+</pre></table></code></div></div><h2 id="bootstrap-kind-cluster-and-provision-eks-auto-mode-with-ack-and-kro"><span class="me-2">Bootstrap Kind Cluster and Provision EKS Auto Mode with ACK and kro</span><a href="#bootstrap-kind-cluster-and-provision-eks-auto-mode-with-ack-and-kro" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p>This section covers creating a temporary Kind cluster, installing kro and ACK controllers, defining ResourceGraphDefinitions, and using them to provision the EKS Auto Mode Cluster along with all supporting AWS resources.</p><h3 id="create-kind-cluster"><span class="me-2">Create Kind Cluster</span><a href="#create-kind-cluster" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p><a href="https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg" alt="Kind logo" width="300" loading="lazy"></a></p><p>Create the <a href="https://kind.sigs.k8s.io/">Kind</a> cluster:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre>kind create cluster <span class="nt">--name</span> <span class="s2">"kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap"</span> <span class="nt">--kubeconfig</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kubeconfig-kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap.yaml"</span>
+<span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kubeconfig-kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap.yaml"</span>
+</pre></table></code></div></div><h3 id="install-kro-on-kind-cluster"><span class="me-2">Install kro on Kind Cluster</span><a href="#install-kro-on-kind-cluster" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Install <a href="https://kro.run/">kro</a> using Helm:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro</span>
+<span class="nv">KRO_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"0.8.5"</span>
+helm upgrade <span class="nt">--install</span> <span class="nt">--version</span><span class="o">=</span><span class="k">${</span><span class="nv">KRO_HELM_CHART_VERSION</span><span class="k">}</span> <span class="nt">--namespace</span> kro-system <span class="nt">--create-namespace</span> kro oci://registry.k8s.io/kro/charts/kro
+</pre></table></code></div></div><h3 id="install-ack-controllers-on-kind-cluster"><span class="me-2">Install ACK Controllers on Kind Cluster</span><a href="#install-ack-controllers-on-kind-cluster" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p><a href="https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/aws-controllers-k8s/docs/c79a80b9e82f5c5b2ef7b7de1713fa9ca0b1246f/website/static/img/ack-logo.png" alt="ACK logo" width="150" loading="lazy"></a></p><p>Create namespace and configure AWS credentials for ACK:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre>kubectl create namespace ack-system
+<span class="nb">set</span> +x
+kubectl <span class="nt">-n</span> ack-system create secret generic aws-credentials <span class="nt">--from-literal</span><span class="o">=</span><span class="nv">credentials</span><span class="o">=</span><span class="s2">"[default]
+aws_access_key_id=</span><span class="k">${</span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="k">}</span><span class="s2">
+aws_secret_access_key=</span><span class="k">${</span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="k">}</span><span class="s2">
+aws_session_token=</span><span class="k">${</span><span class="nv">AWS_SESSION_TOKEN</span><span class="k">}</span><span class="s2">
+aws_role_to_assume=</span><span class="k">${</span><span class="nv">AWS_ROLE_TO_ASSUME</span><span class="k">}</span><span class="s2">"</span>
+<span class="nb">set</span> <span class="nt">-x</span>
+</pre></table></code></div></div><p>Install <a href="https://aws-controllers-k8s.github.io/docs/">ACK controllers</a> (S3, IAM, EKS, EC2, KMS, CloudWatch Logs):</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart</span>
+<span class="nv">ACK_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"46.75.1"</span>
+
+<span class="nb">cat</span> <span class="o">&gt;</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/helm_values-ack.yml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+eks:
+  enabled: true
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+ec2:
+  enabled: true
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+iam:
+  enabled: true
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+kms:
+  enabled: true
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+cloudwatchlogs:
+  enabled: true
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+s3:
+  enabled: true
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+</span><span class="no">EOF
+</span>helm upgrade <span class="nt">--install</span> <span class="nt">--version</span><span class="o">=</span><span class="k">${</span><span class="nv">ACK_HELM_CHART_VERSION</span><span class="k">}</span> <span class="nt">--namespace</span> ack-system <span class="nt">--values</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/helm_values-ack.yml"</span> ack oci://public.ecr.aws/aws-controllers-k8s/ack-chart
+</pre></table></code></div></div><h3 id="create-eks-auto-mode-cluster-with-ack-and-kro"><span class="me-2">Create EKS Auto Mode Cluster with ACK and kro</span><a href="#create-eks-auto-mode-cluster-with-ack-and-kro" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Create an <a href="https://aws.amazon.com/eks/auto-mode/">EKS Auto Mode Cluster</a> using kro ResourceGraphDefinitions. This approach uses ResourceGraphDefinitions for the EKS Auto Mode Cluster itself.</p><h4 id="add-kms-key-resourcegraphdefinition"><span class="me-2">Add KMS Key ResourceGraphDefinition</span><a href="#add-kms-key-resourcegraphdefinition" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>Define a KMS key used for encrypting EKS Auto Mode Cluster and S3 data:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kro-kmskey-rgd.yaml"</span> <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">' | kubectl apply -f -
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: kmskey
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: KmsKey
+    spec:
+      name: string
+      accountId: string
+      region: string | default="us-east-1"
+    status:
+      keyARN: </span><span class="k">${</span><span class="nv">kmsKey</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+      keyID: </span><span class="k">${</span><span class="nv">kmsKey</span><span class="p">.status.keyID</span><span class="k">}</span><span class="sh">
+  resources:
+  - id: kmsKey
+    template:
+      apiVersion: kms.services.k8s.aws/v1alpha1
+      kind: Key
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-kms-key"
+      spec:
+        description: "KMS key for </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh"> EKS Auto Mode Cluster"
+        enableKeyRotation: true
+        policy: |
+          {
+            "Version": "2012-10-17",
+            "Id": "eks-key-policy-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">",
+            "Statement": [
+              {
+                "Sid": "Allow full access to the account root",
+                "Effect": "Allow",
+                "Principal": {
+                  "AWS": "arn:aws:iam::</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.accountId</span><span class="k">}</span><span class="sh">:root"
+                },
+                "Action": "kms:*",
+                "Resource": "*"
+              },
+              {
+                "Sid": "Allow AWS services to use the key",
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": [
+                    "eks.amazonaws.com",
+                    "logs.</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">.amazonaws.com"
+                  ]
+                },
+                "Action": [
+                  "kms:Encrypt",
+                  "kms:Decrypt",
+                  "kms:ReEncrypt*",
+                  "kms:GenerateDataKey*",
+                  "kms:CreateGrant",
+                  "kms:DescribeKey"
+                ],
+                "Resource": "*",
+                "Condition": {
+                  "StringEquals": {
+                    "aws:SourceAccount": "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.accountId</span><span class="k">}</span><span class="sh">"
+                  }
+                }
+              },
+              {
+                "Sid": "Allow S3 access for Velero and EKS Auto Mode Cluster node volumes",
+                "Effect": "Allow",
+                "Principal": {
+                  "AWS": "*"
+                },
+                "Action": [
+                  "kms:Encrypt",
+                  "kms:Decrypt",
+                  "kms:ReEncrypt*",
+                  "kms:GenerateDataKey*",
+                  "kms:CreateGrant",
+                  "kms:DescribeKey"
+                ],
+                "Resource": "*",
+                "Condition": {
+                  "StringEquals": {
+                    "kms:ViaService": [
+                      "s3.</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">.amazonaws.com",
+                      "ec2.</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">.amazonaws.com"
+                    ],
+                    "kms:CallerAccount": "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.accountId</span><span class="k">}</span><span class="sh">"
+                  }
+                }
+              }
+            ]
+          }
+  - id: kmsKeyAlias
+    template:
+      apiVersion: kms.services.k8s.aws/v1alpha1
+      kind: Alias
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-kms-alias"
+      spec:
+        name: "alias/</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster"
+        targetKeyID: </span><span class="k">${</span><span class="nv">kmsKey</span><span class="p">.status.keyID</span><span class="k">}</span><span class="sh">
+</span><span class="no">EOF
+</span></pre></table></code></div></div><h3 id="create-s3-bucket-with-ack-and-kro"><span class="me-2">Create S3 Bucket with ACK and kro</span><a href="#create-s3-bucket-with-ack-and-kro" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>First, create an RGD that defines how to create an S3 bucket with proper policies:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kro-s3bucket-rgd.yaml"</span> <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">' | kubectl apply -f -
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: s3-velero-bucket
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: S3Bucket
+    spec:
+      bucketName: string
+      region: string
+      kmsKeyARN: string
+      tags:
+        owner: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+        environment: "string | default=</span><span class="se">\"</span><span class="sh">dev</span><span class="se">\"</span><span class="sh">"
+        cluster: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+    status:
+      bucketARN: </span><span class="k">${</span><span class="nv">s3bucket</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+      bucketName: </span><span class="k">${</span><span class="nv">s3bucket</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+  resources:
+    - id: s3bucket
+      template:
+        apiVersion: s3.services.k8s.aws/v1alpha1
+        kind: Bucket
+        metadata:
+          name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.bucketName</span><span class="k">}</span><span class="sh">
+        spec:
+          name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.bucketName</span><span class="k">}</span><span class="sh">
+          publicAccessBlock:
+            blockPublicACLs: true
+            blockPublicPolicy: true
+            ignorePublicACLs: true
+            restrictPublicBuckets: true
+          encryption:
+            rules:
+              - applyServerSideEncryptionByDefault:
+                  sseAlgorithm: aws:kms
+                  kmsMasterKeyID: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.kmsKeyARN</span><span class="k">}</span><span class="sh">
+          tagging:
+            tagSet:
+              - key: "Name"
+                value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.bucketName</span><span class="k">}</span><span class="sh">"
+              - key: "Owner"
+                value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+              - key: "Environment"
+                value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+              - key: "Cluster"
+                value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+          policy: |
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "ForceSSLOnlyAccess",
+                  "Effect": "Deny",
+                  "Principal": "*",
+                  "Action": "s3:*",
+                  "Resource": [
+                    "arn:aws:s3:::</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.bucketName</span><span class="k">}</span><span class="sh">",
+                    "arn:aws:s3:::</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.bucketName</span><span class="k">}</span><span class="sh">/*"
+                  ],
+                  "Condition": {
+                    "Bool": {
+                      "aws:SecureTransport": "false"
+                    }
+                  }
+                }
+              ]
+            }
+</span><span class="no">EOF
+</span></pre></table></code></div></div><h4 id="add-cloudwatch-loggroup-resourcegraphdefinition"><span class="me-2">Add CloudWatch LogGroup ResourceGraphDefinition</span><a href="#add-cloudwatch-loggroup-resourcegraphdefinition" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>Create a CloudWatch LogGroup for EKS Auto Mode Cluster logs:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kro-ekscloudwatchloggroup-loggroup-rgd.yaml"</span> <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">' | kubectl apply -f -
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: ekscloudwatchloggroup
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: EksCloudWatchLogGroup
+    spec:
+      name: string
+      retentionDays: "integer | default=1"
+      kmsKeyARN: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+      tags:
+        owner: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+        environment: "string | default=</span><span class="se">\"</span><span class="sh">dev</span><span class="se">\"</span><span class="sh">"
+        cluster: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+    status:
+      logGroupName: </span><span class="k">${</span><span class="nv">cloudWatchLogGroup</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">
+  resources:
+  - id: cloudWatchLogGroup
+    template:
+      apiVersion: cloudwatchlogs.services.k8s.aws/v1alpha1
+      kind: LogGroup
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-logs"
+      spec:
+        name: "/aws/eks/</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">/cluster"
+        retentionDays: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.retentionDays</span><span class="k">}</span><span class="sh">
+        kmsKeyID: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.kmsKeyARN</span><span class="k">}</span><span class="sh">
+        tags:
+          Name: "/aws/eks/</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">/cluster"
+          Owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          Environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          Cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+</span><span class="no">EOF
+</span></pre></table></code></div></div><h4 id="add-vpc-resourcegraphdefinition"><span class="me-2">Add VPC ResourceGraphDefinition</span><a href="#add-vpc-resourcegraphdefinition" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>Create a VPC with networking resources for EKS Auto Mode Cluster:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kro-eksvpc-rgd.yaml"</span> <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">' | kubectl apply -f -
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: eksvpc
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: EksVpc
+    spec:
+      name: string
+      region: string | default="us-east-1"
+      tags:
+        owner: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+        environment: "string | default=</span><span class="se">\"</span><span class="sh">dev</span><span class="se">\"</span><span class="sh">"
+        cluster: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+      cidr:
+        vpcCidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.0.0/16</span><span class="se">\"</span><span class="sh">"
+        publicSubnet1Cidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.0.0/19</span><span class="se">\"</span><span class="sh">"
+        publicSubnet2Cidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.32.0/19</span><span class="se">\"</span><span class="sh">"
+        privateSubnet1Cidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.64.0/19</span><span class="se">\"</span><span class="sh">"
+        privateSubnet2Cidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.96.0/19</span><span class="se">\"</span><span class="sh">"
+    status:
+      vpcID: </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+      publicSubnet1ID: </span><span class="k">${</span><span class="nv">publicSubnet1</span><span class="p">.status.subnetID</span><span class="k">}</span><span class="sh">
+      publicSubnet2ID: </span><span class="k">${</span><span class="nv">publicSubnet2</span><span class="p">.status.subnetID</span><span class="k">}</span><span class="sh">
+      privateSubnet1ID: </span><span class="k">${</span><span class="nv">privateSubnet1</span><span class="p">.status.subnetID</span><span class="k">}</span><span class="sh">
+      privateSubnet2ID: </span><span class="k">${</span><span class="nv">privateSubnet2</span><span class="p">.status.subnetID</span><span class="k">}</span><span class="sh">
+  resources:
+  - id: vpc
+    readyWhen:
+      - </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.state == </span><span class="s2">"available"</span><span class="k">}</span><span class="sh">
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: VPC
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-vpc"
+      spec:
+        cidrBlocks:
+          - </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.vpcCidr</span><span class="k">}</span><span class="sh">
+        enableDNSSupport: true
+        enableDNSHostnames: true
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-vpc"
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: eip
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: ElasticIPAddress
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-eip"
+      spec:
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-eip"
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: internetGateway
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: InternetGateway
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-igw"
+      spec:
+        vpc: </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-igw"
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: natGateway
+    readyWhen:
+      - '</span><span class="k">${</span><span class="nv">natGateway</span><span class="p">.status.state == </span><span class="s2">"available"</span><span class="k">}</span><span class="sh">'
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: NATGateway
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-nat-gateway"
+      spec:
+        subnetID: </span><span class="k">${</span><span class="nv">publicSubnet1</span><span class="p">.status.subnetID</span><span class="k">}</span><span class="sh">
+        allocationID: </span><span class="k">${</span><span class="nv">eip</span><span class="p">.status.allocationID</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-nat-gateway"
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: publicRoutetable
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: RouteTable
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-public-routetable"
+      spec:
+        vpcID: </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+        routes:
+        - destinationCIDRBlock: 0.0.0.0/0
+          gatewayID: </span><span class="k">${</span><span class="nv">internetGateway</span><span class="p">.status.internetGatewayID</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-public-routetable"
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: privateRoutetable
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: RouteTable
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-private-routetable"
+      spec:
+        vpcID: </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+        routes:
+        - destinationCIDRBlock: 0.0.0.0/0
+          natGatewayID: </span><span class="k">${</span><span class="nv">natGateway</span><span class="p">.status.natGatewayID</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-private-routetable"
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  # Public Subnet 1 (us-east-1a)
+  - id: publicSubnet1
+    readyWhen:
+      - </span><span class="k">${</span><span class="nv">publicSubnet1</span><span class="p">.status.state == </span><span class="s2">"available"</span><span class="k">}</span><span class="sh">
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: Subnet
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-public-subnet1-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">a"
+      spec:
+        availabilityZone: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">a
+        cidrBlock: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.publicSubnet1Cidr</span><span class="k">}</span><span class="sh">
+        mapPublicIPOnLaunch: true
+        vpcID: </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+        routeTables:
+        - </span><span class="k">${</span><span class="nv">publicRoutetable</span><span class="p">.status.routeTableID</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-public-subnet1-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">a"
+          - key: kubernetes.io/role/elb
+            value: '1'
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  # Public Subnet 2 (us-east-1b)
+  - id: publicSubnet2
+    readyWhen:
+      - </span><span class="k">${</span><span class="nv">publicSubnet2</span><span class="p">.status.state == </span><span class="s2">"available"</span><span class="k">}</span><span class="sh">
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: Subnet
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-public-subnet2-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">b"
+      spec:
+        availabilityZone: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">b
+        cidrBlock: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.publicSubnet2Cidr</span><span class="k">}</span><span class="sh">
+        mapPublicIPOnLaunch: true
+        vpcID: </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+        routeTables:
+        - </span><span class="k">${</span><span class="nv">publicRoutetable</span><span class="p">.status.routeTableID</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-public-subnet2-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">b"
+          - key: kubernetes.io/role/elb
+            value: '1'
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  # Private Subnet 1 (us-east-1a)
+  - id: privateSubnet1
+    readyWhen:
+      - </span><span class="k">${</span><span class="nv">privateSubnet1</span><span class="p">.status.state == </span><span class="s2">"available"</span><span class="k">}</span><span class="sh">
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: Subnet
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-private-subnet1-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">a"
+      spec:
+        availabilityZone: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">a
+        cidrBlock: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.privateSubnet1Cidr</span><span class="k">}</span><span class="sh">
+        vpcID: </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+        routeTables:
+        - </span><span class="k">${</span><span class="nv">privateRoutetable</span><span class="p">.status.routeTableID</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-private-subnet1-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">a"
+          - key: kubernetes.io/role/internal-elb
+            value: '1'
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  # Private Subnet 2 (us-east-1b)
+  - id: privateSubnet2
+    readyWhen:
+      - </span><span class="k">${</span><span class="nv">privateSubnet2</span><span class="p">.status.state == </span><span class="s2">"available"</span><span class="k">}</span><span class="sh">
+    template:
+      apiVersion: ec2.services.k8s.aws/v1alpha1
+      kind: Subnet
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-private-subnet2-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">b"
+      spec:
+        availabilityZone: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">b
+        cidrBlock: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.privateSubnet2Cidr</span><span class="k">}</span><span class="sh">
+        vpcID: </span><span class="k">${</span><span class="nv">vpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+        routeTables:
+        - </span><span class="k">${</span><span class="nv">privateRoutetable</span><span class="p">.status.routeTableID</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: "Name"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-private-subnet2-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">b"
+          - key: kubernetes.io/role/internal-elb
+            value: '1'
+          - key: "Owner"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: "Environment"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: "Cluster"
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+</span><span class="no">EOF
+</span></pre></table></code></div></div><h4 id="add-pod-identity-associations-resourcegraphdefinition"><span class="me-2">Add Pod Identity Associations ResourceGraphDefinition</span><a href="#add-pod-identity-associations-resourcegraphdefinition" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>Create a RGD for <a href="https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html">Pod Identity Associations</a> that sets up Velero and ACK controller permissions:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300
+301
+302
+303
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327
+328
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349
+350
+351
+352
+353
+354
+355
+356
+357
+358
+359
+360
+361
+362
+363
+364
+365
+366
+367
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383
+384
+385
+386
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400
+401
+402
+403
+404
+405
+406
+407
+408
+409
+410
+411
+412
+413
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kro-podidentityassociations-rgd.yaml"</span> <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">' | kubectl apply -f -
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: podidentityassociations
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: PodIdentityAssociations
+    spec:
+      name: string
+      clusterName: string
+      accountId: string
+      s3BucketName: string
+      tags:
+        owner: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+        environment: "string | default=</span><span class="se">\"</span><span class="sh">dev</span><span class="se">\"</span><span class="sh">"
+        cluster: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+  resources:
+  - id: veleroPolicy
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Policy
+      metadata:
+        name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-velero-policy
+      spec:
+        name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-velero-policy
+        description: "Velero S3 backup and snapshot permissions"
+        policyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "S3ObjectAccess",
+                "Effect": "Allow",
+                "Action": [
+                  "s3:GetObject",
+                  "s3:DeleteObject",
+                  "s3:PutObject",
+                  "s3:AbortMultipartUpload",
+                  "s3:ListMultipartUploadParts"
+                ],
+                "Resource": "arn:aws:s3:::</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.s3BucketName</span><span class="k">}</span><span class="sh">/*"
+              },
+              {
+                "Sid": "S3BucketAccess",
+                "Effect": "Allow",
+                "Action": [
+                  "s3:ListBucket"
+                ],
+                "Resource": "arn:aws:s3:::</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.s3BucketName</span><span class="k">}</span><span class="sh">"
+              }
+            ]
+          }
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: veleroRole
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-velero-velero"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-velero-velero"
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "pods.eks.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        policies:
+          - </span><span class="k">${</span><span class="nv">veleroPolicy</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: veleroPodIdentityAssociation
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: PodIdentityAssociation
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-velero-velero"
+      spec:
+        clusterName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.clusterName</span><span class="k">}</span><span class="sh">
+        namespace: velero
+        serviceAccount: velero-server
+        roleARN: </span><span class="k">${</span><span class="nv">veleroRole</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackCloudwatchlogsRole
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-cloudwatchlogs-controller"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-cloudwatchlogs-controller"
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "pods.eks.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        policies:
+          - "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackCloudwatchlogsPodIdentityAssociation
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: PodIdentityAssociation
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-system-ack-cloudwatchlogs-controller"
+      spec:
+        clusterName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.clusterName</span><span class="k">}</span><span class="sh">
+        namespace: ack-system
+        serviceAccount: ack-cloudwatchlogs-controller
+        roleARN: </span><span class="k">${</span><span class="nv">ackCloudwatchlogsRole</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackEc2Role
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-ec2-controller"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-ec2-controller"
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "pods.eks.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        policies:
+          - "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackEc2PodIdentityAssociation
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: PodIdentityAssociation
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-system-ack-ec2-controller"
+      spec:
+        clusterName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.clusterName</span><span class="k">}</span><span class="sh">
+        namespace: ack-system
+        serviceAccount: ack-ec2-controller
+        roleARN: </span><span class="k">${</span><span class="nv">ackEc2Role</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackEksRole
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-eks-controller"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-eks-controller"
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "pods.eks.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        inlinePolicies:
+          eks-controller-policy: |
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "eks:*",
+                    "iam:GetRole",
+                    "iam:PassRole",
+                    "iam:ListAttachedRolePolicies",
+                    "ec2:DescribeSubnets",
+                    "kms:DescribeKey",
+                    "kms:CreateGrant"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackEksPodIdentityAssociation
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: PodIdentityAssociation
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-system-ack-eks-controller"
+      spec:
+        clusterName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.clusterName</span><span class="k">}</span><span class="sh">
+        namespace: ack-system
+        serviceAccount: ack-eks-controller
+        roleARN: </span><span class="k">${</span><span class="nv">ackEksRole</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackIamRole
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-iam-controller"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-iam-controller"
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "pods.eks.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        policies:
+          - "arn:aws:iam::aws:policy/IAMFullAccess"
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackIamPodIdentityAssociation
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: PodIdentityAssociation
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-system-ack-iam-controller"
+      spec:
+        clusterName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.clusterName</span><span class="k">}</span><span class="sh">
+        namespace: ack-system
+        serviceAccount: ack-iam-controller
+        roleARN: </span><span class="k">${</span><span class="nv">ackIamRole</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackKmsRole
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-kms-controller"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-kms-controller"
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "pods.eks.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        inlinePolicies:
+          kms-controller-policy: |
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "kms:*",
+                  "Resource": "*"
+                }
+              ]
+            }
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackKmsPodIdentityAssociation
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: PodIdentityAssociation
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-system-ack-kms-controller"
+      spec:
+        clusterName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.clusterName</span><span class="k">}</span><span class="sh">
+        namespace: ack-system
+        serviceAccount: ack-kms-controller
+        roleARN: </span><span class="k">${</span><span class="nv">ackKmsRole</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackS3Role
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-s3-controller"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-s3-controller"
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "pods.eks.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        policies:
+          - "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: ackS3PodIdentityAssociation
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: PodIdentityAssociation
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ack-system-ack-s3-controller"
+      spec:
+        clusterName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.clusterName</span><span class="k">}</span><span class="sh">
+        namespace: ack-system
+        serviceAccount: ack-s3-controller
+        roleARN: </span><span class="k">${</span><span class="nv">ackS3Role</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+</span><span class="no">EOF
+</span></pre></table></code></div></div><h4 id="add-eks-auto-mode-cluster-resourcegraphdefinition"><span class="me-2">Add EKS Auto Mode Cluster ResourceGraphDefinition</span><a href="#add-eks-auto-mode-cluster-resourcegraphdefinition" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>Create the EKS Auto Mode Cluster RGD:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
+241
+242
+243
+244
+245
+246
+247
+248
+249
+250
+251
+252
+253
+254
+255
+256
+257
+258
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kro-eks-auto-mode-cluster-rgd.yaml"</span> <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">' | kubectl apply -f -
+apiVersion: kro.run/v1alpha1
+kind: ResourceGraphDefinition
+metadata:
+  name: eks-auto-mode-cluster
+spec:
+  schema:
+    apiVersion: v1alpha1
+    kind: EksAutoModeCluster
+    spec:
+      name: string
+      region: string | default="us-east-1"
+      k8sVersion: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+      accountId: string
+      adminRoleARN: string
+      tags:
+        owner: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+        environment: "string | default=</span><span class="se">\"</span><span class="sh">dev</span><span class="se">\"</span><span class="sh">"
+        cluster: "string | default=</span><span class="se">\"\"</span><span class="sh">"
+      s3BucketName: string
+      vpcConfig:
+        endpointPrivateAccess: "boolean | default=true"
+        endpointPublicAccess: "boolean | default=true"
+      nodeGroupConfig:
+        desiredSize: "integer | default=2"
+        minSize: "integer | default=1"
+        maxSize: "integer | default=3"
+        instanceType: "string | default=</span><span class="se">\"</span><span class="sh">t4g.medium</span><span class="se">\"</span><span class="sh">"
+        volumeSize: "integer | default=20"
+      cidr:
+        vpcCidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.0.0/16</span><span class="se">\"</span><span class="sh">"
+        publicSubnet1Cidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.0.0/19</span><span class="se">\"</span><span class="sh">"
+        publicSubnet2Cidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.32.0/19</span><span class="se">\"</span><span class="sh">"
+        privateSubnet1Cidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.64.0/19</span><span class="se">\"</span><span class="sh">"
+        privateSubnet2Cidr: "string | default=</span><span class="se">\"</span><span class="sh">192.168.96.0/19</span><span class="se">\"</span><span class="sh">"
+    status:
+      clusterARN: </span><span class="k">${</span><span class="nv">cluster</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+      clusterStatus: </span><span class="k">${</span><span class="nv">cluster</span><span class="p">.status.status</span><span class="k">}</span><span class="sh">
+      vpcID: </span><span class="k">${</span><span class="nv">eksVpc</span><span class="p">.status.vpcID</span><span class="k">}</span><span class="sh">
+      privateSubnet1ID: </span><span class="k">${</span><span class="nv">eksVpc</span><span class="p">.status.privateSubnet1ID</span><span class="k">}</span><span class="sh">
+      privateSubnet2ID: </span><span class="k">${</span><span class="nv">eksVpc</span><span class="p">.status.privateSubnet2ID</span><span class="k">}</span><span class="sh">
+      kmsKeyARN: </span><span class="k">${</span><span class="nv">kmsKey</span><span class="p">.status.keyARN</span><span class="k">}</span><span class="sh">
+      s3BucketARN: </span><span class="k">${</span><span class="nv">s3Bucket</span><span class="p">.status.bucketARN</span><span class="k">}</span><span class="sh">
+  resources:
+  - id: kmsKey
+    template:
+      apiVersion: kro.run/v1alpha1
+      kind: KmsKey
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-kms"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">"
+        accountId: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.accountId</span><span class="k">}</span><span class="sh">"
+        region: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">
+  - id: s3Bucket
+    template:
+      apiVersion: kro.run/v1alpha1
+      kind: S3Bucket
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-s3"
+      spec:
+        bucketName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.s3BucketName</span><span class="k">}</span><span class="sh">
+        region: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">
+        kmsKeyARN: </span><span class="k">${</span><span class="nv">kmsKey</span><span class="p">.status.keyARN</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: cloudWatchLogGroup
+    template:
+      apiVersion: kro.run/v1alpha1
+      kind: EksCloudWatchLogGroup
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-logs"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">"
+        kmsKeyARN: </span><span class="k">${</span><span class="nv">kmsKey</span><span class="p">.status.keyARN</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: eksVpc
+    template:
+      apiVersion: kro.run/v1alpha1
+      kind: EksVpc
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-vpc"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">"
+        region: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.region</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+        cidr:
+          vpcCidr: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.vpcCidr</span><span class="k">}</span><span class="sh">
+          publicSubnet1Cidr: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.publicSubnet1Cidr</span><span class="k">}</span><span class="sh">
+          publicSubnet2Cidr: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.publicSubnet2Cidr</span><span class="k">}</span><span class="sh">
+          privateSubnet1Cidr: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.privateSubnet1Cidr</span><span class="k">}</span><span class="sh">
+          privateSubnet2Cidr: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.cidr.privateSubnet2Cidr</span><span class="k">}</span><span class="sh">
+  - id: clusterRole
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-role"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-eks-auto-mode-cluster-role"
+        description: "EKS Auto Mode Cluster IAM role"
+        policies:
+          - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+          - arn:aws:iam::aws:policy/AmazonEKSComputePolicy
+          - arn:aws:iam::aws:policy/AmazonEKSBlockStoragePolicy
+          - arn:aws:iam::aws:policy/AmazonEKSLoadBalancingPolicy
+          - arn:aws:iam::aws:policy/AmazonEKSNetworkingPolicy
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "eks.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: nodeRole
+    template:
+      apiVersion: iam.services.k8s.aws/v1alpha1
+      kind: Role
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ng-role"
+      spec:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-nodegroup-</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-ng-NodeRole"
+        assumeRolePolicyDocument: |
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "ec2.amazonaws.com"
+                },
+                "Action": [
+                  "sts:AssumeRole",
+                  "sts:TagSession"
+                ]
+              }
+            ]
+          }
+        policies:
+          - "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+          - "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+        tags:
+          - key: owner
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          - key: environment
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          - key: cluster
+            value: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: cluster
+    readyWhen:
+      - '</span><span class="k">${</span><span class="nv">cluster</span><span class="p">.status.status == </span><span class="s2">"ACTIVE"</span><span class="k">}</span><span class="sh">'
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: Cluster
+      metadata:
+        name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">
+        annotations:
+          clusterRoleArn: </span><span class="k">${</span><span class="nv">clusterRole</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+      spec:
+        name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">
+        roleARN: </span><span class="k">${</span><span class="nv">clusterRole</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+        version: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.k8sVersion</span><span class="k">}</span><span class="sh">
+        accessConfig:
+          authenticationMode: API_AND_CONFIG_MAP
+          bootstrapClusterCreatorAdminPermissions: true
+        computeConfig:
+          enabled: true
+          nodeRoleARN: </span><span class="k">${</span><span class="nv">nodeRole</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+          nodePools:
+            - system
+            - general-purpose
+        kubernetesNetworkConfig:
+          ipFamily: ipv4
+          elasticLoadBalancing:
+            enabled: true
+        logging:
+          clusterLogging:
+            - enabled: true
+              types:
+                - api
+                - audit
+                - authenticator
+                - controllerManager
+                - scheduler
+        storageConfig:
+          blockStorage:
+            enabled: true
+        resourcesVPCConfig:
+          endpointPrivateAccess: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.vpcConfig.endpointPrivateAccess</span><span class="k">}</span><span class="sh">
+          endpointPublicAccess: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.vpcConfig.endpointPublicAccess</span><span class="k">}</span><span class="sh">
+          subnetIDs:
+            - </span><span class="k">${</span><span class="nv">eksVpc</span><span class="p">.status.privateSubnet1ID</span><span class="k">}</span><span class="sh">
+            - </span><span class="k">${</span><span class="nv">eksVpc</span><span class="p">.status.privateSubnet2ID</span><span class="k">}</span><span class="sh">
+        encryptionConfig:
+          - provider:
+              keyARN: </span><span class="k">${</span><span class="nv">kmsKey</span><span class="p">.status.keyARN</span><span class="k">}</span><span class="sh">
+            resources:
+              - secrets
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+  - id: addonPodIdentity
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: Addon
+      metadata:
+        name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-pod-identity
+        annotations:
+          cluster-arn: </span><span class="k">${</span><span class="nv">cluster</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+      spec:
+        name: eks-pod-identity-agent
+        clusterName: </span><span class="k">${</span><span class="nv">cluster</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">
+  - id: accessEntry
+    template:
+      apiVersion: eks.services.k8s.aws/v1alpha1
+      kind: AccessEntry
+      metadata:
+        name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-admin-access
+        # Reference cluster.status to ensure kro waits for cluster to be ACTIVE
+        annotations:
+          cluster-arn: </span><span class="k">${</span><span class="nv">cluster</span><span class="p">.status.ackResourceMetadata.arn</span><span class="k">}</span><span class="sh">
+      spec:
+        clusterName: </span><span class="k">${</span><span class="nv">cluster</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">
+        principalARN: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.adminRoleARN</span><span class="k">}</span><span class="sh">
+        type: STANDARD
+        accessPolicies:
+          - policyARN: "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+            accessScope:
+              type: cluster
+  - id: podIdentityAssociations
+    template:
+      apiVersion: kro.run/v1alpha1
+      kind: PodIdentityAssociations
+      metadata:
+        name: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">-pod-identity-associations"
+      spec:
+        name: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">
+        clusterName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.name</span><span class="k">}</span><span class="sh">
+        accountId: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.accountId</span><span class="k">}</span><span class="sh">"
+        s3BucketName: </span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.s3BucketName</span><span class="k">}</span><span class="sh">
+        tags:
+          owner: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.owner</span><span class="k">}</span><span class="sh">"
+          environment: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.environment</span><span class="k">}</span><span class="sh">"
+          cluster: "</span><span class="k">${</span><span class="nv">schema</span><span class="p">.spec.tags.cluster</span><span class="k">}</span><span class="sh">"
+</span><span class="no">EOF
+</span>kubectl <span class="nb">wait</span> <span class="nt">--for</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.status.state}'</span><span class="o">=</span>Active resourcegraphdefinition/eks-auto-mode-cluster <span class="nt">-n</span> kro-system <span class="nt">--timeout</span><span class="o">=</span>5m
+</pre></table></code></div></div><h4 id="create-eks-auto-mode-cluster-instance"><span class="me-2">Create EKS Auto Mode Cluster Instance</span><a href="#create-eks-auto-mode-cluster-instance" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h4><p>Now create a single instance that provisions the EKS cluster using the expanded combined RGD:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/kro-eks-auto-mode-cluster.yaml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+apiVersion: kro.run/v1alpha1
+kind: EksAutoModeCluster
+metadata:
+  name: </span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="sh">
+  namespace: kro-system
+spec:
+  name: </span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="sh">
+  region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+  accountId: "</span><span class="k">${</span><span class="nv">AWS_ACCOUNT_ID</span><span class="k">}</span><span class="sh">"
+  adminRoleARN: "</span><span class="k">${</span><span class="nv">AWS_ROLE_TO_ASSUME</span><span class="p">%/*</span><span class="k">}</span><span class="sh">/admin"
+  s3BucketName: </span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="sh">
+  tags:
+    owner: </span><span class="k">${</span><span class="nv">MY_EMAIL</span><span class="k">}</span><span class="sh">
+    environment: dev
+    cluster: </span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="sh">
+</span><span class="no">EOF
+</span>kubectl <span class="nb">wait</span> <span class="nt">--for</span><span class="o">=</span><span class="nv">condition</span><span class="o">=</span>Ready <span class="s2">"eksautomodecluster/</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">"</span> <span class="nt">-n</span> kro-system <span class="nt">--timeout</span><span class="o">=</span>30m
+</pre></table></code></div></div><h3 id="install-velero"><span class="me-2">Install Velero</span><a href="#install-velero" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p><a href="https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/heroes/velero.svg" alt="velero" width="400" loading="lazy"></a></p><p>Install the <code class="language-plaintext highlighter-rouge">velero</code> <a href="https://artifacthub.io/packages/helm/vmware-tanzu/velero">Helm chart</a> and modify its <a href="https://github.com/vmware-tanzu/helm-charts/blob/velero-11.3.2/charts/velero/values.yaml">default values</a>:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts</span>
+<span class="nv">VELERO_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"11.3.2"</span>
+
+helm repo add <span class="nt">--force-update</span> vmware-tanzu https://vmware-tanzu.github.io/helm-charts
+<span class="nb">cat</span> <span class="o">&gt;</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/helm_values-velero.yml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+initContainers:
+  - name: velero-plugin-for-aws
+    # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?&lt;version&gt;.+)$
+    image: velero/velero-plugin-for-aws:v1.13.2
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+upgradeCRDs: false
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: </span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="sh">
+      prefix: velero
+      config:
+        region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+credentials:
+  useSecret: true
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=</span><span class="k">${</span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="k">}</span><span class="sh">
+      aws_secret_access_key=</span><span class="k">${</span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="k">}</span><span class="sh">
+      aws_session_token=</span><span class="k">${</span><span class="nv">AWS_SESSION_TOKEN</span><span class="k">}</span><span class="sh">
+snapshotsEnabled: false
+</span><span class="no">EOF
+</span>helm upgrade <span class="nt">--install</span> <span class="nt">--version</span> <span class="s2">"</span><span class="k">${</span><span class="nv">VELERO_HELM_CHART_VERSION</span><span class="k">}</span><span class="s2">"</span> <span class="nt">--namespace</span> velero <span class="nt">--create-namespace</span> <span class="nt">--wait</span> <span class="nt">--values</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/helm_values-velero.yml"</span> velero vmware-tanzu/velero
+</pre></table></code></div></div><p>Create a Velero backup for kro and ACK resources. Use resource filtering with API group wildcards to capture <code class="language-plaintext highlighter-rouge">kro.run</code> objects (cluster-scoped RGDs and namespaced instances) and <code class="language-plaintext highlighter-rouge">services.k8s.aws</code> objects (ACK-managed AWS resources), all scoped to the <code class="language-plaintext highlighter-rouge">kro-system</code> namespace:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap/velero-kro-ack-backup.yaml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: kro-ack-backup
+  namespace: velero
+spec:
+  # Include kro-system namespace where kro instances are created
+  includedNamespaces:
+    - kro-system
+  # Include cluster-scoped kro resources (ResourceGraphDefinitions)
+  includedClusterScopedResources:
+    - "*.kro.run"
+  # Include namespaced kro instances and ACK resources (with status)
+  includedNamespaceScopedResources:
+    - "*.kro.run"
+    - "*.services.k8s.aws"
+</span><span class="no">EOF
+</span></pre></table></code></div></div><h2 id="migrate-bootstrap-resources-to-eks-auto-mode-cluster"><span class="me-2">Migrate Bootstrap Resources to EKS Auto Mode Cluster</span><a href="#migrate-bootstrap-resources-to-eks-auto-mode-cluster" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p><a href="https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png" alt="EKS logo" width="350" loading="lazy"></a></p><p>At this point the Kind cluster has done its job: the EKS Auto Mode Cluster is running in AWS, the S3 bucket exists, and a Velero backup of all kro and ACK resources is stored in S3. The remaining steps switch context to the new EKS cluster and make it self-managing:</p><ol><li>Configure <code class="language-plaintext highlighter-rouge">kubectl</code> access to the EKS Auto Mode Cluster<li>Install kro, ACK controllers, and Velero on the EKS cluster (all with zero replicas to prevent premature reconciliation)<li>Restore the Velero backup so that kro and ACK resources appear with their existing AWS resource ARNs intact<li>Scale controllers back up — they adopt existing AWS resources instead of creating duplicates<li>Delete the Kind bootstrap cluster</ol><h3 id="configure-access-to-eks-auto-mode-cluster"><span class="me-2">Configure Access to EKS Auto Mode Cluster</span><a href="#configure-access-to-eks-auto-mode-cluster" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Update kubeconfig for the new EKS Auto Mode cluster:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">/kubeconfig-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">.conf"</span>
+aws eks update-kubeconfig <span class="nt">--region</span> <span class="s2">"</span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="s2">"</span> <span class="nt">--name</span> <span class="s2">"</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">"</span> <span class="nt">--kubeconfig</span> <span class="s2">"</span><span class="k">${</span><span class="nv">KUBECONFIG</span><span class="k">}</span><span class="s2">"</span>
+</pre></table></code></div></div><h3 id="install-kro-on-eks-auto-mode-cluster"><span class="me-2">Install kro on EKS Auto Mode Cluster</span><a href="#install-kro-on-eks-auto-mode-cluster" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Install kro on the EKS Auto Mode Cluster with zero replicas — the same approach used for ACK below. kro’s CRDs are registered but the controller does not reconcile until after the Velero restore completes:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro</span>
+<span class="nv">KRO_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"0.8.5"</span>
+helm upgrade <span class="nt">--install</span> <span class="nt">--namespace</span> kro-system <span class="nt">--create-namespace</span> <span class="nt">--set</span> deployment.replicaCount<span class="o">=</span>0 <span class="nt">--version</span><span class="o">=</span><span class="k">${</span><span class="nv">KRO_HELM_CHART_VERSION</span><span class="k">}</span> kro oci://registry.k8s.io/kro/charts/kro
+</pre></table></code></div></div><h3 id="install-ack-controllers-on-eks-auto-mode-cluster"><span class="me-2">Install ACK Controllers on EKS Auto Mode Cluster</span><a href="#install-ack-controllers-on-eks-auto-mode-cluster" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Install ACK controllers with <code class="language-plaintext highlighter-rouge">deployment.replicas: 0</code> so the controllers install their CRDs but do not start reconciling. This prevents a race condition during the Velero restore: Velero restores CRs in two steps (create without status, then patch <code class="language-plaintext highlighter-rouge">/status</code>). If ACK controllers are running during the create step, they see a CR with no ARN in <code class="language-plaintext highlighter-rouge">.status.ackResourceMetadata</code> and attempt to create new AWS resources - duplicating ones that already exist. Deploying with zero replicas eliminates this window; the controllers are scaled back up after the restore completes and all status fields are in place:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart</span>
+<span class="nv">ACK_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"46.75.1"</span>
+
+<span class="nb">cat</span> <span class="o">&gt;</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">/helm_values-ack.yml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+eks:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+ec2:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+iam:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+kms:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+cloudwatchlogs:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+s3:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+</span><span class="no">EOF
+</span>helm upgrade <span class="nt">--install</span> <span class="nt">--version</span><span class="o">=</span><span class="k">${</span><span class="nv">ACK_HELM_CHART_VERSION</span><span class="k">}</span> <span class="nt">--namespace</span> ack-system <span class="nt">--create-namespace</span> <span class="nt">--values</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">/helm_values-ack.yml"</span> ack oci://public.ecr.aws/aws-controllers-k8s/ack-chart
+</pre></table></code></div></div><h3 id="install-velero-on-eks-auto-mode-cluster"><span class="me-2">Install Velero on EKS Auto Mode Cluster</span><a href="#install-velero-on-eks-auto-mode-cluster" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Install the <code class="language-plaintext highlighter-rouge">velero</code> <a href="https://artifacthub.io/packages/helm/vmware-tanzu/velero">Helm chart</a> and modify its <a href="https://github.com/vmware-tanzu/helm-charts/blob/velero-11.3.2/charts/velero/values.yaml">default values</a>:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts</span>
+<span class="nv">VELERO_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"11.3.2"</span>
+
+helm repo add <span class="nt">--force-update</span> vmware-tanzu https://vmware-tanzu.github.io/helm-charts
+<span class="nb">cat</span> <span class="o">&gt;</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">/helm_values-velero.yml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+initContainers:
+  - name: velero-plugin-for-aws
+    # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?&lt;version&gt;.+)$
+    image: velero/velero-plugin-for-aws:v1.13.2
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+upgradeCRDs: false
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: </span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="sh">
+      prefix: velero
+      config:
+        region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+snapshotsEnabled: false
+</span><span class="no">EOF
+</span>helm upgrade <span class="nt">--install</span> <span class="nt">--version</span> <span class="s2">"</span><span class="k">${</span><span class="nv">VELERO_HELM_CHART_VERSION</span><span class="k">}</span><span class="s2">"</span> <span class="nt">--namespace</span> velero <span class="nt">--create-namespace</span> <span class="nt">--wait</span> <span class="nt">--values</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">/helm_values-velero.yml"</span> velero vmware-tanzu/velero
+</pre></table></code></div></div><p>Wait for the <code class="language-plaintext highlighter-rouge">kro-ack-backup</code> to appear in the Velero backup list (synced from the S3 bucket):</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="k">while</span> <span class="o">!</span> kubectl get backup <span class="nt">-n</span> velero kro-ack-backup 2&gt; /dev/null<span class="p">;</span> <span class="k">do
+  </span><span class="nb">echo</span> <span class="s2">"Waiting for kro-ack-backup to appear..."</span>
+  <span class="nb">sleep </span>5
+<span class="k">done</span>
+</pre></table></code></div></div><h3 id="restore-kro-and-ack-resources-to-eks"><span class="me-2">Restore kro and ACK Resources to EKS</span><a href="#restore-kro-and-ack-resources-to-eks" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><p>Create restore from backup:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">/velero-kro-ack-restore.yaml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: kro-ack-restore
+  namespace: velero
+spec:
+  backupName: kro-ack-backup
+  restoreStatus:
+    includedResources:
+      - "*"
+</span><span class="no">EOF
+</span>kubectl <span class="nb">wait</span> <span class="nt">--for</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.status.phase}'</span><span class="o">=</span>Completed restore/kro-ack-restore <span class="nt">-n</span> velero
+</pre></table></code></div></div><p>Scale kro and ACK controllers back up. When the controllers start, every CR already has its ARN in <code class="language-plaintext highlighter-rouge">.status.ackResourceMetadata</code>, so they reconcile with existing AWS resources instead of creating duplicates:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre>kubectl scale deploy <span class="nt">-n</span> kro-system kro <span class="nt">--replicas</span><span class="o">=</span>1
+<span class="k">for </span>DEPLOY <span class="k">in</span> <span class="si">$(</span>kubectl get deploy <span class="nt">-n</span> ack-system <span class="nt">-o</span> name<span class="si">)</span><span class="p">;</span> <span class="k">do
+  </span>kubectl scale <span class="s2">"</span><span class="k">${</span><span class="nv">DEPLOY</span><span class="k">}</span><span class="s2">"</span> <span class="nt">-n</span> ack-system <span class="nt">--replicas</span><span class="o">=</span>1
+<span class="k">done</span>
+</pre></table></code></div></div><p>Verify the restore. ACK resources have their <code class="language-plaintext highlighter-rouge">.status</code> fields intact (containing AWS resource IDs), and kro resources recognize their managed ACK resources:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre>kubectl get resourcegraphdefinition
+<span class="k">for </span>RESOURCE <span class="k">in</span> <span class="si">$(</span>kubectl api-resources <span class="nt">--api-group</span> kro.run <span class="nt">--no-headers</span> | <span class="nb">awk</span> <span class="s1">'!/resourcegraphdefinition/{print $1}'</span><span class="si">)</span><span class="p">;</span> <span class="k">do
+  </span><span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">=== </span><span class="k">${</span><span class="nv">RESOURCE</span><span class="k">}</span><span class="s2"> ==="</span>
+  kubectl get <span class="s2">"</span><span class="k">${</span><span class="nv">RESOURCE</span><span class="k">}</span><span class="s2">"</span> <span class="nt">-A</span>
+<span class="k">done</span>
+</pre></table></code></div></div><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+</pre><td class="rouge-code"><pre><span class="go">NAME                      APIVERSION   KIND                      STATE    AGE
+eks-auto-mode-cluster     v1alpha1     EksAutoModeCluster        Active   9s
+ekscloudwatchloggroup     v1alpha1     EksCloudWatchLogGroup     Active   9s
+eksvpc                    v1alpha1     EksVpc                    Active   9s
+kmskey                    v1alpha1     KmsKey                    Active   9s
+podidentityassociations   v1alpha1     PodIdentityAssociations   Active   9s
+s3-velero-bucket          v1alpha1     S3Bucket                  Active   9s
+
+=== eksautomodeclusters ===
+NAMESPACE    NAME   STATE    READY   AGE
+kro-system   k02    ACTIVE   True    12s
+
+=== ekscloudwatchloggroups ===
+NAMESPACE    NAME       STATE    READY   AGE
+kro-system   k02-logs   ACTIVE   True    13s
+
+=== eksvpcs ===
+NAMESPACE    NAME      STATE    READY   AGE
+kro-system   k02-vpc   ACTIVE   True    14s
+
+=== kmskeys ===
+NAMESPACE    NAME      STATE    READY   AGE
+kro-system   k02-kms   ACTIVE   True    14s
+
+=== podidentityassociations ===
+NAMESPACE    NAME                                           CLUSTER   NAMESPACE    SERVICEACCOUNT                  SYNCED   AGE
+kro-system   k02-ack-system-ack-cloudwatchlogs-controller   k02       ack-system   ack-cloudwatchlogs-controller   True     15s
+kro-system   k02-ack-system-ack-ec2-controller              k02       ack-system   ack-ec2-controller              True     14s
+kro-system   k02-ack-system-ack-eks-controller              k02       ack-system   ack-eks-controller              True     14s
+kro-system   k02-ack-system-ack-iam-controller              k02       ack-system   ack-iam-controller              True     14s
+kro-system   k02-ack-system-ack-kms-controller              k02       ack-system   ack-kms-controller              True     14s
+kro-system   k02-ack-system-ack-s3-controller               k02       ack-system   ack-s3-controller               True     14s
+kro-system   k02-velero-velero                              k02       velero       velero-server                   True     14s
+
+=== s3buckets ===
+NAMESPACE    NAME     STATE    READY   AGE
+kro-system   k02-s3   ACTIVE   True    14s
+</span></pre></table></code></div></div><p>Delete the restore:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>kubectl delete restore kro-ack-restore <span class="nt">-n</span> velero
+</pre></table></code></div></div><p>The EKS Auto Mode cluster is now managing its own infrastructure through kro and ACK resources that were migrated from the Kind cluster.</p><p>Remove the bootstrap Kind cluster:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre>kind delete cluster <span class="nt">--name</span> <span class="s2">"kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap"</span>
+</pre></table></code></div></div><h2 id="cleanup"><span class="me-2">Cleanup</span><a href="#cleanup" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><p><a href="https://raw.githubusercontent.com/xprateek/Lazycons_Pro/e805250e2471efb1882f108086be779957469bbf/svgs/ram_cleanup.svg" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/xprateek/Lazycons_Pro/e805250e2471efb1882f108086be779957469bbf/svgs/ram_cleanup.svg" alt="Cleanup" width="150" loading="lazy"></a></p><p>Define environment variables and workspace paths for cleanup tasks:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="nb">export </span><span class="nv">AWS_DEFAULT_REGION</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">:-</span><span class="nv">us</span><span class="p">-east-1</span><span class="k">}</span><span class="s2">"</span>
+<span class="nb">export </span><span class="nv">CLUSTER_FQDN</span><span class="o">=</span><span class="s2">"k02.k8s.mylabs.dev"</span>
+<span class="nb">export </span><span class="nv">CLUSTER_NAME</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="p">%%.*</span><span class="k">}</span><span class="s2">"</span>
+<span class="nb">export </span><span class="nv">TMP_DIR</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">:-${</span><span class="nv">PWD</span><span class="k">}</span><span class="p">/tmp</span><span class="k">}</span><span class="s2">"</span>
+<span class="nb">mkdir</span> <span class="nt">-pv</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">"</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup"</span>
+</pre></table></code></div></div><p>Create the Kind cluster:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre>kind create cluster <span class="nt">--name</span> <span class="s2">"kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup"</span> <span class="nt">--kubeconfig</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup/kubeconfig-kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup.yaml"</span>
+<span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup/kubeconfig-kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup.yaml"</span>
+</pre></table></code></div></div><p>Install kro using Helm:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro</span>
+<span class="nv">KRO_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"0.8.5"</span>
+helm upgrade <span class="nt">--install</span> <span class="nt">--version</span><span class="o">=</span><span class="k">${</span><span class="nv">KRO_HELM_CHART_VERSION</span><span class="k">}</span> <span class="nt">--namespace</span> kro-system <span class="nt">--create-namespace</span> <span class="nt">--set</span> deployment.replicas<span class="o">=</span>0 kro oci://registry.k8s.io/kro/charts/kro
+</pre></table></code></div></div><p>Create namespace and configure AWS credentials for ACK:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre>kubectl create namespace ack-system
+<span class="nb">set</span> +x
+kubectl <span class="nt">-n</span> ack-system create secret generic aws-credentials <span class="nt">--from-literal</span><span class="o">=</span><span class="nv">credentials</span><span class="o">=</span><span class="s2">"[default]
+aws_access_key_id=</span><span class="k">${</span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="k">}</span><span class="s2">
+aws_secret_access_key=</span><span class="k">${</span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="k">}</span><span class="s2">
+aws_session_token=</span><span class="k">${</span><span class="nv">AWS_SESSION_TOKEN</span><span class="k">}</span><span class="s2">
+aws_role_to_assume=</span><span class="k">${</span><span class="nv">AWS_ROLE_TO_ASSUME</span><span class="k">}</span><span class="s2">"</span>
+<span class="nb">set</span> <span class="nt">-x</span>
+</pre></table></code></div></div><p>Install ACK controllers with <code class="language-plaintext highlighter-rouge">deployment.replicas: 0</code> — CRDs are registered but controllers stay idle until the restore populates <code class="language-plaintext highlighter-rouge">.status</code> fields (same race-condition guard as the main cluster):</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart</span>
+<span class="nv">ACK_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"46.75.1"</span>
+
+<span class="nb">cat</span> <span class="o">&gt;</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup/helm_values-ack.yml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+eks:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+ec2:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+iam:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+kms:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+cloudwatchlogs:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+s3:
+  enabled: true
+  deployment:
+    replicas: 0
+  aws:
+    region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+    credentials:
+      secretName: aws-credentials
+</span><span class="no">EOF
+</span>helm upgrade <span class="nt">--install</span> <span class="nt">--version</span><span class="o">=</span><span class="k">${</span><span class="nv">ACK_HELM_CHART_VERSION</span><span class="k">}</span> <span class="nt">--namespace</span> ack-system <span class="nt">--values</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup/helm_values-ack.yml"</span> ack oci://public.ecr.aws/aws-controllers-k8s/ack-chart
+</pre></table></code></div></div><p>Install the <code class="language-plaintext highlighter-rouge">velero</code> <a href="https://artifacthub.io/packages/helm/vmware-tanzu/velero">Helm chart</a> and modify its <a href="https://github.com/vmware-tanzu/helm-charts/blob/velero-11.3.2/charts/velero/values.yaml">default values</a>:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+</pre><td class="rouge-code"><pre><span class="c"># renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts</span>
+<span class="nv">VELERO_HELM_CHART_VERSION</span><span class="o">=</span><span class="s2">"11.3.2"</span>
+
+helm repo add <span class="nt">--force-update</span> vmware-tanzu https://vmware-tanzu.github.io/helm-charts
+<span class="nb">cat</span> <span class="o">&gt;</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup/helm_values-velero.yml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+initContainers:
+  - name: velero-plugin-for-aws
+    # renovate: datasource=docker depName=velero/velero-plugin-for-aws extractVersion=^(?&lt;version&gt;.+)$
+    image: velero/velero-plugin-for-aws:v1.13.2
+    volumeMounts:
+      - mountPath: /target
+        name: plugins
+upgradeCRDs: false
+configuration:
+  backupStorageLocation:
+    - name: default
+      provider: aws
+      bucket: </span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="sh">
+      prefix: velero
+      config:
+        region: </span><span class="k">${</span><span class="nv">AWS_DEFAULT_REGION</span><span class="k">}</span><span class="sh">
+credentials:
+  useSecret: true
+  secretContents:
+    cloud: |
+      [default]
+      aws_access_key_id=</span><span class="k">${</span><span class="nv">AWS_ACCESS_KEY_ID</span><span class="k">}</span><span class="sh">
+      aws_secret_access_key=</span><span class="k">${</span><span class="nv">AWS_SECRET_ACCESS_KEY</span><span class="k">}</span><span class="sh">
+      aws_session_token=</span><span class="k">${</span><span class="nv">AWS_SESSION_TOKEN</span><span class="k">}</span><span class="sh">
+snapshotsEnabled: false
+</span><span class="no">EOF
+</span>helm upgrade <span class="nt">--install</span> <span class="nt">--version</span> <span class="s2">"</span><span class="k">${</span><span class="nv">VELERO_HELM_CHART_VERSION</span><span class="k">}</span><span class="s2">"</span> <span class="nt">--namespace</span> velero <span class="nt">--create-namespace</span> <span class="nt">--wait</span> <span class="nt">--values</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup/helm_values-velero.yml"</span> velero vmware-tanzu/velero
+
+<span class="k">while</span> <span class="o">!</span> kubectl get backup <span class="nt">-n</span> velero kro-ack-backup 2&gt; /dev/null<span class="p">;</span> <span class="k">do
+  </span><span class="nb">echo</span> <span class="s2">"Waiting for kro-ack-backup to appear..."</span>
+  <span class="nb">sleep </span>5
+<span class="k">done</span>
+</pre></table></code></div></div><p>Restore kro and ACK resources from the Velero backup:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre><td class="rouge-code"><pre><span class="nb">tee</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">/velero-kro-ack-restore.yaml"</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: kro-ack-restore
+  namespace: velero
+spec:
+  backupName: kro-ack-backup
+  existingResourcePolicy: update
+  restoreStatus:
+    includedResources:
+      - "*"
+</span><span class="no">EOF
+</span>kubectl <span class="nb">wait</span> <span class="nt">--for</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.status.phase}'</span><span class="o">=</span>Completed restore/kro-ack-restore <span class="nt">-n</span> velero
+</pre></table></code></div></div><p>Scale kro and ACK controllers back up so they can reconcile the restored resources:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre>kubectl scale deploy <span class="nt">-n</span> kro-system kro <span class="nt">--replicas</span><span class="o">=</span>1
+<span class="k">for </span>DEPLOY <span class="k">in</span> <span class="si">$(</span>kubectl get deploy <span class="nt">-n</span> ack-system <span class="nt">-o</span> name<span class="si">)</span><span class="p">;</span> <span class="k">do
+  </span>kubectl scale <span class="s2">"</span><span class="k">${</span><span class="nv">DEPLOY</span><span class="k">}</span><span class="s2">"</span> <span class="nt">-n</span> ack-system <span class="nt">--replicas</span><span class="o">=</span>1
+<span class="k">done</span>
+</pre></table></code></div></div><p>Delete the Velero backup, remove the restore, and delete the EKS Auto Mode Cluster along with all kro-managed AWS resources:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre><td class="rouge-code"><pre>kubectl apply <span class="nt">-n</span> velero <span class="nt">-f</span> - <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh"> || true
+apiVersion: velero.io/v1
+kind: DeleteBackupRequest
+metadata:
+  name: kro-ack-backup-delete
+  namespace: velero
+spec:
+  backupName: kro-ack-backup
+</span><span class="no">EOF
+
+</span>kubectl delete restore kro-ack-restore <span class="nt">-n</span> velero
+</pre></table></code></div></div><p>Delete the EKS Auto Mode Cluster kro instance and all its kro-managed AWS resources. First, patch the S3Bucket CR to remove its finalizer — this is needed because a field-ownership conflict between Velero’s restore and kro’s Server-Side Apply prevents kro from cleaning it up automatically, which would cause the delete to hang indefinitely:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="c"># Workaround: after Velero restore, Server-Side Apply field ownership prevents</span>
+<span class="c"># KRO from removing its own finalizer from the S3Bucket CR. The finalizer is</span>
+<span class="c"># owned by Velero's field manager, so KRO's SSA patch silently fails to remove</span>
+<span class="c"># it, causing deletion to hang indefinitely.</span>
+kubectl patch s3buckets k02-s3 <span class="nt">-n</span> kro-system <span class="nt">--type</span><span class="o">=</span>json <span class="nt">-p</span><span class="o">=</span><span class="s1">'[{"op": "remove", "path": "/metadata/finalizers/0"}]'</span>
+
+kubectl delete eksautomodeclusters.kro.run <span class="nt">-n</span> kro-system <span class="s2">"</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">"</span> <span class="nt">--timeout</span><span class="o">=</span>10m <span class="o">||</span> <span class="nb">true</span>
+</pre></table></code></div></div><p>Delete all the kind clusters:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre>kind delete cluster <span class="nt">--name</span> <span class="s2">"kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap"</span>
+kind delete cluster <span class="nt">--name</span> <span class="s2">"kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup"</span>
+</pre></table></code></div></div><p>Remove the <code class="language-plaintext highlighter-rouge">${TMP_DIR}/${CLUSTER_FQDN}</code> directory:</p><div class="language-sh highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre><td class="rouge-code"><pre><span class="nb">set</span> +e
+<span class="k">if</span> <span class="o">[[</span> <span class="nt">-d</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">"</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then
+  for </span>FILE <span class="k">in</span> <span class="se">\</span>
+    <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">"</span>/<span class="o">{</span>helm_values-ack.yml,helm_values-velero.yml,kubeconfig-<span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span>.conf,velero-kro-ack-restore.yaml<span class="o">}</span> <span class="se">\</span>
+    <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap"</span>/<span class="o">{</span>helm_values-ack.yml,helm_values-velero.yml,kro-eks-auto-mode-cluster-rgd.yaml,kro-eks-auto-mode-cluster.yaml,kro-ekscloudwatchloggroup-loggroup-rgd.yaml,kro-eksvpc-rgd.yaml,kro-kmskey-rgd.yaml,kro-podidentityassociations-rgd.yaml,kro-s3bucket-rgd.yaml,<span class="s2">"kubeconfig-kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap.yaml"</span>,velero-kro-ack-backup.yaml<span class="o">}</span> <span class="se">\</span>
+    <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup"</span>/<span class="o">{</span>kubeconfig-kind-<span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="nt">-cleanup</span>.yaml,helm_values-ack.yml,helm_values-velero.yml<span class="o">}</span><span class="p">;</span> <span class="k">do
+    if</span> <span class="o">[[</span> <span class="nt">-f</span> <span class="s2">"</span><span class="k">${</span><span class="nv">FILE</span><span class="k">}</span><span class="s2">"</span> <span class="o">]]</span><span class="p">;</span> <span class="k">then
+      </span><span class="nb">rm</span> <span class="nt">-v</span> <span class="s2">"</span><span class="k">${</span><span class="nv">FILE</span><span class="k">}</span><span class="s2">"</span>
+    <span class="k">else
+      </span><span class="nb">echo</span> <span class="s2">"❌ File not found: </span><span class="k">${</span><span class="nv">FILE</span><span class="k">}</span><span class="s2">"</span>
+    <span class="k">fi
+  done
+  </span><span class="nb">rmdir</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">CLUSTER_FQDN</span><span class="k">}</span><span class="s2">"</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-bootstrap"</span> <span class="s2">"</span><span class="k">${</span><span class="nv">TMP_DIR</span><span class="k">}</span><span class="s2">/kind-</span><span class="k">${</span><span class="nv">CLUSTER_NAME</span><span class="k">}</span><span class="s2">-cleanup"</span>
+<span class="k">fi
+</span><span class="nb">set</span> <span class="nt">-e</span>
+</pre></table></code></div></div><p>Enjoy your self-managed EKS cluster with ACK and kro… 😉</p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw me-1"></i> <a href="/categories/kubernetes/">Kubernetes</a>, <a href="/categories/cloud/">Cloud</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw me-1"></i> <a href="/tags/ack/" class="post-tag no-text-decoration" >ack</a> <a href="/tags/amazon-eks/" class="post-tag no-text-decoration" >amazon-eks</a> <a href="/tags/eks-auto-mode/" class="post-tag no-text-decoration" >eks-auto-mode</a> <a href="/tags/kind/" class="post-tag no-text-decoration" >kind</a> <a href="/tags/kro/" class="post-tag no-text-decoration" >kro</a> <a href="/tags/kubernetes/" class="post-tag no-text-decoration" >kubernetes</a> <a href="/tags/velero/" class="post-tag no-text-decoration" >velero</a></div><div class=" post-tail-bottom d-flex justify-content-between align-items-center mt-5 pb-2 " ><div class="license-wrapper"> This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> by the author.</div><div class="share-wrapper d-flex align-items-center"> <span class="share-label text-muted">Share</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=Bootstrap%20EKS%20Auto%20Mode%20Cluster%20with%20ACK%20and%20kro%20using%20Kind%20-%20Petr's%20Blog&url=https%3A%2F%2Fruzickap.github.io%2Fposts%2Fbootstrap-eks-auto-mode-bootstrap-ack-kro-velero%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Twitter" aria-label="Twitter"> <i class="fa-fw fa-brands fa-square-x-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=Bootstrap%20EKS%20Auto%20Mode%20Cluster%20with%20ACK%20and%20kro%20using%20Kind%20-%20Petr's%20Blog&u=https%3A%2F%2Fruzickap.github.io%2Fposts%2Fbootstrap-eks-auto-mode-bootstrap-ack-kro-velero%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Facebook" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fruzickap.github.io%2Fposts%2Fbootstrap-eks-auto-mode-bootstrap-ack-kro-velero%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Linkedin" aria-label="Linkedin"> <i class="fa-fw fab fa-linkedin"></i> </a> <script defer type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/share-to-mastodon/+esm"></script> <button class="btn text-start" data-bs-toggle="tooltip" data-bs-placement="top" title="Mastodon" aria-label="Mastodon"> <share-to-mastodon class="share-mastodon" message="Bootstrap%20EKS%20Auto%20Mode%20Cluster%20with%20ACK%20and%20kro%20using%20Kind%20-%20Petr's%20Blog" url="https%3A%2F%2Fruzickap.github.io%2Fposts%2Fbootstrap-eks-auto-mode-bootstrap-ack-kro-velero%2F"customInstanceList="[{&quot;label&quot;:&quot;mastodon.social&quot;,&quot;link&quot;:&quot;https://mastodon.social/&quot;},{&quot;label&quot;:&quot;mastodon.online&quot;,&quot;link&quot;:&quot;https://mastodon.online/&quot;},{&quot;label&quot;:&quot;fosstodon.org&quot;,&quot;link&quot;:&quot;https://fosstodon.org/&quot;},{&quot;label&quot;:&quot;photog.social&quot;,&quot;link&quot;:&quot;https://photog.social/&quot;}]" > <i class="fa-fw fa-brands fa-mastodon"></i> </share-to-mastodon> </button> <button id="copy-link" aria-label="Copy link" class="btn small" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy link" data-title-succeed="Link copied successfully!" > <i class="fa-fw fas fa-link pe-none fs-6"></i> </button> </span></div></div></div></article></main><aside aria-label="Panel" id="panel-wrapper" class="col-xl-3 ps-2 text-muted"><div class="access"><section id="access-lastmod"><h2 class="panel-heading">Recently Updated</h2><ul class="content list-unstyled ps-0 pb-1 ms-1 mt-2"><li class="text-truncate lh-lg"> <a href="/posts/installtion-f5-bigip-virtual-edition-to-rhel7/">Installation F5 BIGIP Virtual Edition to RHEL7</a><li class="text-truncate lh-lg"> <a href="/posts/detect-a-hacker-attacks-eks-vm/">Detect the hacker attacks on Amazon EKS and EC2 instances</a><li class="text-truncate lh-lg"> <a href="/posts/secure-cheap-amazon-eks-auto/">Build secure and cheap Amazon EKS Auto Mode</a><li class="text-truncate lh-lg"> <a href="/posts/eks-auto-cert-manager-velero/">Amazon EKS Auto Mode with cert-manager and Velero</a><li class="text-truncate lh-lg"> <a href="/posts/mcp-servers-k8s/">MCP Servers running on Kubernetes</a></ul></section><section><h2 class="panel-heading">Trending Tags</h2><div class="d-flex flex-wrap mt-3 mb-1 me-3"> <a class="post-tag btn btn-outline-primary" href="/tags/kubernetes/">kubernetes</a> <a class="post-tag btn btn-outline-primary" href="/tags/amazon-eks/">amazon-eks</a> <a class="post-tag btn btn-outline-primary" href="/tags/security/">security</a> <a class="post-tag btn btn-outline-primary" href="/tags/cert-manager/">cert-manager</a> <a class="post-tag btn btn-outline-primary" href="/tags/eksctl/">eksctl</a> <a class="post-tag btn btn-outline-primary" href="/tags/bash/">bash</a> <a class="post-tag btn btn-outline-primary" href="/tags/pxe/">pxe</a> <a class="post-tag btn btn-outline-primary" href="/tags/wifi/">wifi</a> <a class="post-tag btn btn-outline-primary" href="/tags/prometheus/">prometheus</a> <a class="post-tag btn btn-outline-primary" href="/tags/automation/">automation</a></div></section></div><div class="toc-border-cover z-3"></div><section id="toc-wrapper" class="invisible position-sticky ps-0 pe-4 pb-4"><h2 class="panel-heading ps-3 pb-2 mb-0">Contents</h2><nav id="toc"></nav></section></aside></div><div class="row"><div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 px-md-4"><aside id="related-posts" aria-labelledby="related-label"><h3 class="mb-4" id="related-label">Further Reading</h3><nav class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-4"><article class="col"> <a href="/posts/eks-auto-cert-manager-velero/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1738364400" data-df="ll" > Feb 1, 2025 </time><h4 class="pt-0 my-2">Amazon EKS Auto Mode with cert-manager and Velero</h4><div class="text-muted"><p>Back up and restore Let's Encrypt production certificates using Velero on Amazon EKS Auto Mode with S3 storage</p></div></div></a></article><article class="col"> <a href="/posts/mcp-servers-k8s/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1748296800" data-df="ll" > May 27, 2025 </time><h4 class="pt-0 my-2">MCP Servers running on Kubernetes</h4><div class="text-muted"><p>Deploy MCP servers on Amazon EKS Auto Mode using ToolHive, vLLM, LibreChat, and Open WebUI for self-hosted AI chat</p></div></div></a></article><article class="col"> <a href="/posts/secure-cheap-amazon-eks-auto/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1734130800" data-df="ll" > Dec 14, 2024 </time><h4 class="pt-0 my-2">Build secure and cheap Amazon EKS Auto Mode</h4><div class="text-muted"><p>Build "cheap and secure" Amazon EKS Auto Mode with network policies, cluster encryption and logging</p></div></div></a></article></nav></aside><nav class="post-navigation d-flex justify-content-between" aria-label="Post Navigation"> <a href="/posts/amazon-eks-grafana-stack/" class="btn btn-outline-primary" aria-label="Older" ><p>Amazon EKS and Grafana stack</p></a><div class="btn btn-outline-primary disabled" aria-label="Newer"><p>-</p></div></nav><footer aria-label="Site Info" class=" d-flex flex-column justify-content-center text-muted flex-lg-row justify-content-lg-between align-items-lg-center pb-lg-3 " ><p>© <time>2026</time> <a href="https://twitter.com/Ruzicka_Petr">Petr Ruzicka</a>. <span data-bs-toggle="tooltip" data-bs-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author." >Some rights reserved.</span></p><p>Using the <a data-bs-toggle="tooltip" data-bs-placement="top" title="v7.4.1" href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener" >Chirpy</a> theme for <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a>.</p></footer></div></div><div id="search-result-wrapper" class="d-flex justify-content-center d-none"><div class="col-11 content"><div id="search-hints"><section><h2 class="panel-heading">Trending Tags</h2><div class="d-flex flex-wrap mt-3 mb-1 me-3"> <a class="post-tag btn btn-outline-primary" href="/tags/kubernetes/">kubernetes</a> <a class="post-tag btn btn-outline-primary" href="/tags/amazon-eks/">amazon-eks</a> <a class="post-tag btn btn-outline-primary" href="/tags/security/">security</a> <a class="post-tag btn btn-outline-primary" href="/tags/cert-manager/">cert-manager</a> <a class="post-tag btn btn-outline-primary" href="/tags/eksctl/">eksctl</a> <a class="post-tag btn btn-outline-primary" href="/tags/bash/">bash</a> <a class="post-tag btn btn-outline-primary" href="/tags/pxe/">pxe</a> <a class="post-tag btn btn-outline-primary" href="/tags/wifi/">wifi</a> <a class="post-tag btn btn-outline-primary" href="/tags/prometheus/">prometheus</a> <a class="post-tag btn btn-outline-primary" href="/tags/automation/">automation</a></div></section></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><aside aria-label="Scroll to Top"> <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow"> <i class="fas fa-angle-up"></i> </button></aside></div><div id="mask" class="d-none position-fixed w-100 h-100 z-1"></div><aside id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-animation="true" data-bs-autohide="false" ><div class="toast-header"> <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close" ></button></div><div class="toast-body text-center pt-0"><p class="px-2 mb-3">A new version of content is available.</p><button type="button" class="btn btn-primary" aria-label="Update"> Update </button></div></aside><script> (function () { const themeMapper = Theme.getThemeMapper('light', 'dark_dimmed'); const initTheme = themeMapper[Theme.visualState]; let lang = 'en';if (lang.length > 2 && !lang.startsWith('zh')) { lang = lang.slice(0, 2); } let giscusAttributes = { src: 'https://giscus.app/client.js', 'data-repo': 'ruzickap/ruzickap.github.io', 'data-repo-id': 'R_kgDOGkp4nQ', 'data-category': 'General', 'data-category-id': 'DIC_kwDOGkp4nc4CSdu1', 'data-mapping': 'pathname', 'data-strict' : '0', 'data-reactions-enabled': '1', 'data-emit-metadata': '0', 'data-theme': initTheme, 'data-input-position': 'bottom', 'data-lang': lang, 'data-loading': 'lazy', crossorigin: 'anonymous', async: '' }; let giscusNode = document.createElement('script'); Object.entries(giscusAttributes).forEach(([key, value]) => giscusNode.setAttribute(key, value) ); const $footer = document.querySelector('footer'); $footer.insertAdjacentElement("beforebegin", giscusNode); addEventListener('message', (event) => { if (event.source === window && event.data && event.data.id === Theme.ID) { const newTheme = themeMapper[Theme.visualState]; const message = { setConfig: { theme: newTheme } }; const giscus = document.getElementsByClassName('giscus-frame')[0].contentWindow; giscus.postMessage({ giscus: message }, 'https://giscus.app'); } }); })(); </script> <script> document.addEventListener('DOMContentLoaded', () => { SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<article class="px-1 px-sm-2 px-lg-4 px-xl-0"><header><h2><a href="{url}">{title}</a></h2><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div></header><p>{content}</p></article>', noResultsText: '<p class="mt-5">Oops! No results found.</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="me-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); }); </script>

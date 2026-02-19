@@ -1,0 +1,269 @@
+# mise.toml - Tool and task management configuration
+# This file manages tool versions, environment variables, and automated tasks for blog post testing
+
+##############################################################################
+# Tool Versions
+##############################################################################
+[tools]
+# keep-sorted start
+"ubi:aws-cloudformation/rain" = "1.24.2"
+"ubi:harehare/mq" = "0.5.13"
+aws = "2.26.2"
+aws-copilot = "1.34.1"
+cilium-cli = "0.18.3"
+eksctl = "0.207.0"
+helm = "4.1.0"
+kind = "0.29.0"
+kubectl = "1.35.0"
+velero = "1.16.0"
+yq = "4.52.2"
+# keep-sorted end
+
+##############################################################################
+# Global Settings
+##############################################################################
+[settings]
+jobs = 1
+trusted_config_paths = ["/"]
+
+##############################################################################
+# Environment Variables
+##############################################################################
+[env]
+FORCE_COLOR = 1
+
+##############################################################################
+# Tasks - Blog Post Testing
+# Each task follows the pattern:
+# - create:posts:* - Creates and tests blog post environments
+# - delete:posts:* - Cleans up blog post test environments
+##############################################################################
+
+#------------------------------------------------------------------------------
+# EKS Access
+#------------------------------------------------------------------------------
+[tasks."eks-access"]
+description = 'EKS Access - eval "$(mise run a)"'
+alias = "a"
+quiet = true
+env.EKS_POST_FILE = "./_posts/2026/2026-01-13-amazon-eks-grafana-stack.md"
+run = '''
+cat <<EOF
+$(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
+
+eval "\$(aws sts assume-role --role-arn "\${AWS_ROLE_TO_ASSUME}" --role-session-name "\${USER}@\$(hostname -f)-\$(date +%s)" --duration-seconds 7200 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
+export KUBECONFIG="/tmp/kubeconfig-\${CLUSTER_NAME}-\$\$.conf"
+aws eks update-kubeconfig --name "\${CLUSTER_NAME}" --kubeconfig "\${KUBECONFIG}"
+EOF
+'''
+
+#------------------------------------------------------------------------------
+# Run the cheapest Amazon EKS
+#------------------------------------------------------------------------------
+[tasks."create:2022-11-27-cheapest-amazon-eks"]
+description = 'Create: Run the cheapest Amazon EKS'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2022-11-27-cheapest-amazon-eks"]
+description = 'Delete: Run the cheapest Amazon EKS'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS - Karpenter tests
+#------------------------------------------------------------------------------
+[tasks."create:2022-12-24-amazon-eks-karpenter-tests|2022-11-27-cheapest-amazon-eks"]
+description = 'Create: Amazon EKS - Karpenter tests'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2022-12-24-amazon-eks-karpenter-tests|2022-11-27-cheapest-amazon-eks"]
+description = 'Delete: Amazon EKS - Karpenter tests'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Velero and cert-manager
+#------------------------------------------------------------------------------
+[tasks."create:2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
+description = "Create: Velero and cert-manager"
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
+description = "Delete: Velero and cert-manager"
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Secrets Store CSI Driver and Reloader
+#------------------------------------------------------------------------------
+[tasks."create:2023-04-01-secrets-store-csi-driver-reloader|2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
+description = 'Create: Secrets Store CSI Driver and Reloader'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-04-01-secrets-store-csi-driver-reloader|2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
+description = 'Delete: Secrets Store CSI Driver and Reloader'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Secrets Store CSI Driver and Reloader
+#------------------------------------------------------------------------------
+[tasks."create:2023-04-01-secrets-store-csi-driver-reloader|2022-11-27-cheapest-amazon-eks"]
+description = 'Create: Secrets Store CSI Driver and Reloader'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-04-01-secrets-store-csi-driver-reloader|2022-11-27-cheapest-amazon-eks"]
+description = 'Delete: Secrets Store CSI Driver and Reloader'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# My favourite krew plugins for kubectl
+#------------------------------------------------------------------------------
+[tasks."create:2023-06-06-my-favourite-krew-plugins-kubectl|2022-11-27-cheapest-amazon-eks"]
+description = 'Create: My favourite krew plugins for kubectl'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-06-06-my-favourite-krew-plugins-kubectl|2022-11-27-cheapest-amazon-eks"]
+description = 'Delete: My favourite krew plugins for kubectl'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Build secure Amazon EKS with Cilium and network encryption
+#------------------------------------------------------------------------------
+[tasks."create:2023-08-03-cilium-amazon-eks"]
+description = 'Create: Build secure Amazon EKS with Cilium and network encryption'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-08-03-cilium-amazon-eks"]
+description = 'Delete: Build secure Amazon EKS with Cilium and network encryption'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Build secure and cheap Amazon EKS
+#------------------------------------------------------------------------------
+[tasks."create:2023-09-25-secure-cheap-amazon-eks"]
+description = 'Create: Build secure and cheap Amazon EKS'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2023-09-25-secure-cheap-amazon-eks"]
+description = 'Delete: Build secure and cheap Amazon EKS'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Exploit vulnerability in a WordPress plugin with Kali Linux
+#------------------------------------------------------------------------------
+[tasks."create:2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1"]
+description = 'Create: Exploit vulnerability in a WordPress plugin with Kali Linux'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2024-04-27-exploit-vulnerability-wordpress-plugin-kali-linux-1"]
+description = 'Delete: Exploit vulnerability in a WordPress plugin with Kali Linux'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Build secure and cheap Amazon EKS with Pod Identities
+#------------------------------------------------------------------------------
+[tasks."create:2024-05-03-secure-cheap-amazon-eks-with-pod-identities"]
+description = 'Create: Build secure and cheap Amazon EKS with Pod Identities'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2024-05-03-secure-cheap-amazon-eks-with-pod-identities"]
+description = 'Delete: Build secure and cheap Amazon EKS with Pod Identities'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Exploit vulnerability in a WordPress plugin with Kali Linux 2
+#------------------------------------------------------------------------------
+[tasks."create:2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2"]
+description = 'Create: Exploit vulnerability in a WordPress plugin with Kali Linux 2'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2024-05-09-exploit-vulnerability-wordpress-plugin-kali-linux-2"]
+description = 'Delete: Exploit vulnerability in a WordPress plugin with Kali Linux 2'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Using keep-sorted to organize Terraform objects
+#------------------------------------------------------------------------------
+[tasks."create:2024-12-12-terraform-keep-sorted"]
+description = 'Create: Using keep-sorted to organize Terraform objects'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2024-12-12-terraform-keep-sorted"]
+description = 'Delete: Using keep-sorted to organize Terraform objects'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Build secure and cheap Amazon EKS Auto Mode
+#------------------------------------------------------------------------------
+[tasks."create:2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Create: Build secure and cheap Amazon EKS Auto Mode'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Delete: Build secure and cheap Amazon EKS Auto Mode'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS Auto Mode with cert-manager and Velero
+#------------------------------------------------------------------------------
+[tasks."create:2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Create: Amazon EKS Auto Mode with cert-manager and Velero'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Delete: Amazon EKS Auto Mode with cert-manager and Velero'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# MCP Servers running on Kubernetes
+#------------------------------------------------------------------------------
+[tasks."create:2025-05-27-mcp-servers-k8s|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Create: MCP Servers running on Kubernetes'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2025-05-27-mcp-servers-k8s|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Delete: MCP Servers running on Kubernetes'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Exploiting RCE Vulnerabilities in Ollama on Kubernetes
+#------------------------------------------------------------------------------
+[tasks."create:2025-07-10-ollama-k8s-exploitation|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Create: Exploiting RCE Vulnerabilities in Ollama on Kubernetes'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2025-07-10-ollama-k8s-exploitation|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto"]
+description = 'Delete: Exploiting RCE Vulnerabilities in Ollama on Kubernetes'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS and Grafana stack
+#------------------------------------------------------------------------------
+[tasks."create:2026-01-13-amazon-eks-grafana-stack"]
+description = 'Create: Amazon EKS and Grafana stack'
+run = ["./scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}"]
+
+[tasks."delete:2026-01-13-amazon-eks-grafana-stack"]
+description = 'Delete: Amazon EKS and Grafana stack'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind
+#------------------------------------------------------------------------------
+[tasks."create:2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero"]
+description = 'Create: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind'
+run = ["./scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}"]
+
+[tasks."delete:2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero"]
+description = 'Delete: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Create and delete all posts
+#------------------------------------------------------------------------------
+[tasks."create-delete:posts:all"]
+description = 'Create and delete all posts'
+run = '''
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  while read -r TASK; do
+    mise run "${TASK}"
+  done < <(sed -n 's/^\[tasks."\(\(create\|delete\):.*\)"]/\1/p' mise.toml)
+'''

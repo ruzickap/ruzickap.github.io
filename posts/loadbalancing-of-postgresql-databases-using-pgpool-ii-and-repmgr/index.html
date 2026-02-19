@@ -1,0 +1,1773 @@
+<!doctype html><html lang="en" data-mode="dark"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f7f7"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1b1b1e"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="viewport" content="width=device-width, user-scalable=no initial-scale=1, shrink-to-fit=no, viewport-fit=cover" ><meta name="generator" content="Jekyll v4.4.1" /><meta property="og:title" content="Loadbalancing of PostgreSQL databases using pgpool-II and repmgr" /><meta name="author" content="Petr Ruzicka" /><meta property="og:locale" content="en" /><meta name="description" content="Loadbalancing of PostgreSQL databases using pgpool-II and repmgr" /><meta property="og:description" content="Loadbalancing of PostgreSQL databases using pgpool-II and repmgr" /><link rel="canonical" href="https://ruzickap.github.io/posts/loadbalancing-of-postgresql-databases-using-pgpool-ii-and-repmgr/" /><meta property="og:url" content="https://ruzickap.github.io/posts/loadbalancing-of-postgresql-databases-using-pgpool-ii-and-repmgr/" /><meta property="og:site_name" content="Petr’s Blog" /><meta property="og:type" content="article" /><meta property="article:published_time" content="2014-10-25T00:00:00+02:00" /><meta name="twitter:card" content="summary" /><meta property="twitter:title" content="Loadbalancing of PostgreSQL databases using pgpool-II and repmgr" /><meta name="twitter:site" content="@Ruzicka_Petr" /><meta name="twitter:creator" content="@Ruzicka_Petr" /><meta name="google-site-verification" content="4ugGShJoiB9veoPwFcMsMjzk-1BYbi5ozcSnovkBWtA" /><meta name="msvalidate.01" content="592AB158E3F9EF887F8DC8E69A2FF754" /> <script type="application/ld+json"> {"@context":"https://schema.org","@type":"BlogPosting","author":{"@type":"Person","name":"Petr Ruzicka","url":"https://petr.ruzicka.dev"},"dateModified":"2026-01-17T19:48:44+01:00","datePublished":"2014-10-25T00:00:00+02:00","description":"Loadbalancing of PostgreSQL databases using pgpool-II and repmgr","headline":"Loadbalancing of PostgreSQL databases using pgpool-II and repmgr","mainEntityOfPage":{"@type":"WebPage","@id":"https://ruzickap.github.io/posts/loadbalancing-of-postgresql-databases-using-pgpool-ii-and-repmgr/"},"url":"https://ruzickap.github.io/posts/loadbalancing-of-postgresql-databases-using-pgpool-ii-and-repmgr/"}</script><title>Loadbalancing of PostgreSQL databases using pgpool-II and repmgr | Petr's Blog</title><link rel="icon" type="image/png" href="/assets/img/favicons/favicon-96x96.png" sizes="96x96"><link rel="icon" type="image/svg+xml" href="/assets/img/favicons/favicon.svg"><link rel="shortcut icon" href="/assets/img/favicons/favicon.ico"><link rel="apple-touch-icon" sizes="180x180" href="/assets/img/favicons/apple-touch-icon.png"><link rel="manifest" href="/assets/img/favicons/site.webmanifest"><link rel="preconnect" href="https://fonts.googleapis.com" ><link rel="dns-prefetch" href="https://fonts.googleapis.com" ><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="dns-prefetch" href="https://fonts.gstatic.com" ><link rel="preconnect" href="https://cdn.jsdelivr.net" ><link rel="dns-prefetch" href="https://cdn.jsdelivr.net" ><link rel="stylesheet" href="/assets/css/jekyll-theme-chirpy.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Source+Sans+Pro:wght@400;600;700;900&display=swap"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tocbot@4.36.4/dist/tocbot.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/loading-attribute-polyfill@2.1.1/dist/loading-attribute-polyfill.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox@3.3.0/dist/css/glightbox.min.css"> <script src="/assets/js/dist/theme.min.js"></script> <script defer src="https://cdn.jsdelivr.net/combine/npm/simple-jekyll-search@1.10.0/dest/simple-jekyll-search.min.js,npm/loading-attribute-polyfill@2.1.1/dist/loading-attribute-polyfill.umd.min.js,npm/glightbox@3.3.0/dist/js/glightbox.min.js,npm/clipboard@2.0.11/dist/clipboard.min.js,npm/dayjs@1.11.18/dayjs.min.js,npm/dayjs@1.11.18/locale/en.js,npm/dayjs@1.11.18/plugin/relativeTime.js,npm/dayjs@1.11.18/plugin/localizedFormat.js,npm/tocbot@4.36.4/dist/tocbot.min.js"></script> <script defer src="/assets/js/dist/post.min.js"></script> <script> document.addEventListener('DOMContentLoaded', () => { const pv = document.getElementById('pageviews'); if (pv !== null) { const uri = location.pathname.replace(/\/$/, ''); const url = `https://ruzickap-github-io.goatcounter.com/counter/${encodeURIComponent(uri)}.json`; fetch(url) .then((response) => response.json()) .then((data) => { const count = data.count.replace(/\D/g, ''); pv.innerText = new Intl.NumberFormat().format(count); }) .catch((error) => { pv.innerText = '1'; }); } }); </script> <script defer src="/app.min.js?baseurl=&register=true" ></script> <script defer src="https://www.googletagmanager.com/gtag/js?id=G-64WRCWDZM8"></script> <script> document.addEventListener('DOMContentLoaded', () => { window.dataLayer = window.dataLayer || []; function gtag() { dataLayer.push(arguments); } gtag('js', new Date()); gtag('config', 'G-64WRCWDZM8'); }); </script> <script async src="https://gc.zgo.at/count.js" data-goatcounter="https://ruzickap-github-io.goatcounter.com/count" ></script> <script defer src="https://cloud.umami.is/script.js" data-website-id="380ea41a-7d5f-4423-8e13-03151bde195f" ></script> <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "ad8c64404e1e41dba184019564cf11bb"}' ></script><body><aside aria-label="Sidebar" id="sidebar" class="d-flex flex-column align-items-end"><header class="profile-wrapper"> <a href="/" id="avatar" class="rounded-circle"><img src="https://0.gravatar.com/avatar/5484c0fd9f98e2ffd9212b158931bf4b?s=200" width="112" height="112" alt="avatar" onerror="this.style.display='none'"></a> <a class="site-title d-block" href="/">Petr's Blog</a><p class="site-subtitle fst-italic mb-0">DevOps • GitOps • K8s</p></header><nav class="flex-column flex-grow-1 w-100 ps-0"><ul class="nav"><li class="nav-item"> <a href="/" class="nav-link"> <i class="fa-fw fas fa-home"></i> <span>HOME</span> </a><li class="nav-item"> <a href="/categories/" class="nav-link"> <i class="fa-fw fas fa-stream"></i> <span>CATEGORIES</span> </a><li class="nav-item"> <a href="/tags/" class="nav-link"> <i class="fa-fw fas fa-tags"></i> <span>TAGS</span> </a><li class="nav-item"> <a href="/archives/" class="nav-link"> <i class="fa-fw fas fa-archive"></i> <span>ARCHIVES</span> </a><li class="nav-item"> <a href="/projects/" class="nav-link"> <i class="fa-fw fas fa-project-diagram"></i> <span>PROJECTS</span> </a><li class="nav-item"> <a href="/about/" class="nav-link"> <i class="fa-fw fas fa-info-circle"></i> <span>ABOUT</span> </a></ul></nav><div class="sidebar-bottom d-flex flex-wrap align-items-center w-100"> <a href="https://github.com/ruzickap" aria-label="github" target="_blank" rel="noopener noreferrer" > <i class="fab fa-github"></i> </a> <a href="javascript:location.href = 'mailto:' + ['petr.ruzicka','gmail.com'].join('@')" aria-label="email" > <i class="fas fa-envelope"></i> </a> <a href="https://petr.ruzicka.dev" aria-label="homepage" target="_blank" rel="noopener noreferrer" > <i class="fas fa-home"></i> </a> <a href="https://mastodon.social/@petr_ruzicka" aria-label="mastodon" target="_blank" rel="noopener noreferrer me" > <i class="fab fa-mastodon"></i> </a> <a href="/feed.xml" aria-label="rss" > <i class="fas fa-rss"></i> </a></div></aside><div id="main-wrapper" class="d-flex justify-content-center"><div class="container d-flex flex-column px-xxl-5"><header id="topbar-wrapper" class="flex-shrink-0" aria-label="Top Bar"><div id="topbar" class="d-flex align-items-center justify-content-between px-lg-3 h-100" ><nav id="breadcrumb" aria-label="Breadcrumb"> <span> <a href="/">Home</a> </span> <span>Loadbalancing of PostgreSQL databases using pgpool-II and repmgr</span></nav><button type="button" id="sidebar-trigger" class="btn btn-link" aria-label="Sidebar"> <i class="fas fa-bars fa-fw"></i> </button><div id="topbar-title"> Post</div><button type="button" id="search-trigger" class="btn btn-link" aria-label="Search"> <i class="fas fa-search fa-fw"></i> </button> <search id="search" class="align-items-center ms-3 ms-lg-0"> <i class="fas fa-search fa-fw"></i> <input class="form-control" id="search-input" type="search" aria-label="search" autocomplete="off" placeholder="Search..." > </search> <button type="button" class="btn btn-link text-decoration-none" id="search-cancel">Cancel</button></div></header><div class="row flex-grow-1"><main aria-label="Main Content" class="col-12 col-lg-11 col-xl-9 px-md-4"><article class="px-1" data-toc="true"><header><h1 data-toc-skip>Loadbalancing of PostgreSQL databases using pgpool-II and repmgr</h1><p class="post-desc fw-light mb-4">Loadbalancing of PostgreSQL databases using pgpool-II and repmgr</p><div class="post-meta text-muted"> <span> Posted <time data-ts="1414188000" data-df="ll" data-bs-toggle="tooltip" data-bs-placement="bottom" > Oct 25, 2014 </time> </span> <span> Updated <time data-ts="1768675724" data-df="ll" data-bs-toggle="tooltip" data-bs-placement="bottom" > Jan 17, 2026 </time> </span><div class="d-flex justify-content-between"> <span> By <em> <a href="https://petr.ruzicka.dev">Petr Ruzicka</a> </em> </span><div> <span> <em id="pageviews"> <i class="fas fa-spinner fa-spin small"></i> </em> views </span> <span class="readtime" data-bs-toggle="tooltip" data-bs-placement="bottom" title="7655 words" > <em>42 min</em> read</span></div></div></div></header><div id="toc-bar" class="d-flex align-items-center justify-content-between invisible"> <span class="label text-truncate">Loadbalancing of PostgreSQL databases using pgpool-II and repmgr</span> <button type="button" class="toc-trigger btn me-1"> <i class="fa-solid fa-list-ul fa-fw"></i> </button></div><button id="toc-solo-trigger" type="button" class="toc-trigger btn btn-outline-secondary btn-sm"> <span class="label ps-2 pe-1">Contents</span> <i class="fa-solid fa-angle-right fa-fw"></i> </button> <dialog id="toc-popup" class="p-0"><div class="header d-flex flex-row align-items-center justify-content-between"><div class="label text-truncate py-2 ms-4">Loadbalancing of PostgreSQL databases using pgpool-II and repmgr</div><button id="toc-popup-close" type="button" class="btn mx-1 my-1 opacity-75"> <i class="fas fa-close"></i> </button></div><div id="toc-popup-content" class="px-4 py-3 pb-4"></div></dialog><div class="content"><blockquote class="prompt-info"><p>Original post from <a href="https://linux.xvx.cz/2014/10/loadbalancing-of-postgresql-databases.html">linux.xvx.cz</a></p></blockquote><p>I had to solve the <a href="https://www.postgresql.org/">PostgreSQL</a> HA and Redundancy a few weeks ago. A lot has been written about this topic, but I was not able to find a guide describing pgpool-II and repmgr. After reading some documents I built the solution which I’m going to describe.</p><p>In short it contains the Master/Slave DB <a href="https://wiki.postgresql.org/wiki/Streaming_Replication">Streaming replication</a> and <a href="https://www.pgpool.net/">pgpool</a> load distribution and HA. The replication “part” is managed by <a href="https://www.repmgr.org/">repmgr</a>.</p><p>Here is the network diagram:</p><p><a href="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram.svg" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram.svg" alt="PostgreSQL pgpool-II and repmgr architecture diagram" loading="lazy"></a></p><ul><li><p>Master PostgreSQL database installation - <code class="language-plaintext highlighter-rouge">cz01-psql01</code>:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+</pre><td class="rouge-code"><pre><span class="c">#PostgreSQL installation</span>
+yum localinstall <span class="nt">-y</span> http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
+yum <span class="nb">install</span> <span class="nt">-y</span> postgresql93-server repmgr
+yum <span class="nb">install</span> <span class="nt">-y</span> <span class="nt">--enablerepo</span><span class="o">=</span>centos-base postgresql93-contrib
+service postgresql-9.3 initdb
+chkconfig postgresql-9.3 on
+
+<span class="nb">sed</span> <span class="nt">-i</span>.orig <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#listen_addresses = 'localhost'/listen_addresses = '*'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#shared_preload_libraries = ''/shared_preload_libraries = 'repmgr_funcs'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#wal_level = minimal/wal_level = hot_standby/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#archive_mode = off/archive_mode = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s@^#archive_command = ''@archive_command = 'cd .'@"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#max_wal_senders = 0/max_wal_senders = 1/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#wal_keep_segments = 0/wal_keep_segments = 5000/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#</span><span class="se">\(</span><span class="s2">wal_sender_timeout =.*</span><span class="se">\)</span><span class="s2">/</span><span class="se">\1</span><span class="s2">/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#hot_standby = off/hot_standby = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#log_min_duration_statement = -1/log_min_duration_statement = 0/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^log_line_prefix = '&lt; %m &gt;'/log_line_prefix = '%t [%p]: [%l-1] user=%u,db=%d '/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#log_checkpoints =.*/log_checkpoints = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#log_connections =.*/log_connections = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#log_disconnections =.*/log_disconnections = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#log_lock_waits = off/log_lock_waits = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#log_statement = 'none'/log_statement = 'all'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#log_temp_files = -1/log_temp_files = 0/"</span> <span class="se">\</span>
+  /var/lib/pgsql/9.3/data/postgresql.conf
+
+<span class="nb">cat</span> <span class="o">&gt;&gt;</span> /var/lib/pgsql/9.3/data/pg_hba.conf <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+host    all             admin           0.0.0.0/0               md5
+host    all             all             10.32.243.0/24          md5
+# cz01-psql01
+host    repmgr          repmgr          10.32.243.147/32        trust
+host    replication     repmgr          10.32.243.147/32        trust
+# cz01-psql02
+host    repmgr          repmgr          10.32.243.148/32        trust
+host    replication     repmgr          10.32.243.148/32        trust
+</span><span class="no">EOF
+
+</span><span class="k">for </span>SERVER <span class="k">in </span>cz01-psql01 cz01-psql02 cz01-pgpool-ha cz01-pgpool01 cz01-pgpool02<span class="p">;</span> <span class="k">do
+  </span><span class="nb">echo</span> <span class="s2">"</span><span class="nv">$SERVER</span><span class="s2">.example.com:5432:postgres:admin:password123"</span> <span class="o">&gt;&gt;</span> ~/.pgpass
+  <span class="nb">echo</span> <span class="s2">"</span><span class="nv">$SERVER</span><span class="s2">.example.com:5432:repmgr:repmgr:repmgr_password"</span> <span class="o">&gt;&gt;</span> ~/.pgpass
+<span class="k">done
+</span><span class="nb">chmod </span>0600 ~/.pgpass
+<span class="nb">cp</span> ~/.pgpass /var/lib/pgsql/
+
+<span class="c">#Configure repmgr</span>
+<span class="nb">mkdir</span> /var/lib/pgsql/repmgr
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /var/lib/pgsql/repmgr/repmgr.conf <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+cluster=pgsql_cluster
+node=1
+node_name=cz01-psql01
+conninfo='host=cz01-psql01.example.com user=repmgr dbname=repmgr'
+pg_bindir=/usr/pgsql-9.3/bin/
+master_response_timeout=5
+reconnect_attempts=2
+reconnect_interval=2
+failover=manual
+promote_command='/usr/pgsql-9.3/bin/repmgr standby promote -f /var/lib/pgsql/repmgr/repmgr.conf'
+follow_command='/usr/pgsql-9.3/bin/repmgr standby follow -f /var/lib/pgsql/repmgr/repmgr.conf'
+</span><span class="no">EOF
+
+</span><span class="nb">cp</span> <span class="nt">-r</span> /root/.ssh /var/lib/pgsql/
+<span class="nb">chown</span> <span class="nt">-R</span> postgres:postgres /var/lib/pgsql/.ssh /var/lib/pgsql/.pgpass /var/lib/pgsql/repmgr
+
+<span class="nb">echo</span> <span class="s2">"PATH=/usr/pgsql-9.3/bin:</span><span class="nv">$PATH</span><span class="s2">"</span> <span class="o">&gt;&gt;</span> /var/lib/pgsql/.bash_profile
+service postgresql-9.3 start
+
+<span class="c">#Add users</span>
+<span class="nb">sudo</span> <span class="nt">-u</span> postgres psql <span class="nt">-c</span> <span class="s2">"CREATE ROLE admin SUPERUSER CREATEDB CREATEROLE INHERIT REPLICATION LOGIN ENCRYPTED PASSWORD 'password123';"</span>
+<span class="nb">sudo</span> <span class="nt">-u</span> postgres psql <span class="nt">-c</span> <span class="s2">"CREATE USER repmgr SUPERUSER LOGIN ENCRYPTED PASSWORD 'repmgr_password';"</span>
+<span class="nb">sudo</span> <span class="nt">-u</span> postgres psql <span class="nt">-c</span> <span class="s2">"CREATE DATABASE repmgr OWNER repmgr;"</span>
+
+<span class="c">#Register DB instance as master</span>
+su - postgres <span class="nt">-c</span> <span class="s2">"repmgr -f /var/lib/pgsql/repmgr/repmgr.conf --verbose master register"</span>
+
+<span class="c">#Configure SSL Layer for PostgreSQL</span>
+<span class="c"># shellcheck disable=SC2016</span>
+<span class="nb">sed</span> <span class="nt">-i</span>.orig <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s@\$dir/cacert.pem@\$dir/example.com-ca.crt @'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s@\$dir/crl.pem@\$dir/example.com-ca.crl @'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s@\$dir/private/cakey.pem@\$dir/private/example.com-ca.key @'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s/^\(crlnumber\)/#\1/'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s/= XX/= CZ/'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s/^#\(stateOrProvinceName_default.*\) Default Province/\1 Czech Republic/'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s/= Default City/= Brno/'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s/= Default Company Ltd/= Example, Inc\./'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s/= policy_match/= policy_anything/'</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s1">'s/^#\(unique_subject\)/\1/'</span> /etc/pki/tls/openssl.cnf
+
+<span class="nb">touch</span> /etc/pki/CA/index.txt
+<span class="nb">echo </span>01 <span class="o">&gt;</span> /etc/pki/CA/serial
+<span class="nb">cd</span> /etc/pki/CA <span class="o">||</span> <span class="nb">exit</span>
+
+<span class="c"># Private key for CA</span>
+<span class="o">(</span>
+  <span class="nb">umask </span>077
+  openssl genrsa <span class="nt">-passout</span> pass:password123 <span class="nt">-out</span> private/example.com-ca.key 1024
+  openssl pkey <span class="nt">-text</span> <span class="nt">-passout</span> pass:password123 <span class="nt">-in</span> private/example.com-ca.key <span class="o">&gt;</span> private/example.com-ca.key.info
+<span class="o">)</span>
+
+<span class="nv">SUBJ</span><span class="o">=</span><span class="s2">"
+C=CZ
+ST=Czech Republic
+O=Example, Inc.
+localityName=Brno
+commonName=example.com Certificate Authority
+"</span>
+
+openssl req <span class="nt">-passin</span> pass:password123 <span class="nt">-subj</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"</span><span class="nv">$SUBJ</span><span class="s2">"</span> | <span class="nb">tr</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="s2">"/"</span><span class="si">)</span><span class="s2">"</span> <span class="nt">-new</span> <span class="nt">-x509</span> <span class="nt">-key</span> private/example.com-ca.key <span class="nt">-days</span> 3650 <span class="nt">-out</span> example.com-ca.crt
+openssl x509 <span class="nt">-noout</span> <span class="nt">-text</span> <span class="nt">-in</span> example.com-ca.crt <span class="o">&gt;</span> example.com-ca.crt.info
+
+<span class="c"># cz01-psql01 Certificate</span>
+openssl genrsa <span class="nt">-passout</span> pass:password123 <span class="nt">-des3</span> <span class="nt">-out</span> cz01-psql01.example.com_priv_encrypted.key 2048
+openssl rsa <span class="nt">-passin</span> pass:password123 <span class="nt">-in</span> cz01-psql01.example.com_priv_encrypted.key <span class="nt">-out</span> cz01-psql01.example.com_priv.key
+
+<span class="nv">SUBJ</span><span class="o">=</span><span class="s2">"
+C=CZ
+ST=Czech Republic
+O=Example
+OU=Deployment
+L=Brno
+CN=cz01-psql01.example.com
+emailAddress=root@example.com
+"</span>
+openssl req <span class="nt">-passin</span> pass:password123 <span class="nt">-new</span> <span class="nt">-subj</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"</span><span class="nv">$SUBJ</span><span class="s2">"</span> | <span class="nb">tr</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="s2">"/"</span><span class="si">)</span><span class="s2">"</span> <span class="nt">-days</span> 3650 <span class="nt">-key</span> cz01-psql01.example.com_priv_encrypted.key <span class="nt">-out</span> cz01-psql01.example.com.csr
+
+openssl ca <span class="nt">-passin</span> pass:password123 <span class="nt">-batch</span> <span class="nt">-in</span> cz01-psql01.example.com.csr <span class="nt">-out</span> cz01-psql01.example.com.crt
+openssl x509 <span class="nt">-noout</span> <span class="nt">-text</span> <span class="nt">-in</span> cz01-psql01.example.com.crt <span class="o">&gt;</span> cz01-psql01.example.com.crt.info
+
+<span class="nb">cp</span> /etc/pki/CA/cz01-psql01.example.com.crt /var/lib/pgsql/9.3/server.crt
+<span class="nb">cp</span> /etc/pki/CA/cz01-psql01.example.com_priv.key /var/lib/pgsql/9.3/server.key
+<span class="nb">chown </span>postgres:postgres /var/lib/pgsql/9.3/server.<span class="k">*</span>
+<span class="nb">chmod </span>0600 /var/lib/pgsql/9.3/server.key
+
+<span class="nb">sed</span> <span class="nt">-i</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/#ssl = off/ssl = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s@#ssl_cert_file = 'server.crt'@ssl_cert_file = '../server.crt'@"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s@#ssl_key_file = 'server.key'@ssl_key_file = '../server.key'@"</span> <span class="se">\</span>
+  /var/lib/pgsql/9.3/data/postgresql.conf
+
+service postgresql-9.3 restart
+
+<span class="c"># Quick Test</span>
+<span class="nb">export </span><span class="nv">PGSSLMODE</span><span class="o">=</span>require
+psql <span class="nt">--host</span> cz01-psql01.example.com <span class="nt">--username</span><span class="o">=</span>fuzeme <span class="nt">--dbname</span><span class="o">=</span>fuzers <span class="nt">-w</span> <span class="nt">-l</span>
+</pre></table></code></div></div><li><p>Slave PostgreSQL database installation - <code class="language-plaintext highlighter-rouge">cz01-psql02</code>:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+</pre><td class="rouge-code"><pre><span class="c">#PostgreSQL installation</span>
+yum localinstall <span class="nt">-y</span> http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
+yum <span class="nb">install</span> <span class="nt">-y</span> postgresql93-server repmgr
+yum <span class="nb">install</span> <span class="nt">-y</span> <span class="nt">--enablerepo</span><span class="o">=</span>centos-base postgresql93-contrib
+chkconfig postgresql-9.3 on
+
+<span class="nb">echo</span> <span class="s2">"PATH=/usr/pgsql-9.3/bin:</span><span class="nv">$PATH</span><span class="s2">"</span> <span class="o">&gt;&gt;</span> /var/lib/pgsql/.bash_profile
+
+scp <span class="nt">-r</span> cz01-psql01.example.com:/root/<span class="o">{</span>.pgpass,.ssh<span class="o">}</span> /root/
+<span class="nb">cp</span> <span class="nt">-r</span> /root/<span class="o">{</span>.pgpass,.ssh<span class="o">}</span> /var/lib/pgsql/
+<span class="nb">chown</span> <span class="nt">-R</span> postgres:postgres /var/lib/pgsql/.pgpass /var/lib/pgsql/.ssh
+
+<span class="c">#Check the connection to primary node</span>
+su - postgres <span class="nt">-c</span> <span class="s2">"psql --username=repmgr --dbname=repmgr --host cz01-psql01.example.com -w -l"</span>
+
+<span class="c">#Replicate the DB from the master mode</span>
+su - postgres <span class="nt">-c</span> <span class="s2">"repmgr -D /var/lib/pgsql/9.3/data -d repmgr -p 5432 -U repmgr -R postgres --verbose standby clone cz01-psql01.example.com"</span>
+
+<span class="c">#Configure the repmgr</span>
+<span class="nb">mkdir</span> /var/lib/pgsql/repmgr
+<span class="nb">cat</span> <span class="o">&gt;</span> /var/lib/pgsql/repmgr/repmgr.conf <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+cluster=pgsql_cluster
+node=2
+node_name=cz01-psql02
+conninfo='host=cz01-psql02.example.com user=repmgr dbname=repmgr'
+pg_bindir=/usr/pgsql-9.3/bin/
+master_response_timeout=5
+reconnect_attempts=2
+reconnect_interval=2
+failover=manual
+promote_command='/usr/pgsql-9.3/bin/repmgr standby promote -f /var/lib/pgsql/repmgr/repmgr.conf'
+follow_command='/usr/pgsql-9.3/bin/repmgr standby follow -f /var/lib/pgsql/repmgr/repmgr.conf'
+</span><span class="no">EOF
+
+</span><span class="nb">chown</span> <span class="nt">-R</span> postgres:postgres /var/lib/pgsql/repmgr
+
+<span class="c"># cz01-psql02 Certificate</span>
+<span class="nb">cd</span> /etc/pki/CA <span class="o">||</span> <span class="nb">exit
+</span>openssl genrsa <span class="nt">-passout</span> pass:password123 <span class="nt">-des3</span> <span class="nt">-out</span> cz01-psql02.example.com_priv_encrypted.key 2048
+openssl rsa <span class="nt">-passin</span> pass:password123 <span class="nt">-in</span> cz01-psql02.example.com_priv_encrypted.key <span class="nt">-out</span> cz01-psql02.example.com_priv.key
+
+<span class="nv">SUBJ</span><span class="o">=</span><span class="s2">"
+C=CZ
+ST=Czech Republic
+O=Example
+OU=Deployment
+L=Brno
+CN=cz01-psql02.example.com
+emailAddress=root@example.com
+"</span>
+
+openssl req <span class="nt">-passin</span> pass:password123 <span class="nt">-new</span> <span class="nt">-subj</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"</span><span class="nv">$SUBJ</span><span class="s2">"</span> | <span class="nb">tr</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="s2">"/"</span><span class="si">)</span><span class="s2">"</span> <span class="nt">-days</span> 3650 <span class="nt">-key</span> cz01-psql02.example.com_priv_encrypted.key <span class="nt">-out</span> cz01-psql02.example.com.csr
+
+scp /etc/pki/CA/cz01-psql02.example.com.csr root@cz01-psql01.example.com:/etc/pki/CA/
+
+ssh root@cz01-psql01.example.com <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
+cd /etc/pki/CA
+openssl ca -passin pass:password123 -batch -in cz01-psql02.example.com.csr -out cz01-psql02.example.com.crt
+openssl x509 -noout -text -in cz01-psql02.example.com.crt &gt; cz01-psql02.example.com.crt.info
+</span><span class="no">EOF
+
+</span>scp root@cz01-psql01.example.com:/etc/pki/CA/cz01-psql02.example.com.crt /etc/pki/CA/
+
+<span class="nb">cp</span> /etc/pki/CA/cz01-psql02.example.com.crt /var/lib/pgsql/9.3/server.crt
+<span class="nb">cp</span> /etc/pki/CA/cz01-psql02.example.com_priv.key /var/lib/pgsql/9.3/server.key
+<span class="nb">chown </span>postgres:postgres /var/lib/pgsql/9.3/server.<span class="k">*</span>
+
+<span class="nb">chmod </span>0600 /var/lib/pgsql/9.3/server.key
+
+service postgresql-9.3 start
+
+<span class="c">#Register the DB instance as slave</span>
+su - postgres <span class="nt">-c</span> <span class="s2">"repmgr -f /var/lib/pgsql/repmgr/repmgr.conf --verbose standby register"</span>
+</pre></table></code></div></div><li><p>pgpool server installation (common for primary/secondary node) - <code class="language-plaintext highlighter-rouge">cz01-pgpool0{1,2}</code>:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+</pre><td class="rouge-code"><pre><span class="c">#pgpool installation</span>
+yum localinstall <span class="nt">-y</span> http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
+yum <span class="nb">install</span> <span class="nt">-y</span> pgpool-II-93 postgresql93
+
+scp <span class="nt">-r</span> cz01-psql01.example.com:/root/<span class="o">{</span>.ssh,.pgpass<span class="o">}</span> /root/
+scp cz01-psql01.example.com:/root/.pgpass /root/
+
+<span class="nb">cp</span> /etc/pgpool-II-93/pcp.conf.sample /etc/pgpool-II-93/pcp.conf
+<span class="nb">echo</span> <span class="s2">"admin:</span><span class="si">$(</span>pg_md5 password123<span class="si">)</span><span class="s2">"</span> <span class="o">&gt;&gt;</span> /etc/pgpool-II-93/pcp.conf
+
+<span class="nb">sed</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^listen_addresses = .localhost./listen_addresses = '*'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^log_destination = .stderr./log_destination = 'syslog'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^port = .*/port = 5432/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^backend_hostname0 =.*/backend_hostname0 = 'cz01-psql01.example.com'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#backend_flag0/backend_flag0/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#backend_hostname1 =.*/backend_hostname1 = 'cz01-psql02.example.com'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#backend_port1 = 5433/backend_port1 = 5432/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#backend_weight1/backend_weight1/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#backend_data_directory1 =.*/backend_data_directory1 = '</span><span class="se">\/</span><span class="s2">var</span><span class="se">\/</span><span class="s2">lib</span><span class="se">\/</span><span class="s2">pgsql</span><span class="se">\/</span><span class="s2">9.3</span><span class="se">\/</span><span class="s2">data'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#backend_flag1/backend_flag1/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^log_hostname =.*/log_hostname = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^syslog_facility =.*/syslog_facility = 'daemon.info'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^sr_check_user =.*/sr_check_user = 'admin'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^sr_check_password =.*/sr_check_password = 'password123'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^health_check_period =.*/health_check_period = 10/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^health_check_user =.*/health_check_user = 'admin'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^health_check_password =.*/health_check_password = 'password123'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^use_watchdog =.*/use_watchdog = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^delegate_IP =.*/delegate_IP = '10.32.243.250'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^netmask 255.255.255.0/netmask 255.255.255.128/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^heartbeat_device0 =.*/heartbeat_device0 = 'eth0'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#other_pgpool_port0 =.*/other_pgpool_port0 = 5432/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#other_wd_port0 = 9000/other_wd_port0 = 9000/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^load_balance_mode = off/load_balance_mode = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^master_slave_mode = off/master_slave_mode = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^master_slave_sub_mode =.*/master_slave_sub_mode = 'stream'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s@^failover_command = ''@failover_command = '/etc/pgpool-II-93/failover_stream.sh %d %H'@"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^recovery_user = 'nobody'/recovery_user = 'admin'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^recovery_password = ''/recovery_password = 'password123'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^recovery_1st_stage_command = ''/recovery_1st_stage_command = 'basebackup.sh'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^sr_check_period = 0/sr_check_period = 10/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^delay_threshold = 0/delay_threshold = 10000000/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^log_connections = off/log_connections = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^log_statement = off/log_statement = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^log_per_node_statement = off/log_per_node_statement = on/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^log_standby_delay = 'none'/log_standby_delay = 'always'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^enable_pool_hba = off/enable_pool_hba = on/"</span> <span class="se">\</span>
+  /etc/pgpool-II-93/pgpool.conf.sample <span class="o">&gt;</span> /etc/pgpool-II-93/pgpool.conf
+
+<span class="nb">cat</span> <span class="o">&gt;</span> /etc/pgpool-II-93/failover_stream.sh <span class="o">&lt;&lt;</span> <span class="sh">\</span><span class="no">EOF</span><span class="sh">
+#!/bin/sh
+# Failover command for streaming replication.
+#
+# Arguments: </span><span class="nv">$1</span><span class="sh">: failed node id. </span><span class="nv">$2</span><span class="sh">: new master hostname.
+
+failed_node=</span><span class="nv">$1</span><span class="sh">
+new_master=</span><span class="nv">$2</span><span class="sh">
+
+(
+date
+echo "Failed node: </span><span class="nv">$failed_node</span><span class="sh">"
+set -x
+
+# Promote standby/slave to be a new master (old master failed)
+/usr/bin/ssh -T -l postgres </span><span class="nv">$new_master</span><span class="sh"> "/usr/pgsql-9.3/bin/repmgr -f /var/lib/pgsql/repmgr/repmgr.conf standby promote 2&gt;/dev/null 1&gt;/dev/null &lt;&amp;-"
+
+exit 0;
+) 2&gt;&amp;1 | tee -a /tmp/failover_stream.sh.log
+</span><span class="no">EOF
+</span><span class="nb">chmod </span>755 /etc/pgpool-II-93/failover_stream.sh
+
+<span class="nb">cp</span> /etc/pgpool-II-93/pool_hba.conf.sample /etc/pgpool-II-93/pool_hba.conf
+<span class="nb">echo</span> <span class="s2">"host    all         all         0.0.0.0/0             md5"</span> <span class="o">&gt;&gt;</span> /etc/pgpool-II-93/pool_hba.conf
+
+<span class="nb">mkdir</span> <span class="nt">-p</span> /var/lib/pgsql/9.3/data
+groupadd <span class="nt">-g</span> 26 <span class="nt">-o</span> <span class="nt">-r</span> postgres
+useradd <span class="nt">-M</span> <span class="nt">-n</span> <span class="nt">-g</span> postgres <span class="nt">-o</span> <span class="nt">-r</span> <span class="nt">-d</span> /var/lib/pgsql <span class="nt">-s</span> /bin/bash <span class="nt">-c</span> <span class="s2">"PostgreSQL Server"</span> <span class="nt">-u</span> 26 postgres
+
+<span class="nb">cp</span> <span class="nt">-R</span> /root/.ssh /var/lib/pgsql/
+<span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'/^User /d'</span> /var/lib/pgsql/.ssh/config
+
+pg_md5 <span class="nt">-m</span> <span class="nt">-u</span> admin password123
+
+<span class="nb">chown</span> <span class="nt">-R</span> postgres:postgres /var/lib/pgsql /etc/pgpool-II-93/pool_passwd
+
+<span class="nb">chmod </span>6755 /sbin/ifconfig
+<span class="nb">chmod </span>6755 /sbin/arping
+
+chkconfig pgpool-II-93 on
+</pre></table></code></div></div><li><p>Primary pgpool server installation - <code class="language-plaintext highlighter-rouge">cz01-pgpool01</code>:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="nb">sed</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool01.example.com'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool02.example.com'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool02.example.com'/"</span> <span class="se">\</span>
+  <span class="nt">-i</span> /etc/pgpool-II-93/pgpool.conf
+
+service pgpool-II-93 start
+</pre></table></code></div></div><li><p>Secondary pgpool server installation - <code class="language-plaintext highlighter-rouge">cz01-pgpool02</code>:</p><div class="language-bash highlighter-rouge"><div class="code-header"> <span data-label-text="Shell"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="nb">sed</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^wd_hostname =.*/wd_hostname = 'cz01-pgpool02.example.com'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^heartbeat_destination0 =.*/heartbeat_destination0 = 'cz01-pgpool01.example.com'/"</span> <span class="se">\</span>
+  <span class="nt">-e</span> <span class="s2">"s/^#other_pgpool_hostname0 =.*/other_pgpool_hostname0 = 'cz01-pgpool01.example.com'/"</span> <span class="se">\</span>
+  <span class="nt">-i</span> /etc/pgpool-II-93/pgpool.conf
+
+service pgpool-II-93 start
+</pre></table></code></div></div></ul><p>Now the all 4 server should be configured according the picture mentioned above. To be sure everything is working properly I decided to do various tests by stopping/starting the databases to see how all components are ready for outages. In the next pare there will be a lot of outputs of logs+commands which can be handy for troubleshooting in the future and which will test the proper configuration.</p><p>All the files modified and used for the configuration above can be found in the <a href="https://github.com/ruzickap/linux.xvx.cz/tree/gh-pages/files/postgresql_pgpool_repmgr">postgresql_pgpool_repmgr repository</a>.</p><h2 id="testing"><span class="me-2">Testing</span><a href="#testing" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h2><h3 id="check-the-cluster-status"><span class="me-2">Check the cluster status</span><a href="#check-the-cluster-status" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh postgres@cz01-psql02.example.com <span class="s2">"/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"</span>
+<span class="go">Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+[2014-10-23 14:39:40] [INFO] repmgr connecting to database
+Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
+Role | Connection String
+* master | host=cz01-psql01.example.com user=repmgr dbname=repmgr
+ standby | host=cz01-psql02.example.com user=repmgr dbname=repmgr
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_count 1 localhost 9898 admin password123
+<span class="go">2
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 0
+<span class="go">cz01-psql01.example.com 5432 1 0.500000
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 1
+<span class="go">cz01-psql02.example.com 5432 1 0.500000
+</span></pre></table></code></div></div><h3 id="check-if-the-replication-is-working"><span class="me-2">Check if the replication is working</span><a href="#check-if-the-replication-is-working" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-c</span> <span class="s2">"create database mydb"</span>
+<span class="go">CREATE DATABASE
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="go"> mydb | admin | UTF8 | en_US.UTF-8 | en_US.UTF-8 |
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-psql01.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="go"> mydb | admin | UTF8 | en_US.UTF-8 | en_US.UTF-8 |
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-psql02.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="go"> mydb | admin | UTF8 | en_US.UTF-8 | en_US.UTF-8 |
+</span></pre></table></code></div></div><h3 id="check-what-is-the-primary-pgpool-it-has-2-ips"><span class="me-2">Check what is the primary pgpool (it has 2 IPs)</span><a href="#check-what-is-the-primary-pgpool-it-has-2-ips" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh <span class="nt">-q</span> cz01-pgpool01 <span class="s2">"ip a s"</span>
+<span class="go">1: lo: mtu 16436 qdisc noqueue state UNKNOWN
+ link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+ inet 127.0.0.1/8 scope host lo
+2: eth0: mtu 1500 qdisc pfifo_fast state UP qlen 1000
+ link/ether 00:50:56:91:0a:86 brd ff:ff:ff:ff:ff:ff
+ inet 10.32.243.157/25 brd 10.32.243.255 scope global eth0
+ inet 10.32.243.250/24 brd 10.32.243.255 scope global eth0:0
+</span></pre></table></code></div></div><h3 id="stop-the-master-db"><span class="me-2">Stop the Master DB</span><a href="#stop-the-master-db" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span><span class="nb">date</span> <span class="o">&amp;&amp;</span> ssh root@cz01-psql01.example.com <span class="s2">"service postgresql-9.3 stop"</span>
+<span class="go">Thu Oct 23 14:43:09 CEST 2014
+Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+Stopping postgresql-9.3 service: [ OK ]
+</span></pre></table></code></div></div><p>The pgpool is monitoring both master and slave databases if they are responding. If one of them is not responding the pgpool executes the <code class="language-plaintext highlighter-rouge">failover_stream.sh</code> file. This script is responsible for promoting the slave to be a new master. The result is that the read-only slave will become read/write master. In the diagram below I used the red colour to see the changes which were done when slave was promoted to master.</p><p><a href="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_master_down.svg" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_master_down.svg" alt="PostgreSQL failover diagram - master down" loading="lazy"></a></p><h3 id="pgpool01-logs-right-after-the-master-was-stopped"><span class="me-2">pgpool01 logs right after the master was stopped</span><a href="#pgpool01-logs-right-after-the-master-was-stopped" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool01 ~ #</span><span class="w"> </span><span class="nb">cat</span> /var/log/local0
+<span class="c">...
+</span><span class="go">2014-10-23T14:43:11.547651+02:00 cz01-pgpool01 pgpool[23301]: connect_inet_domain_socket: getsockopt() detected error: Connection refused
+2014-10-23T14:43:11.547678+02:00 cz01-pgpool01 pgpool[23301]: make_persistent_db_connection: connection to cz01-psql01.example.com(5432) failed
+2014-10-23T14:43:11.562642+02:00 cz01-pgpool01 pgpool[23301]: check_replication_time_lag: could not connect to DB node 0, check sr_check_user and sr_check_password
+2014-10-23T14:43:12.327080+02:00 cz01-pgpool01 pgpool[23257]: connect_inet_domain_socket: getsockopt() detected error: Connection refused
+2014-10-23T14:43:12.327127+02:00 cz01-pgpool01 pgpool[23257]: make_persistent_db_connection: connection to cz01-psql01.example.com(5432) failed
+2014-10-23T14:43:12.332564+02:00 cz01-pgpool01 pgpool[23257]: connect_inet_domain_socket: getsockopt() detected error: Connection refused
+2014-10-23T14:43:12.332661+02:00 cz01-pgpool01 pgpool[23257]: make_persistent_db_connection: connection to cz01-psql01.example.com(5432) failed
+2014-10-23T14:43:12.332740+02:00 cz01-pgpool01 pgpool[23257]: health check failed. 0 th host cz01-psql01.example.com at port 5432 is down
+2014-10-23T14:43:12.332822+02:00 cz01-pgpool01 pgpool[23257]: set 0 th backend down status
+2014-10-23T14:43:12.332920+02:00 cz01-pgpool01 pgpool[23257]: wd_start_interlock: start interlocking
+2014-10-23T14:43:12.348543+02:00 cz01-pgpool01 pgpool[23257]: wd_assume_lock_holder: become a new lock holder
+2014-10-23T14:43:12.372682+02:00 cz01-pgpool01 pgpool[23264]: wd_send_response: WD_STAND_FOR_LOCK_HOLDER received but lock holder exists already
+2014-10-23T14:43:13.369470+02:00 cz01-pgpool01 pgpool[23257]: starting degeneration. shutdown host cz01-psql01.example.com(5432)
+2014-10-23T14:43:13.369521+02:00 cz01-pgpool01 pgpool[23257]: Restart all children
+2014-10-23T14:43:13.369544+02:00 cz01-pgpool01 pgpool[23257]: execute command: /etc/pgpool-II-93/failover_stream.sh 0 cz01-psql02.example.com
+2014-10-23T14:43:15.916452+02:00 cz01-pgpool01 pgpool[23257]: find_primary_node_repeatedly: waiting for finding a primary node
+2014-10-23T14:43:15.933033+02:00 cz01-pgpool01 pgpool[23257]: find_primary_node: primary node id is 1
+2014-10-23T14:43:15.937969+02:00 cz01-pgpool01 pgpool[23257]: wd_end_interlock: end interlocking
+2014-10-23T14:43:16.963481+02:00 cz01-pgpool01 pgpool[23257]: failover: set new primary node: 1
+2014-10-23T14:43:16.963534+02:00 cz01-pgpool01 pgpool[23257]: failover: set new master node: 1
+2014-10-23T14:43:17.051441+02:00 cz01-pgpool01 pgpool[23301]: worker process received restart request
+2014-10-23T14:43:17.055720+02:00 cz01-pgpool01 pgpool[23257]: failover done. shutdown host cz01-psql01.example.com(5432)
+2014-10-23T14:43:18.059487+02:00 cz01-pgpool01 pgpool[23300]: pcp child process received restart request
+2014-10-23T14:43:18.064463+02:00 cz01-pgpool01 pgpool[23257]: PCP child 23300 exits with status 256 in failover()
+2014-10-23T14:43:18.064493+02:00 cz01-pgpool01 pgpool[23257]: fork a new PCP child pid 26164 in failover()
+2014-10-23T14:43:18.064499+02:00 cz01-pgpool01 pgpool[23257]: worker child 23301 exits with status 256
+2014-10-23T14:43:18.065907+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 26165
+</span></pre></table></code></div></div><h3 id="psql01-masted-db-logs-right-after-the-master-was-stopped"><span class="me-2">psql01 (masted db) logs right after the master was stopped</span><a href="#psql01-masted-db-logs-right-after-the-master-was-stopped" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre><td class="rouge-code"><pre><span class="gp">cz01-psql01 / #</span><span class="w"> </span><span class="nb">cat</span> /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
+<span class="c">...
+</span><span class="go">2014-10-23 14:43:10 CEST [18254]: [6-1] user=,db= LOG: received fast shutdown request
+2014-10-23 14:43:10 CEST [18254]: [7-1] user=,db= LOG: aborting any active transactions
+2014-10-23 14:43:10 CEST [24392]: [13-1] user=admin,db=postgres FATAL: terminating connection due to administrator command
+2014-10-23 14:43:10 CEST [24392]: [14-1] user=admin,db=postgres LOG: disconnection: session time: 0:03:01.366 user=admin database=postgres host=10.32.243.157 port=53814
+2014-10-23 14:43:10 CEST [24386]: [13-1] user=admin,db=postgres FATAL: terminating connection due to administrator command
+2014-10-23 14:43:10 CEST [24386]: [14-1] user=admin,db=postgres LOG: disconnection: session time: 0:03:08.732 user=admin database=postgres host=10.32.243.157 port=53812
+2014-10-23 14:43:10 CEST [18266]: [2-1] user=,db= LOG: autovacuum launcher shutting down
+2014-10-23 14:43:10 CEST [18263]: [27-1] user=,db= LOG: shutting down
+2014-10-23 14:43:10 CEST [18263]: [28-1] user=,db= LOG: checkpoint starting: shutdown immediate
+</span><span class="gp">2014-10-23 14:43:10 CEST [18263]: [29-1] user=,db= LOG: checkpoint complete: wrote 1 buffers (0.0%);</span><span class="w"> </span>0 transaction log file<span class="o">(</span>s<span class="o">)</span> added, 0 removed, 0 recycled<span class="p">;</span> <span class="nv">write</span><span class="o">=</span>0.002 s, <span class="nb">sync</span><span class="o">=</span>0.002 s, <span class="nv">total</span><span class="o">=</span>0.479 s<span class="p">;</span> <span class="nb">sync </span><span class="nv">files</span><span class="o">=</span>1, <span class="nv">longest</span><span class="o">=</span>0.002 s, <span class="nv">average</span><span class="o">=</span>0.002 s
+<span class="go">2014-10-23 14:43:10 CEST [18263]: [30-1] user=,db= LOG: database system is shut down
+2014-10-23 14:43:11 CEST [18438]: [3-1] user=repmgr,db=[unknown] LOG: disconnection: session time: 0:48:37.268 user=repmgr database= host=10.32.243.148 port=50909
+</span></pre></table></code></div></div><h3 id="psql02-slave-db-logs-right-after-the-master-was-stopped"><span class="me-2">psql02 (slave db) logs right after the master was stopped</span><a href="#psql02-slave-db-logs-right-after-the-master-was-stopped" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+</pre><td class="rouge-code"><pre><span class="gp">cz01-psql02 / #</span><span class="w"> </span><span class="nb">cat</span> /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
+<span class="c">...
+</span><span class="go">2014-10-23 14:43:11 CEST [18031]: [2-1] user=,db= LOG: replication terminated by primary server
+2014-10-23 14:43:11 CEST [18031]: [3-1] user=,db= DETAIL: End of WAL reached on timeline 1 at 0/61000090.
+2014-10-23 14:43:11 CEST [18031]: [4-1] user=,db= FATAL: could not send end-of-streaming message to primary: no COPY in progress
+2014-10-23 14:43:11 CEST [18030]: [5-1] user=,db= LOG: record with zero length at 0/61000090
+2014-10-23 14:43:11 CEST [24120]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.157 port=52991
+2014-10-23 14:43:11 CEST [24120]: [2-1] user=admin,db=postgres LOG: connection authorized: user=admin database=postgres
+2014-10-23 14:43:11 CEST [24120]: [3-1] user=admin,db=postgres LOG: disconnection: session time: 0:00:00.010 user=admin database=postgres host=10.32.243.157 port=52991
+2014-10-23 14:43:13 CEST [24121]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.158 port=53841
+2014-10-23 14:43:13 CEST [24121]: [2-1] user=admin,db=postgres LOG: connection authorized: user=admin database=postgres
+2014-10-23 14:43:13 CEST [24121]: [3-1] user=admin,db=postgres LOG: disconnection: session time: 0:00:00.009 user=admin database=postgres host=10.32.243.158 port=53841
+2014-10-23 14:43:13 CEST [23435]: [9-1] user=admin,db=postgres LOG: disconnection: session time: 0:03:11.742 user=admin database=postgres host=10.32.243.157 port=52915
+2014-10-23 14:43:13 CEST [23438]: [5-1] user=admin,db=postgres LOG: disconnection: session time: 0:03:04.381 user=admin database=postgres host=10.32.243.157 port=52917
+2014-10-23 14:43:13 CEST [24129]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.148 port=54332
+2014-10-23 14:43:13 CEST [24129]: [2-1] user=repmgr,db=repmgr LOG: connection authorized: user=repmgr database=repmgr
+2014-10-23 14:43:13 CEST [24129]: [3-1] user=repmgr,db=repmgr LOG: statement: WITH pg_version(ver) AS (SELECT split_part(version(), ' ', 2)) SELECT split_part(ver, '.', 1), split_part(ver, '.', 2) FROM pg_version
+2014-10-23 14:43:13 CEST [24129]: [4-1] user=repmgr,db=repmgr LOG: duration: 2.850 ms
+2014-10-23 14:43:13 CEST [24129]: [5-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_is_in_recovery()
+2014-10-23 14:43:13 CEST [24129]: [6-1] user=repmgr,db=repmgr LOG: duration: 0.339 ms
+2014-10-23 14:43:13 CEST [24129]: [7-1] user=repmgr,db=repmgr LOG: statement: SELECT id, conninfo FROM "repmgr_pgsql_cluster".repl_nodes WHERE cluster = 'pgsql_cluster' and not witness
+2014-10-23 14:43:13 CEST [24129]: [8-1] user=repmgr,db=repmgr LOG: duration: 2.634 ms
+2014-10-23 14:43:13 CEST [24130]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.148 port=54334
+2014-10-23 14:43:13 CEST [24130]: [2-1] user=repmgr,db=repmgr LOG: connection authorized: user=repmgr database=repmgr
+2014-10-23 14:43:13 CEST [24130]: [3-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_is_in_recovery()
+2014-10-23 14:43:13 CEST [24130]: [4-1] user=repmgr,db=repmgr LOG: duration: 1.347 ms
+2014-10-23 14:43:13 CEST [24129]: [9-1] user=repmgr,db=repmgr LOG: statement: SELECT setting FROM pg_settings WHERE name = 'data_directory'
+2014-10-23 14:43:13 CEST [24130]: [5-1] user=repmgr,db=repmgr LOG: disconnection: session time: 0:00:00.024 user=repmgr database=repmgr host=10.32.243.148 port=54334
+2014-10-23 14:43:13 CEST [24129]: [10-1] user=repmgr,db=repmgr LOG: duration: 4.954 ms
+2014-10-23 14:43:13 CEST [24129]: [11-1] user=repmgr,db=repmgr LOG: disconnection: session time: 0:00:00.067 user=repmgr database=repmgr host=10.32.243.148 port=54332
+2014-10-23 14:43:13 CEST [18021]: [6-1] user=,db= LOG: received fast shutdown request
+2014-10-23 14:43:13 CEST [18021]: [7-1] user=,db= LOG: aborting any active transactions
+2014-10-23 14:43:13 CEST [18032]: [28-1] user=,db= LOG: shutting down
+2014-10-23 14:43:13 CEST [18032]: [29-1] user=,db= LOG: restartpoint starting: shutdown immediate
+</span><span class="gp">2014-10-23 14:43:13 CEST [18032]: [30-1] user=,db= LOG: restartpoint complete: wrote 6 buffers (0.0%);</span><span class="w"> </span>0 transaction log file<span class="o">(</span>s<span class="o">)</span> added, 0 removed, 0 recycled<span class="p">;</span> <span class="nv">write</span><span class="o">=</span>0.002 s, <span class="nb">sync</span><span class="o">=</span>0.002 s, <span class="nv">total</span><span class="o">=</span>0.008 s<span class="p">;</span> <span class="nb">sync </span><span class="nv">files</span><span class="o">=</span>6, <span class="nv">longest</span><span class="o">=</span>0.000 s, <span class="nv">average</span><span class="o">=</span>0.000 s
+<span class="go">2014-10-23 14:43:13 CEST [18032]: [31-1] user=,db= LOG: recovery restart point at 0/61000028
+2014-10-23 14:43:13 CEST [18032]: [32-1] user=,db= DETAIL: last completed transaction was at log time 2014-10-23 14:40:08.829957+02
+2014-10-23 14:43:13 CEST [18032]: [33-1] user=,db= LOG: database system is shut down
+2014-10-23 14:43:14 CEST [24141]: [1-1] user=,db= LOG: database system was shut down in recovery at 2014-10-23 14:43:13 CEST
+</span><span class="gp">2014-10-23 14:43:14 CEST [24141]: [2-1] user=,db= LOG: database system was not properly shut down;</span><span class="w"> </span>automatic recovery <span class="k">in </span>progress
+<span class="go">2014-10-23 14:43:14 CEST [24141]: [3-1] user=,db= LOG: consistent recovery state reached at 0/61000090
+2014-10-23 14:43:14 CEST [24141]: [4-1] user=,db= LOG: record with zero length at 0/61000090
+2014-10-23 14:43:14 CEST [24141]: [5-1] user=,db= LOG: redo is not required
+2014-10-23 14:43:14 CEST [24141]: [6-1] user=,db= LOG: checkpoint starting: end-of-recovery immediate
+</span><span class="gp">2014-10-23 14:43:14 CEST [24141]: [7-1] user=,db= LOG: checkpoint complete: wrote 0 buffers (0.0%);</span><span class="w"> </span>0 transaction log file<span class="o">(</span>s<span class="o">)</span> added, 0 removed, 0 recycled<span class="p">;</span> <span class="nv">write</span><span class="o">=</span>0.002 s, <span class="nb">sync</span><span class="o">=</span>0.000 s, <span class="nv">total</span><span class="o">=</span>0.005 s<span class="p">;</span> <span class="nb">sync </span><span class="nv">files</span><span class="o">=</span>0, <span class="nv">longest</span><span class="o">=</span>0.000 s, <span class="nv">average</span><span class="o">=</span>0.000 s
+<span class="go">2014-10-23 14:43:14 CEST [24145]: [1-1] user=,db= LOG: autovacuum launcher started
+2014-10-23 14:43:14 CEST [24133]: [5-1] user=,db= LOG: database system is ready to accept connections
+2014-10-23 14:43:15 CEST [24148]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=[local]
+2014-10-23 14:43:15 CEST [24148]: [2-1] user=postgres,db=postgres LOG: connection authorized: user=postgres database=postgres
+2014-10-23 14:43:15 CEST [24148]: [3-1] user=postgres,db=postgres LOG: disconnection: session time: 0:00:00.019 user=postgres database=postgres host=[local]
+2014-10-23 14:43:15 CEST [24149]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.148 port=54335
+2014-10-23 14:43:15 CEST [24149]: [2-1] user=repmgr,db=repmgr LOG: connection authorized: user=repmgr database=repmgr
+2014-10-23 14:43:15 CEST [24149]: [3-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_is_in_recovery()
+2014-10-23 14:43:15 CEST [24149]: [4-1] user=repmgr,db=repmgr LOG: duration: 2.252 ms
+2014-10-23 14:43:15 CEST [24149]: [5-1] user=repmgr,db=repmgr LOG: disconnection: session time: 0:00:00.030 user=repmgr database=repmgr host=10.32.243.148 port=54335
+</span></pre></table></code></div></div><h3 id="failover_streamsh-output-log-from-primary-pgpool"><span class="me-2">failover_stream.sh output log from primary pgpool</span><a href="#failover_streamsh-output-log-from-primary-pgpool" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool01 / #</span><span class="w"> </span><span class="nb">cat</span> /tmp/failover_stream.sh.log
+<span class="go">Thu Oct 23 14:43:13 CEST 2014
+Failed node: 0
+</span><span class="gp">+ /usr/bin/ssh -T -l postgres cz01-psql02.example.com '/usr/pgsql-9.3/bin/repmgr -f /var/lib/pgsql/repmgr/repmgr.conf standby promote 2&gt;</span>/dev/null 1&gt;/dev/null
+<span class="go">Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
++ exit 0
+</span></pre></table></code></div></div><h3 id="check-the-cluster-status-after-master-failure"><span class="me-2">Check the cluster status after master failure</span><a href="#check-the-cluster-status-after-master-failure" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh postgres@cz01-psql02.example.com <span class="s2">"/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"</span>
+<span class="go">Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+[2014-10-23 14:49:07] [INFO] repmgr connecting to database
+[2014-10-23 14:49:07] [ERROR] Connection to database failed: could not connect to server: Connection refused
+        Is the server running on host "cz01-psql01.example.com" (10.32.243.147) and accepting
+        TCP/IP connections on port 5432?
+
+Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
+Role      | Connection String
+  FAILED  | host=cz01-psql01.example.com user=repmgr dbname=repmgr
+* master  | host=cz01-psql02.example.com user=repmgr dbname=repmgr
+
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 0
+<span class="go">cz01-psql01.example.com 5432 3 0.500000
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 1
+<span class="go">cz01-psql02.example.com 5432 1 0.500000
+</span></pre></table></code></div></div><h3 id="check-if-everything-is-working"><span class="me-2">Check if everything is working</span><a href="#check-if-everything-is-working" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-c</span> <span class="s2">"drop database mydb"</span>
+<span class="go">DROP DATABASE
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-psql02.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+</pre></table></code></div></div><h3 id="make-the-old-master-to-be-a-new-slave-cz01-psql01"><span class="me-2">Make the “old master” to be a “new slave” cz01-psql01</span><a href="#make-the-old-master-to-be-a-new-slave-cz01-psql01" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh cz01-psql01.example.com <span class="s1">'service postgresql-9.3 stop; su - postgres -c "repmgr -D /var/lib/pgsql/9.3/data -d repmgr -p 5432 -U repmgr -R postgres --verbose --force standby clone cz01-psql02.example.com"; service postgresql-9.3 start;'</span>
+<span class="go">Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+Stopping postgresql-9.3 service: [  OK  ]
+[2014-10-23 14:52:08] [ERROR] Did not find the configuration file './repmgr.conf', continuing
+[2014-10-23 14:52:08] [NOTICE] repmgr Destination directory /var/lib/pgsql/9.3/data provided, try to clone everything in it.
+[2014-10-23 14:52:08] [INFO] repmgr connecting to master database
+[2014-10-23 14:52:08] [INFO] repmgr connected to master, checking its state
+[2014-10-23 14:52:09] [INFO] Successfully connected to primary. Current installation size is 188 MB
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+[2014-10-23 14:52:09] [NOTICE] Starting backup...
+[2014-10-23 14:52:09] [WARNING] directory "/var/lib/pgsql/9.3/data" exists but is not empty
+[2014-10-23 14:52:09] [INFO] standby clone: master control file '/var/lib/pgsql/9.3/data/global/pg_control'
+[2014-10-23 14:52:09] [INFO] standby clone: master control file '/var/lib/pgsql/9.3/data/global/pg_control'
+[2014-10-23 14:52:09] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/global/pg_control /var/lib/pgsql/9.3/data/global'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+pg_control
+</span><span class="gp">        8192 100%    7.81MB/s    0:00:00 (xfer#</span>1, to-check<span class="o">=</span>0/1<span class="o">)</span>
+<span class="go">
+sent 102 bytes  received 236 bytes  676.00 bytes/sec
+total size is 8192  speedup is 24.24
+[2014-10-23 14:52:09] [INFO] standby clone: master data directory '/var/lib/pgsql/9.3/data'
+[2014-10-23 14:52:09] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete --exclude=pg_xlog* --exclude=pg_log* --exclude=pg_control --exclude=*.pid postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/* /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+deleting base/16528/pg_filenode.map
+deleting base/16528/PG_VERSION
+deleting base/16528/12890
+deleting base/16528/12888
+</span><span class="c">...
+...
+...
+</span><span class="go">pg_stat_tmp/db_16413.stat
+</span><span class="gp">        6089 100%  849.47kB/s    0:00:00 (xfer#</span>16, to-check<span class="o">=</span>2/1542<span class="o">)</span>
+<span class="go">pg_stat_tmp/global.stat
+</span><span class="gp">        1026 100%  125.24kB/s    0:00:00 (xfer#</span>17, to-check<span class="o">=</span>1/1542<span class="o">)</span>
+<span class="go">
+sent 3810 bytes  received 94096 bytes  39162.40 bytes/sec
+total size is 198017139  speedup is 2022.52
+[2014-10-23 14:52:11] [INFO] standby clone: master config file '/var/lib/pgsql/9.3/data/postgresql.conf'
+[2014-10-23 14:52:11] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/postgresql.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes  received 80 bytes  60.67 bytes/sec
+total size is 20561  speedup is 225.95
+[2014-10-23 14:52:12] [INFO] standby clone: master hba file '/var/lib/pgsql/9.3/data/pg_hba.conf'
+[2014-10-23 14:52:12] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/pg_hba.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes  received 76 bytes  174.00 bytes/sec
+total size is 4812  speedup is 55.31
+[2014-10-23 14:52:12] [INFO] standby clone: master ident file '/var/lib/pgsql/9.3/data/pg_ident.conf'
+[2014-10-23 14:52:12] [INFO] rsync command line:  'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql02.example.com:/var/lib/pgsql/9.3/data/pg_ident.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes  received 78 bytes  178.00 bytes/sec
+total size is 1636  speedup is 18.38
+[2014-10-23 14:52:12] [NOTICE] Finishing backup...
+NOTICE:  pg_stop_backup complete, all required WAL segments have been archived
+[2014-10-23 14:52:13] [INFO] repmgr requires primary to keep WAL files 000000010000000000000062 until at least 000000010000000000000062
+[2014-10-23 14:52:13] [NOTICE] repmgr standby clone complete
+[2014-10-23 14:52:13] [NOTICE] HINT: You can now start your postgresql server
+[2014-10-23 14:52:13] [NOTICE] for example : pg_ctl -D /var/lib/pgsql/9.3/data start
+Opening configuration file: ./repmgr.conf
+Starting postgresql-9.3 service: [  OK  ]
+</span></pre></table></code></div></div><p>Once the slave has been promoted to master, the DB administrator should check exactly what happened to the failed master database. Once the problem has been analyzed, the administrator should not simply restart the “failed” database but instead reconfigure it as a slave. There is currently a master DB; therefore, every other database needs to be a slave. The command above sets up a new slave with data replication from the running master. Pgpool also needs to be notified that the “new” slave is up and running and ready for read-only queries (the commands will follow). The diagram below shows the current status, and the red color indicates the additional changes.</p><p><a href="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_failed_master_become_slave.svg" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_failed_master_become_slave.svg" alt="Diagram: Failed master become slave" loading="lazy"></a></p><h3 id="logs-right-after-the-new-slave-cz01-psql01-was-configuredstarted"><span class="me-2">Logs right after the new slave cz01-psql01 was configured+started</span><a href="#logs-right-after-the-new-slave-cz01-psql01-was-configuredstarted" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="gp">cz01-psql01 / #</span><span class="w"> </span><span class="nb">cat</span> /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
+<span class="c">...
+</span><span class="gp">2014-10-23 14:52:14 CEST [26707]: [1-1] user=,db= LOG: database system was interrupted;</span><span class="w"> </span>last known up at 2014-10-23 14:52:09 CEST
+<span class="go">2014-10-23 14:52:14 CEST [26707]: [2-1] user=,db= LOG: entering standby mode
+2014-10-23 14:52:14 CEST [26708]: [1-1] user=,db= LOG: started streaming WAL from primary at 0/62000000 on timeline 1
+2014-10-23 14:52:14 CEST [26707]: [3-1] user=,db= LOG: redo starts at 0/62000028
+2014-10-23 14:52:14 CEST [26707]: [4-1] user=,db= LOG: consistent recovery state reached at 0/620000F0
+2014-10-23 14:52:14 CEST [26698]: [5-1] user=,db= LOG: database system is ready to accept read only connections
+</span></pre></table></code></div></div><h3 id="logs-from-cz01-psql02-after-the-new-slave-was-configured"><span class="me-2">Logs from cz01-psql02 after the new slave was configured</span><a href="#logs-from-cz01-psql02-after-the-new-slave-was-configured" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+</pre><td class="rouge-code"><pre><span class="gp">cz01-psql02 / #</span><span class="w"> </span><span class="nb">cat</span> /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
+<span class="c">...
+</span><span class="go">2014-10-23 14:52:08 CEST [25481]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.147 port=52477
+2014-10-23 14:52:08 CEST [25481]: [2-1] user=repmgr,db=repmgr LOG: connection authorized: user=repmgr database=repmgr
+2014-10-23 14:52:08 CEST [25481]: [3-1] user=repmgr,db=repmgr LOG: statement: WITH pg_version(ver) AS (SELECT split_part(version(), ' ', 2)) SELECT split_part(ver, '.', 1), split_part(ver, '.', 2) FROM pg_version
+2014-10-23 14:52:08 CEST [25481]: [4-1] user=repmgr,db=repmgr LOG: duration: 2.790 ms
+2014-10-23 14:52:08 CEST [25481]: [5-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_is_in_recovery()
+2014-10-23 14:52:08 CEST [25481]: [6-1] user=repmgr,db=repmgr LOG: duration: 0.451 ms
+2014-10-23 14:52:08 CEST [25481]: [7-1] user=repmgr,db=repmgr LOG: statement: SELECT true FROM pg_settings WHERE name = 'wal_level' AND setting = 'hot_standby'
+2014-10-23 14:52:09 CEST [25481]: [8-1] user=repmgr,db=repmgr LOG: duration: 7.175 ms
+</span><span class="gp">2014-10-23 14:52:09 CEST [25481]: [9-1] user=repmgr,db=repmgr LOG: statement: SELECT true FROM pg_settings WHERE name = 'wal_keep_segments' AND setting::integer &gt;</span><span class="o">=</span> <span class="s1">'5000'</span>::integer
+<span class="go">2014-10-23 14:52:09 CEST [25481]: [10-1] user=repmgr,db=repmgr LOG: duration: 3.971 ms
+2014-10-23 14:52:09 CEST [25481]: [11-1] user=repmgr,db=repmgr LOG: statement: SELECT true FROM pg_settings WHERE name = 'archive_mode' AND setting = 'on'
+2014-10-23 14:52:09 CEST [25481]: [12-1] user=repmgr,db=repmgr LOG: duration: 3.191 ms
+2014-10-23 14:52:09 CEST [25481]: [13-1] user=repmgr,db=repmgr LOG: statement: SELECT true FROM pg_settings WHERE name = 'hot_standby' AND setting = 'on'
+2014-10-23 14:52:09 CEST [25481]: [14-1] user=repmgr,db=repmgr LOG: duration: 3.147 ms
+2014-10-23 14:52:09 CEST [25481]: [15-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_tablespace_location(oid) spclocation FROM pg_tablespace WHERE spcname NOT IN ('pg_default', 'pg_global')
+2014-10-23 14:52:09 CEST [25481]: [16-1] user=repmgr,db=repmgr LOG: duration: 2.541 ms
+2014-10-23 14:52:09 CEST [25481]: [17-1] user=repmgr,db=repmgr LOG: statement: SELECT name, setting FROM pg_settings WHERE name IN ('data_directory', 'config_file', 'hba_file', 'ident_file', 'stats_temp_directory')
+2014-10-23 14:52:09 CEST [25481]: [18-1] user=repmgr,db=repmgr LOG: duration: 3.842 ms
+2014-10-23 14:52:09 CEST [25481]: [19-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_size_pretty(SUM(pg_database_size(oid))::bigint) FROM pg_database
+2014-10-23 14:52:09 CEST [25481]: [20-1] user=repmgr,db=repmgr LOG: duration: 16.913 ms
+2014-10-23 14:52:09 CEST [25481]: [21-1] user=repmgr,db=repmgr LOG: statement: SET synchronous_commit TO OFF
+2014-10-23 14:52:09 CEST [25481]: [22-1] user=repmgr,db=repmgr LOG: duration: 0.282 ms
+2014-10-23 14:52:09 CEST [25481]: [23-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_xlogfile_name(pg_start_backup('repmgr_standby_clone_1414068729'))
+2014-10-23 14:52:09 CEST [24142]: [3-1] user=,db= LOG: checkpoint starting: force wait
+2014-10-23 14:52:09 CEST [25489]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.158 port=53963
+2014-10-23 14:52:09 CEST [25489]: [2-1] user=admin,db=postgres LOG: connection authorized: user=admin database=postgres
+2014-10-23 14:52:09 CEST [25489]: [3-1] user=admin,db=postgres LOG: disconnection: session time: 0:00:00.008 user=admin database=postgres host=10.32.243.158 port=53963
+2014-10-23 14:52:09 CEST [25490]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.157 port=53120
+2014-10-23 14:52:09 CEST [25490]: [2-1] user=admin,db=template1 LOG: connection authorized: user=admin database=template1
+2014-10-23 14:52:09 CEST [25490]: [3-1] user=admin,db=template1 LOG: disconnection: session time: 0:00:00.008 user=admin database=template1 host=10.32.243.157 port=53120
+</span><span class="gp">2014-10-23 14:52:09 CEST [24142]: [4-1] user=,db= LOG: checkpoint complete: wrote 1 buffers (0.0%);</span><span class="w"> </span>0 transaction log file<span class="o">(</span>s<span class="o">)</span> added, 0 removed, 0 recycled<span class="p">;</span> <span class="nv">write</span><span class="o">=</span>0.002 s, <span class="nb">sync</span><span class="o">=</span>0.000 s, <span class="nv">total</span><span class="o">=</span>0.391 s<span class="p">;</span> <span class="nb">sync </span><span class="nv">files</span><span class="o">=</span>1, <span class="nv">longest</span><span class="o">=</span>0.000 s, <span class="nv">average</span><span class="o">=</span>0.000 s
+<span class="go">2014-10-23 14:52:09 CEST [25481]: [24-1] user=repmgr,db=repmgr LOG: duration: 403.777 ms
+2014-10-23 14:52:11 CEST [25481]: [25-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_tablespace_location(oid) spclocation FROM pg_tablespace WHERE spcname NOT IN ('pg_default', 'pg_global')
+2014-10-23 14:52:11 CEST [25481]: [26-1] user=repmgr,db=repmgr LOG: duration: 0.514 ms
+2014-10-23 14:52:12 CEST [25481]: [27-1] user=repmgr,db=repmgr LOG: statement: SELECT pg_xlogfile_name(pg_stop_backup())
+2014-10-23 14:52:13 CEST [25481]: [28-1] user=repmgr,db=repmgr LOG: duration: 1005.802 ms
+2014-10-23 14:52:13 CEST [25481]: [29-1] user=repmgr,db=repmgr LOG: disconnection: session time: 0:00:04.406 user=repmgr database=repmgr host=10.32.243.147 port=52477
+2014-10-23 14:52:14 CEST [25524]: [1-1] user=[unknown],db=[unknown] LOG: connection received: host=10.32.243.147 port=52484
+2014-10-23 14:52:14 CEST [25524]: [2-1] user=repmgr,db=[unknown] LOG: replication connection authorized: user=repmgr
+</span></pre></table></code></div></div><h3 id="no-pgpool-changes-after-the-new-slave-cz01-psql01-was-configuredstarted"><span class="me-2">No pgpool changes after the new slave cz01-psql01 was configured+started</span><a href="#no-pgpool-changes-after-the-new-slave-cz01-psql01-was-configuredstarted" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool01 / #</span><span class="w"> </span><span class="nb">tail</span> <span class="nt">-f</span> /var/log/local0
+</pre></table></code></div></div><h3 id="check-the-cluster-status-after-failover"><span class="me-2">Check the cluster status after failover</span><a href="#check-the-cluster-status-after-failover" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh postgres@cz01-psql02.example.com <span class="s2">"/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"</span>
+<span class="go">Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+[2014-10-23 14:58:23] [INFO] repmgr connecting to database
+Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
+Role | Connection String
+ standby | host=cz01-psql01.example.com user=repmgr dbname=repmgr
+* master | host=cz01-psql02.example.com user=repmgr dbname=repmgr
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 0
+<span class="go">cz01-psql01.example.com 5432 3 0.500000
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 1
+<span class="go">cz01-psql02.example.com 5432 1 0.500000
+</span></pre></table></code></div></div><h3 id="check-if-everything-is-working-after-reinitialization"><span class="me-2">Check if everything is working after reinitialization</span><a href="#check-if-everything-is-working-after-reinitialization" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-c</span> <span class="s2">"create database mydb"</span>
+<span class="go">CREATE DATABASE
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="go"> mydb | admin | UTF8 | en_US.UTF-8 | en_US.UTF-8 |
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-psql01.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="go"> mydb | admin | UTF8 | en_US.UTF-8 | en_US.UTF-8 |
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-psql02.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="go"> mydb | admin | UTF8 | en_US.UTF-8 | en_US.UTF-8 |
+</span></pre></table></code></div></div><h3 id="reinitialize-the-slave-in-pgpool-to-be-ready-for-read-only-queries"><span class="me-2">Reinitialize the slave in pgpool to be ready for read only queries</span><a href="#reinitialize-the-slave-in-pgpool-to-be-ready-for-read-only-queries" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_detach_node 0 localhost 9898 admin password123 0
+<span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_attach_node 0 localhost 9898 admin password123 0
+</pre></table></code></div></div><h3 id="logfile-right-after-the-slave-was-enabled-for-ro-queries"><span class="me-2">Logfile right after the slave was enabled for RO queries</span><a href="#logfile-right-after-the-slave-was-enabled-for-ro-queries" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool01 / #</span><span class="w"> </span><span class="nb">cat</span> /var/log/local0
+<span class="c">...
+</span><span class="go">2014-10-23T15:55:38.440946+02:00 cz01-pgpool01 pgpool[23264]: send_failback_request: fail back 0 th node request from pid 23264
+2014-10-23T15:55:38.442034+02:00 cz01-pgpool01 pgpool[23257]: wd_start_interlock: start interlocking
+2014-10-23T15:55:38.455732+02:00 cz01-pgpool01 pgpool[23257]: wd_assume_lock_holder: become a new lock holder
+2014-10-23T15:55:38.459908+02:00 cz01-pgpool01 pgpool[23264]: wd_send_response: WD_STAND_FOR_LOCK_HOLDER received but lock holder exists already
+2014-10-23T15:55:38.963952+02:00 cz01-pgpool01 pgpool[23257]: starting fail back. reconnect host cz01-psql01.example.com(5432)
+2014-10-23T15:55:38.970549+02:00 cz01-pgpool01 pgpool[23257]: Do not restart children because we are failbacking node id 0 hostcz01-psql01.example.com port:5432 and we are in streaming replication mode
+2014-10-23T15:55:38.974760+02:00 cz01-pgpool01 pgpool[23257]: find_primary_node_repeatedly: waiting for finding a primary node
+2014-10-23T15:55:39.018890+02:00 cz01-pgpool01 pgpool[23257]: find_primary_node: primary node id is 1
+2014-10-23T15:55:39.024830+02:00 cz01-pgpool01 pgpool[23257]: wd_end_interlock: end interlocking
+2014-10-23T15:55:40.048487+02:00 cz01-pgpool01 pgpool[23257]: failover: set new primary node: 1
+2014-10-23T15:55:40.048514+02:00 cz01-pgpool01 pgpool[23257]: failover: set new master node: 0
+2014-10-23T15:55:40.048520+02:00 cz01-pgpool01 pgpool[23257]: failback done. reconnect host cz01-psql01.example.com(5432)
+2014-10-23T15:55:40.050908+02:00 cz01-pgpool01 pgpool[26165]: worker process received restart request
+2014-10-23T15:55:41.051525+02:00 cz01-pgpool01 pgpool[26164]: pcp child process received restart request
+2014-10-23T15:55:41.056496+02:00 cz01-pgpool01 pgpool[23257]: PCP child 26164 exits with status 256 in failover()
+2014-10-23T15:55:41.056543+02:00 cz01-pgpool01 pgpool[23257]: fork a new PCP child pid 1392 in failover()
+2014-10-23T15:55:41.056565+02:00 cz01-pgpool01 pgpool[23257]: worker child 26165 exits with status 256
+2014-10-23T15:55:41.057839+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 1393
+</span></pre></table></code></div></div><h3 id="check-pgpool-status-the-slave-should-have-a-good-value-now"><span class="me-2">Check pgpool status the slave should have a good value now</span><a href="#check-pgpool-status-the-slave-should-have-a-good-value-now" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 0
+<span class="go">cz01-psql01.example.com 5432 1 0.500000
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 1
+<span class="go">cz01-psql02.example.com 5432 1 0.500000
+</span></pre></table></code></div></div><h3 id="check-if-everything-is-working-fine"><span class="me-2">Check if everything is working fine</span><a href="#check-if-everything-is-working-fine" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-c</span> <span class="s2">"drop database mydb"</span>
+<span class="go">DROP DATABASE
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-psql01.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-psql02.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+</pre></table></code></div></div><h3 id="stop-the-master-db-original-slave---new-master-should-be-promoted"><span class="me-2">Stop the master DB (original slave) - new master should be promoted</span><a href="#stop-the-master-db-original-slave---new-master-should-be-promoted" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh cz01-psql02.example.com <span class="s1">'service postgresql-9.3 stop'</span>
+<span class="go">Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+Stopping postgresql-9.3 service: [ OK ]
+</span></pre></table></code></div></div><p>Here is another example what may happen if original slave server, promoted to new master fails. Again the slave is automatically promoted by pgpool to the new master and “original master” (later slave) is master again. Changes are using blue color in the diagram below.</p><p><a href="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_new_slave-original_master-become_master_again.svg" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_new_slave-original_master-become_master_again.svg" alt="PostgreSQL failover diagram - original master becomes master again" loading="lazy"></a></p><h3 id="logs-right-after-the-master-original-slave-was-stopped"><span class="me-2">Logs right after the master (original slave) was stopped</span><a href="#logs-right-after-the-master-original-slave-was-stopped" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre><td class="rouge-code"><pre><span class="gp">cz01-psql02 / #</span><span class="w"> </span><span class="nb">cat</span> /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
+<span class="c">...
+</span><span class="go">2014-10-23 16:01:30 CEST [24133]: [6-1] user=,db= LOG: received fast shutdown request
+2014-10-23 16:01:30 CEST [24133]: [7-1] user=,db= LOG: aborting any active transactions
+2014-10-23 16:01:30 CEST [1991]: [7-1] user=admin,db=postgres FATAL: terminating connection due to administrator command
+2014-10-23 16:01:30 CEST [1991]: [8-1] user=admin,db=postgres LOG: disconnection: session time: 0:02:13.805 user=admin database=postgres host=10.32.243.157 port=53988
+2014-10-23 16:01:30 CEST [1986]: [7-1] user=admin,db=postgres FATAL: terminating connection due to administrator command
+2014-10-23 16:01:30 CEST [1986]: [8-1] user=admin,db=postgres LOG: disconnection: session time: 0:02:19.271 user=admin database=postgres host=10.32.243.157 port=53982
+2014-10-23 16:01:30 CEST [24145]: [2-1] user=,db= LOG: autovacuum launcher shutting down
+2014-10-23 16:01:30 CEST [24142]: [37-1] user=,db= LOG: shutting down
+2014-10-23 16:01:30 CEST [24142]: [38-1] user=,db= LOG: checkpoint starting: shutdown immediate
+</span><span class="gp">2014-10-23 16:01:30 CEST [24142]: [39-1] user=,db= LOG: checkpoint complete: wrote 1 buffers (0.0%);</span><span class="w"> </span>0 transaction log file<span class="o">(</span>s<span class="o">)</span> added, 0 removed, 0 recycled<span class="p">;</span> <span class="nv">write</span><span class="o">=</span>0.002 s, <span class="nb">sync</span><span class="o">=</span>0.008 s, <span class="nv">total</span><span class="o">=</span>0.449 s<span class="p">;</span> <span class="nb">sync </span><span class="nv">files</span><span class="o">=</span>1, <span class="nv">longest</span><span class="o">=</span>0.008 s, <span class="nv">average</span><span class="o">=</span>0.008 s
+<span class="go">2014-10-23 16:01:30 CEST [24142]: [40-1] user=,db= LOG: database system is shut down
+2014-10-23 16:01:31 CEST [25524]: [3-1] user=repmgr,db=[unknown] LOG: disconnection: session time: 1:09:17.350 user=repmgr database= host=10.32.243.147 port=52484
+</span></pre></table></code></div></div><h3 id="logs-from-pgpool01-after-the-master-was-stopped"><span class="me-2">Logs from pgpool01 after the master was stopped</span><a href="#logs-from-pgpool01-after-the-master-was-stopped" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool01 / #</span><span class="w"> </span><span class="nb">cat</span> /var/log/local0
+<span class="c">...
+</span><span class="go">2014-10-23T16:01:33.199817+02:00 cz01-pgpool01 pgpool[23257]: connect_inet_domain_socket: getsockopt() detected error: Connection refused
+2014-10-23T16:01:33.200803+02:00 cz01-pgpool01 pgpool[23257]: make_persistent_db_connection: connection to cz01-psql02.example.com(5432) failed
+2014-10-23T16:01:33.200989+02:00 cz01-pgpool01 pgpool[23257]: health check failed. 1 th host cz01-psql02.example.com at port 5432 is down
+2014-10-23T16:01:33.201148+02:00 cz01-pgpool01 pgpool[23257]: set 1 th backend down status
+2014-10-23T16:01:33.201280+02:00 cz01-pgpool01 pgpool[23257]: wd_start_interlock: start interlocking
+2014-10-23T16:01:33.207742+02:00 cz01-pgpool01 pgpool[23264]: wd_send_response: WD_STAND_FOR_LOCK_HOLDER received it
+2014-10-23T16:01:33.213943+02:00 cz01-pgpool01 pgpool[23264]: wd_send_response: failover request from other pgpool is canceled because it's while switching
+2014-10-23T16:01:33.229107+02:00 cz01-pgpool01 pgpool[1393]: connect_inet_domain_socket: getsockopt() detected error: Connection refused
+2014-10-23T16:01:33.229133+02:00 cz01-pgpool01 pgpool[1393]: make_persistent_db_connection: connection to cz01-psql02.example.com(5432) failed
+2014-10-23T16:01:33.233566+02:00 cz01-pgpool01 pgpool[1393]: check_replication_time_lag: could not connect to DB node 1, check sr_check_user and sr_check_password
+2014-10-23T16:01:33.716568+02:00 cz01-pgpool01 pgpool[23257]: starting degeneration. shutdown host cz01-psql02.example.com(5432)
+2014-10-23T16:01:33.716597+02:00 cz01-pgpool01 pgpool[23257]: Restart all children
+2014-10-23T16:01:36.720365+02:00 cz01-pgpool01 pgpool[23257]: find_primary_node_repeatedly: waiting for finding a primary node
+2014-10-23T16:01:36.735887+02:00 cz01-pgpool01 pgpool[23257]: find_primary_node: primary node id is 0
+2014-10-23T16:01:36.736038+02:00 cz01-pgpool01 pgpool[23257]: wd_end_interlock: end interlocking
+2014-10-23T16:01:37.243499+02:00 cz01-pgpool01 pgpool[23257]: failover: set new primary node: 0
+2014-10-23T16:01:37.243536+02:00 cz01-pgpool01 pgpool[23257]: failover: set new master node: 0
+2014-10-23T16:01:37.332464+02:00 cz01-pgpool01 pgpool[1393]: worker process received restart request
+2014-10-23T16:01:37.335636+02:00 cz01-pgpool01 pgpool[23257]: failover done. shutdown host cz01-psql02.example.com(5432)
+2014-10-23T16:01:38.338656+02:00 cz01-pgpool01 pgpool[1392]: pcp child process received restart request
+2014-10-23T16:01:38.345478+02:00 cz01-pgpool01 pgpool[23257]: PCP child 1392 exits with status 256 in failover()
+2014-10-23T16:01:38.345510+02:00 cz01-pgpool01 pgpool[23257]: fork a new PCP child pid 2517 in failover()
+2014-10-23T16:01:38.345516+02:00 cz01-pgpool01 pgpool[23257]: worker child 1393 exits with status 256
+2014-10-23T16:01:38.345899+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 2518
+</span></pre></table></code></div></div><h3 id="logs-from-psql01-after-the-master-was-stopped"><span class="me-2">Logs from psql01 after the master was stopped</span><a href="#logs-from-psql01-after-the-master-was-stopped" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre><td class="rouge-code"><pre><span class="gp">cz01-psql01 / #</span><span class="w"> </span><span class="nb">cat</span> /var/lib/pgsql/9.3/data/pg_log/postgresql-Thu.log
+<span class="c">...
+</span><span class="go">2014-10-23 16:01:31 CEST [26708]: [2-1] user=,db= LOG: replication terminated by primary server
+2014-10-23 16:01:31 CEST [26708]: [3-1] user=,db= DETAIL: End of WAL reached on timeline 1 at 0/64000090.
+2014-10-23 16:01:31 CEST [26708]: [4-1] user=,db= FATAL: could not send end-of-streaming message to primary: no COPY in progress
+2014-10-23 16:01:31 CEST [26707]: [5-1] user=,db= LOG: record with zero length at 0/64000090
+</span></pre></table></code></div></div><h3 id="check-status"><span class="me-2">Check status</span><a href="#check-status" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh <span class="nt">-q</span> postgres@cz01-psql01.example.com <span class="s2">"/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"</span>
+<span class="go">[2014-10-23 16:05:16] [INFO] repmgr connecting to database
+Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
+Role | Connection String
+* master | host=cz01-psql01.example.com user=repmgr dbname=repmgr
+ FAILED | host=cz01-psql02.example.com user=repmgr dbname=repmgr
+[2014-10-23 16:05:16] [ERROR] Connection to database failed: could not connect to server: Connection refused
+ Is the server running on host "cz01-psql02.example.com" (10.32.243.148) and accepting
+ TCP/IP connections on port 5432?
+</span></pre></table></code></div></div><h3 id="check-the-functionality"><span class="me-2">Check the functionality</span><a href="#check-the-functionality" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-c</span> <span class="s2">"drop database mydb"</span>
+<span class="go">DROP DATABASE
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-pgpool-ha.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+<span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>psql <span class="nt">--username</span><span class="o">=</span>admin <span class="nt">--dbname</span><span class="o">=</span>postgres <span class="nt">--host</span> cz01-psql01.example.com <span class="nt">-w</span> <span class="nt">-l</span> | <span class="nb">grep </span>mydb
+</pre></table></code></div></div><h3 id="reinitialize-the-stopped-master-to-be-slave-again"><span class="me-2">Reinitialize the stopped master to be slave again</span><a href="#reinitialize-the-stopped-master-to-be-slave-again" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh cz01-psql02.example.com <span class="s1">'service postgresql-9.3 stop; su - postgres -c "repmgr -D /var/lib/pgsql/9.3/data -d repmgr -p 5432 -U repmgr -R postgres --verbose --force standby clone cz01-psql01.example.com"; service postgresql-9.3 start;'</span>
+<span class="go">Warning: Permanently added 'cz01-psql02.example.com,10.32.243.148' (RSA) to the list of known hosts.
+
+Stopping postgresql-9.3 service: [ OK ]
+[2014-10-23 16:07:11] [ERROR] Did not find the configuration file './repmgr.conf', continuing
+[2014-10-23 16:07:11] [NOTICE] repmgr Destination directory /var/lib/pgsql/9.3/data provided, try to clone everything in it.
+[2014-10-23 16:07:11] [INFO] repmgr connecting to master database
+[2014-10-23 16:07:11] [INFO] repmgr connected to master, checking its state
+[2014-10-23 16:07:11] [INFO] Successfully connected to primary. Current installation size is 188 MB
+Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+[2014-10-23 16:07:11] [NOTICE] Starting backup...
+[2014-10-23 16:07:11] [WARNING] directory "/var/lib/pgsql/9.3/data" exists but is not empty
+[2014-10-23 16:07:11] [INFO] standby clone: master control file '/var/lib/pgsql/9.3/data/global/pg_control'
+[2014-10-23 16:07:11] [INFO] standby clone: master control file '/var/lib/pgsql/9.3/data/global/pg_control'
+[2014-10-23 16:07:11] [INFO] rsync command line: 'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql01.example.com:/var/lib/pgsql/9.3/data/global/pg_control /var/lib/pgsql/9.3/data/global'
+Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+receiving incremental file list
+pg_control
+</span><span class="gp"> 8192 100% 7.81MB/s 0:00:00 (xfer#</span>1, to-check<span class="o">=</span>0/1<span class="o">)</span>
+<span class="go">
+sent 102 bytes received 235 bytes 674.00 bytes/sec
+total size is 8192 speedup is 24.31
+[2014-10-23 16:07:12] [INFO] standby clone: master data directory '/var/lib/pgsql/9.3/data'
+[2014-10-23 16:07:12] [INFO] rsync command line: 'rsync --archive --checksum --compress --progress --rsh=ssh --delete --exclude=pg_xlog* --exclude=pg_log* --exclude=pg_control --exclude=*.pid postgres@cz01-psql01.example.com:/var/lib/pgsql/9.3/data/* /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+receiving incremental file list
+backup_label
+</span><span class="gp"> 222 100% 216.80kB/s 0:00:00 (xfer#</span>1, to-check<span class="o">=</span>1239/1241<span class="o">)</span>
+<span class="go">backup_label.old
+</span><span class="gp"> 222 100% 216.80kB/s 0:00:00 (xfer#</span>2, to-check<span class="o">=</span>1238/1241<span class="o">)</span>
+<span class="go">recovery.done
+</span><span class="gp"> 102 100% 99.61kB/s 0:00:00 (xfer#</span>3, to-check<span class="o">=</span>1232/1241<span class="o">)</span>
+<span class="go">base/
+base/1/
+base/1/pg_internal.init
+</span><span class="gp"> 116404 100% 155.93kB/s 0:00:00 (xfer#</span>4, to-check<span class="o">=</span>1225/1490<span class="o">)</span>
+<span class="go">base/12896/
+base/12896/pg_internal.init
+</span><span class="gp"> 116404 100% 153.41kB/s 0:00:00 (xfer#</span>5, to-check<span class="o">=</span>804/1542<span class="o">)</span>
+<span class="go">base/16386/
+base/16386/pg_internal.init
+</span><span class="gp"> 116404 100% 151.97kB/s 0:00:00 (xfer#</span>6, to-check<span class="o">=</span>559/1542<span class="o">)</span>
+<span class="go">base/16413/
+base/16413/pg_internal.init
+</span><span class="gp"> 116404 100% 150.56kB/s 0:00:00 (xfer#</span>7, to-check<span class="o">=</span>301/1542<span class="o">)</span>
+<span class="go">deleting pg_stat/global.stat
+deleting pg_stat/db_16413.stat
+deleting pg_stat/db_16386.stat
+deleting pg_stat/db_12896.stat
+deleting pg_stat/db_1.stat
+deleting pg_stat/db_0.stat
+global/
+global/12789
+</span><span class="gp"> 8192 100% 7.81MB/s 0:00:00 (xfer#</span>8, to-check<span class="o">=</span>30/1542<span class="o">)</span>
+<span class="go">global/12791
+</span><span class="gp"> 16384 100% 15.62MB/s 0:00:00 (xfer#</span>9, to-check<span class="o">=</span>27/1542<span class="o">)</span>
+<span class="go">global/12792
+</span><span class="gp"> 16384 100% 15.62MB/s 0:00:00 (xfer#</span>10, to-check<span class="o">=</span>26/1542<span class="o">)</span>
+<span class="go">global/12892
+</span><span class="gp"> 8192 100% 7.81MB/s 0:00:00 (xfer#</span>11, to-check<span class="o">=</span>17/1542<span class="o">)</span>
+<span class="go">global/12894
+</span><span class="gp"> 16384 100% 15.62MB/s 0:00:00 (xfer#</span>12, to-check<span class="o">=</span>16/1542<span class="o">)</span>
+<span class="go">global/12895
+</span><span class="gp"> 16384 100% 5.21MB/s 0:00:00 (xfer#</span>13, to-check<span class="o">=</span>15/1542<span class="o">)</span>
+<span class="go">global/pg_internal.init
+</span><span class="gp"> 12784 100% 2.44MB/s 0:00:00 (xfer#</span>14, to-check<span class="o">=</span>13/1542<span class="o">)</span>
+<span class="go">pg_clog/0000
+</span><span class="gp"> 8192 100% 1.56MB/s 0:00:00 (xfer#</span>15, to-check<span class="o">=</span>12/1542<span class="o">)</span>
+<span class="go">pg_notify/
+pg_stat/
+pg_stat_tmp/
+pg_stat_tmp/db_0.stat
+</span><span class="gp"> 2540 100% 310.06kB/s 0:00:00 (xfer#</span>16, to-check<span class="o">=</span>6/1542<span class="o">)</span>
+<span class="go">pg_stat_tmp/db_1.stat
+</span><span class="gp"> 1864 100% 227.54kB/s 0:00:00 (xfer#</span>17, to-check<span class="o">=</span>5/1542<span class="o">)</span>
+<span class="go">pg_stat_tmp/db_12896.stat
+</span><span class="gp"> 3047 100% 371.95kB/s 0:00:00 (xfer#</span>18, to-check<span class="o">=</span>4/1542<span class="o">)</span>
+<span class="go">pg_stat_tmp/db_16386.stat
+</span><span class="gp"> 4230 100% 458.98kB/s 0:00:00 (xfer#</span>19, to-check<span class="o">=</span>3/1542<span class="o">)</span>
+<span class="go">pg_stat_tmp/db_16413.stat
+</span><span class="gp"> 6089 100% 660.70kB/s 0:00:00 (xfer#</span>20, to-check<span class="o">=</span>2/1542<span class="o">)</span>
+<span class="go">pg_stat_tmp/global.stat
+</span><span class="gp"> 1026 100% 100.20kB/s 0:00:00 (xfer#</span>21, to-check<span class="o">=</span>1/1542<span class="o">)</span>
+<span class="go">
+sent 5452 bytes received 93077 bytes 65686.00 bytes/sec
+total size is 198017139 speedup is 2009.73
+[2014-10-23 16:07:13] [INFO] standby clone: master config file '/var/lib/pgsql/9.3/data/postgresql.conf'
+[2014-10-23 16:07:13] [INFO] rsync command line: 'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql01.example.com:/var/lib/pgsql/9.3/data/postgresql.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes received 80 bytes 60.67 bytes/sec
+total size is 20561 speedup is 225.95
+[2014-10-23 16:07:14] [INFO] standby clone: master hba file '/var/lib/pgsql/9.3/data/pg_hba.conf'
+[2014-10-23 16:07:14] [INFO] rsync command line: 'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql01.example.com:/var/lib/pgsql/9.3/data/pg_hba.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes received 76 bytes 174.00 bytes/sec
+total size is 4812 speedup is 55.31
+[2014-10-23 16:07:14] [INFO] standby clone: master ident file '/var/lib/pgsql/9.3/data/pg_ident.conf'
+[2014-10-23 16:07:14] [INFO] rsync command line: 'rsync --archive --checksum --compress --progress --rsh=ssh --delete postgres@cz01-psql01.example.com:/var/lib/pgsql/9.3/data/pg_ident.conf /var/lib/pgsql/9.3/data'
+Warning: Permanently added 'cz01-psql01.example.com,10.32.243.147' (RSA) to the list of known hosts.
+
+receiving incremental file list
+
+sent 11 bytes received 78 bytes 178.00 bytes/sec
+total size is 1636 speedup is 18.38
+[2014-10-23 16:07:14] [NOTICE] Finishing backup...
+NOTICE: pg_stop_backup complete, all required WAL segments have been archived
+[2014-10-23 16:07:15] [INFO] repmgr requires primary to keep WAL files 000000010000000000000065 until at least 000000010000000000000065
+[2014-10-23 16:07:15] [NOTICE] repmgr standby clone complete
+[2014-10-23 16:07:15] [NOTICE] HINT: You can now start your postgresql server
+[2014-10-23 16:07:15] [NOTICE] for example : pg_ctl -D /var/lib/pgsql/9.3/data start
+Opening configuration file: ./repmgr.conf
+Starting postgresql-9.3 service: [ OK ]
+</span></pre></table></code></div></div><p>Again - after the db administrator find out the cause why master went down he needs to initialize the failed master as a slave (by running command above). Then everything is like before the testing - original master/slave state. The green color is used for showing up the changes in the diagram.</p><p><a href="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_make_original_slave-failed_master-to_become_slave_again.svg" class="popup img-link shimmer"><img src="https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/postgresql_pgpool_repmgr/diagram_make_original_slave-failed_master-to_become_slave_again.svg" alt="PostgreSQL failover diagram - failed master becomes slave again" loading="lazy"></a></p><h3 id="check-cluster-status-after-recovery"><span class="me-2">Check cluster status after recovery</span><a href="#check-cluster-status-after-recovery" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh <span class="nt">-q</span> postgres@cz01-psql02.example.com <span class="s2">"/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"</span>
+<span class="go">[2014-10-23 16:08:23] [INFO] repmgr connecting to database
+Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
+Role | Connection String
+* master | host=cz01-psql01.example.com user=repmgr dbname=repmgr
+ standby | host=cz01-psql02.example.com user=repmgr dbname=repmgr
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 0
+<span class="go">cz01-psql01.example.com 5432 1 0.500000
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 1
+<span class="go">cz01-psql02.example.com 5432 3 0.500000
+</span></pre></table></code></div></div><h3 id="re-enable-the-slave-to-be-able-to-receive-read-only-requests"><span class="me-2">Re-enable the slave to be able to receive read-only requests</span><a href="#re-enable-the-slave-to-be-able-to-receive-read-only-requests" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_detach_node 0 localhost 9898 admin password123 1
+<span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_attach_node 0 localhost 9898 admin password123 1
+</pre></table></code></div></div><h3 id="logs-right-after-reenabling-the-slave-again"><span class="me-2">Logs right after reenabling the slave again</span><a href="#logs-right-after-reenabling-the-slave-again" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool01 / #</span><span class="w"> </span><span class="nb">cat</span> /var/log/local0
+<span class="c">...
+</span><span class="go">2014-10-23T16:09:06.675035+02:00 cz01-pgpool01 pgpool[23264]: send_failback_request: fail back 1 th node request from pid 23264
+2014-10-23T16:09:06.675868+02:00 cz01-pgpool01 pgpool[23257]: wd_start_interlock: start interlocking
+2014-10-23T16:09:06.691133+02:00 cz01-pgpool01 pgpool[23257]: wd_assume_lock_holder: become a new lock holder
+2014-10-23T16:09:06.698706+02:00 cz01-pgpool01 pgpool[23264]: wd_send_response: WD_STAND_FOR_LOCK_HOLDER received but lock holder exists already
+2014-10-23T16:09:07.200639+02:00 cz01-pgpool01 pgpool[23257]: starting fail back. reconnect host cz01-psql02.example.com(5432)
+2014-10-23T16:09:07.205234+02:00 cz01-pgpool01 pgpool[23257]: Do not restart children because we are failbacking node id 1 hostcz01-psql02.example.com port:5432 and we are in streaming replication mode
+2014-10-23T16:09:07.209510+02:00 cz01-pgpool01 pgpool[23257]: find_primary_node_repeatedly: waiting for finding a primary node
+2014-10-23T16:09:07.225224+02:00 cz01-pgpool01 pgpool[23257]: find_primary_node: primary node id is 0
+2014-10-23T16:09:07.228223+02:00 cz01-pgpool01 pgpool[23257]: wd_end_interlock: end interlocking
+2014-10-23T16:09:08.244875+02:00 cz01-pgpool01 pgpool[23257]: failover: set new primary node: 0
+2014-10-23T16:09:08.244902+02:00 cz01-pgpool01 pgpool[23257]: failover: set new master node: 0
+2014-10-23T16:09:08.244908+02:00 cz01-pgpool01 pgpool[23257]: failback done. reconnect host cz01-psql02.example.com(5432)
+2014-10-23T16:09:08.247112+02:00 cz01-pgpool01 pgpool[2518]: worker process received restart request
+2014-10-23T16:09:09.248473+02:00 cz01-pgpool01 pgpool[2517]: pcp child process received restart request
+2014-10-23T16:09:09.252461+02:00 cz01-pgpool01 pgpool[23257]: PCP child 2517 exits with status 256 in failover()
+2014-10-23T16:09:09.252492+02:00 cz01-pgpool01 pgpool[23257]: fork a new PCP child pid 3080 in failover()
+2014-10-23T16:09:09.252499+02:00 cz01-pgpool01 pgpool[23257]: worker child 2518 exits with status 256
+2014-10-23T16:09:09.253362+02:00 cz01-pgpool01 pgpool[23257]: fork a new worker child pid 3081
+</span></pre></table></code></div></div><h3 id="final-cluster-status-verification"><span class="me-2">Final cluster status verification</span><a href="#final-cluster-status-verification" class="anchor text-muted"><i class="fas fa-hashtag"></i></a></h3><div class="language-console highlighter-rouge"><div class="code-header"> <span data-label-text="Console"><i class="fas fa-code fa-fw small"></i></span> <button aria-label="copy" data-title-succeed="Copied!"><i class="far fa-clipboard"></i></button></div><div class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre><td class="rouge-code"><pre><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>ssh <span class="nt">-q</span> postgres@cz01-psql02.example.com <span class="s2">"/usr/pgsql-9.3/bin/repmgr --verbose -f /var/lib/pgsql/repmgr/repmgr.conf cluster show"</span>
+<span class="go">[2014-10-23 16:10:33] [INFO] repmgr connecting to database
+Opening configuration file: /var/lib/pgsql/repmgr/repmgr.conf
+Role | Connection String
+* master | host=cz01-psql01.example.com user=repmgr dbname=repmgr
+ standby | host=cz01-psql02.example.com user=repmgr dbname=repmgr
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 0
+<span class="go">cz01-psql01.example.com 5432 1 0.500000
+</span><span class="gp">cz01-pgpool02 ~ #</span><span class="w"> </span>pcp_node_info 1 localhost 9898 admin password123 1
+<span class="go">cz01-psql02.example.com 5432 1 0.500000
+</span></pre></table></code></div></div><p>Huuh… It was a lot of copy &amp; paste work. Anyway it’s here if somebody needs it ;-)</p></div><div class="post-tail-wrapper text-muted"><div class="post-meta mb-3"> <i class="far fa-folder-open fa-fw me-1"></i> <a href="/categories/linux/">Linux</a>, <a href="/categories/storage/">Storage</a>, <a href="/categories/linux-xvx-cz/">linux.xvx.cz</a></div><div class="post-tags"> <i class="fa fa-tags fa-fw me-1"></i> <a href="/tags/database/" class="post-tag no-text-decoration" >database</a> <a href="/tags/load-balancer/" class="post-tag no-text-decoration" >load-balancer</a></div><div class=" post-tail-bottom d-flex justify-content-between align-items-center mt-5 pb-2 " ><div class="license-wrapper"> This post is licensed under <a href="https://creativecommons.org/licenses/by/4.0/"> CC BY 4.0 </a> by the author.</div><div class="share-wrapper d-flex align-items-center"> <span class="share-label text-muted">Share</span> <span class="share-icons"> <a href="https://twitter.com/intent/tweet?text=Loadbalancing%20of%20PostgreSQL%20databases%20using%20pgpool-II%20and%20repmgr%20-%20Petr's%20Blog&url=https%3A%2F%2Fruzickap.github.io%2Fposts%2Floadbalancing-of-postgresql-databases-using-pgpool-ii-and-repmgr%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Twitter" aria-label="Twitter"> <i class="fa-fw fa-brands fa-square-x-twitter"></i> </a> <a href="https://www.facebook.com/sharer/sharer.php?title=Loadbalancing%20of%20PostgreSQL%20databases%20using%20pgpool-II%20and%20repmgr%20-%20Petr's%20Blog&u=https%3A%2F%2Fruzickap.github.io%2Fposts%2Floadbalancing-of-postgresql-databases-using-pgpool-ii-and-repmgr%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Facebook" aria-label="Facebook"> <i class="fa-fw fab fa-facebook-square"></i> </a> <a href="https://www.linkedin.com/sharing/share-offsite/?url=https%3A%2F%2Fruzickap.github.io%2Fposts%2Floadbalancing-of-postgresql-databases-using-pgpool-ii-and-repmgr%2F" target="_blank" rel="noopener" data-bs-toggle="tooltip" data-bs-placement="top" title="Linkedin" aria-label="Linkedin"> <i class="fa-fw fab fa-linkedin"></i> </a> <script defer type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/share-to-mastodon/+esm"></script> <button class="btn text-start" data-bs-toggle="tooltip" data-bs-placement="top" title="Mastodon" aria-label="Mastodon"> <share-to-mastodon class="share-mastodon" message="Loadbalancing%20of%20PostgreSQL%20databases%20using%20pgpool-II%20and%20repmgr%20-%20Petr's%20Blog" url="https%3A%2F%2Fruzickap.github.io%2Fposts%2Floadbalancing-of-postgresql-databases-using-pgpool-ii-and-repmgr%2F"customInstanceList="[{&quot;label&quot;:&quot;mastodon.social&quot;,&quot;link&quot;:&quot;https://mastodon.social/&quot;},{&quot;label&quot;:&quot;mastodon.online&quot;,&quot;link&quot;:&quot;https://mastodon.online/&quot;},{&quot;label&quot;:&quot;fosstodon.org&quot;,&quot;link&quot;:&quot;https://fosstodon.org/&quot;},{&quot;label&quot;:&quot;photog.social&quot;,&quot;link&quot;:&quot;https://photog.social/&quot;}]" > <i class="fa-fw fa-brands fa-mastodon"></i> </share-to-mastodon> </button> <button id="copy-link" aria-label="Copy link" class="btn small" data-bs-toggle="tooltip" data-bs-placement="top" title="Copy link" data-title-succeed="Link copied successfully!" > <i class="fa-fw fas fa-link pe-none fs-6"></i> </button> </span></div></div></div></article></main><aside aria-label="Panel" id="panel-wrapper" class="col-xl-3 ps-2 text-muted"><div class="access"><section id="access-lastmod"><h2 class="panel-heading">Recently Updated</h2><ul class="content list-unstyled ps-0 pb-1 ms-1 mt-2"><li class="text-truncate lh-lg"> <a href="/posts/installtion-f5-bigip-virtual-edition-to-rhel7/">Installation F5 BIGIP Virtual Edition to RHEL7</a><li class="text-truncate lh-lg"> <a href="/posts/detect-a-hacker-attacks-eks-vm/">Detect the hacker attacks on Amazon EKS and EC2 instances</a><li class="text-truncate lh-lg"> <a href="/posts/secure-cheap-amazon-eks-auto/">Build secure and cheap Amazon EKS Auto Mode</a><li class="text-truncate lh-lg"> <a href="/posts/eks-auto-cert-manager-velero/">Amazon EKS Auto Mode with cert-manager and Velero</a><li class="text-truncate lh-lg"> <a href="/posts/mcp-servers-k8s/">MCP Servers running on Kubernetes</a></ul></section><section><h2 class="panel-heading">Trending Tags</h2><div class="d-flex flex-wrap mt-3 mb-1 me-3"> <a class="post-tag btn btn-outline-primary" href="/tags/kubernetes/">kubernetes</a> <a class="post-tag btn btn-outline-primary" href="/tags/amazon-eks/">amazon-eks</a> <a class="post-tag btn btn-outline-primary" href="/tags/security/">security</a> <a class="post-tag btn btn-outline-primary" href="/tags/cert-manager/">cert-manager</a> <a class="post-tag btn btn-outline-primary" href="/tags/eksctl/">eksctl</a> <a class="post-tag btn btn-outline-primary" href="/tags/bash/">bash</a> <a class="post-tag btn btn-outline-primary" href="/tags/pxe/">pxe</a> <a class="post-tag btn btn-outline-primary" href="/tags/wifi/">wifi</a> <a class="post-tag btn btn-outline-primary" href="/tags/prometheus/">prometheus</a> <a class="post-tag btn btn-outline-primary" href="/tags/automation/">automation</a></div></section></div><div class="toc-border-cover z-3"></div><section id="toc-wrapper" class="invisible position-sticky ps-0 pe-4 pb-4"><h2 class="panel-heading ps-3 pb-2 mb-0">Contents</h2><nav id="toc"></nav></section></aside></div><div class="row"><div id="tail-wrapper" class="col-12 col-lg-11 col-xl-9 px-md-4"><aside id="related-posts" aria-labelledby="related-label"><h3 class="mb-4" id="related-label">Further Reading</h3><nav class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4 mb-4"><article class="col"> <a href="/posts/perl-oracle-client-manual-installation-to-home-directory-in-debian/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1268780400" data-df="ll" > Mar 17, 2010 </time><h4 class="pt-0 my-2">Perl Oracle client manual installation to home directory in Debian</h4><div class="text-muted"><p>Install Perl DBD::Oracle and Oracle Instant Client into a home directory on Debian without root access</p></div></div></a></article><article class="col"> <a href="/posts/installtion-f5-bigip-virtual-edition-to-rhel7/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1419289200" data-df="ll" > Dec 23, 2014 </time><h4 class="pt-0 my-2">Installation F5 BIGIP Virtual Edition to RHEL7</h4><div class="text-muted"><p>Installation F5 BIGIP Virtual Edition to RHEL7</p></div></div></a></article><article class="col"> <a href="/posts/debian-wi-fi-hotspot-using-coovachilli-freeradius-mysql-and-daloradius/" class="post-preview card h-100"><div class="card-body"> <time data-ts="1269385200" data-df="ll" > Mar 24, 2010 </time><h4 class="pt-0 my-2">Debian Wi-Fi hotspot using CoovaChilli, FreeRadius, MySQL and daloRADIUS</h4><div class="text-muted"><p>Build a Wi-Fi captive portal hotspot on Debian using CoovaChilli, FreeRadius, MySQL, and daloRADIUS</p></div></div></a></article></nav></aside><nav class="post-navigation d-flex justify-content-between" aria-label="Post Navigation"> <a href="/posts/vmware-vcenter-server-5x-appliance-instalation-and-configuration-using-ssh-command-line/" class="btn btn-outline-primary" aria-label="Older" ><p>VMware vCenter Server 5.x Appliance installation and configuration using ssh command line</p></a> <a href="/posts/installtion-f5-bigip-virtual-edition-to-rhel7/" class="btn btn-outline-primary" aria-label="Newer" ><p>Installation F5 BIGIP Virtual Edition to RHEL7</p></a></nav><footer aria-label="Site Info" class=" d-flex flex-column justify-content-center text-muted flex-lg-row justify-content-lg-between align-items-lg-center pb-lg-3 " ><p>© <time>2026</time> <a href="https://twitter.com/Ruzicka_Petr">Petr Ruzicka</a>. <span data-bs-toggle="tooltip" data-bs-placement="top" title="Except where otherwise noted, the blog posts on this site are licensed under the Creative Commons Attribution 4.0 International (CC BY 4.0) License by the author." >Some rights reserved.</span></p><p>Using the <a data-bs-toggle="tooltip" data-bs-placement="top" title="v7.4.1" href="https://github.com/cotes2020/jekyll-theme-chirpy" target="_blank" rel="noopener" >Chirpy</a> theme for <a href="https://jekyllrb.com" target="_blank" rel="noopener">Jekyll</a>.</p></footer></div></div><div id="search-result-wrapper" class="d-flex justify-content-center d-none"><div class="col-11 content"><div id="search-hints"><section><h2 class="panel-heading">Trending Tags</h2><div class="d-flex flex-wrap mt-3 mb-1 me-3"> <a class="post-tag btn btn-outline-primary" href="/tags/kubernetes/">kubernetes</a> <a class="post-tag btn btn-outline-primary" href="/tags/amazon-eks/">amazon-eks</a> <a class="post-tag btn btn-outline-primary" href="/tags/security/">security</a> <a class="post-tag btn btn-outline-primary" href="/tags/cert-manager/">cert-manager</a> <a class="post-tag btn btn-outline-primary" href="/tags/eksctl/">eksctl</a> <a class="post-tag btn btn-outline-primary" href="/tags/bash/">bash</a> <a class="post-tag btn btn-outline-primary" href="/tags/pxe/">pxe</a> <a class="post-tag btn btn-outline-primary" href="/tags/wifi/">wifi</a> <a class="post-tag btn btn-outline-primary" href="/tags/prometheus/">prometheus</a> <a class="post-tag btn btn-outline-primary" href="/tags/automation/">automation</a></div></section></div><div id="search-results" class="d-flex flex-wrap justify-content-center text-muted mt-3"></div></div></div></div><aside aria-label="Scroll to Top"> <button id="back-to-top" type="button" class="btn btn-lg btn-box-shadow"> <i class="fas fa-angle-up"></i> </button></aside></div><div id="mask" class="d-none position-fixed w-100 h-100 z-1"></div><aside id="notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-animation="true" data-bs-autohide="false" ><div class="toast-header"> <button type="button" class="btn-close ms-auto" data-bs-dismiss="toast" aria-label="Close" ></button></div><div class="toast-body text-center pt-0"><p class="px-2 mb-3">A new version of content is available.</p><button type="button" class="btn btn-primary" aria-label="Update"> Update </button></div></aside><script> (function () { const themeMapper = Theme.getThemeMapper('light', 'dark_dimmed'); const initTheme = themeMapper[Theme.visualState]; let lang = 'en';if (lang.length > 2 && !lang.startsWith('zh')) { lang = lang.slice(0, 2); } let giscusAttributes = { src: 'https://giscus.app/client.js', 'data-repo': 'ruzickap/ruzickap.github.io', 'data-repo-id': 'R_kgDOGkp4nQ', 'data-category': 'General', 'data-category-id': 'DIC_kwDOGkp4nc4CSdu1', 'data-mapping': 'pathname', 'data-strict' : '0', 'data-reactions-enabled': '1', 'data-emit-metadata': '0', 'data-theme': initTheme, 'data-input-position': 'bottom', 'data-lang': lang, 'data-loading': 'lazy', crossorigin: 'anonymous', async: '' }; let giscusNode = document.createElement('script'); Object.entries(giscusAttributes).forEach(([key, value]) => giscusNode.setAttribute(key, value) ); const $footer = document.querySelector('footer'); $footer.insertAdjacentElement("beforebegin", giscusNode); addEventListener('message', (event) => { if (event.source === window && event.data && event.data.id === Theme.ID) { const newTheme = themeMapper[Theme.visualState]; const message = { setConfig: { theme: newTheme } }; const giscus = document.getElementsByClassName('giscus-frame')[0].contentWindow; giscus.postMessage({ giscus: message }, 'https://giscus.app'); } }); })(); </script> <script> document.addEventListener('DOMContentLoaded', () => { SimpleJekyllSearch({ searchInput: document.getElementById('search-input'), resultsContainer: document.getElementById('search-results'), json: '/assets/js/data/search.json', searchResultTemplate: '<article class="px-1 px-sm-2 px-lg-4 px-xl-0"><header><h2><a href="{url}">{title}</a></h2><div class="post-meta d-flex flex-column flex-sm-row text-muted mt-1 mb-1"> {categories} {tags}</div></header><p>{content}</p></article>', noResultsText: '<p class="mt-5">Oops! No results found.</p>', templateMiddleware: function(prop, value, template) { if (prop === 'categories') { if (value === '') { return `${value}`; } else { return `<div class="me-sm-4"><i class="far fa-folder fa-fw"></i>${value}</div>`; } } if (prop === 'tags') { if (value === '') { return `${value}`; } else { return `<div><i class="fa fa-tag fa-fw"></i>${value}</div>`; } } } }); }); </script>

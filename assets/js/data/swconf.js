@@ -1,0 +1,1 @@
+const swconf = { cacheName: 'chirpy-1771519034',resources: [ '/assets/css/jekyll-theme-chirpy.css', '/', '/categories/', '/tags/', '/archives/', '/projects/', '/about/', ], interceptor: {paths: [ ],urlPrefixes: [ 'https://ruzickap-github-io.goatcounter.com/counter/' ] }, purge: false };
