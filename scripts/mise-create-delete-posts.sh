@@ -18,7 +18,7 @@ export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER
 : "${RUN_FILE:="${TMP_DIR}/${1//[:|]/_}.sh"}"
 
 # For the GH Actions which already has the role assumed
-CURRENT_ROLE_ARN=$(aws sts get-caller-identity --query Arn --output text 2>/dev/null || true)
+CURRENT_ROLE_ARN=$(aws sts get-caller-identity --query Arn --output text 2> /dev/null || true)
 if [[ ! "${CURRENT_ROLE_ARN}" =~ ${AWS_ROLE_TO_ASSUME##*/} ]]; then
   eval "$(aws sts assume-role --role-arn "${AWS_ROLE_TO_ASSUME}" --role-session-name "$USER@${HOSTNAME}-$(date +%s)" --duration-seconds 7200 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
   [[ "${GITHUB_ACTIONS:-}" == "true" ]] && echo -e "::add-mask::${AWS_ACCESS_KEY_ID}\n::add-mask::${AWS_SECRET_ACCESS_KEY}\n::add-mask::${AWS_SESSION_TOKEN}"
