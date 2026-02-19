@@ -1918,6 +1918,7 @@ kind delete cluster --name "kind-${CLUSTER_NAME}-cleanup"
 Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
+set +e
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
   for FILE in \
     "${TMP_DIR}/${CLUSTER_FQDN}"/{helm_values-ack.yml,helm_values-velero.yml,kubeconfig-${CLUSTER_NAME}.conf,velero-kro-ack-restore.yaml} \
@@ -1931,6 +1932,7 @@ if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
   done
   rmdir "${TMP_DIR}/${CLUSTER_FQDN}" "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap" "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup"
 fi
+set -e
 ```
 
 Enjoy your self-managed EKS cluster with ACK and kro! 😉
