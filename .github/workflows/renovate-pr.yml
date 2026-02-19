@@ -45,7 +45,7 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@e0021407031f5be11a464abee9a0776171c79891 # v47.0.1
+        uses: tj-actions/changed-files@7dee1b0c1557f278e5c7dc244927139d78c0e22a # v47.0.4
         with:
           files: "_posts/**"
           # Use comma separator for Renovate's RENOVATE_INCLUDE_PATHS (expects comma-separated or JSON array)
@@ -60,7 +60,7 @@ jobs:
 
       - name: 💡 Self-hosted Renovate
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: renovatebot/github-action@8b7941943a108b2cc2150730963164aa8baeab8c # v44.2.2
+        uses: renovatebot/github-action@d65ef9e20512193cc070238b49c3873a361cd50c # v46.1.1
         env:
           RENOVATE_INCLUDE_PATHS: ${{ steps.changed-files.outputs.all_changed_files }}
         with:
