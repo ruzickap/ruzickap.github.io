@@ -2,7 +2,7 @@
 title: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind
 author: Petr Ruzicka
 date: 2026-01-26
-description: Use Kind cluster with AWS Controllers for Kubernetes (ACK) and Kubernetes Resource Orchestrator (kro) to bootstrap self-managed EKS cluster
+description: Use a Kind cluster with AWS Controllers for Kubernetes (ACK) and Kubernetes Resource Orchestrator (kro) to bootstrap a self-managed EKS cluster
 categories: [Kubernetes, Cloud]
 tags: [ack, amazon-eks, eks-auto-mode, kind, kro, kubernetes, velero]
 mermaid: true
@@ -13,9 +13,10 @@ This post demonstrates how to use a temporary Kind cluster with [AWS Controllers
 for Kubernetes (ACK)](https://aws-controllers-k8s.github.io/community/) and
 [Kubernetes Resource Orchestrator (kro)](https://kro.run/) to bootstrap
 a production EKS Auto Mode Cluster that manages itself. The process involves
-creating AWS resources including S3 bucket and EKS Auto Mode Clusters using
-native Kubernetes APIs, backing up those resources with Velero, and restoring
-them to the new EKS Auto Mode Cluster - effectively making it self-managed.
+creating AWS resources including an S3 bucket and an EKS Auto Mode Cluster
+using native Kubernetes APIs, backing up those resources with Velero, and
+restoring them to the new EKS Auto Mode Cluster — effectively making it
+self-managed.
 
 ## Requirements
 
@@ -314,7 +315,7 @@ EOF
 
 ### Create S3 Bucket with ACK and kro
 
-First, create a RGD that defines how to create an S3 bucket with proper
+First, create an RGD that defines how to create an S3 bucket with proper
 policies:
 
 ```bash
@@ -1406,7 +1407,7 @@ kubectl wait --for=jsonpath='{.status.state}'=Active resourcegraphdefinition/eks
 
 #### Create EKS Auto Mode Cluster Instance
 
-Now create a single instance that provisions EKS cluster using the expanded
+Now create a single instance that provisions the EKS cluster using the expanded
 combined RGD:
 
 ```bash
@@ -1472,10 +1473,10 @@ EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/helm_values-velero.yml" velero vmware-tanzu/velero
 ```
 
-Create a Velero backup for kro and ACK resources. Use resource filtering with
-API group wildcards to capture `kro.run` objects (cluster-scoped RGDs and
-namespaced instances) and `services.k8s.aws` objects (ACK-managed AWS
-resources), scoped to `kro-system`:
+Create a Velero backup for kro and ACK resources. Use resource filtering
+with API group wildcards to capture `kro.run` objects (cluster-scoped RGDs
+and namespaced instances) and `services.k8s.aws` objects (ACK-managed AWS
+resources), all scoped to the `kro-system` namespace:
 
 ```bash
 tee "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/velero-kro-ack-backup.yaml" << EOF | kubectl apply -f -
@@ -1512,7 +1513,7 @@ cluster and make it self-managing:
    (all with zero replicas to prevent premature reconciliation)
 1. Restore the Velero backup so that kro and ACK resources appear with their
    existing AWS resource ARNs intact
-1. Scale controllers back up -- they adopt existing AWS resources instead of
+1. Scale controllers back up — they adopt existing AWS resources instead of
    creating duplicates
 1. Delete the Kind bootstrap cluster
 
@@ -1527,7 +1528,7 @@ aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAM
 
 ### Install kro on EKS Auto Mode Cluster
 
-Install kro on the EKS Auto Mode cluster with zero replicas — the same approach
+Install kro on the EKS Auto Mode Cluster with zero replicas — the same approach
 used for ACK below. kro's CRDs are registered but the controller does not
 reconcile until after the Velero restore completes:
 
@@ -1728,7 +1729,7 @@ kubectl delete restore kro-ack-restore -n velero
 The EKS Auto Mode cluster is now managing its own infrastructure through kro and
 ACK resources that were migrated from the Kind cluster.
 
-Remove the bootstrap kind cluster:
+Remove the bootstrap Kind cluster:
 
 ```bash
 kind delete cluster --name "kind-${CLUSTER_NAME}-bootstrap"
