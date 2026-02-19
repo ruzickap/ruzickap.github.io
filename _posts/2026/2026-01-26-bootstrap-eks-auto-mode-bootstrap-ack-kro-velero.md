@@ -6,7 +6,6 @@ description: Use Kind cluster with AWS Controllers for Kubernetes (ACK) and Kube
 categories: [Kubernetes, Cloud]
 tags: [ack, amazon-eks, eks-auto-mode, kind, kro, kubernetes, velero]
 mermaid: true
-# image: https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.png
 image: https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg
 ---
 
@@ -33,12 +32,12 @@ it self-managed.
 The bootstrap process follows these steps:
 
 1. Deploy Kind cluster locally
-2. Install kro and ACK controllers on Kind cluster
-3. Use ACK + kro to provision EKS Auto Mode Cluster and S3 bucket
-4. Install Velero on Kind cluster and backup kro + ACK resources
-5. Install kro, ACK controllers, and Velero on EKS Auto Mode Cluster
-6. Restore kro and ACK resources to EKS Auto Mode Cluster
-7. Delete Kind cluster - EKS Auto Mode Cluster now manages itself
+1. Install kro and ACK controllers on Kind cluster
+1. Use ACK + kro to provision EKS Auto Mode Cluster and S3 bucket
+1. Install Velero on Kind cluster and backup kro + ACK resources to S3 bucket
+1. Install kro, ACK controllers, and Velero on EKS Auto Mode Cluster
+1. Restore kro and ACK resources to EKS Auto Mode Cluster
+1. Delete Kind cluster - EKS Auto Mode Cluster now manages itself
 
 ```mermaid
 flowchart TD
@@ -119,7 +118,7 @@ the EKS Auto Mode Cluster along with all supporting AWS resources.
 
 ![Kind logo](https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b101bafcb4620942d8c66571/logo/logo.svg){:width="300"}
 
-Create the Kind cluster:
+Create the [Kind](https://kind.sigs.k8s.io/) cluster:
 
 ```bash
 kind create cluster --name "kind-${CLUSTER_NAME}-bootstrap" --kubeconfig "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kubeconfig-kind-${CLUSTER_NAME}-bootstrap.yaml"
@@ -128,7 +127,7 @@ export KUBECONFIG="${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kubeconfig-kind-${C
 
 ### Install kro on Kind Cluster
 
-Install kro using Helm:
+Install [kro](https://kro.run/) using Helm:
 
 ```bash
 # renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro
@@ -153,7 +152,7 @@ aws_role_to_assume=${AWS_ROLE_TO_ASSUME}"
 set -x
 ```
 
-Install ACK controllers (S3, IAM, EKS, EC2, KMS, CloudWatch Logs):
+Install [ACK controllers](https://aws-controllers-k8s.github.io/docs/) (S3, IAM, EKS, EC2, KMS, CloudWatch Logs):
 
 ```bash
 # renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart
@@ -202,10 +201,9 @@ helm upgrade --install --version=${ACK_HELM_CHART_VERSION} --namespace ack-syste
 
 ### Create EKS Auto Mode Cluster with ACK and kro
 
-Create an EKS Auto Mode Cluster using kro
-ResourceGraphDefinitions. This approach uses
-ResourceGraphDefinitions for the EKS Auto Mode Cluster
-itself.
+Create an [EKS Auto Mode Cluster](https://aws.amazon.com/eks/auto-mode/) using
+kro ResourceGraphDefinitions. This approach uses ResourceGraphDefinitions
+for the EKS Auto Mode Cluster itself.
 
 #### Add KMS Key ResourceGraphDefinition
 
@@ -317,8 +315,8 @@ EOF
 
 ### Create S3 Bucket with ACK and kro
 
-First, create a ResourceGroup that defines how to create an S3 bucket with
-proper policies:
+First, create a RGD that defines how to create an S3
+bucket with proper policies:
 
 ```bash
 tee "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kro-s3bucket-rgd.yaml" << 'EOF' | kubectl apply -f -
@@ -697,8 +695,8 @@ EOF
 
 #### Add Pod Identity Associations ResourceGraphDefinition
 
-Create a ResourceGraphDefinition for Pod Identity Associations that sets up
-Velero and ACK controller permissions:
+Create a RGD for [Pod Identity Associations](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
+that sets up Velero and ACK controller permissions:
 
 ```bash
 tee "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kro-podidentityassociations-rgd.yaml" << 'EOF' | kubectl apply -f -
@@ -1131,7 +1129,7 @@ EOF
 
 #### Add EKS Auto Mode Cluster ResourceGraphDefinition
 
-Create the EKS Auto Mode Cluster ResourceGraphDefinition:
+Create the EKS Auto Mode Cluster RGD:
 
 ```bash
 tee "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kro-eks-auto-mode-cluster-rgd.yaml" << 'EOF' | kubectl apply -f -
@@ -1410,7 +1408,7 @@ kubectl wait --for=jsonpath='{.status.state}'=Active resourcegraphdefinition/eks
 #### Create EKS Auto Mode Cluster Instance
 
 Now create a single instance that provisions EKS cluster using the expanded
-combined ResourceGraphDefinition:
+combined RGD:
 
 ```bash
 tee "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/kro-eks-auto-mode-cluster.yaml" << EOF | kubectl apply -f -
@@ -1504,7 +1502,7 @@ EOF
 
 ## Migrate Bootstrap Resources to EKS Auto Mode Cluster
 
-![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="300"}
+![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="350"}
 
 At this point the Kind cluster has done its job: the EKS Auto Mode
 Cluster is running in AWS, the S3 bucket exists, and a Velero backup
@@ -1531,9 +1529,9 @@ aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAM
 
 ### Install kro on EKS Auto Mode Cluster
 
-Install kro on the EKS Auto Mode cluster with zero replicas — the
-same approach used for ACK below. kro's CRDs are registered but the
-controller does not reconcile until after the Velero restore completes:
+Install kro on the EKS Auto Mode cluster with zero replicas — the same approach
+used for ACK below. kro's CRDs are registered but the controller does not
+reconcile until after the Velero restore completes:
 
 ```bash
 # renovate: datasource=docker depName=registry.k8s.io/kro/charts/kro
@@ -1543,16 +1541,14 @@ helm upgrade --install --namespace kro-system --create-namespace --set deploymen
 
 ### Install ACK Controllers on EKS Auto Mode Cluster
 
-Install ACK controllers with `deployment.replicas: 0` so the
-controllers install their CRDs but do not start reconciling.
-This prevents a race condition during the Velero restore: Velero
-restores CRs in two steps (create without status, then patch
-`/status`). If ACK controllers are running during the create step,
-they see a CR with no ARN in `.status.ackResourceMetadata` and
-attempt to create new AWS resources - duplicating ones that already
-exist. Deploying with zero replicas eliminates this window; the
-controllers are scaled back up after the restore completes and all
-status fields are in place:
+Install ACK controllers with `deployment.replicas: 0` so the controllers install
+their CRDs but do not start reconciling. This prevents a race condition during
+the Velero restore: Velero restores CRs in two steps (create without status,
+then patch `/status`). If ACK controllers are running during the create step,
+they see a CR with no ARN in `.status.ackResourceMetadata` and attempt to create
+new AWS resources - duplicating ones that already exist. Deploying with zero
+replicas eliminates this window; the controllers are scaled back up after the
+restore completes and all status fields are in place:
 
 ```bash
 # renovate: datasource=github-tags depName=aws-controllers-k8s/ack-chart
@@ -1631,8 +1627,8 @@ EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" velero vmware-tanzu/velero
 ```
 
-Wait for the `kro-ack-backup` to appear in the Velero backup list (synced
-from the S3 bucket):
+Wait for the `kro-ack-backup` to appear in the Velero backup list (synced from
+the S3 bucket):
 
 ```bash
 while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
@@ -1643,12 +1639,8 @@ done
 
 ### Restore kro and ACK Resources to EKS
 
-ACK controllers are already running with zero replicas (set during
-Helm install above), so no additional scaling is needed before the
-restore.
-
-Create restore from backup with `existingResourcePolicy: update`
-as a safety net for re-runs:
+Create restore from backup with `existingResourcePolicy: update` as a safety net
+for re-runs:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/velero-kro-ack-restore.yaml" << EOF | kubectl apply -f -
@@ -1659,7 +1651,7 @@ metadata:
   namespace: velero
 spec:
   backupName: kro-ack-backup
-  existingResourcePolicy: update
+  #############3333333333333# existingResourcePolicy: update
   restoreStatus:
     includedResources:
       - "*"
