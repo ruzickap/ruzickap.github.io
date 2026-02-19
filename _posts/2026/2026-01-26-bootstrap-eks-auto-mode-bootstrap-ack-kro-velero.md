@@ -12,11 +12,11 @@ image: https://raw.githubusercontent.com/kubernetes-sigs/kind/ccfe8997a77ec9b8b1
 This post demonstrates how to use a temporary Kind cluster with [AWS Controllers
 for Kubernetes (ACK)](https://aws-controllers-k8s.github.io/community/) and
 [Kubernetes Resource Orchestrator (kro)](https://kro.run/) to bootstrap
-a production EKS Auto Mode Cluster that manages itself. The process involves
-creating AWS resources including an S3 bucket and an EKS Auto Mode Cluster
-using native Kubernetes APIs, backing up those resources with Velero, and
-restoring them to the new EKS Auto Mode Cluster — effectively making it
-self-managed.
+a [EKS Auto Mode Cluster](https://aws.amazon.com/eks/auto-mode/) that manages
+itself. The process involves creating AWS resources including an
+[S3 bucket](https://aws.amazon.com/s3/) and an EKS Auto Mode Cluster using
+native Kubernetes APIs, backing up those resources with Velero, and restoring
+them to the new EKS Auto Mode Cluster — effectively making it self-managed.
 
 ## Requirements
 
@@ -1739,8 +1739,7 @@ kind delete cluster --name "kind-${CLUSTER_NAME}-bootstrap"
 
 ![Cleanup](https://raw.githubusercontent.com/xprateek/Lazycons_Pro/e805250e2471efb1882f108086be779957469bbf/svgs/ram_cleanup.svg){:width="150"}
 
-To delete all resources, you must empty the S3 bucket before deletion since ACK
-does not support force-deleting non-empty buckets:
+Define environment variables and workspace paths for cleanup tasks:
 
 ```sh
 export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
