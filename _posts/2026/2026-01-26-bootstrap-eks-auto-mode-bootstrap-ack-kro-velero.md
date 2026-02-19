@@ -1504,7 +1504,7 @@ EOF
 
 ## Migrate Bootstrap Resources to EKS Auto Mode Cluster
 
-![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="200"}
+![EKS logo](https://raw.githubusercontent.com/nightmareze1/eks-terraform/52038e91fba097db6346737557fa3a9e9a5d827e/img/amazon-eks-logo.png){:width="300"}
 
 At this point the Kind cluster has done its job: the EKS Auto Mode
 Cluster is running in AWS, the S3 bucket exists, and a Velero backup
@@ -1906,7 +1906,7 @@ conflict between Velero's restore and kro's Server-Side Apply
 prevents kro from cleaning it up automatically, which would
 cause the delete to hang indefinitely:
 
-```bash
+```sh
 # Workaround: after Velero restore, Server-Side Apply field ownership prevents
 # KRO from removing its own finalizer from the S3Bucket CR. The finalizer is
 # owned by Velero's field manager, so KRO's SSA patch silently fails to remove
