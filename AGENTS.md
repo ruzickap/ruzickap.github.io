@@ -1,243 +1,147 @@
 # AI Agent Guidelines
 
-Personal blog built with Jekyll and Chirpy theme. This guide helps AI agents
-work effectively with blog posts, infrastructure testing, and code quality.
+## Overview
 
-## Quick Reference
+Jekyll blog (Chirpy theme) deployed to GitHub Pages / Cloudflare Pages.
+Primary content: Markdown blog posts with executable shell code blocks
+tested as E2E integration tests against AWS EKS clusters.
 
-```bash
-# Build Jekyll site
-bundle install && bundle exec jekyll build --destination public
-
-# Test a single blog post (creates AWS resources)
-mise run create:2026-01-13-amazon-eks-grafana-stack
-
-# Clean up test resources
-mise run delete:2026-01-13-amazon-eks-grafana-stack
-
-# Get EKS cluster access (run once per session)
-eval "$(mise run a)"
-
-# Run all linters locally
-mega-linter-runner --remove-container --env VALIDATE_ALL_CODEBASE=true
-
-# Run pre-commit hooks
-pre-commit run --all-files
-```
-
-## Build & Development
-
-### Local Jekyll Build
+## Build / Lint / Test Commands
 
 ```bash
-# Install dependencies
+# Install Ruby dependencies
 bundle install
 
-# Build site
+# Build the Jekyll site
 bundle exec jekyll build --destination public
 
-# Validate HTML
-bundle exec htmlproofer public --disable-external
-```
+# Test built site (HTML validation, internal links)
+bundle exec htmlproofer public \
+  --disable-external \
+  --ignore-urls "/127.0.0.1/,/0.0.0.0/,/localhost/,/.local/"
 
-### Docker Build
-
-```bash
-docker run --rm -it --volume="${PWD}:/mnt" --workdir /mnt ubuntu bash -c '
-  apt update && apt install build-essential git ruby-bundler ruby-dev -y &&
-  git config --global --add safe.directory /mnt &&
-  bundle install && jekyll build --destination public
-'
-```
-
-### Environment Requirements
-
-- Ruby 3.4.8
-- Jekyll theme: `jekyll-theme-chirpy ~> 7.4`
-- Dependencies: See `Gemfile`
-
-## Testing
-
-### Single Post Testing
-
-Blog posts contain executable code blocks. Use `mise` to test them:
-
-```bash
-# Test individual post
-mise run create:YYYY-MM-DD-post-title
-
-# Test with dependencies (runs prerequisites first)
-mise run "create:2023-04-01-post|2022-11-27-prerequisite"
-
-# Clean up resources
-mise run delete:YYYY-MM-DD-post-title
-```
-
-### Code Block Conventions (CRITICAL)
-
-Code block language identifiers determine test execution:
-
-- **`bash`** - Commands executed during resource **creation** (GitHub Actions)
-- **`sh`** - Commands executed during resource **deletion/cleanup**
-- **`shell`** - Display-only commands, **NOT executed** in tests
-
-Example:
-
-````markdown
-```bash
-# This RUNS during create tests
-export CLUSTER_NAME="test-cluster"
-```
-
-```shell
-# This is SHOWN but NOT executed
-kubectl get pods
-```
-
-```sh
-# This RUNS during delete tests
-eksctl delete cluster --name="${CLUSTER_NAME}"
-```
-````
-
-### EKS Access
-
-When testing EKS-related posts, get cluster access once per session:
-
-```bash
-eval "$(mise run a)"
-```
-
-This assumes AWS IAM role and configures `KUBECONFIG`.
-
-## Linting & Quality
-
-### Pre-commit Hooks
-
-All commits must pass (enforced with `fail_fast: true`):
-
-- **Markdown**: `rumdl` (Rust-based, MD041 disabled for frontmatter)
-- **Shell**: `shellcheck` (SC2317 excluded), `shfmt` (2-space indent)
-- **YAML**: `yamllint` (relaxed mode, no line-length limit)
-- **Security**: `gitleaks`, `wizcli-scan-dir-secrets`
-- **Formatting**: `prettier` (excludes `.md`, `_config.yml`)
-- **Commits**: `commitizen`, `gitlint` (conventional commits, 80 char limit)
-
-### MegaLinter
-
-Runs comprehensive validation:
-
-```bash
+# Run MegaLinter (shellcheck, shfmt, rumdl, lychee, checkov, etc.)
 mega-linter-runner --remove-container \
   --container-name="mega-linter" \
   --env VALIDATE_ALL_CODEBASE=true
+
+# Run a single post E2E test (requires AWS credentials + mise)
+mise run "create:<post-date-slug>"
+mise run "delete:<post-date-slug>"
+
+# Run all post E2E tests
+mise run "create-delete:posts:all"
+
+# Individual linters
+actionlint                                            # GH Actions
+rumdl file.md                                         # Markdown
+shellcheck script.sh                                  # Shell lint
+shfmt --case-indent --indent 2 --space-redirects file # Shell fmt
+lychee --root-dir . --verbose file.md                 # Links
 ```
 
-**Enabled**: shellcheck, shfmt, rumdl, yamllint, jsonlint, prettier, lychee
-**Disabled**: markdownlint (using rumdl), cspell, jscpd, terrascan
+## Repository Structure
 
-**Excluded files**: `CHANGELOG.md`
+- `_posts/YYYY/` -- Blog posts (Markdown with YAML front matter)
+- `_tabs/` -- Navigation pages (about, archives, categories, tags)
+- `_data/` -- Site data (authors, contact, share config)
+- `_plugins/` -- Jekyll Ruby plugins
+- `assets/img/` -- Images (favicons, per-post `.avif` files)
+- `scripts/` -- Shell scripts for testing and project generation
+- `mise.toml` -- Tool versions and E2E test task definitions
+- `.github/workflows/` -- CI/CD workflow files
 
-## Code Style Guidelines
+## Blog Post Conventions
 
-### Blog Post Structure
+Every post requires YAML front matter with: `title`, `author`, `date`,
+`description`, `categories` (array), `tags` (array), `image`.
+File naming: `_posts/YYYY/YYYY-MM-DD-slug-title.md`
 
-**Filename**: `_posts/YYYY/YYYY-MM-DD-kebab-case-title.md`
+### Code Block Language Tags (Critical)
 
-**Required frontmatter**:
+Code blocks in posts drive the E2E test system:
 
-```yaml
----
-title: Post Title Here
-author: Petr Ruzicka
-date: YYYY-MM-DD
-description: SEO-friendly description
-categories: [Category1, Category2]
-tags: [lowercase-tag, another-tag]
-image: https://example.com/image.png  # Optional
----
-```
+- `` ```bash `` -- Executed during **create** (provisioning)
+- `` ```shell `` -- **Display only**, never executed
+- `` ```sh `` -- Executed during **delete** (cleanup/teardown)
 
-**Categories**: Title Case, broad domains (Kubernetes, Cloud, Security, Linux)
-**Tags**: lowercase, hyphen-separated (amazon-eks, cert-manager, bash)
+## Shell Scripts
 
-### Markdown Formatting
+- **Shebang**: `#!/usr/bin/env bash`
+- **Strict mode**: `set -euo pipefail` (or `set -euxo pipefail`)
+- **Variables**: UPPERCASE with braces: `${MY_VARIABLE}`
+- **Required var checks**: `: "${VAR:?Error: VAR is not set!}"`
+- **Defaults**: `${VAR:-default_value}`
+- **Linting**: Must pass `shellcheck` (SC2317 excluded)
+- **Formatting**: `shfmt --case-indent --indent 2 --space-redirects`
+- **Indentation**: 2 spaces, no tabs
 
-- **Line length**: 80 characters max (prose wrapped with `--prose-wrap always`)
-- **Headings**: Proper hierarchy, no skipped levels, no trailing periods
-- **Code fences**: Always include language identifier
-- **Links**: Line breaks allowed in long URLs for readability
+## Markdown Files
 
-### Shell Scripts
+- Must pass `rumdl` checks (MD036 and MD041 disabled globally)
+- Wrap lines at 72 characters
+- Use proper heading hierarchy (no skipped levels)
+- Include language identifiers in all code fences
+- Shell code blocks inside Markdown are extracted and validated
+  by `shellcheck` and `shfmt` during CI
+- Use Chirpy admonitions: `{: .prompt-info }`, `{: .prompt-tip }`,
+  `{: .prompt-warning }`, `{: .prompt-danger }`
 
-**Header**:
+## JSON Files
 
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-```
+- Must pass `jsonlint --comments` validation
+- `.devcontainer/devcontainer.json` is excluded from linting
 
-**Formatting** (enforced by `shfmt`):
+## Terraform Files
 
-- 2-space indentation (`--indent 2`)
-- Space before redirects (`--space-redirects`)
-- Case indentation enabled (`--case-indent`)
+- Must pass `tflint`, `checkov`, `kics`, and `trivy` scans
+- Only HIGH/CRITICAL severity issues fail the build
 
-**Variable conventions**:
+## GitHub Actions
 
-```bash
-# Environment variables: UPPER_CASE
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+- **Pin actions** to full SHA commits, not tags
+- **Permissions**: `permissions: read-all` default; grant only
+  what is needed per job
+- **Validate** every workflow change with `actionlint`
+- **Runner**: Prefer `ubuntu-24.04-arm` for cost efficiency
 
-# Required variables
-: "${AWS_ACCESS_KEY_ID:?Error: AWS_ACCESS_KEY_ID not set!}"
+## Security and Link Scanning
 
-# Parameter expansion for defaults
-TMP_DIR="${TMP_DIR:-${PWD}}"
-```
-
-**Error handling**:
-
-```bash
-# Exit on error (set -e)
-# Fail on undefined variables (set -u)
-# Fail on pipe errors (set -o pipefail)
-
-# Conditional execution
-[[ "${CONDITION}" == "true" ]] && command
-
-# Directory checks
-[[ ! -d "${TMP_DIR}" ]] && mkdir -v "${TMP_DIR}"
-```
+CI runs: Checkov (`CKV_GHA_7` skipped), DevSkim (DS162092/DS137138
+ignored), KICS (HIGH only), Trivy (HIGH/CRITICAL, ignores unfixed),
+Gitleaks, Secretlint. Link checking via `lychee` (config in
+`lychee.toml`); accepts 200/429; caching enabled; excludes template
+variables, shell variables, private IPs, `CHANGELOG.md`.
 
 ## Version Control
 
 ### Commit Messages
 
-Format: `<type>: <description>` (max 80 chars, imperative mood, lowercase)
-
-**Types**: feat, fix, docs, chore, refactor, test, style, perf, ci, build
-
-**Example**:
-
-```markdown
-feat: add eks auto mode testing guide
-
-- Implement automated cluster creation
-- Add cleanup procedures
-- Include cost optimization tips
-```
+- **Format**: `<type>: <description>` (conventional commits)
+- **Types**: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`,
+  `style`, `perf`, `ci`, `build`, `revert`
+- **Subject**: imperative mood, lowercase, no period, max 72 chars
+- **Body**: wrap at 72 chars, explain what and why
+- **References**: use `Fixes`, `Closes`, or `Resolves` keywords
 
 ### Branching
 
-Follow [Conventional Branch](https://conventional-branch.github.io/) spec:
-
-- `feat/123-add-feature-name`
-- `fix/456-resolve-bug`
-- Use kebab-case, include issue number when applicable
+[Conventional Branch](https://conventional-branch.github.io/) format:
+`feature/`, `feat/`, `bugfix/`, `fix/`, `hotfix/`, `release/`,
+`chore/`. Lowercase, hyphens only, no consecutive/leading/trailing
+hyphens.
 
 ### Pull Requests
 
-- Create as **draft** initially
-- Title: conventional commit format
-- Link issues: `Fixes #123`, `Closes #456`
+- Always create as **draft** initially
+- Title must follow conventional commit format
+- Include clear description and link related issues
+
+## Quality Checklist
+
+- [ ] Two spaces for indentation (no tabs)
+- [ ] Shell code blocks pass `shellcheck` and `shfmt`
+- [ ] Markdown passes `rumdl`
+- [ ] Links are valid (`lychee`)
+- [ ] Actions pinned to SHA; validated with `actionlint`
+- [ ] Atomic, focused commits with conventional messages
