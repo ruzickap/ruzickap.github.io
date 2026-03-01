@@ -33,11 +33,11 @@ mise run "delete:<post-date-slug>"
 mise run "create-delete:posts:all"
 
 # Individual linters
-actionlint                                              # GH Actions
-rumdl <file.md>                                         # Markdown
-shellcheck <script.sh>                                  # Shell lint
-shfmt --case-indent --indent 2 --space-redirects <file> # Shell fmt
-lychee --root-dir . --verbose <file.md>                 # Links
+actionlint                                            # GH Actions
+rumdl file.md                                         # Markdown
+shellcheck script.sh                                  # Shell lint
+shfmt --case-indent --indent 2 --space-redirects file # Shell fmt
+lychee --root-dir . --verbose file.md                 # Links
 ```
 
 ## Repository Structure
