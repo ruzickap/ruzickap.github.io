@@ -6,7 +6,7 @@
 ##############################################################################
 [tools]
 # keep-sorted start
-"ubi:aws-cloudformation/rain" = "1.24.2"
+"ubi:aws-cloudformation/rain" = "1.24.3"
 "ubi:harehare/mq" = "0.5.15"
 aws = "2.26.2"
 aws-copilot = "1.34.1"
