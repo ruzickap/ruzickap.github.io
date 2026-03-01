@@ -623,6 +623,33 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes)
 
+### [container-image-scans](https://github.com/ruzickap/container-image-scans)
+
+- Description: Container image scans
+- Topics: container, container-image, container-security, cve, image, public,
+  security, vulnerability
+
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/container-image-scans.svg?style=social)](https://github.com/ruzickap/container-image-scans/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/container-image-scans.svg?style=social)](https://github.com/ruzickap/container-image-scans/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/container-image-scans.svg?style=social)](https://github.com/ruzickap/container-image-scans)
+
+- CI/CD status:
+
+- Issue tracking:
+
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/pulls)
+
+- Repository:
+
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/container-image-scans/latest)](https://github.com/ruzickap/container-image-scans/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans)
+
 ### [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
 - Description: Notes from Amazon EKS Bottlerocket and Fargate testing
