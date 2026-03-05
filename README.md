@@ -12,7 +12,10 @@ Personal blog and website built with Jekyll using the Chirpy theme.
 [**ruzickap.github.io**](https://ruzickap.github.io/)
 
 - Main Page: <https://ruzickap.github.io>
+
 - Dev Page: <https://ruzickap-github-io.pages.dev>
+
+- [DeepWiki](https://deepwiki.com/ruzickap/ruzickap.github.io)
 
 ## Categories and Tags
 
