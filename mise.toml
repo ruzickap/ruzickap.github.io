@@ -22,23 +22,16 @@ yq = "4.52.5"
 
 ##############################################################################
 # Plugins
-##############################################################################
 [plugins]
 fnox-env = "https://github.com/jdx/mise-env-fnox"
-
-##############################################################################
 # Global Settings
-##############################################################################
 [settings]
 jobs = 1
 trusted_config_paths = ["/"]
-
-##############################################################################
 # Environment Variables
-##############################################################################
 [env]
 _.fnox-env = { tools = true }
-# _.file = { path = ".env.yaml", redact = true }
+_.file = { path = ".env.yaml", redact = true }
 FORCE_COLOR = 1
 
 ##############################################################################
@@ -268,11 +261,13 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 # Amazon EKS with Argo CD
 #------------------------------------------------------------------------------
 [tasks."create:2026-03-04-eks-argocd"]
-description = 'Create: Amazon EKS with Argo CD'
+description = 'Delete: Amazon EKS with Argo CD capability'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2026-03-04-eks-argocd"]
-description = 'Delete: Amazon EKS with Argo CD'
+# Amazon EKS with Argo CD capability
+[tasks."create:2026-03-04-eks-capabilities-argocd"]
+[tasks."delete:2026-03-04-eks-capabilities-argocd"]
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
