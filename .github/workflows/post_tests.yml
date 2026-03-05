@@ -75,7 +75,8 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install mise and dependencies
-        env:
+        uses: jdx/mise-action@v3
+        with:
           # renovate: datasource=github-releases depName=jdx/mise
           MISE_VERSION: 2026.4.6
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
