@@ -94,7 +94,7 @@ environment variables, such as:
 
 ```bash
 # AWS Region
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 # Cluster Name: k02
@@ -162,37 +162,37 @@ cat > "${TMP_DIR}/kind-${CLUSTER_NAME}-bootstrap/helm_values-ack.yml" << EOF
 eks:
   enabled: true
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 ec2:
   enabled: true
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 iam:
   enabled: true
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 kms:
   enabled: true
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 cloudwatchlogs:
   enabled: true
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 s3:
   enabled: true
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 EOF
@@ -1419,7 +1419,7 @@ metadata:
   namespace: kro-system
 spec:
   name: ${CLUSTER_NAME}
-  region: ${AWS_DEFAULT_REGION}
+  region: ${AWS_REGION}
   accountId: "${AWS_ACCOUNT_ID}"
   adminRoleARN: "${AWS_ROLE_TO_ASSUME%/*}/admin"
   s3BucketName: ${CLUSTER_FQDN}
@@ -1459,7 +1459,7 @@ configuration:
       bucket: ${CLUSTER_FQDN}
       prefix: velero
       config:
-        region: ${AWS_DEFAULT_REGION}
+        region: ${AWS_REGION}
 credentials:
   useSecret: true
   secretContents:
@@ -1523,7 +1523,7 @@ Update kubeconfig for the new EKS Auto Mode cluster:
 
 ```bash
 export KUBECONFIG="${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf"
-aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
+aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
 ### Install kro on EKS Auto Mode Cluster
@@ -1559,37 +1559,37 @@ eks:
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
 ec2:
   enabled: true
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
 iam:
   enabled: true
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
 kms:
   enabled: true
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
 cloudwatchlogs:
   enabled: true
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
 s3:
   enabled: true
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
 EOF
 helm upgrade --install --version=${ACK_HELM_CHART_VERSION} --namespace ack-system --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-ack.yml" ack oci://public.ecr.aws/aws-controllers-k8s/ack-chart
 ```
@@ -1620,7 +1620,7 @@ configuration:
       bucket: ${CLUSTER_FQDN}
       prefix: velero
       config:
-        region: ${AWS_DEFAULT_REGION}
+        region: ${AWS_REGION}
 snapshotsEnabled: false
 EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" velero vmware-tanzu/velero
@@ -1742,7 +1742,7 @@ kind delete cluster --name "kind-${CLUSTER_NAME}-bootstrap"
 Define environment variables and workspace paths for cleanup tasks:
 
 ```sh
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
@@ -1791,7 +1791,7 @@ eks:
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 ec2:
@@ -1799,7 +1799,7 @@ ec2:
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 iam:
@@ -1807,7 +1807,7 @@ iam:
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 kms:
@@ -1815,7 +1815,7 @@ kms:
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 cloudwatchlogs:
@@ -1823,7 +1823,7 @@ cloudwatchlogs:
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 s3:
@@ -1831,7 +1831,7 @@ s3:
   deployment:
     replicas: 0
   aws:
-    region: ${AWS_DEFAULT_REGION}
+    region: ${AWS_REGION}
     credentials:
       secretName: aws-credentials
 EOF
@@ -1862,7 +1862,7 @@ configuration:
       bucket: ${CLUSTER_FQDN}
       prefix: velero
       config:
-        region: ${AWS_DEFAULT_REGION}
+        region: ${AWS_REGION}
 credentials:
   useSecret: true
   secretContents:

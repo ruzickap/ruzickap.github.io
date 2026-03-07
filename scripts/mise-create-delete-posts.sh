@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # AWS Region
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Cluster Name: k01
@@ -57,13 +57,13 @@ mq "select(.code.lang == \"${MQ_CODE_BLOCK}\") | to_text()" "${POST_FILES_ARRAY[
 
 if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
   if eksctl get clusters --name="${CLUSTER_NAME}" && [[ "${1%:*}" = "delete" ]]; then
-    aws eks update-kubeconfig --region "${AWS_DEFAULT_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
+    aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
   fi
   (
     echo "😇 <https://${CLUSTER_FQDN}>"
     echo '```'
     echo "export CLUSTER_NAME=\"${CLUSTER_NAME}\""
-    echo "export AWS_DEFAULT_REGION=\"${AWS_DEFAULT_REGION}\""
+    echo "export AWS_REGION=\"${AWS_REGION}\""
     echo "eval \"\$(mise run a)\""
     echo '```'
   ) | tee "${GITHUB_STEP_SUMMARY}"

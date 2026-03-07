@@ -57,7 +57,7 @@ few environment variables, such as:
 
 ```bash
 # AWS Region
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Base Domain: k8s.mylabs.dev
@@ -78,7 +78,7 @@ Confirm that all essential variables have been properly configured:
 
 ```bash
 : "${AWS_ACCESS_KEY_ID?}"
-: "${AWS_DEFAULT_REGION?}"
+: "${AWS_REGION?}"
 : "${AWS_SECRET_ACCESS_KEY?}"
 : "${AWS_ROLE_TO_ASSUME?}"
 : "${GOOGLE_CLIENT_ID?}"
@@ -396,13 +396,13 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
-  region: ${AWS_DEFAULT_REGION}
+  region: ${AWS_REGION}
   tags:
     karpenter.sh/discovery: ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
-  - ${AWS_DEFAULT_REGION}a
-  - ${AWS_DEFAULT_REGION}b
+  - ${AWS_REGION}a
+  - ${AWS_REGION}b
 accessConfig:
   accessEntries:
     - principalARN: arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/admin
@@ -496,7 +496,7 @@ managedNodeGroups:
     instanceType: t4g.medium
     desiredCapacity: 2
     availabilityZones:
-      - ${AWS_DEFAULT_REGION}a
+      - ${AWS_REGION}a
     minSize: 2
     maxSize: 3
     volumeSize: 20
@@ -778,7 +778,7 @@ spec:
           values: ["4095"]
         - key: "topology.kubernetes.io/zone"
           operator: In
-          values: ["${AWS_DEFAULT_REGION}a"]
+          values: ["${AWS_REGION}a"]
         - key: karpenter.k8s.aws/instance-family
           operator: In
           values: ["t4g", "t3a"]
@@ -915,12 +915,12 @@ configuration:
       bucket: ${CLUSTER_FQDN}
       prefix: velero
       config:
-        region: ${AWS_DEFAULT_REGION}
+        region: ${AWS_REGION}
   volumeSnapshotLocation:
     - name:
       provider: aws
       config:
-        region: ${AWS_DEFAULT_REGION}
+        region: ${AWS_REGION}
 serviceAccount:
   server:
     name: velero
@@ -1219,8 +1219,8 @@ mimir:
       storage:
         backend: s3
         s3:
-          endpoint: s3.${AWS_DEFAULT_REGION}.amazonaws.com
-          region: ${AWS_DEFAULT_REGION}
+          endpoint: s3.${AWS_REGION}.amazonaws.com
+          region: ${AWS_REGION}
           storage_class: ONEZONE_IA
     alertmanager_storage:
       s3:
@@ -1444,7 +1444,7 @@ loki:
       ruler: ${CLUSTER_FQDN}
       admin: ${CLUSTER_FQDN}
     s3:
-      region: ${AWS_DEFAULT_REGION}
+      region: ${AWS_REGION}
   schemaConfig:
     configs:
       - from: 2024-04-01
@@ -1456,7 +1456,7 @@ loki:
           period: 24h
   storage_config:
     aws:
-      region: ${AWS_DEFAULT_REGION}
+      region: ${AWS_REGION}
       bucketnames: ${CLUSTER_FQDN}
   limits_config:
     retention_period: 1w
@@ -1515,7 +1515,7 @@ tempo:
       backend: s3
       s3:
         bucket: ${CLUSTER_FQDN}
-        endpoint: s3.${AWS_DEFAULT_REGION}.amazonaws.com
+        endpoint: s3.${AWS_REGION}.amazonaws.com
 serviceMonitor:
   enabled: true
 affinity:
