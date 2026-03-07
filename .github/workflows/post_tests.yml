@@ -42,7 +42,7 @@ on:
         default: k01.k8s.mylabs.dev
 
 env:
-  AWS_DEFAULT_REGION: us-east-1
+  AWS_REGION: us-east-1
   AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -67,7 +67,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 7200
           role-session-name: GitHubOidcFederatedRole
-          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
           mask-aws-account-id: true
 
       - name: Check out repository code
