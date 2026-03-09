@@ -12,7 +12,7 @@ export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
 # Try a simple AWS STS call to validate credentials
-if aws sts get-caller-identity >/dev/null 2>&1; then
+if aws sts get-caller-identity > /dev/null 2>&1; then
   echo "✅ AWS access verified."
 else
   echo "❌ ERROR: Unable to access AWS. Check credentials or permissions."
@@ -58,8 +58,6 @@ if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
   (
     echo "😇 <https://${CLUSTER_FQDN}>"
     echo '```'
-    echo "export CLUSTER_NAME=\"${CLUSTER_NAME}\""
-    echo "export AWS_REGION=\"${AWS_REGION}\""
     echo "eval \"\$(mise run a)\""
     echo '```'
   ) | tee "${GITHUB_STEP_SUMMARY}"

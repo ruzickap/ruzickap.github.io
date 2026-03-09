@@ -40,6 +40,19 @@ shfmt --case-indent --indent 2 --space-redirects file # Shell fmt
 lychee --root-dir . --verbose file.md                 # Links
 ```
 
+## Cluster Access
+
+E2E tests run against AWS EKS clusters. Connect to the cluster:
+
+```bash
+eval "$(mise run a)"
+```
+
+This sets environment variables (e.g. `CLUSTER_NAME`) and
+configures `KUBECONFIG` for `kubectl` access.
+Run this command **once per session** -- it only needs to be
+executed a single time to configure the environment.
+
 ## Repository Structure
 
 - `_posts/YYYY/` -- Blog posts (Markdown with YAML front matter)

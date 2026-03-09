@@ -146,7 +146,7 @@ mega-linter-runner --remove-container \
   --env VALIDATE_ALL_CODEBASE=true
 ```
 
-## Tests
+## Tests - not working
 
 ```bash
 docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock" \

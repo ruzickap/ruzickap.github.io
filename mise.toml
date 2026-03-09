@@ -6,14 +6,14 @@
 ##############################################################################
 [tools]
 # keep-sorted start
-"ubi:aws-cloudformation/rain" = "1.24.3"
-"ubi:harehare/mq" = "0.5.25"
+"github:aws-cloudformation/rain" = "1.24.3"
+"github:harehare/mq" = "0.5.17"
 aws = { version = "2.34.2", symlink_bins = "true" }
 aws-copilot = "1.34.1"
 cilium-cli = "0.18.3"
 eksctl = "0.224.0"
-fnox = "latest"
-helm = "4.1.3"
+fnox = "1.19.0"
+helm = "4.1.1"
 kind = "0.31.0"
 kubectl = "1.35.3"
 velero = "1.17.2"
@@ -22,12 +22,16 @@ yq = "4.52.5"
 
 ##############################################################################
 # Plugins
+##############################################################################
 [plugins]
 fnox-env = "https://github.com/jdx/mise-env-fnox"
+
+##############################################################################
 # Global Settings
 [settings]
 jobs = 1
-trusted_config_paths = ["/"]
+
+##############################################################################
 # Environment Variables
 [env]
 _.fnox-env = { tools = true }
@@ -53,7 +57,6 @@ run = '''
 cat <<EOF
 $(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
 
-eval "\$(aws sts assume-role --role-arn "\${AWS_ROLE_TO_ASSUME}" --role-session-name "\${USER}@\$(hostname -f)-\$(date +%s)" --duration-seconds 7200 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
 export KUBECONFIG="/tmp/kubeconfig-\${CLUSTER_NAME}-\$\$.conf"
 aws eks update-kubeconfig --name "\${CLUSTER_NAME}" --kubeconfig "\${KUBECONFIG}"
 EOF
