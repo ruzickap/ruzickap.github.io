@@ -1,13 +1,10 @@
 ---
-title: Amazon EKS with Argo CD capability
+title: Amazon EKS with Argo CD
 author: Petr Ruzicka
 date: 2026-03-04
-description: Build Amazon EKS with ArgoCD capability and IAM Identity Center
-categories: [Kubernetes, Cloud]
-tags:
-  [amazon-eks, argocd, cert-manager, eks, eksctl, grafana, homepage,
-  envoy-gateway, kubernetes, monitoring, sso, velero, victorialogs,
-  victoriametrics]
+description: Build Amazon EKS with ArgoCD
+categories: [Kubernetes, Cloud, Monitoring]
+tags: [amazon-eks, argocd, cert-manager, eks, eksctl, grafana, homepage, envoy-gateway, kubernetes, monitoring, velero, victorialogs, victoriametrics]
 image: https://raw.githubusercontent.com/akuity/awesome-argo/977bf4e5e8b5382325967711d7c3c21e382cba1d/images/argo.png
 ---
 
@@ -37,10 +34,9 @@ The Amazon EKS setup should align with the following criteria:
   should be enabled where supported
 - [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
   should be used to allow applications and pods to communicate with AWS APIs
-- [ArgoCD](https://argoproj.github.io/cd/) deployed as an AWS-managed
-  [EKS capability](https://docs.aws.amazon.com/eks/latest/userguide/argocd.html)
-  with [IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)
-  for authentication, using Application CRDs for declarative deployments
+- [ArgoCD](https://argoproj.github.io/cd/) deployed via
+  [Helm chart](https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd),
+  using Application CRDs for declarative deployments
 - [Envoy Gateway](https://gateway.envoyproxy.io/) as the Gateway API
   implementation with OIDC authentication and JWT-based authorization
   via Google for protecting web endpoints
@@ -63,9 +59,6 @@ and set up other necessary secrets and variables:
 export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AWS_SESSION_TOKEN="xxxxxxxx"
-export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
-export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
-export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```
 
 If you plan to follow this document and its tasks, you will need to set up
@@ -73,7 +66,7 @@ a few environment variables, such as:
 
 ```bash
 # AWS Region
-export AWS_DEFAULT_REGION="${AWS_DEFAULT_REGION:-us-east-1}"
+export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # Base Domain: k8s.mylabs.dev
@@ -88,19 +81,6 @@ export TAGS="${TAGS:-Owner=${MY_EMAIL},Environment=dev,Cluster=${CLUSTER_FQDN}}"
 export AWS_PARTITION="aws"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) && export AWS_ACCOUNT_ID
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-```
-
-Confirm that all essential variables have been properly configured:
-
-```bash
-: "${AWS_ACCESS_KEY_ID?}"
-: "${AWS_DEFAULT_REGION?}"
-: "${AWS_SECRET_ACCESS_KEY?}"
-: "${AWS_ROLE_TO_ASSUME?}"
-: "${GOOGLE_CLIENT_ID?}"
-: "${GOOGLE_CLIENT_SECRET?}"
-
-echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
 ```
 
 Install the required tools:
@@ -239,12 +219,10 @@ aws iam create-service-linked-role --aws-service-name spot.amazonaws.com
 
 Details: [Work with Spot Instances](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-requests.html)
 
-### Create Route53, KMS, and IAM Identity Center infrastructure
+### Create Route53 and KMS infrastructure
 
 Generate a CloudFormation template that defines an [Amazon Route 53](https://aws.amazon.com/route53/)
-zone, an [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key,
-and an [IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)
-instance for ArgoCD authentication.
+zone and an [AWS Key Management Service (KMS)](https://aws.amazon.com/kms/) key.
 
 Add the new domain `CLUSTER_FQDN` to Route 53, and set up DNS delegation from
 the `BASE_DOMAIN`.
@@ -252,7 +230,7 @@ the `BASE_DOMAIN`.
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" << \EOF
 AWSTemplateFormatVersion: 2010-09-09
-Description: Route53, KMS key, and IAM Identity Center instance
+Description: Route53 and KMS key
 
 Parameters:
   BaseDomain:
@@ -337,10 +315,6 @@ Resources:
             Action:
               - s3:ListBucket
             Resource: !Sub "arn:aws:s3:::${ClusterFQDN}"
-  SSOInstance:
-    Type: AWS::SSO::Instance
-    Properties:
-      Name: !Sub "eks-${ClusterName}-idc"
 Outputs:
   KMSKeyArn:
     Description: The ARN of the created KMS Key to encrypt EKS related services
@@ -360,18 +334,6 @@ Outputs:
     Export:
       Name:
         Fn::Sub: "${AWS::StackName}-S3AccessPolicy"
-  SSOInstanceArn:
-    Description: IAM Identity Center instance ARN for ArgoCD
-    Value: !GetAtt SSOInstance.InstanceArn
-    Export:
-      Name:
-        Fn::Sub: "${AWS::StackName}-SSOInstanceArn"
-  SSOIdentityStoreId:
-    Description: IAM Identity Center Identity Store ID
-    Value: !GetAtt SSOInstance.IdentityStoreId
-    Export:
-      Name:
-        Fn::Sub: "${AWS::StackName}-SSOIdentityStoreId"
 EOF
 
 # shellcheck disable=SC2001
@@ -379,12 +341,10 @@ eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
   --parameter-overrides "BaseDomain=${BASE_DOMAIN} ClusterFQDN=${CLUSTER_FQDN} ClusterName=${CLUSTER_NAME}" \
   --stack-name "${CLUSTER_NAME}-route53-kms" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-cf-route53-kms.yml" --tags "${TAGS//,/ }"
 
-AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query "Stacks[0].Outputs[? OutputKey==\`KMSKeyArn\` || OutputKey==\`KMSKeyId\` || OutputKey==\`S3AccessPolicyArn\` || OutputKey==\`SSOInstanceArn\` || OutputKey==\`SSOIdentityStoreId\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
+AWS_CLOUDFORMATION_DETAILS=$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}-route53-kms" --query "Stacks[0].Outputs[? OutputKey==\`KMSKeyArn\` || OutputKey==\`KMSKeyId\` || OutputKey==\`S3AccessPolicyArn\`].{OutputKey:OutputKey,OutputValue:OutputValue}")
 AWS_KMS_KEY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyArn\") .OutputValue")
 AWS_KMS_KEY_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"KMSKeyId\") .OutputValue")
 AWS_S3_ACCESS_POLICY_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"S3AccessPolicyArn\") .OutputValue")
-IDC_INSTANCE_ARN=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"SSOInstanceArn\") .OutputValue")
-IDC_IDENTITY_STORE_ID=$(echo "${AWS_CLOUDFORMATION_DETAILS}" | jq -r ".[] | select(.OutputKey==\"SSOIdentityStoreId\") .OutputValue")
 ```
 
 After running the CloudFormation stack, you should see the following
@@ -400,8 +360,6 @@ You should also see the following KMS key:
 
 ![KMS key](/assets/img/posts/2023/2023-08-03-cilium-amazon-eks/kms-key.avif)
 _KMS key_
-
--------------------------------> Add screentot of IDC_IDENTITY_STORE !!!!!! xxxx
 
 ### Create Karpenter infrastructure
 
@@ -420,24 +378,6 @@ eval aws cloudformation deploy --stack-name "${CLUSTER_NAME}-karpenter" \
   --parameter-overrides "ClusterName=${CLUSTER_NAME}" --tags "${TAGS//,/ }"
 ```
 
-### Configure IAM Identity Center user
-
-The [ArgoCD EKS capability](https://docs.aws.amazon.com/eks/latest/userguide/argocd.html)
-requires [AWS IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)
-for authentication. The IAM Identity Center instance was already
-provisioned by the CloudFormation stack above. Create a user in the
-Identity Store that will serve as the ArgoCD administrator.
-
-```bash
-IDC_USER_ID=$(
-  aws identitystore create-user --identity-store-id "${IDC_IDENTITY_STORE_ID}" \
-    --user-name "argocd-admin" --display-name "ArgoCD Admin" \
-    --name "GivenName=ArgoCD,FamilyName=Admin" \
-    --emails "Value=${MY_EMAIL},Type=Work,Primary=true" --query "UserId" --output text
-)
-echo -e "IDC Instance ARN: ${IDC_INSTANCE_ARN}\nIdentity Store ID: ${IDC_IDENTITY_STORE_ID}\nIDC User ID: ${IDC_USER_ID}"
-```
-
 ### Create Amazon EKS
 
 I will use [eksctl](https://eksctl.io/) to create the
@@ -451,13 +391,13 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
   name: ${CLUSTER_NAME}
-  region: ${AWS_DEFAULT_REGION}
+  region: ${AWS_REGION}
   tags:
     karpenter.sh/discovery: ${CLUSTER_NAME}
     $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
 availabilityZones:
-  - ${AWS_DEFAULT_REGION}a
-  - ${AWS_DEFAULT_REGION}b
+  - ${AWS_REGION}a
+  - ${AWS_REGION}b
 autoModeConfig:
   enabled: false
 accessConfig:
@@ -468,7 +408,6 @@ accessConfig:
           accessScope:
             type: cluster
 iam:
-  withOIDC: true
   podIdentityAssociations:
     - namespace: aws-load-balancer-controller
       serviceAccountName: aws-load-balancer-controller
@@ -512,41 +451,17 @@ iam:
             ]
             Resource:
               - "*"
-    - namespace: kube-system
-      serviceAccountName: aws-node
-      roleName: eksctl-${CLUSTER_NAME}-vpc-cni
-      wellKnownPolicies:
-        amazonVPCCNI: true
 iamIdentityMappings:
   - arn: "arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:role/KarpenterNodeRole-${CLUSTER_NAME}"
     username: system:node:{{EC2PrivateDNSName}}
     groups:
       - system:bootstrappers
       - system:nodes
-capabilities:
-  - name: argocd
-    type: ARGOCD
-    deletePropagationPolicy: RETAIN
-    accessPolicies:
-      - policyARN: arn:${AWS_PARTITION}:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
-        accessScope:
-          type: cluster
-    configuration:
-      argocd:
-        awsIdc:
-          idcInstanceArn: ${IDC_INSTANCE_ARN}
-          idcRegion: ${AWS_DEFAULT_REGION}
-        rbacRoleMappings:
-          - role: ADMIN
-            identities:
-              - id: ${IDC_USER_ID}
-                type: SSO_USER
 addons:
-  - name: coredns
   - name: eks-pod-identity-agent
-  - name: kube-proxy
   - name: snapshot-controller
   - name: aws-ebs-csi-driver
+    useDefaultPodIdentityAssociations: true
     configurationValues: |-
       defaultStorageClass:
         enabled: true
@@ -565,7 +480,7 @@ managedNodeGroups:
     instanceType: t4g.medium
     desiredCapacity: 2
     availabilityZones:
-      - ${AWS_DEFAULT_REGION}a
+      - ${AWS_REGION}a
     minSize: 2
     maxSize: 3
     volumeSize: 20
@@ -658,122 +573,6 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
     --ingress
   ```
 
-### ArgoCD
-
-[Argo CD](https://argoproj.github.io/cd/) is a declarative, GitOps
-continuous delivery tool for Kubernetes. Amazon EKS provides ArgoCD as a
-managed [capability](https://docs.aws.amazon.com/eks/latest/userguide/argocd.html),
-eliminating the need to install and manage ArgoCD yourself.
-
-![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/c67cff8065bb6540b1c79deb0b71e5e11c87a746/docs/assets/argo.png){:width="200"}
-
-The ArgoCD capability was configured in the `eksctl` ClusterConfig
-`capabilities` section and deployed automatically during cluster
-creation. The capability uses
-[IAM Identity Center](https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html)
-for authentication, which was set up in the previous steps.
-
-Wait for the ArgoCD capability to be fully ready:
-
-```bash
-kubectl wait --for=condition=Available --timeout=300s \
-  deployment -n argocd -l app.kubernetes.io/part-of=argocd
-```
-
-Each ArgoCD Application below carries a
-[sync-wave](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/)
-annotation (`argocd.argoproj.io/sync-wave`) that documents the intended
-deployment order. The waves ensure that CRDs and infrastructure
-components are deployed before the applications that depend on them:
-
-| Wave | Components                                       |
-| ---- | ------------------------------------------------ |
-| -5   | Gateway API CRDs                                 |
-| -3   | AWS LB Controller, Karpenter, cert-manager       |
-| -1   | Envoy Gateway, ExternalDNS, Velero               |
-| 0    | victoria-metrics-k8s-stack, victoria-logs-single |
-| 1    | Grafana                                          |
-| 2    | Homepage                                         |
-
-### Gateway API CRDs
-
-Install the [Gateway API](https://gateway-api.sigs.k8s.io/) Custom
-Resource Definitions (CRDs) that are required by Envoy Gateway using an
-ArgoCD Application CRD pointing at the upstream Git repository:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-gateway-api-crds.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: gateway-api-crds
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-5"
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/kubernetes-sigs/gateway-api
-    targetRevision: v1.4.0
-    path: config/crd/standard
-  destination:
-    server: https://kubernetes.default.svc
-  syncPolicy:
-    automated:
-      prune: false
-      selfHeal: true
-    syncOptions:
-      - ServerSideApply=true
-EOF
-```
-
-### AWS Load Balancer Controller
-
-The [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
-is a controller that manages Elastic Load Balancers for a Kubernetes
-cluster.
-
-![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
-
-Install the `aws-load-balancer-controller`
-[Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
-using an ArgoCD Application CRD:
-
-```bash
-# renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
-AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.17.1"
-
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-aws-load-balancer-controller.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: aws-load-balancer-controller
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-3"
-spec:
-  project: default
-  destination:
-    namespace: aws-load-balancer-controller
-    server: https://kubernetes.default.svc
-  source:
-    chart: aws-load-balancer-controller
-    repoURL: https://aws.github.io/eks-charts
-    targetRevision: ${AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION}
-    helm:
-      values: |
-        serviceAccount:
-          name: aws-load-balancer-controller
-        clusterName: ${CLUSTER_NAME}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-EOF
-```
-
 ### Pod Scheduling PriorityClasses
 
 Configure [PriorityClasses](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
@@ -844,6 +643,260 @@ Delete the `gp2` StorageClass, as `gp3` will be used instead:
 
 ```bash
 kubectl delete storageclass gp2 || true
+```
+
+### ArgoCD
+
+[Argo CD](https://argoproj.github.io/cd/) is a declarative, GitOps
+continuous delivery tool for Kubernetes.
+
+![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/c67cff8065bb6540b1c79deb0b71e5e11c87a746/docs/assets/argo.png){:width="200"}
+
+Install the `argo-cd` [Helm chart](https://artifacthub.io/packages/helm/argo/argo-cd)
+and modify its [default values](https://github.com/argoproj/argo-helm/blob/argo-cd-9.4.9/charts/argo-cd/values.yaml).
+The chart is first installed directly via Helm to bootstrap ArgoCD on the
+cluster, then ArgoCD takes over managing itself through an Application
+CRD ([Manage Argo CD Using Argo CD](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#manage-argo-cd-using-argo-cd)):
+
+```bash
+# renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
+ARGOCD_HELM_CHART_VERSION="9.4.9"
+
+helm repo add --force-update argo https://argoproj.github.io/argo-helm
+helm upgrade --install --version "${ARGOCD_HELM_CHART_VERSION}" --namespace argocd --create-namespace argo-cd argo/argo-cd
+```
+
+Each ArgoCD Application below carries a [sync-wave](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/)
+annotation (`argocd.argoproj.io/sync-wave`) that documents the intended
+deployment order. The waves ensure that CRDs and infrastructure
+components are deployed before the applications that depend on them:
+
+| Wave | Components                                       |
+| ---- | ------------------------------------------------ |
+| -5   | Gateway API CRDs                                 |
+| -3   | AWS LB Controller, Karpenter, cert-manager       |
+| -1   | Envoy Gateway, ExternalDNS, Velero               |
+| 0    | victoria-metrics-k8s-stack, victoria-logs-single |
+| 1    | Grafana                                          |
+| 2    | Homepage                                         |
+
+### Gateway API CRDs
+
+Install the [Gateway API](https://gateway-api.sigs.k8s.io/) Custom
+Resource Definitions (CRDs) that are required by Envoy Gateway using an
+ArgoCD Application CRD pointing at the upstream Git repository:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-gateway-api-crds.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gateway-api-crds
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/kubernetes-sigs/gateway-api
+    targetRevision: v1.4.0
+    path: config/crd/standard
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+EOF
+
+exit
+```
+
+### Envoy Gateway
+
+[Envoy Gateway](https://gateway.envoyproxy.io/) is an implementation of
+the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) built on
+[Envoy Proxy](https://www.envoyproxy.io/) that provides advanced traffic
+management, OIDC authentication, and JWT-based authorization.
+
+![Envoy Gateway](https://raw.githubusercontent.com/envoyproxy/gateway/refs/heads/main/site/static/img/envoy-gateway.svg){:width="250"}
+
+Install Envoy Gateway using an ArgoCD Application CRD:
+
+```bash
+# renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
+ENVOY_GATEWAY_HELM_CHART_VERSION="v1.7.0"
+
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-envoy-gateway.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  project: default
+  destination:
+    namespace: envoy-gateway-system
+    server: https://kubernetes.default.svc
+  source:
+    chart: gateway-helm
+    repoURL: docker.io/envoyproxy
+    targetRevision: ${ENVOY_GATEWAY_HELM_CHART_VERSION}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    - ServerSideApply=true
+EOF
+```
+
+Wait for the Envoy Gateway ArgoCD Application to be healthy:
+
+```bash
+kubectl wait --for=condition=Healthy application/envoy-gateway -n argocd --timeout=300s
+```
+
+Configure the [Gateway](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gateway)
+resource with AWS NLB annotations using an [EnvoyProxy](https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/)
+custom resource:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-envoy-gateway-gateway.yml" << EOF | kubectl apply -f -
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: aws-nlb
+  namespace: envoy-gateway-system
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: external
+          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+          service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
+          service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: eg
+  namespace: envoy-gateway-system
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-dns
+spec:
+  gatewayClassName: eg
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: aws-nlb
+  listeners:
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.${CLUSTER_FQDN}"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: ingress-cert-production
+            namespace: cert-manager
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https-apex
+      port: 443
+      protocol: HTTPS
+      hostname: "${CLUSTER_FQDN}"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: ingress-cert-production
+            namespace: cert-manager
+      allowedRoutes:
+        namespaces:
+          from: All
+EOF
+```
+
+Create an ArgoCD Application to let ArgoCD manage itself:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-argo-cd.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-cd
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  source:
+    chart: argo-cd
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: ${ARGOCD_HELM_CHART_VERSION}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
+```
+
+### AWS Load Balancer Controller
+
+The [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
+is a controller that manages Elastic Load Balancers for a Kubernetes
+cluster.
+
+![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
+
+Install the `aws-load-balancer-controller`
+[Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
+using an ArgoCD Application CRD:
+
+```bash
+# renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
+AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.17.1"
+
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-aws-load-balancer-controller.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aws-load-balancer-controller
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-3"
+spec:
+  project: default
+  destination:
+    namespace: aws-load-balancer-controller
+    server: https://kubernetes.default.svc
+  source:
+    chart: aws-load-balancer-controller
+    repoURL: https://aws.github.io/eks-charts
+    targetRevision: ${AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION}
+    helm:
+      values: |
+        serviceAccount:
+          name: aws-load-balancer-controller
+        clusterName: ${CLUSTER_NAME}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+EOF
 ```
 
 ### Karpenter
@@ -952,7 +1005,7 @@ spec:
           values: ["4095"]
         - key: "topology.kubernetes.io/zone"
           operator: In
-          values: ["${AWS_DEFAULT_REGION}a"]
+          values: ["${AWS_REGION}a"]
         - key: karpenter.k8s.aws/instance-family
           operator: In
           values: ["t4g", "t3a"]
@@ -1061,7 +1114,7 @@ spec:
     solvers:
       - dns01:
           route53:
-            region: ${AWS_DEFAULT_REGION}
+            region: ${AWS_REGION}
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
@@ -1138,12 +1191,12 @@ spec:
               bucket: ${CLUSTER_FQDN}
               prefix: velero
               config:
-                region: ${AWS_DEFAULT_REGION}
+                region: ${AWS_REGION}
           volumeSnapshotLocation:
             - name:
               provider: aws
               config:
-                region: ${AWS_DEFAULT_REGION}
+                region: ${AWS_REGION}
         serviceAccount:
           server:
             name: velero
@@ -1348,120 +1401,6 @@ spec:
       selfHeal: true
     syncOptions:
     - CreateNamespace=true
-EOF
-```
-
-### Envoy Gateway
-
-[Envoy Gateway](https://gateway.envoyproxy.io/) is an implementation of
-the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) built on
-[Envoy Proxy](https://www.envoyproxy.io/) that provides advanced traffic
-management, OIDC authentication, and JWT-based authorization.
-
-![Envoy Gateway](https://raw.githubusercontent.com/envoyproxy/gateway/refs/heads/main/site/static/img/envoy-gateway.svg){:width="250"}
-
-Install Envoy Gateway using an ArgoCD Application CRD:
-
-```bash
-# renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
-ENVOY_GATEWAY_HELM_CHART_VERSION="v1.7.0"
-
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-envoy-gateway.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: envoy-gateway
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-1"
-spec:
-  project: default
-  destination:
-    namespace: envoy-gateway-system
-    server: https://kubernetes.default.svc
-  source:
-    chart: gateway-helm
-    repoURL: docker.io/envoyproxy
-    targetRevision: ${ENVOY_GATEWAY_HELM_CHART_VERSION}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-    - ServerSideApply=true
-EOF
-```
-
-Wait for the Envoy Gateway ArgoCD Application to be healthy:
-
-```bash
-kubectl wait --for=condition=Healthy application/envoy-gateway -n argocd --timeout=300s
-```
-
-Configure the [Gateway](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gateway)
-resource with AWS NLB annotations using an
-[EnvoyProxy](https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/)
-custom resource:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-envoy-gateway-gateway.yml" << EOF | kubectl apply -f -
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: EnvoyProxy
-metadata:
-  name: aws-nlb
-  namespace: envoy-gateway-system
-spec:
-  provider:
-    type: Kubernetes
-    kubernetes:
-      envoyService:
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-type: external
-          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-          service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
-          service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: eg
-  namespace: envoy-gateway-system
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production-dns
-spec:
-  gatewayClassName: eg
-  infrastructure:
-    parametersRef:
-      group: gateway.envoyproxy.io
-      kind: EnvoyProxy
-      name: aws-nlb
-  listeners:
-    - name: https
-      port: 443
-      protocol: HTTPS
-      hostname: "*.${CLUSTER_FQDN}"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: ingress-cert-production
-            namespace: cert-manager
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: https-apex
-      port: 443
-      protocol: HTTPS
-      hostname: "${CLUSTER_FQDN}"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: ingress-cert-production
-            namespace: cert-manager
-      allowedRoutes:
-        namespaces:
-          from: All
 EOF
 ```
 
@@ -2120,23 +2059,6 @@ fi
 
 {% endraw %}
 
-Remove Homepage HTTPRoute, Envoy Gateway SecurityPolicy, Envoy Gateway
-resources, Grafana HTTPRoute, monitoring applications, and stop
-Karpenter by deleting the ArgoCD Applications:
-
-```sh
-kubectl delete httproute -n homepage homepage || true
-kubectl delete httproute -n monitoring grafana || true
-kubectl delete securitypolicy -n envoy-gateway-system google-oidc || true
-kubectl delete secret -n envoy-gateway-system google-oidc-client-secret || true
-kubectl delete gateway -n envoy-gateway-system eg || true
-kubectl delete envoyproxy -n envoy-gateway-system aws-nlb || true
-kubectl delete application -n argocd homepage grafana victoria-logs-single victoria-metrics-k8s-stack || true
-kubectl delete application -n argocd envoy-gateway gateway-api-crds || true
-kubectl delete application -n argocd velero external-dns cert-manager aws-load-balancer-controller || true
-kubectl delete application -n argocd karpenter || true
-```
-
 Remove any remaining EC2 instances provisioned by Karpenter (if they
 still exist):
 
@@ -2154,6 +2076,7 @@ VPC:
 for RESOLVER_QUERY_LOG_CONFIGS_ID in $(aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?contains(DestinationArn, '/aws/eks/${CLUSTER_NAME}/cluster')].Id" --output text); do
   RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOURCEID=$(aws route53resolver list-resolver-query-log-config-associations --filters "Name=ResolverQueryLogConfigId,Values=${RESOLVER_QUERY_LOG_CONFIGS_ID}" --query 'ResolverQueryLogConfigAssociations[].ResourceId' --output text)
   if [[ -n "${RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOURCEID}" ]]; then
+    echo "*** Disassociating Resolver query log config: ${RESOLVER_QUERY_LOG_CONFIGS_ID} from resource: ${RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOURCEID}"
     aws route53resolver disassociate-resolver-query-log-config --resolver-query-log-config-id "${RESOLVER_QUERY_LOG_CONFIGS_ID}" --resource-id "${RESOLVER_QUERY_LOG_CONFIG_ASSOCIATIONS_RESOURCEID}"
     sleep 5
   fi
@@ -2164,6 +2087,7 @@ Clean up AWS Route 53 Resolver query log configurations:
 
 ```sh
 for AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID in $(aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" --output text); do
+  echo "*** Removing Route 53 Resolver query log config: ${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
   aws route53resolver delete-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
 done
 ```
@@ -2181,6 +2105,7 @@ Remove the Route 53 DNS records from the DNS Zone:
 ```sh
 CLUSTER_FQDN_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${CLUSTER_FQDN}.\`].Id" --output text)
 if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
+  echo "*** Removing Route 53 DNS records from zone: ${CLUSTER_FQDN_ZONE_ID}"
   aws route53 list-resource-record-sets --hosted-zone-id "${CLUSTER_FQDN_ZONE_ID}" | jq -c '.ResourceRecordSets[] | select (.Type != "SOA" and .Type != "NS")' |
     while read -r RESOURCERECORDSET; do
       aws route53 change-resource-record-sets \
@@ -2196,47 +2121,14 @@ Delete Instance profile which belongs to Karpenter role:
 ```sh
 if AWS_INSTANCE_PROFILES_FOR_ROLE=$(aws iam list-instance-profiles-for-role --role-name "KarpenterNodeRole-${CLUSTER_NAME}" --query 'InstanceProfiles[].{Name:InstanceProfileName}' --output text); then
   if [[ -n "${AWS_INSTANCE_PROFILES_FOR_ROLE}" ]]; then
+    echo "*** Removing instance profile: ${AWS_INSTANCE_PROFILES_FOR_ROLE} from role: KarpenterNodeRole-${CLUSTER_NAME}"
     aws iam remove-role-from-instance-profile --instance-profile-name "${AWS_INSTANCE_PROFILES_FOR_ROLE}" --role-name "KarpenterNodeRole-${CLUSTER_NAME}"
     aws iam delete-instance-profile --instance-profile-name "${AWS_INSTANCE_PROFILES_FOR_ROLE}"
   fi
 fi
 ```
 
-Remove the IAM Identity Center user (the instance is deleted with
-the CloudFormation stack):
-
-```sh
-IDC_INSTANCE_ARN=$(
-  aws sso-admin list-instances \
-    --query "Instances[?Status=='ACTIVE'].InstanceArn | [0]" \
-    --output text
-)
-
-if [[ -n "${IDC_INSTANCE_ARN}" && "${IDC_INSTANCE_ARN}" != "None" ]]; then
-  IDC_IDENTITY_STORE_ID=$(
-    aws sso-admin list-instances \
-      --query "Instances[?InstanceArn=='${IDC_INSTANCE_ARN}'].IdentityStoreId | [0]" \
-      --output text
-  )
-
-  IDC_USER_ID=$(
-    aws identitystore list-users \
-      --identity-store-id "${IDC_IDENTITY_STORE_ID}" \
-      --filters "AttributePath=UserName,AttributeValue=argocd-admin" \
-      --query "Users[0].UserId" \
-      --output text
-  )
-
-  if [[ -n "${IDC_USER_ID}" && "${IDC_USER_ID}" != "None" ]]; then
-    aws identitystore delete-user \
-      --identity-store-id "${IDC_IDENTITY_STORE_ID}" \
-      --user-id "${IDC_USER_ID}"
-  fi
-fi
-```
-
-Remove the CloudFormation stacks (this also deletes the IAM Identity
-Center instance):
+Remove the CloudFormation stacks:
 
 ```sh
 aws cloudformation delete-stack --stack-name "${CLUSTER_NAME}-route53-kms"
@@ -2265,6 +2157,7 @@ Remove the CloudWatch log group:
 
 ```sh
 if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
+  echo "*** Removing CloudWatch log group: /aws/eks/${CLUSTER_NAME}/cluster"
   aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
 fi
 ```
