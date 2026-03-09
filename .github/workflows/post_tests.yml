@@ -29,6 +29,7 @@ on:
           - 2025-07-10-ollama-k8s-exploitation|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto
           - 2026-01-13-amazon-eks-grafana-stack
           - 2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero
+          - 2026-03-04-eks-capabilities-argocd
       action:
         type: choice
         description: Select action
@@ -66,7 +67,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 7200
-          role-session-name: GitHubOidcFederatedRole
+          role-session-name: ${{ github.event.repository.name }}-${{ github.workflow }}-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
           mask-aws-account-id: true
 

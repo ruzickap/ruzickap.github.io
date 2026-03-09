@@ -8,16 +8,23 @@
 # keep-sorted start
 "ubi:aws-cloudformation/rain" = "1.24.3"
 "ubi:harehare/mq" = "0.5.17"
-aws = "2.26.2"
+aws = { version = "2.34.2", symlink_bins = "true" }
 aws-copilot = "1.34.1"
 cilium-cli = "0.18.3"
-eksctl = "0.207.0"
+eksctl = "0.224.0"
+fnox = "latest"
 helm = "4.1.1"
 kind = "0.31.0"
 kubectl = "1.35.2"
-velero = "1.16.0"
+velero = "1.17.2"
 yq = "4.52.4"
 # keep-sorted end
+
+##############################################################################
+# Plugins
+##############################################################################
+[plugins]
+fnox-env = "https://github.com/jdx/mise-env-fnox"
 
 ##############################################################################
 # Global Settings
@@ -30,6 +37,8 @@ trusted_config_paths = ["/"]
 # Environment Variables
 ##############################################################################
 [env]
+_.fnox-env = { tools = true }
+# _.file = { path = ".env.yaml", redact = true }
 FORCE_COLOR = 1
 
 ##############################################################################
@@ -253,6 +262,17 @@ run = ["./scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}"]
 
 [tasks."delete:2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero"]
 description = 'Delete: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS with Argo CD
+#------------------------------------------------------------------------------
+[tasks."create:2026-03-04-eks-argocd"]
+description = 'Create: Amazon EKS with Argo CD'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2026-03-04-eks-argocd"]
+description = 'Delete: Amazon EKS with Argo CD'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
