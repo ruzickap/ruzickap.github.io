@@ -605,6 +605,347 @@ description: "This priority class should be used for high priority workloads"
 EOF
 ```
 
+### ArgoCD
+
+[Argo CD](https://argoproj.github.io/cd/) is a declarative, GitOps
+continuous delivery tool for Kubernetes.
+
+![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/master/docs/assets/argo.png){:width="200"}
+
+Install the `argo-cd` [Helm chart](https://artifacthub.io/packages/helm/argo/argo-cd)
+and modify its [default values](https://github.com/argoproj/argo-helm/blob/argo-cd-9.4.12/charts/argo-cd/values.yaml).
+The chart is first installed directly via Helm to bootstrap ArgoCD on
+the cluster. After Envoy Gateway is deployed (providing the Gateway API
+CRDs), ArgoCD takes over managing itself through an Application CRD
+([Manage Argo CD Using Argo CD](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#manage-argo-cd-using-argo-cd))
+that also configures an
+[HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
+to expose the ArgoCD UI:
+
+```bash
+# renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
+ARGOCD_HELM_CHART_VERSION="9.4.12"
+
+helm repo add --force-update argo https://argoproj.github.io/argo-helm
+helm upgrade --install --version "${ARGOCD_HELM_CHART_VERSION}" --namespace argocd --create-namespace --wait argo-cd argo/argo-cd
+```
+
+### Prometheus Operator CRDs
+
+[Prometheus Operator CRDs](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-operator-crds)
+provides the Custom Resource Definitions (CRDs) that define the Prometheus
+operator resources. These CRDs are required before installing ServiceMonitor
+resources.
+
+Install the `prometheus-operator-crds`
+[Helm chart](https://github.com/prometheus-community/helm-charts/tree/prometheus-operator-crds-28.0.0/charts/prometheus-operator-crds)
+to set up the necessary CRDs:
+
+```bash
+# renovate: datasource=docker depName=prometheus-community/charts/prometheus-operator-crds registryUrl=https://ghcr.io
+PROMETHEUS_OPERATOR_CRDS_HELM_CHART_VERSION="28.0.0"
+
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-prometheus-operator-crds.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-operator-crds
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: kube-system
+    server: https://kubernetes.default.svc
+  source:
+    chart: prometheus-operator-crds
+    repoURL: ghcr.io/prometheus-community/charts
+    targetRevision: ${PROMETHEUS_OPERATOR_CRDS_HELM_CHART_VERSION}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - Replace=true
+EOF
+```
+
+Wait for the Prometheus Operator CRDs ArgoCD Application
+to be healthy and synced:
+
+```bash
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/prometheus-operator-crds -n argocd --timeout=300s
+```
+
+### Envoy Gateway
+
+[Envoy Gateway](https://gateway.envoyproxy.io/) is an implementation of
+the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) built on
+[Envoy Proxy](https://www.envoyproxy.io/) that provides advanced traffic
+management, OIDC authentication, and JWT-based authorization.
+
+![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="250"}
+
+Install Envoy Gateway using an ArgoCD
+[Application](https://gateway.envoyproxy.io/docs/install/install-argocd/)
+CRD. `ServerSideApply` avoids the 262,144-byte annotation size
+limit, and `CreateNamespace` ensures the target namespace exists:
+
+```bash
+# renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
+ENVOY_GATEWAY_HELM_CHART_VERSION="v1.7.1"
+
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-envoy-gateway.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: gateway-helm
+    repoURL: docker.io/envoyproxy
+    targetRevision: ${ENVOY_GATEWAY_HELM_CHART_VERSION}
+    helm:
+      values: |
+        deployment:
+          priorityClassName: critical-priority
+  destination:
+    namespace: envoy-gateway-system
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true
+EOF
+```
+
+Wait for the Envoy Gateway ArgoCD Application to be healthy:
+
+```bash
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/envoy-gateway -n argocd --timeout=300s
+```
+
+The Helm chart creates the
+[GatewayClass](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gatewayclass)
+via a `certgen` pre-install hook, but ArgoCD's auto-prune can
+remove hook-created resources that are not part of the tracked
+manifests. Following the [official guide](https://gateway.envoyproxy.io/docs/install/install-argocd/),
+apply the GatewayClass explicitly alongside the [EnvoyProxy](https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/),
+[Gateway](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gateway),
+and [SecurityPolicy](https://gateway.envoyproxy.io/docs/tasks/security/oidc/)
+resources. The SecurityPolicy handles the full OIDC authorization
+code flow with Google — redirect, consent, callback, and cookie-based session
+management — plus JWT-based authorization to restrict access to a specific email
+address. No separate proxy pod is needed.
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-envoy-gateway-gateway.yml" << EOF | kubectl apply -f -
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: aws-nlb
+  namespace: envoy-gateway-system
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: external
+          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+          service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
+          service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: eg
+  namespace: envoy-gateway-system
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-dns
+spec:
+  gatewayClassName: eg
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: aws-nlb
+  listeners:
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.${CLUSTER_FQDN}"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: cert-production
+            namespace: cert-manager
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https-apex
+      port: 443
+      protocol: HTTPS
+      hostname: "${CLUSTER_FQDN}"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: cert-production
+            namespace: cert-manager
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: google-oidc-client-secret
+  namespace: envoy-gateway-system
+type: Opaque
+stringData:
+  client-secret: "${GOOGLE_CLIENT_SECRET}"
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: google-oidc
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: eg
+  oidc:
+    provider:
+      issuer: "https://accounts.google.com"
+    clientID: "${GOOGLE_CLIENT_ID}"
+    clientSecret:
+      name: google-oidc-client-secret
+    redirectURL: "https://grafana.${CLUSTER_FQDN}/oauth2/callback"
+    scopes:
+      - openid
+      - email
+      - profile
+    cookieNames:
+      accessToken: oidc-access-token
+      idToken: oidc-id-token
+    cookieDomain: "${CLUSTER_FQDN}"
+    logoutPath: "/logout"
+  jwt:
+    providers:
+      - name: google
+        issuer: "https://accounts.google.com"
+        remoteJWKS:
+          uri: "https://www.googleapis.com/oauth2/v3/certs"
+        extractFrom:
+          cookies:
+            - oidc-id-token
+  authorization:
+    defaultAction: Deny
+    rules:
+      - name: allow-specific-email
+        action: Allow
+        principal:
+          jwt:
+            provider: google
+            claims:
+              - name: email
+                values:
+                  - "${MY_EMAIL}"
+              - name: email_verified
+                values:
+                  - "true"
+EOF
+```
+
+All routes through the Envoy Gateway now require Google authentication.
+Only `${MY_EMAIL}` is allowed to access the services.
+
+Now that the Gateway API CRDs are available, create an ArgoCD
+Application to let ArgoCD manage itself. The `server.httproute`
+section configures an
+[HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
+to expose the ArgoCD UI via the Envoy Gateway:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-argo-cd.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-cd
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  source:
+    chart: argo-cd
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: ${ARGOCD_HELM_CHART_VERSION}
+    helm:
+      values: |
+        global:
+          priorityClassName: critical-priority
+        configs:
+          params:
+            server.insecure: true
+        controller:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+        server:
+          httproute:
+            enabled: true
+            parentRefs:
+              - name: eg
+                namespace: envoy-gateway-system
+                sectionName: https
+            hostnames:
+              - argocd.${CLUSTER_FQDN}
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+        repoServer:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+EOF
+```
+
+Remove the initial Helm release secret so that only ArgoCD manages
+itself going forward (the bootstrap release is no longer needed):
+
+```bash
+kubectl delete secret -n argocd -l owner=helm,name=argo-cd
+```
+
 ### Add Storage Classes and Volume Snapshots
 
 Configure persistent storage for your EKS cluster by setting up GP3
@@ -645,260 +986,6 @@ Delete the `gp2` StorageClass, as `gp3` will be used instead:
 kubectl delete storageclass gp2 || true
 ```
 
-### ArgoCD
-
-[Argo CD](https://argoproj.github.io/cd/) is a declarative, GitOps
-continuous delivery tool for Kubernetes.
-
-![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/c67cff8065bb6540b1c79deb0b71e5e11c87a746/docs/assets/argo.png){:width="200"}
-
-Install the `argo-cd` [Helm chart](https://artifacthub.io/packages/helm/argo/argo-cd)
-and modify its [default values](https://github.com/argoproj/argo-helm/blob/argo-cd-9.4.9/charts/argo-cd/values.yaml).
-The chart is first installed directly via Helm to bootstrap ArgoCD on the
-cluster, then ArgoCD takes over managing itself through an Application
-CRD ([Manage Argo CD Using Argo CD](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#manage-argo-cd-using-argo-cd)):
-
-```bash
-# renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-ARGOCD_HELM_CHART_VERSION="9.4.9"
-
-helm repo add --force-update argo https://argoproj.github.io/argo-helm
-helm upgrade --install --version "${ARGOCD_HELM_CHART_VERSION}" --namespace argocd --create-namespace argo-cd argo/argo-cd
-```
-
-Each ArgoCD Application below carries a [sync-wave](https://argo-cd.readthedocs.io/en/stable/user-guide/sync-waves/)
-annotation (`argocd.argoproj.io/sync-wave`) that documents the intended
-deployment order. The waves ensure that CRDs and infrastructure
-components are deployed before the applications that depend on them:
-
-| Wave | Components                                       |
-| ---- | ------------------------------------------------ |
-| -5   | Gateway API CRDs                                 |
-| -3   | AWS LB Controller, Karpenter, cert-manager       |
-| -1   | Envoy Gateway, ExternalDNS, Velero               |
-| 0    | victoria-metrics-k8s-stack, victoria-logs-single |
-| 1    | Grafana                                          |
-| 2    | Homepage                                         |
-
-### Gateway API CRDs
-
-Install the [Gateway API](https://gateway-api.sigs.k8s.io/) Custom
-Resource Definitions (CRDs) that are required by Envoy Gateway using an
-ArgoCD Application CRD pointing at the upstream Git repository:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-gateway-api-crds.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: gateway-api-crds
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-5"
-spec:
-  project: default
-  source:
-    repoURL: https://github.com/kubernetes-sigs/gateway-api
-    targetRevision: v1.4.0
-    path: config/crd/standard
-  destination:
-    server: https://kubernetes.default.svc
-  syncPolicy:
-    automated:
-      prune: false
-      selfHeal: true
-    syncOptions:
-      - ServerSideApply=true
-EOF
-
-exit
-```
-
-### Envoy Gateway
-
-[Envoy Gateway](https://gateway.envoyproxy.io/) is an implementation of
-the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) built on
-[Envoy Proxy](https://www.envoyproxy.io/) that provides advanced traffic
-management, OIDC authentication, and JWT-based authorization.
-
-![Envoy Gateway](https://raw.githubusercontent.com/envoyproxy/gateway/refs/heads/main/site/static/img/envoy-gateway.svg){:width="250"}
-
-Install Envoy Gateway using an ArgoCD Application CRD:
-
-```bash
-# renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
-ENVOY_GATEWAY_HELM_CHART_VERSION="v1.7.0"
-
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-envoy-gateway.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: envoy-gateway
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-1"
-spec:
-  project: default
-  destination:
-    namespace: envoy-gateway-system
-    server: https://kubernetes.default.svc
-  source:
-    chart: gateway-helm
-    repoURL: docker.io/envoyproxy
-    targetRevision: ${ENVOY_GATEWAY_HELM_CHART_VERSION}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-    - ServerSideApply=true
-EOF
-```
-
-Wait for the Envoy Gateway ArgoCD Application to be healthy:
-
-```bash
-kubectl wait --for=condition=Healthy application/envoy-gateway -n argocd --timeout=300s
-```
-
-Configure the [Gateway](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gateway)
-resource with AWS NLB annotations using an [EnvoyProxy](https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/)
-custom resource:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-envoy-gateway-gateway.yml" << EOF | kubectl apply -f -
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: EnvoyProxy
-metadata:
-  name: aws-nlb
-  namespace: envoy-gateway-system
-spec:
-  provider:
-    type: Kubernetes
-    kubernetes:
-      envoyService:
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-type: external
-          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-          service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
-          service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: eg
-  namespace: envoy-gateway-system
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production-dns
-spec:
-  gatewayClassName: eg
-  infrastructure:
-    parametersRef:
-      group: gateway.envoyproxy.io
-      kind: EnvoyProxy
-      name: aws-nlb
-  listeners:
-    - name: https
-      port: 443
-      protocol: HTTPS
-      hostname: "*.${CLUSTER_FQDN}"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: ingress-cert-production
-            namespace: cert-manager
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: https-apex
-      port: 443
-      protocol: HTTPS
-      hostname: "${CLUSTER_FQDN}"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: ingress-cert-production
-            namespace: cert-manager
-      allowedRoutes:
-        namespaces:
-          from: All
-EOF
-```
-
-Create an ArgoCD Application to let ArgoCD manage itself:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-argo-cd.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: argo-cd
-  namespace: argocd
-spec:
-  project: default
-  destination:
-    namespace: argocd
-    server: https://kubernetes.default.svc
-  source:
-    chart: argo-cd
-    repoURL: https://argoproj.github.io/argo-helm
-    targetRevision: ${ARGOCD_HELM_CHART_VERSION}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-EOF
-```
-
-### AWS Load Balancer Controller
-
-The [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
-is a controller that manages Elastic Load Balancers for a Kubernetes
-cluster.
-
-![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
-
-Install the `aws-load-balancer-controller`
-[Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
-using an ArgoCD Application CRD:
-
-```bash
-# renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
-AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="1.17.1"
-
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-aws-load-balancer-controller.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: aws-load-balancer-controller
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-3"
-spec:
-  project: default
-  destination:
-    namespace: aws-load-balancer-controller
-    server: https://kubernetes.default.svc
-  source:
-    chart: aws-load-balancer-controller
-    repoURL: https://aws.github.io/eks-charts
-    targetRevision: ${AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION}
-    helm:
-      values: |
-        serviceAccount:
-          name: aws-load-balancer-controller
-        clusterName: ${CLUSTER_NAME}
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-EOF
-```
-
 ### Karpenter
 
 [Karpenter](https://karpenter.sh/) is a Kubernetes node autoscaler built
@@ -920,8 +1007,8 @@ kind: Application
 metadata:
   name: karpenter
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-3"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -939,19 +1026,21 @@ spec:
           interruptionQueue: ${CLUSTER_NAME}
           featureGates:
             spotToSpotConsolidation: true
+        serviceMonitor:
+          enabled: true
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
 EOF
 ```
 
 Wait for the Karpenter ArgoCD Application to be healthy:
 
 ```bash
-kubectl wait --for=condition=Healthy application/karpenter -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/karpenter -n argocd --timeout=300s
 ```
 
 Configure [Karpenter](https://karpenter.sh/) by applying the following
@@ -1025,15 +1114,13 @@ EOF
 
 ### cert-manager
 
-[cert-manager](https://cert-manager.io/) adds certificates and
-certificate issuers as resource types in Kubernetes clusters and
-simplifies the process of obtaining, renewing, and using those
-certificates.
+[cert-manager](https://cert-manager.io/) adds certificates and certificate
+issuers as resource types in Kubernetes clusters and simplifies the process of
+obtaining, renewing, and using those certificates.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="150"}
 
-Install the `cert-manager`
-[Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
+Install the `cert-manager` [Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
 using an ArgoCD Application CRD:
 
 ```bash
@@ -1046,8 +1133,6 @@ kind: Application
 metadata:
   name: cert-manager
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-3"
 spec:
   project: default
   destination:
@@ -1078,31 +1163,45 @@ spec:
                     app.kubernetes.io/instance: cert-manager
                     app.kubernetes.io/component: webhook
                 topologyKey: kubernetes.io/hostname
+        prometheus:
+          enabled: true
+          servicemonitor:
+            enabled: true
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
 EOF
 ```
 
 Wait for the cert-manager ArgoCD Application to be healthy:
 
 ```bash
-kubectl wait --for=condition=Healthy application/cert-manager -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
 ```
 
-Create a [ClusterIssuer](https://cert-manager.io/docs/concepts/issuer/)
-for Let's Encrypt production certificates and a wildcard Certificate
-for the cluster domain:
+### Generate a Let's Encrypt production certificate
+
+<!-- prettier-ignore-start -->
+> These steps only need to be performed once.
+{: .prompt-info }
+<!-- prettier-ignore-end -->
+
+Production-ready Let's Encrypt certificates should generally be generated only
+once. The goal is to back up the certificate and then restore it whenever
+needed for a new cluster.
+
+Create a Let's Encrypt production `ClusterIssuer`:
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer.yml" << EOF | kubectl apply -f -
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-production.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-production-dns
+  namespace: cert-manager
   labels:
     letsencrypt: production
 spec:
@@ -1112,30 +1211,157 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-production-dns
     solvers:
-      - dns01:
-          route53:
-            region: ${AWS_REGION}
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: ingress-cert-production
-  namespace: cert-manager
-  labels:
-    letsencrypt: production
-spec:
-  secretName: ingress-cert-production
-  secretTemplate:
+      - selector:
+          dnsZones:
+            - ${CLUSTER_FQDN}
+        dns01:
+          route53: {}
+EOF
+kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
+kubectl label secret --namespace cert-manager letsencrypt-production-dns letsencrypt=production
+```
+
+Create a new certificate and have it signed by Let's Encrypt for validation:
+
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
+  tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
+  apiVersion: cert-manager.io/v1
+  kind: Certificate
+  metadata:
+    name: cert-production
+    namespace: cert-manager
     labels:
       letsencrypt: production
-  issuerRef:
-    name: letsencrypt-production-dns
-    kind: ClusterIssuer
-  commonName: "*.${CLUSTER_FQDN}"
-  dnsNames:
-    - "*.${CLUSTER_FQDN}"
-    - "${CLUSTER_FQDN}"
+  spec:
+    secretName: cert-production
+    secretTemplate:
+      labels:
+        letsencrypt: production
+    issuerRef:
+      name: letsencrypt-production-dns
+      kind: ClusterIssuer
+    commonName: "*.${CLUSTER_FQDN}"
+    dnsNames:
+      - "*.${CLUSTER_FQDN}"
+      - "${CLUSTER_FQDN}"
 EOF
+  kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate cert-production
+fi
+```
+
+### Create S3 bucket
+
+<!-- prettier-ignore-start -->
+> The following step needs to be performed only once.
+{: .prompt-info }
+<!-- prettier-ignore-end -->
+
+Use CloudFormation to create an S3 bucket that will be used for storing Velero
+backups.
+
+```bash
+if ! aws s3 ls "s3://${CLUSTER_FQDN}"; then
+  cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  S3BucketName:
+    Description: Name of the S3 bucket
+    Type: String
+  EmailToSubscribe:
+    Description: Confirm subscription over email to receive a copy of S3 events
+    Type: String
+
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          # Transitions objects to the ONEZONE_IA storage class after 30 days
+          - Id: TransitionToOneZoneIA
+            Status: Enabled
+            Transitions:
+              - TransitionInDays: 30
+                StorageClass: STANDARD_IA
+          - Id: DeleteOldObjects
+            Status: Enabled
+            ExpirationInDays: 120
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          # S3 Bucket policy force HTTPs requests
+          - Sid: ForceSSLOnlyAccess
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub ${S3Bucket.Arn}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+  S3Policy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub "${S3BucketName}-s3"
+      Description: !Sub "Policy required by Velero to write to S3 bucket ${S3BucketName}"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: Allow
+          Action:
+          - s3:ListBucket
+          - s3:GetBucketLocation
+          - s3:ListBucketMultipartUploads
+          Resource: !GetAtt S3Bucket.Arn
+        - Effect: Allow
+          Action:
+          - s3:PutObject
+          - s3:GetObject
+          - s3:DeleteObject
+          - s3:ListMultipartUploadParts
+          - s3:AbortMultipartUpload
+          Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
+        # S3 Bucket policy does not deny HTTP requests
+        - Sid: ForceSSLOnlyAccess
+          Effect: Deny
+          Action: "s3:*"
+          Resource:
+            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}"
+            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}/*"
+          Condition:
+            Bool:
+              aws:SecureTransport: "false"
+Outputs:
+  S3PolicyArn:
+    Description: The ARN of the created Amazon S3 policy
+    Value: !Ref S3Policy
+  S3Bucket:
+    Description: The name of the created Amazon S3 bucket
+    Value: !Ref S3Bucket
+EOF
+
+  eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
+    --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
+    --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
+fi
 ```
 
 ### Velero
@@ -1155,7 +1381,7 @@ using an ArgoCD Application CRD:
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="11.3.2"
+VELERO_HELM_CHART_VERSION="12.0.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-velero.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -1163,8 +1389,6 @@ kind: Application
 metadata:
   name: velero
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-1"
 spec:
   project: default
   destination:
@@ -1179,11 +1403,14 @@ spec:
         initContainers:
           - name: velero-plugin-for-aws
             # renovate: datasource=github-tags depName=vmware-tanzu/velero-plugin-for-aws extractVersion=^(?<version>.+)$
-            image: velero/velero-plugin-for-aws:v1.13.1
+            image: velero/velero-plugin-for-aws:v1.14.0
             volumeMounts:
               - mountPath: /target
                 name: plugins
         priorityClassName: high-priority
+        metrics:
+          serviceMonitor:
+            enabled: true
         configuration:
           backupStorageLocation:
             - name:
@@ -1231,126 +1458,23 @@ EOF
 Wait for the Velero ArgoCD Application to be healthy:
 
 ```bash
-kubectl wait --for=condition=Healthy application/velero -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/velero -n argocd --timeout=300s
 ```
 
-#### Restore cert-manager objects
-
-The following steps will guide you through restoring a Let's Encrypt
-production certificate, previously backed up by Velero to S3, onto a
-new cluster.
-
-Initiate the restore process for the cert-manager objects.
+Wait for Velero to sync with the S3 bucket and be ready for backup and restore
+operations:
 
 ```bash
 while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
-velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 ```
 
-View details about the restore process:
+Initiate the restore process for the cert-manager objects if the backup exists
+in the S3 bucket:
 
 ```bash
-velero restore describe --selector letsencrypt=production --details
-```
-
-```console
-Name:         velero-monthly-backup-cert-manager-production-20251030075321
-Namespace:    velero
-Labels:       letsencrypt=production
-Annotations:  <none>
-
-Phase:                       Completed
-Total items to be restored:  3
-Items restored:              3
-
-Started:    2025-10-30 07:53:22 +0100 CET
-Completed:  2025-10-30 07:53:24 +0100 CET
-
-Backup:  velero-monthly-backup-cert-manager-production-20250921155028
-
-Namespaces:
-  Included:  all namespaces found in the backup
-  Excluded:  <none>
-
-Resources:
-  Included:        *
-  Excluded:        nodes, events, events.events.k8s.io, backups.velero.io, restores.velero.io, resticrepositories.velero.io, csinodes.storage.k8s.io, volumeattachments.storage.k8s.io, backuprepositories.velero.io
-  Cluster-scoped:  auto
-
-Namespace mappings:  <none>
-
-Label selector:  <none>
-
-Or label selector:  <none>
-
-Restore PVs:  auto
-
-CSI Snapshot Restores: <none included>
-
-Existing Resource Policy:   update
-ItemOperationTimeout:       4h0m0s
-
-Preserve Service NodePorts:  auto
-
-Uploader config:
-
-
-HooksAttempted:   0
-HooksFailed:      0
-
-Resource List:
-  cert-manager.io/v1/Certificate:
-    - cert-manager/ingress-cert-production(created)
-  v1/Secret:
-    - cert-manager/ingress-cert-production(created)
-    - cert-manager/letsencrypt-production-dns(created)
-```
-
-Verify that the certificate was restored properly:
-
-```bash
-kubectl describe certificates -n cert-manager ingress-cert-production
-```
-
-```console
-Name:         ingress-cert-production
-Namespace:    cert-manager
-Labels:       letsencrypt=production
-              velero.io/backup-name=velero-monthly-backup-cert-manager-production-20250921155028
-              velero.io/restore-name=velero-monthly-backup-cert-manager-production-20251030075321
-Annotations:  <none>
-API Version:  cert-manager.io/v1
-Kind:         Certificate
-Metadata:
-  Creation Timestamp:  2025-10-30T06:53:23Z
-  Generation:          1
-  Resource Version:    5521
-  UID:                 33422558-3105-4936-87d8-468befb5dc2b
-Spec:
-  Common Name:  *.k01.k8s.mylabs.dev
-  Dns Names:
-    *.k01.k8s.mylabs.dev
-    k01.k8s.mylabs.dev
-  Issuer Ref:
-    Group:      cert-manager.io
-    Kind:       ClusterIssuer
-    Name:       letsencrypt-production-dns
-  Secret Name:  ingress-cert-production
-  Secret Template:
-    Labels:
-      Letsencrypt:  production
-Status:
-  Conditions:
-    Last Transition Time:  2025-10-30T06:53:23Z
-    Message:               Certificate is up to date and has not expired
-    Observed Generation:   1
-    Reason:                Ready
-    Status:                True
-    Type:                  Ready
-  Not After:               2025-12-20T10:53:07Z
-  Not Before:              2025-09-21T10:53:08Z
-  Renewal Time:            2025-11-20T10:53:07Z
-Events:                    <none>
+if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
+  velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
+fi
 ```
 
 ### ExternalDNS
@@ -1375,8 +1499,6 @@ kind: Application
 metadata:
   name: external-dns
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "-1"
 spec:
   project: default
   destination:
@@ -1395,24 +1517,35 @@ spec:
         policy: sync
         domainFilters:
           - ${CLUSTER_FQDN}
+        serviceMonitor:
+          enabled: true
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-    - CreateNamespace=true
+      - CreateNamespace=true
 EOF
 ```
 
 ### victoria-metrics-k8s-stack
 
-[![victoria-metrics-k8s-stack](https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/docs/logo.webp){:width="200"}](https://victoriametrics.com/)
+[![victoria-metrics-k8s-stack](https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/docs/victoriametrics/logo.webp){:width="200"}](https://victoriametrics.com/)
 
 Install [victoria-metrics-k8s-stack](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/)
 which provides a full monitoring stack with [VictoriaMetrics](https://victoriametrics.com/)
 components: VMSingle for metrics storage, VMAgent for scraping,
-VMAlert for alerting rules, and the VictoriaMetrics Operator with
-CRDs (VMServiceScrape, VMPodScrape, VMRule, etc.):
+VMAlert for alerting rules, the VictoriaMetrics Operator with
+CRDs (VMServiceScrape, VMPodScrape, VMRule, etc.), and
+[Grafana](https://grafana.com/) with preconfigured
+[VictoriaMetrics](https://victoriametrics.com/) and
+[VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)
+datasources. The
+[victoriametrics-metrics-datasource](https://grafana.com/grafana/plugins/victoriametrics-metrics-datasource/)
+and
+[victoriametrics-logs-datasource](https://grafana.com/grafana/plugins/victoriametrics-logs-datasource/)
+Grafana plugins are required for the native VictoriaMetrics
+and VictoriaLogs datasource types:
 
 ```bash
 # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
@@ -1424,8 +1557,6 @@ kind: Application
 metadata:
   name: victoria-metrics-k8s-stack
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   destination:
@@ -1483,7 +1614,133 @@ spec:
             receivers:
               - name: blackhole
         grafana:
-          enabled: false
+          enabled: true
+          # Disable Grafana's secret leak detection for values
+          # with Google OIDC client_secret set explicitly
+          assertNoLeakedSecrets: false
+          plugins:
+            - victoriametrics-logs-datasource
+            - victoriametrics-metrics-datasource
+          dashboardProviders:
+            dashboardproviders.yaml:
+              apiVersion: 1
+              providers:
+                - name: default
+                  orgId: 1
+                  folder: ""
+                  type: file
+                  disableDeletion: false
+                  editable: false
+                  options:
+                    path: /var/lib/grafana/dashboards/default
+          sidecar:
+            dashboards:
+              enabled: false
+          dashboards:
+            default:
+              1860-node-exporter-full:
+                gnetId: 1860
+                revision: 42
+                datasource: VictoriaMetrics
+              15757-kubernetes-views-global:
+                gnetId: 15757
+                revision: 43
+                datasource: VictoriaMetrics
+              15758-kubernetes-views-namespaces:
+                gnetId: 15758
+                revision: 44
+                datasource: VictoriaMetrics
+              15759-kubernetes-views-nodes:
+                gnetId: 15759
+                revision: 40
+                datasource: VictoriaMetrics
+              15760-kubernetes-views-pods:
+                gnetId: 15760
+                revision: 37
+                datasource: VictoriaMetrics
+              15761-kubernetes-system-api-server:
+                gnetId: 15761
+                revision: 20
+                datasource: VictoriaMetrics
+              15762-kubernetes-system-coredns:
+                gnetId: 15762
+                revision: 22
+                datasource: VictoriaMetrics
+              20842-cert-manager-kubernetes:
+                gnetId: 20842
+                revision: 3
+                datasource: VictoriaMetrics
+              22171-karpenter-overview:
+                gnetId: 22171
+                revision: 3
+                datasource: VictoriaMetrics
+              22172-karpenter-activity:
+                gnetId: 22172
+                revision: 3
+                datasource: VictoriaMetrics
+              22173-karpenter-performance:
+                gnetId: 22173
+                revision: 3
+                datasource: VictoriaMetrics
+              23838-velero-overview:
+                gnetId: 23838
+                revision: 1
+                datasource: VictoriaMetrics
+              23969-external-dns:
+                gnetId: 23969
+                revision: 1
+                datasource: VictoriaMetrics
+          persistence:
+            enabled: false
+          grafana.ini:
+            analytics:
+              check_for_updates: false
+            server:
+              root_url: https://grafana.${CLUSTER_FQDN}
+            auth:
+              disable_login_form: true
+            auth.google:
+              enabled: true
+              allow_sign_up: true
+              auto_login: true
+              scopes: openid email profile
+              auth_url: https://accounts.google.com/o/oauth2/v2/auth
+              token_url: https://oauth2.googleapis.com/token
+              api_url: https://www.googleapis.com/oauth2/v2/userinfo
+              client_id: ${GOOGLE_CLIENT_ID}
+              client_secret: ${GOOGLE_CLIENT_SECRET}
+              allowed_domains: ${MY_EMAIL##*@}
+            users:
+              auto_assign_org_role: Admin
+          serviceMonitor:
+            enabled: true
+          ingress:
+            enabled: false
+          service:
+            type: ClusterIP
+            port: 80
+            targetPort: 3000
+        defaultDatasources:
+          victoriametrics:
+            datasources:
+              - name: VictoriaMetrics
+                type: prometheus
+                access: proxy
+                isDefault: true
+                uid: victoriametrics
+                jsonData:
+                  httpMethod: POST
+                  timeInterval: "30s"
+              - name: VictoriaMetrics (DS)
+                isDefault: false
+                access: proxy
+                type: victoriametrics-metrics-datasource
+          extra:
+            - name: VictoriaLogs
+              type: victoriametrics-logs-datasource
+              uid: victorialogs
+              access: proxy
+              url: http://victoria-logs-single-server.monitoring.svc:9428
         defaultDashboards:
           enabled: true
           annotations:
@@ -1568,8 +1825,6 @@ kind: Application
 metadata:
   name: victoria-logs-single
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "0"
 spec:
   project: default
   destination:
@@ -1641,178 +1896,10 @@ spec:
 EOF
 ```
 
-### Grafana
-
-[![Grafana](https://raw.githubusercontent.com/grafana/grafana/main/public/img/grafana_icon.svg){:width="150"}](https://grafana.com/)
-
-Install [Grafana](https://grafana.com/) with
-[VictoriaMetrics](https://victoriametrics.com/) and
-[VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)
-datasources preconfigured. The
-[victoriametrics-logs-datasource](https://grafana.com/grafana/plugins/victoriametrics-logs-datasource/)
-Grafana plugin is required for querying VictoriaLogs:
-
-```bash
-# renovate: datasource=helm depName=grafana registryUrl=https://grafana.github.io/helm-charts
-GRAFANA_HELM_CHART_VERSION="10.5.12"
-
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-grafana.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: grafana
-  namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
-spec:
-  project: default
-  destination:
-    namespace: monitoring
-    server: https://kubernetes.default.svc
-  source:
-    chart: grafana
-    repoURL: https://grafana.github.io/helm-charts
-    targetRevision: ${GRAFANA_HELM_CHART_VERSION}
-    helm:
-      values: |
-        plugins:
-          - victoriametrics-logs-datasource
-        datasources:
-          datasources.yaml:
-            apiVersion: 1
-            datasources:
-              - name: VictoriaMetrics
-                type: prometheus
-                uid: victoriametrics
-                access: proxy
-                url: http://vmsingle-victoria-metrics-k8s-stack.monitoring.svc:8428
-                isDefault: true
-                jsonData:
-                  httpMethod: POST
-                  timeInterval: "30s"
-              - name: VictoriaLogs
-                type: victoriametrics-logs-datasource
-                uid: victorialogs
-                access: proxy
-                url: http://victoria-logs-single-server.monitoring.svc:9428
-        dashboardProviders:
-          dashboardproviders.yaml:
-            apiVersion: 1
-            providers:
-              - name: default
-                orgId: 1
-                folder: ""
-                type: file
-                disableDeletion: false
-                editable: false
-                options:
-                  path: /var/lib/grafana/dashboards/default
-        sidecar:
-          dashboards:
-            enabled: true
-            label: grafana_dashboard
-            labelValue: "1"
-            searchNamespace: ALL
-            folder: /var/lib/grafana/dashboards/default
-            provider:
-              name: default
-              disableDeletion: false
-              allowUiUpdates: false
-        dashboards:
-          default:
-            1860-node-exporter-full:
-              gnetId: 1860
-              revision: 42
-              datasource: VictoriaMetrics
-            15757-kubernetes-views-global:
-              gnetId: 15757
-              revision: 43
-              datasource: VictoriaMetrics
-            15758-kubernetes-views-namespaces:
-              gnetId: 15758
-              revision: 44
-              datasource: VictoriaMetrics
-            15759-kubernetes-views-nodes:
-              gnetId: 15759
-              revision: 40
-              datasource: VictoriaMetrics
-            15760-kubernetes-views-pods:
-              gnetId: 15760
-              revision: 37
-              datasource: VictoriaMetrics
-            15761-kubernetes-system-api-server:
-              gnetId: 15761
-              revision: 20
-              datasource: VictoriaMetrics
-            15762-kubernetes-system-coredns:
-              gnetId: 15762
-              revision: 22
-              datasource: VictoriaMetrics
-            20842-cert-manager-kubernetes:
-              gnetId: 20842
-              revision: 3
-              datasource: VictoriaMetrics
-            22171-karpenter-overview:
-              gnetId: 22171
-              revision: 3
-              datasource: VictoriaMetrics
-            22172-karpenter-activity:
-              gnetId: 22172
-              revision: 3
-              datasource: VictoriaMetrics
-            22173-karpenter-performance:
-              gnetId: 22173
-              revision: 3
-              datasource: VictoriaMetrics
-            23838-velero-overview:
-              gnetId: 23838
-              revision: 1
-              datasource: VictoriaMetrics
-            23969-external-dns:
-              gnetId: 23969
-              revision: 1
-              datasource: VictoriaMetrics
-        persistence:
-          enabled: false
-        grafana.ini:
-          analytics:
-            check_for_updates: false
-          server:
-            root_url: https://grafana.${CLUSTER_FQDN}
-          auth:
-            disable_login_form: true
-          auth.google:
-            enabled: true
-            allow_sign_up: true
-            auto_login: true
-            scopes: openid email profile
-            auth_url: https://accounts.google.com/o/oauth2/v2/auth
-            token_url: https://oauth2.googleapis.com/token
-            api_url: https://www.googleapis.com/oauth2/v2/userinfo
-            client_id: ${GOOGLE_CLIENT_ID}
-            client_secret: ${GOOGLE_CLIENT_SECRET}
-            allowed_domains: ${MY_EMAIL##*@}
-          users:
-            auto_assign_org_role: Admin
-        ingress:
-          enabled: false
-        service:
-          type: ClusterIP
-          port: 80
-          targetPort: 3000
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-    - CreateNamespace=true
-EOF
-```
-
 Wait for monitoring ArgoCD Applications to be healthy:
 
 ```bash
-kubectl wait --for=condition=Healthy application/victoria-metrics-k8s-stack application/victoria-logs-single application/grafana -n argocd --timeout=600s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/victoria-metrics-k8s-stack application/victoria-logs-single -n argocd --timeout=600s
 ```
 
 Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
@@ -1834,93 +1921,9 @@ spec:
     - grafana.${CLUSTER_FQDN}
   rules:
     - backendRefs:
-        - name: grafana
+        - name: victoria-metrics-k8s-stack-grafana
           port: 80
 EOF
-```
-
-Access Grafana through your browser:
-
-```shell
-echo "https://grafana.${CLUSTER_FQDN}"
-```
-
-### Envoy Gateway SecurityPolicy
-
-Envoy Gateway's
-[SecurityPolicy](https://gateway.envoyproxy.io/docs/tasks/security/oidc/)
-handles the full OIDC authorization code flow with Google — redirect,
-consent, callback, and cookie-based session management — plus JWT-based
-authorization to restrict access to a specific email address. No
-separate proxy pod is needed.
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-envoy-gateway-security-policy.yml" << EOF | kubectl apply -f -
-apiVersion: v1
-kind: Secret
-metadata:
-  name: google-oidc-client-secret
-  namespace: envoy-gateway-system
-type: Opaque
-stringData:
-  client-secret: "${GOOGLE_CLIENT_SECRET}"
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: SecurityPolicy
-metadata:
-  name: google-oidc
-  namespace: envoy-gateway-system
-spec:
-  targetRefs:
-    - group: gateway.networking.k8s.io
-      kind: Gateway
-      name: eg
-  oidc:
-    provider:
-      issuer: "https://accounts.google.com"
-    clientID: "${GOOGLE_CLIENT_ID}"
-    clientSecret:
-      name: google-oidc-client-secret
-    redirectURL: "https://grafana.${CLUSTER_FQDN}/oauth2/callback"
-    scopes:
-      - openid
-      - email
-      - profile
-    cookieNames:
-      accessToken: oidc-access-token
-      idToken: oidc-id-token
-    cookieDomain: ".${CLUSTER_FQDN}"
-    logoutPath: "/logout"
-  jwt:
-    providers:
-      - name: google
-        issuer: "https://accounts.google.com"
-        remoteJWKS:
-          uri: "https://www.googleapis.com/oauth2/v3/certs"
-        extractFrom:
-          cookies:
-            - oidc-id-token
-  authorization:
-    defaultAction: Deny
-    rules:
-      - name: allow-specific-email
-        action: Allow
-        principal:
-          jwt:
-            provider: google
-            claims:
-              - name: email
-                values:
-                  - "${MY_EMAIL}"
-              - name: email_verified
-                values:
-                  - "true"
-EOF
-```
-
-```shell
-echo "All routes through the Envoy Gateway now require Google authentication"
-echo "Only ${MY_EMAIL} is allowed to access the services"
 ```
 
 ### Homepage
@@ -1940,8 +1943,6 @@ kind: Application
 metadata:
   name: homepage
   namespace: argocd
-  annotations:
-    argocd.argoproj.io/sync-wave: "2"
 spec:
   project: default
   destination:
@@ -1967,7 +1968,7 @@ spec:
                     icon: grafana.svg
                     href: https://grafana.${CLUSTER_FQDN}
                     description: Visualization Platform
-                    siteMonitor: http://grafana.monitoring.svc:80
+                    siteMonitor: http://victoria-metrics-k8s-stack-grafana.monitoring.svc:80
           widgets:
             - logo:
                 icon: kubernetes.svg
@@ -2008,10 +2009,6 @@ spec:
 EOF
 ```
 
-```bash
-kubectl wait --for=condition=Healthy application/homepage -n argocd --timeout=300s
-```
-
 Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
 to expose Homepage via the Envoy Gateway:
 
@@ -2036,15 +2033,18 @@ spec:
 EOF
 ```
 
-Access Homepage through your browser:
-
-```shell
-echo "https://${CLUSTER_FQDN}"
-```
-
 ## Clean-up
 
 ![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
+
+Stop Karpenter from launching additional nodes and remove
+Envoy Gateway to release the AWS Load Balancer:
+
+```sh
+kubectl delete application -n argocd karpenter envoy-gateway || true
+kubectl wait --for=delete application/karpenter application/envoy-gateway -n argocd --timeout=300s 2>/dev/null || true
+kubectl get pods -n karpenter || true
+```
 
 Back up the certificate before deleting the cluster (in case it was
 renewed):
@@ -2058,16 +2058,6 @@ fi
 ```
 
 {% endraw %}
-
-Remove any remaining EC2 instances provisioned by Karpenter (if they
-still exist):
-
-```sh
-for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" "Name=tag:karpenter.sh/nodepool,Values=*" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
-  echo "Removing Karpenter EC2: ${EC2}"
-  aws ec2 terminate-instances --instance-ids "${EC2}"
-done
-```
 
 Disassociate a Route 53 Resolver query log configuration from an Amazon
 VPC:
@@ -2089,6 +2079,16 @@ Clean up AWS Route 53 Resolver query log configurations:
 for AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID in $(aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogConfigs[?Name=='${CLUSTER_NAME}-vpc-dns-logs'].Id" --output text); do
   echo "*** Removing Route 53 Resolver query log config: ${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
   aws route53resolver delete-resolver-query-log-config --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}"
+done
+```
+
+Remove any remaining EC2 instances provisioned by Karpenter (if they
+still exist):
+
+```sh
+for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" "Name=tag:karpenter.sh/nodepool,Values=*" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
+  echo "*** Removing Karpenter EC2: ${EC2}"
+  aws ec2 terminate-instances --instance-ids "${EC2}"
 done
 ```
 
@@ -2142,13 +2142,13 @@ Remove volumes and snapshots related to the cluster (as a precaution):
 
 ```sh
 for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text); do
-  echo "Removing Volume: ${VOLUME}"
+  echo "*** Removing Volume: ${VOLUME}"
   aws ec2 delete-volume --volume-id "${VOLUME}"
 done
 
 # Remove EBS snapshots associated with the cluster
 for SNAPSHOT in $(aws ec2 describe-snapshots --owner-ids self --filter "Name=tag:Name,Values=${CLUSTER_NAME}-dynamic-snapshot*" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Snapshots[].SnapshotId' --output text); do
-  echo "Removing Snapshot: ${SNAPSHOT}"
+  echo "*** Removing Snapshot: ${SNAPSHOT}"
   aws ec2 delete-snapshot --snapshot-id "${SNAPSHOT}"
 done
 ```
@@ -2166,7 +2166,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},k8s-argocd-{aws-load-balancer-controller,cert-manager,external-dns,gateway-api-crds,grafana,homepage,envoy-gateway,karpenter,velero,victoria-logs-single,victoria-metrics-k8s-stack},k8s-{cert-manager-clusterissuer,envoy-gateway-gateway,envoy-gateway-security-policy,grafana-httproute,homepage-httproute,karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,aws-s3,cloudformation-karpenter,eksctl-${CLUSTER_NAME},k8s-argocd-{argo-cd,cert-manager,external-dns,homepage,envoy-gateway,karpenter,prometheus-operator-crds,velero,victoria-logs-single,victoria-metrics-k8s-stack},k8s-{cert-manager-certificate-production,cert-manager-clusterissuer-production,envoy-gateway-gateway,grafana-httproute,homepage-httproute,karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else

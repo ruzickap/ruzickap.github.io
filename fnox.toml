@@ -2,5 +2,5 @@
 ps = { type = "aws-ps", profile = "my-aws", region = "eu-central-1" }
 
 [secrets]
-GOOGLE_CLIENT_ID = { provider = "ps", value = "/github/ruzickap/ruzickap.github.io/actions-secrets/GOOGLE_CLIENT_ID" }
-GOOGLE_CLIENT_SECRET = { provider = "ps", value = "/github/ruzickap/ruzickap.github.io/actions-secrets/GOOGLE_CLIENT_SECRET" }
+GOOGLE_CLIENT_ID = { provider = "ps", value = "/github/ruzickap/ruzickap.github.io/actions-secrets/GOOGLE_CLIENT_ID", if_missing = "error" }
+GOOGLE_CLIENT_SECRET = { provider = "ps", value = "/github/ruzickap/ruzickap.github.io/actions-secrets/GOOGLE_CLIENT_SECRET", if_missing = "error" }

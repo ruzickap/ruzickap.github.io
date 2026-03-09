@@ -44,7 +44,6 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  AWS_ROLE_TO_ASSUME: ${{ secrets.AWS_ROLE_TO_ASSUME }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
@@ -65,7 +64,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          role-to-assume: ${{ secrets.RUZICKA_SBX01_AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 7200
           role-session-name: ${{ github.event.repository.name }}-${{ github.workflow }}-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
@@ -75,8 +74,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Install mise and dependencies
-        uses: jdx/mise-action@v3
-        with:
+        env:
           # renovate: datasource=github-releases depName=jdx/mise
           MISE_VERSION: 2026.4.6
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
