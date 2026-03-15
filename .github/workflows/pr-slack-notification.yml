@@ -19,11 +19,7 @@ on:
     types:
       - submitted
 
-permissions:
-  actions: read # needed for cache operations
-  contents: read # needed to checkout the repository
-  issues: read # needed to read issue comments
-  pull-requests: read # needed to read pull request details
+permissions: read-all
 
 defaults:
   run:
@@ -37,7 +33,7 @@ jobs:
     steps:
       - name: Post PR summary message to slack
         id: message
-        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         with:
           method: chat.postMessage
           token: ${{ secrets.MY_SLACK_BOT_TOKEN }}
@@ -52,7 +48,7 @@ jobs:
           echo "${TS}" > slack-message-timestamp.txt
 
       - name: Cache slack message timestamp
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/save@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
         with:
           path: slack-message-timestamp.txt
           key: slack-message-timestamp-${{ github.event.pull_request.html_url }}-${{ steps.message.outputs.ts }}
@@ -65,8 +61,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        with:
-          persist-credentials: false
 
       - name: Retrieve Slack message timestamp from cache
         id: slack-timestamp
@@ -116,7 +110,7 @@ jobs:
 
       - name: React to PR summary message in slack with emoji
         if: ${{ steps.slack-timestamp.outputs.github_event_pull_request_html_url == 'true' && env.EMOJI != 'false' }}
-        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         with:
           method: reactions.add
           token: ${{ secrets.MY_SLACK_BOT_TOKEN }}
@@ -127,7 +121,7 @@ jobs:
 
       - name: Update the original message with status Merged ✅
         if: ${{ github.event.pull_request.merged && steps.slack-timestamp.outputs.github_event_pull_request_html_url == 'true' }}
-        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         with:
           method: chat.update
           token: ${{ secrets.MY_SLACK_BOT_TOKEN }}
@@ -144,7 +138,7 @@ jobs:
 
       - name: Update the original message with status Closed ❎
         if: ${{ github.event.action == 'closed' && github.event.pull_request.merged == false && steps.slack-timestamp.outputs.github_event_pull_request_html_url == 'true' }}
-        uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+        uses: slackapi/slack-github-action@af78098f536edbc4de71162a307590698245be95 # v3.0.1
         with:
           method: chat.update
           token: ${{ secrets.MY_SLACK_BOT_TOKEN }}
