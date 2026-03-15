@@ -79,7 +79,7 @@ Code blocks in posts drive the E2E test system:
 ## Markdown Files
 
 - Must pass `rumdl` checks (MD036 and MD041 disabled globally)
-- Wrap lines at 72 characters
+- Wrap lines at 80 characters
 - Use proper heading hierarchy (no skipped levels)
 - Include language identifiers in all code fences
 - Shell code blocks inside Markdown are extracted and validated
