@@ -51,7 +51,7 @@ jobs:
           # Use comma separator for Renovate's RENOVATE_INCLUDE_PATHS (expects comma-separated or JSON array)
           separator: ","
 
-      - uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+      - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2.2.2
         if: steps.changed-files.outputs.any_changed == 'true'
         id: app-token
         with:
