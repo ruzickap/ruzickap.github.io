@@ -36,7 +36,9 @@ jobs:
       # https://github.com/lycheeverse/lychee/issues/1734
       - name: Remove unavailable URLs from cache to check them again
         run: |
-          sed -i '/,,/d' .lycheecache
+          if [[ -f .lycheecache ]]; then
+            sed -i '/,,/d' .lycheecache
+          fi
 
       - name: Link Checker
         env:
