@@ -14,7 +14,7 @@ cilium-cli = "0.18.3"
 eksctl = "0.207.0"
 helm = "4.1.4"
 kind = "0.31.0"
-kubectl = "1.35.3"
+kubectl = "1.35.4"
 velero = "1.16.0"
 yq = "4.52.5"
 # keep-sorted end
