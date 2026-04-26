@@ -623,6 +623,46 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes)
 
+### [container-image-scans](https://github.com/ruzickap/container-image-scans)
+
+- Description: Container image scans
+- Topics: container, container-image, container-security, cve, image, public,
+  security, vulnerability
+
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/container-image-scans.svg?style=social)](https://github.com/ruzickap/container-image-scans/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/container-image-scans.svg?style=social)](https://github.com/ruzickap/container-image-scans/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/container-image-scans.svg?style=social)](https://github.com/ruzickap/container-image-scans)
+
+- CI/CD status:
+
+  [![GitHub Actions status - apply-schema](https://github.com/ruzickap/container-image-scans/workflows/apply-schema/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/apply-schema.yml)
+  [![GitHub Actions status - codeql](https://github.com/ruzickap/container-image-scans/workflows/codeql/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/codeql.yml)
+  [![GitHub Actions status - commit-check](https://github.com/ruzickap/container-image-scans/workflows/commit-check/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/commit-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/container-image-scans/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - nightly-scans](https://github.com/ruzickap/container-image-scans/workflows/nightly-scans/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/nightly-scans.yml)
+  [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/container-image-scans/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/pr-size-labeler.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/container-image-scans/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/pr-slack-notification.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/container-image-scans/workflows/release-please/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/release-please.yml)
+  [![GitHub Actions status - renovate](https://github.com/ruzickap/container-image-scans/workflows/renovate/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/renovate.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/container-image-scans/workflows/scorecards/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/scorecards.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/container-image-scans/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/container-image-scans/workflows/stale/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/stale.yml)
+
+- Issue tracking:
+
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/pulls)
+
+- Repository:
+
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/container-image-scans/latest)](https://github.com/ruzickap/container-image-scans/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans)
+
 ### [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
 - Description: Notes from Amazon EKS Bottlerocket and Fargate testing
@@ -1205,7 +1245,6 @@ order: 4
 
   [![GitHub Actions status - codeql](https://github.com/ruzickap/ruzickap.github.io/workflows/codeql/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/codeql.yml)
   [![GitHub Actions status - commit-check](https://github.com/ruzickap/ruzickap.github.io/workflows/commit-check/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/commit-check.yml)
-  [![GitHub Actions status - Copilot code review](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer)
   [![GitHub Actions status - dependency-review](https://github.com/ruzickap/ruzickap.github.io/workflows/dependency-review/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/dependency-review.yml)
   [![GitHub Actions status - docs-confluence-sync](https://github.com/ruzickap/ruzickap.github.io/workflows/docs-confluence-sync/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/docs-confluence-sync.yml)
   [![GitHub Actions status - generate-projects](https://github.com/ruzickap/ruzickap.github.io/workflows/generate-projects/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/generate-projects.yml)
@@ -1251,7 +1290,6 @@ order: 4
 
   [![GitHub Actions status - codeql](https://github.com/ruzickap/xvx.cz/workflows/codeql/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/codeql.yml)
   [![GitHub Actions status - commit-check](https://github.com/ruzickap/xvx.cz/workflows/commit-check/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/commit-check.yml)
-  [![GitHub Actions status - Copilot code review](https://github.com/ruzickap/xvx.cz/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/copilot-pull-request-reviewer/copilot-pull-request-reviewer)
   [![GitHub Actions status - gh-pages-build](https://github.com/ruzickap/xvx.cz/workflows/gh-pages-build/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/gh-pages-build.yml)
   [![GitHub Actions status - links](https://github.com/ruzickap/xvx.cz/workflows/links/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/links.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/xvx.cz/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/mega-linter.yml)
