@@ -57,8 +57,8 @@ while read -r GITHUB_REPOSITORY_TITLE_TMP; do
   GITHUB_REPOSITORY_TOPICS=$(jq -r '[.repositoryTopics[].name] | join(", ")' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
   GITHUB_REPOSITORY_HOMEPAGEURL=$(jq -r '.homepageUrl' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
   GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.defaultBranchRef.name' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
-  # Remove pages-build-deployment and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
-  GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY_NAME}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path==""))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
+  # Remove pages-build-deployment, Copilot agent workflows, and any obsolete GitHub Actions which doesn't have path like "vuepress-build"
+  GITHUB_REPOSITORY_CI_CD_STATUS=$(curl -s --header "authorization: Bearer ${GITHUB_TOKEN}" "https://api.github.com/repos/${GITHUB_REPOSITORY_NAME}/actions/workflows" | jq -r 'del(.workflows[] | select((.path=="dynamic/pages/pages-build-deployment") or (.path=="") or (.path | startswith("dynamic/copilot-")))) | .workflows[] | "  [![GitHub Actions status - " + .name + "](" + .badge_url + ")](" + .html_url | gsub("/blob/.*/.github/"; "/actions/") + ")"' | sort --ignore-case)
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGEURL}" ]]; then echo -e "\n- Website: <${GITHUB_REPOSITORY_HOMEPAGEURL}>"; fi)
   cat << EOF >> "${DESTINATION_FILE}"
 
