@@ -101,8 +101,8 @@ wget -c --directory-prefix=/mnt/sdb1/isos \
   http://xpud.googlecode.com/files/xpud-0.9.2.iso
 ```
 
-The following code is taken from [Ubuntu Forums](https://ubuntuforums.org)
-where I added more live CDs. I also changed the main `grub.cfg` a little bit and
+The following code where I added more live CDs. I also changed the main
+`grub.cfg` a little bit and
 use 64 live CDs `amd64`.
 
 Save following text as 3 files:
