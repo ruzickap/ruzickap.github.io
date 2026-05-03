@@ -15,7 +15,7 @@ eksctl = "0.207.0"
 helm = "4.1.4"
 kind = "0.31.0"
 kubectl = "1.36.0"
-velero = "1.16.0"
+velero = "1.16.2"
 yq = "4.53.2"
 # keep-sorted end
 
