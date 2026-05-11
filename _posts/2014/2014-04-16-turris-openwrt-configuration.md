@@ -256,7 +256,7 @@ server:
 EOF
 ```
 
-Configure the DDNS - [duckdns.org](https://duckdns.org/):
+Configure the DDNS - [duckdns.org](https://www.duckdns.org/):
 
 ```bash
 uci set ddns.myddns.enabled=1
