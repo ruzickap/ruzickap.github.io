@@ -624,7 +624,7 @@ to expose the ArgoCD UI:
 
 ```bash
 # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-ARGOCD_HELM_CHART_VERSION="9.4.12"
+ARGOCD_HELM_CHART_VERSION="9.5.13"
 
 helm repo add --force-update argo https://argoproj.github.io/argo-helm
 helm upgrade --install --version "${ARGOCD_HELM_CHART_VERSION}" --namespace argocd --create-namespace --wait argo-cd argo/argo-cd
@@ -643,7 +643,7 @@ to set up the necessary CRDs:
 
 ```bash
 # renovate: datasource=docker depName=prometheus-community/charts/prometheus-operator-crds registryUrl=https://ghcr.io
-PROMETHEUS_OPERATOR_CRDS_HELM_CHART_VERSION="28.0.0"
+PROMETHEUS_OPERATOR_CRDS_HELM_CHART_VERSION="28.0.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-prometheus-operator-crds.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -694,7 +694,7 @@ limit, and `CreateNamespace` ensures the target namespace exists:
 
 ```bash
 # renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
-ENVOY_GATEWAY_HELM_CHART_VERSION="v1.7.1"
+ENVOY_GATEWAY_HELM_CHART_VERSION="1.7.3"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-envoy-gateway.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -999,7 +999,7 @@ using an ArgoCD Application CRD:
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
-KARPENTER_HELM_CHART_VERSION="1.8.4"
+KARPENTER_HELM_CHART_VERSION="1.12.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-karpenter.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -1381,7 +1381,7 @@ using an ArgoCD Application CRD:
 
 ```bash
 # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-VELERO_HELM_CHART_VERSION="12.0.0"
+VELERO_HELM_CHART_VERSION="12.0.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-velero.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -1491,7 +1491,7 @@ using an ArgoCD Application CRD:
 
 ```bash
 # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
-EXTERNAL_DNS_HELM_CHART_VERSION="1.20.0"
+EXTERNAL_DNS_HELM_CHART_VERSION="1.21.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-external-dns.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -1549,7 +1549,7 @@ and VictoriaLogs datasource types:
 
 ```bash
 # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
-VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.72.2"
+VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.77.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-victoria-metrics-k8s-stack.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -1817,7 +1817,7 @@ DaemonSet that collects logs from all pods:
 
 ```bash
 # renovate: datasource=helm depName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-VICTORIA_LOGS_SINGLE_HELM_CHART_VERSION="0.11.28"
+VICTORIA_LOGS_SINGLE_HELM_CHART_VERSION="0.12.4"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-victoria-logs-single.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
