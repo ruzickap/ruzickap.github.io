@@ -2,6 +2,7 @@
 /\.github/workflows/post_tests.yml
 \.elb\.amazonaws\.com
 \.local
+access\.redhat\.com
 cdn\.com
 eko\.one\.pl
 ftp\.xvx\.cz
@@ -22,8 +23,11 @@ web\.archive\.org
 websvn\.xvx\.cz
 www\.conventionalcommits\.org
 www\.cvedetails\.com
+www\.dell\.com
 www\.facebook\.com/sharer/sharer\.php\?title=TITLE&u=URL
+www\.freedesktop\.org
 www\.gnu\.org
+www\.linkedin\.com
 www\.mysql\.com
 www\.reddit\.com/submit\?url=
 # keep-sorted end
