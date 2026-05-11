@@ -45,13 +45,13 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@22103cc46bda19c2b464ffe86db46df6922fd323 # v47.0.5
+        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
         with:
           files: "_posts/**"
           # Use comma separator for Renovate's RENOVATE_INCLUDE_PATHS (expects comma-separated or JSON array)
           separator: ","
 
-      - uses: actions/create-github-app-token@f8d387b68d61c58ab83c6c016672934102569859 # v3.0.0
+      - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
         if: steps.changed-files.outputs.any_changed == 'true'
         id: app-token
         with:

@@ -53,7 +53,7 @@ jobs:
           mkdir public
 
       - name: Setup Ruby
-        uses: ruby/setup-ruby@e65c17d16e57e481586a6a5a0282698790062f92 # v1.300.0
+        uses: ruby/setup-ruby@c4e5b1316158f92e3d49443a9d58b31d25ac0f8f # v1.306.0
         with:
           ruby-version: 3.4.9
           bundler-cache: true
@@ -84,7 +84,7 @@ jobs:
           force_orphan: true
 
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/wrangler-action@da0e0dfe58b7a431659754fdf3f186c529afbe65 # v3.14.1
+        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
         if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/gh-pages' }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
