@@ -19,6 +19,7 @@ BASH_SHFMT_ARGUMENTS: --case-indent --indent 2 --space-redirects
 DISABLE_LINTERS:
   - COPYPASTE_JSCPD
   - MARKDOWN_MARKDOWNLINT # Using rumdl instead (faster Rust-based alternative)
+  - REPOSITORY_KICS # Disabled in favor of other IaC scanners (Checkov, Trivy)
   - REPOSITORY_KINGFISHER # Secret detection with too many false positives
   - SPELL_CSPELL # Spell checking disabled - prone to false positives
   - TERRAFORM_TERRASCAN # Hard to configure - no clear documentation of the config file format
@@ -58,9 +59,6 @@ REPOSITORY_CHECKOV_ARGUMENTS: --quiet
 #   - DS162092: "Do not leave debug code in production"
 #   - DS137138: "Insecure URL" (for HTTP links that are intentional)
 REPOSITORY_DEVSKIM_ARGUMENTS: --ignore-globs CHANGELOG.md --ignore-rule-ids DS162092,DS137138
-
-# KICS (security scanner) - only fail on high severity issues
-REPOSITORY_KICS_ARGUMENTS: --fail-on high
 
 # Trivy (vulnerability scanner) - only check HIGH and CRITICAL severity
 REPOSITORY_TRIVY_ARGUMENTS: --severity HIGH,CRITICAL --ignore-unfixed

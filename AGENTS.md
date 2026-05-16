@@ -94,7 +94,7 @@ Code blocks in posts drive the E2E test system:
 
 ## Terraform Files
 
-- Must pass `tflint`, `checkov`, `kics`, and `trivy` scans
+- Must pass `tflint`, `checkov`, and `trivy` scans
 - Only HIGH/CRITICAL severity issues fail the build
 
 ## GitHub Actions
@@ -108,7 +108,7 @@ Code blocks in posts drive the E2E test system:
 ## Security and Link Scanning
 
 CI runs: Checkov (`CKV_GHA_7` skipped), DevSkim (DS162092/DS137138
-ignored), KICS (HIGH only), Trivy (HIGH/CRITICAL, ignores unfixed),
+ignored), Trivy (HIGH/CRITICAL, ignores unfixed),
 Gitleaks, Secretlint. Link checking via `lychee` (config in
 `lychee.toml`); accepts 200/429; caching enabled; excludes template
 variables, shell variables, private IPs, `CHANGELOG.md`.
