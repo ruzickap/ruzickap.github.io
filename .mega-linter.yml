@@ -6,6 +6,10 @@
 # and in individual linters documentation
 
 # keep-sorted start newline_separated=yes
+# Allow zizmor (GitHub Actions security scanner) to access GitHub token for API calls
+ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
+  - GITHUB_TOKEN
+
 # ShellCheck configuration - exclude SC2317 (unreachable command warning)
 BASH_SHELLCHECK_ARGUMENTS: --exclude=SC2317
 
@@ -21,6 +25,7 @@ DISABLE_LINTERS:
   - MARKDOWN_MARKDOWNLINT # Using rumdl instead (faster Rust-based alternative)
   - REPOSITORY_KICS # Disabled in favor of other IaC scanners (Checkov, Trivy)
   - REPOSITORY_KINGFISHER # Secret detection with too many false positives
+  - REPOSITORY_OSV_SCANNER # No package lockfiles in this Jekyll blog repository
   - SPELL_CSPELL # Spell checking disabled - prone to false positives
   - TERRAFORM_TERRASCAN # Hard to configure - no clear documentation of the config file format
 
