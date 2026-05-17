@@ -5,7 +5,6 @@
 .jekyll-cache
 _site
 public/
-Gemfile.lock
 
 # Lychee cache
 .lycheecache
