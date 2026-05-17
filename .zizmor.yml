@@ -1,7 +1,0 @@
-rules:
-  cache-poisoning:
-    ignore:
-      - gh-pages-build.yml
-  github-app:
-    ignore:
-      - renovate-pr.yml
