@@ -11,20 +11,16 @@ export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
-: "${AWS_ACCESS_KEY_ID:?Error: AWS_ACCESS_KEY_ID environment variable is not set!}"
-: "${AWS_ROLE_TO_ASSUME:?Error: AWS_ROLE_TO_ASSUME environment variable is not set!}"
-: "${AWS_SECRET_ACCESS_KEY:?Error: AWS_SECRET_ACCESS_KEY environment variable is not set!}"
+# Try a simple AWS STS call to validate credentials
+if aws sts get-caller-identity > /dev/null 2>&1; then
+  echo "✅ AWS access verified."
+else
+  echo "❌ ERROR: Unable to access AWS. Check credentials or permissions."
+  exit 1
+fi
+
 : "${GITHUB_STEP_SUMMARY:="${TMP_DIR}/github_step_summary"}"
 : "${RUN_FILE:="${TMP_DIR}/${1//[:|]/_}.sh"}"
-
-# For the GH Actions which already has the role assumed
-CURRENT_ROLE_ARN=$(aws sts get-caller-identity --query Arn --output text 2> /dev/null || true)
-if [[ ! "${CURRENT_ROLE_ARN}" =~ ${AWS_ROLE_TO_ASSUME##*/} ]]; then
-  eval "$(aws sts assume-role --role-arn "${AWS_ROLE_TO_ASSUME}" --role-session-name "$USER@${HOSTNAME}-$(date +%s)" --duration-seconds 7200 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
-  [[ "${GITHUB_ACTIONS:-}" == "true" ]] && echo -e "::add-mask::${AWS_ACCESS_KEY_ID}\n::add-mask::${AWS_SECRET_ACCESS_KEY}\n::add-mask::${AWS_SESSION_TOKEN}"
-else
-  echo "💡 Already using role: ${AWS_ROLE_TO_ASSUME}"
-fi
 
 echo "💡 *** $*"
 
@@ -62,8 +58,6 @@ if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
   (
     echo "😇 <https://${CLUSTER_FQDN}>"
     echo '```'
-    echo "export CLUSTER_NAME=\"${CLUSTER_NAME}\""
-    echo "export AWS_REGION=\"${AWS_REGION}\""
     echo "eval \"\$(mise run a)\""
     echo '```'
   ) | tee "${GITHUB_STEP_SUMMARY}"
