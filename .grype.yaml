@@ -1,5 +1,0 @@
----
-ignore:
-  # False positives: nokogiri 1.19.3 is listed as both vulnerable and fixed version
-  - vulnerability: GHSA-c4rq-3m3g-8wgx
-  - vulnerability: GHSA-v2fc-qm4h-8hqv
