@@ -6,6 +6,9 @@
 # and in individual linters documentation
 
 # keep-sorted start newline_separated=yes
+# Zizmor (GitHub Actions security scanner) - pass config file for rule ignores
+ACTION_ZIZMOR_ARGUMENTS: --config .zizmor.yml
+
 # Allow zizmor (GitHub Actions security scanner) to access GitHub token for API calls
 ACTION_ZIZMOR_UNSECURED_ENV_VARIABLES:
   - GITHUB_TOKEN
