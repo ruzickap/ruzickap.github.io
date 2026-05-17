@@ -33,6 +33,7 @@ jobs:
         with:
           fetch-depth: 0
           submodules: true
+          persist-credentials: false
 
       - name: Set Variables
         env:
@@ -56,7 +57,6 @@ jobs:
         uses: ruby/setup-ruby@c4e5b1316158f92e3d49443a9d58b31d25ac0f8f # v1.306.0
         with:
           ruby-version: 3.4.9
-          bundler-cache: true
 
       - name: Build site
         run: bundle exec jekyll build --destination public
@@ -76,7 +76,7 @@ jobs:
             --ignore-urls "/127.0.0.1/,/0.0.0.0/,/localhost/,/.local/"
 
       - name: Publish to GitHub Pages
-        uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -84,7 +84,7 @@ jobs:
           force_orphan: true
 
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/wrangler-action@9acf94ace14e7dc412b076f2c5c20b8ce93c79cd # v3.15.0
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/gh-pages' }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
