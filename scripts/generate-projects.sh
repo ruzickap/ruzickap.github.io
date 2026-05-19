@@ -54,6 +54,7 @@ while read -r GITHUB_REPOSITORY_TITLE_TMP; do
   echo "*** ${GITHUB_REPOSITORY_NAME}"
   GITHUB_REPOSITORY_DESCRIPTION=$(jq -r '.description' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
   GITHUB_REPOSITORY_URL=$(jq -r '.url' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
+  GITHUB_REPOSITORY_ARCHIVED=$(jq -r '.isArchived' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
   GITHUB_REPOSITORY_TOPICS=$(jq -r '[.repositoryTopics[].name] | join(", ")' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
   GITHUB_REPOSITORY_HOMEPAGEURL=$(jq -r '.homepageUrl' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
   GITHUB_REPOSITORY_DEFAULT_BRANCH=$(jq -r '.defaultBranchRef.name' <<< "${GITHUB_REPOSITORY_TITLE_TMP}")
@@ -62,7 +63,7 @@ while read -r GITHUB_REPOSITORY_TITLE_TMP; do
   GITHUB_REPOSITORY_URL_STRING=$(if [[ -n "${GITHUB_REPOSITORY_HOMEPAGEURL}" ]]; then echo -e "\n- Website: <${GITHUB_REPOSITORY_HOMEPAGEURL}>"; fi)
   cat << EOF >> "${DESTINATION_FILE}"
 
-### [${GITHUB_REPOSITORY_NAME##*/}](${GITHUB_REPOSITORY_URL})
+### [${GITHUB_REPOSITORY_NAME##*/}](${GITHUB_REPOSITORY_URL})$(if [[ "${GITHUB_REPOSITORY_ARCHIVED}" == "true" ]]; then echo " (archived)"; fi)
 
 - Description: ${GITHUB_REPOSITORY_DESCRIPTION}${GITHUB_REPOSITORY_URL_STRING}
 - Topics: ${GITHUB_REPOSITORY_TOPICS}
@@ -90,6 +91,6 @@ ${GITHUB_REPOSITORY_CI_CD_STATUS}
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME})
 EOF
-done <<< "$(gh repo list --visibility public --json defaultBranchRef,description,homepageUrl,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' awsugcz | jq -c && gh repo list --visibility public --topic public --limit 100 --json defaultBranchRef,description,homepageUrl,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' ruzickap | jq -c)"
+done <<< "$(gh repo list --visibility public --json defaultBranchRef,description,homepageUrl,isArchived,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' awsugcz | jq -c && gh repo list --visibility public --topic public --limit 100 --json defaultBranchRef,description,homepageUrl,isArchived,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' ruzickap | jq -c)"
 
 npx prettier -w --parser markdown --prose-wrap always --print-width 80 "${DESTINATION_FILE}"
