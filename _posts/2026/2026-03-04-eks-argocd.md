@@ -624,7 +624,7 @@ to expose the ArgoCD UI:
 
 ```bash
 # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-ARGOCD_HELM_CHART_VERSION="9.5.13"
+ARGOCD_HELM_CHART_VERSION="9.5.15"
 
 helm repo add --force-update argo https://argoproj.github.io/argo-helm
 helm upgrade --install --version "${ARGOCD_HELM_CHART_VERSION}" --namespace argocd --create-namespace --wait argo-cd argo/argo-cd
@@ -643,7 +643,7 @@ to set up the necessary CRDs:
 
 ```bash
 # renovate: datasource=docker depName=prometheus-community/charts/prometheus-operator-crds registryUrl=https://ghcr.io
-PROMETHEUS_OPERATOR_CRDS_HELM_CHART_VERSION="28.0.1"
+PROMETHEUS_OPERATOR_CRDS_HELM_CHART_VERSION="29.0.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-prometheus-operator-crds.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -694,7 +694,7 @@ limit, and `CreateNamespace` ensures the target namespace exists:
 
 ```bash
 # renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
-ENVOY_GATEWAY_HELM_CHART_VERSION="1.7.3"
+ENVOY_GATEWAY_HELM_CHART_VERSION="1.8.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-envoy-gateway.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -999,7 +999,7 @@ using an ArgoCD Application CRD:
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
-KARPENTER_HELM_CHART_VERSION="1.12.0"
+KARPENTER_HELM_CHART_VERSION="1.12.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-karpenter.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -1403,7 +1403,7 @@ spec:
         initContainers:
           - name: velero-plugin-for-aws
             # renovate: datasource=github-tags depName=vmware-tanzu/velero-plugin-for-aws extractVersion=^(?<version>.+)$
-            image: velero/velero-plugin-for-aws:v1.14.0
+            image: velero/velero-plugin-for-aws:v1.14.1
             volumeMounts:
               - mountPath: /target
                 name: plugins
@@ -1549,7 +1549,7 @@ and VictoriaLogs datasource types:
 
 ```bash
 # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
-VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.77.0"
+VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.79.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-victoria-metrics-k8s-stack.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
