@@ -1665,7 +1665,7 @@ and VictoriaLogs datasource types:
 
 ```bash
 # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
-VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.79.1"
+VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.80.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-victoria-metrics-k8s-stack.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -1924,7 +1924,7 @@ DaemonSet that collects logs from all pods:
 
 ```bash
 # renovate: datasource=helm depName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-VICTORIA_LOGS_SINGLE_HELM_CHART_VERSION="0.12.4"
+VICTORIA_LOGS_SINGLE_HELM_CHART_VERSION="0.12.5"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-victoria-logs-single.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
