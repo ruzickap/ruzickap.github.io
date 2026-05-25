@@ -371,7 +371,7 @@ Karpenter.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="400"}
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.9/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
+curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.12/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
 eval aws cloudformation deploy --stack-name "${CLUSTER_NAME}-karpenter" \
   --template-file "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml" \
   --capabilities CAPABILITY_NAMED_IAM \
@@ -678,440 +678,6 @@ to be healthy and synced:
 kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/prometheus-operator-crds -n argocd --timeout=300s
 ```
 
-### Envoy Gateway
-
-[Envoy Gateway](https://gateway.envoyproxy.io/) is an implementation of
-the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) built on
-[Envoy Proxy](https://www.envoyproxy.io/) that provides advanced traffic
-management, OIDC authentication, and JWT-based authorization.
-
-![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="250"}
-
-Install Envoy Gateway using an ArgoCD
-[Application](https://gateway.envoyproxy.io/docs/install/install-argocd/)
-CRD. `ServerSideApply` avoids the 262,144-byte annotation size
-limit, and `CreateNamespace` ensures the target namespace exists:
-
-```bash
-# renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
-ENVOY_GATEWAY_HELM_CHART_VERSION="1.8.0"
-
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-envoy-gateway.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: envoy-gateway
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: default
-  source:
-    chart: gateway-helm
-    repoURL: docker.io/envoyproxy
-    targetRevision: ${ENVOY_GATEWAY_HELM_CHART_VERSION}
-    helm:
-      values: |
-        deployment:
-          priorityClassName: critical-priority
-  destination:
-    namespace: envoy-gateway-system
-    server: https://kubernetes.default.svc
-  syncPolicy:
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-    automated:
-      prune: true
-      selfHeal: true
-EOF
-```
-
-Wait for the Envoy Gateway ArgoCD Application to be healthy:
-
-```bash
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/envoy-gateway -n argocd --timeout=300s
-```
-
-The Helm chart creates the
-[GatewayClass](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gatewayclass)
-via a `certgen` pre-install hook, but ArgoCD's auto-prune can
-remove hook-created resources that are not part of the tracked
-manifests. Following the [official guide](https://gateway.envoyproxy.io/docs/install/install-argocd/),
-apply the GatewayClass explicitly alongside the [EnvoyProxy](https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/),
-[Gateway](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gateway),
-and [SecurityPolicy](https://gateway.envoyproxy.io/docs/tasks/security/oidc/)
-resources. The SecurityPolicy handles the full OIDC authorization
-code flow with Google — redirect, consent, callback, and cookie-based session
-management — plus JWT-based authorization to restrict access to a specific email
-address. No separate proxy pod is needed.
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-envoy-gateway-gateway.yml" << EOF | kubectl apply -f -
-apiVersion: gateway.networking.k8s.io/v1
-kind: GatewayClass
-metadata:
-  name: eg
-spec:
-  controllerName: gateway.envoyproxy.io/gatewayclass-controller
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: EnvoyProxy
-metadata:
-  name: aws-nlb
-  namespace: envoy-gateway-system
-spec:
-  provider:
-    type: Kubernetes
-    kubernetes:
-      envoyService:
-        annotations:
-          service.beta.kubernetes.io/aws-load-balancer-type: external
-          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
-          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
-          service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
-          service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
----
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
-metadata:
-  name: eg
-  namespace: envoy-gateway-system
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production-dns
-spec:
-  gatewayClassName: eg
-  infrastructure:
-    parametersRef:
-      group: gateway.envoyproxy.io
-      kind: EnvoyProxy
-      name: aws-nlb
-  listeners:
-    - name: https
-      port: 443
-      protocol: HTTPS
-      hostname: "*.${CLUSTER_FQDN}"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: cert-production
-            namespace: cert-manager
-      allowedRoutes:
-        namespaces:
-          from: All
-    - name: https-apex
-      port: 443
-      protocol: HTTPS
-      hostname: "${CLUSTER_FQDN}"
-      tls:
-        mode: Terminate
-        certificateRefs:
-          - name: cert-production
-            namespace: cert-manager
-      allowedRoutes:
-        namespaces:
-          from: All
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: google-oidc-client-secret
-  namespace: envoy-gateway-system
-type: Opaque
-stringData:
-  client-secret: "${GOOGLE_CLIENT_SECRET}"
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: SecurityPolicy
-metadata:
-  name: google-oidc
-  namespace: envoy-gateway-system
-spec:
-  targetRefs:
-    - group: gateway.networking.k8s.io
-      kind: Gateway
-      name: eg
-  oidc:
-    provider:
-      issuer: "https://accounts.google.com"
-    clientID: "${GOOGLE_CLIENT_ID}"
-    clientSecret:
-      name: google-oidc-client-secret
-    redirectURL: "https://grafana.${CLUSTER_FQDN}/oauth2/callback"
-    scopes:
-      - openid
-      - email
-      - profile
-    cookieNames:
-      accessToken: oidc-access-token
-      idToken: oidc-id-token
-    cookieDomain: "${CLUSTER_FQDN}"
-    logoutPath: "/logout"
-  jwt:
-    providers:
-      - name: google
-        issuer: "https://accounts.google.com"
-        remoteJWKS:
-          uri: "https://www.googleapis.com/oauth2/v3/certs"
-        extractFrom:
-          cookies:
-            - oidc-id-token
-  authorization:
-    defaultAction: Deny
-    rules:
-      - name: allow-specific-email
-        action: Allow
-        principal:
-          jwt:
-            provider: google
-            claims:
-              - name: email
-                values:
-                  - "${MY_EMAIL}"
-              - name: email_verified
-                values:
-                  - "true"
-EOF
-```
-
-All routes through the Envoy Gateway now require Google authentication.
-Only `${MY_EMAIL}` is allowed to access the services.
-
-Now that the Gateway API CRDs are available, create an ArgoCD
-Application to let ArgoCD manage itself. The `server.httproute`
-section configures an
-[HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
-to expose the ArgoCD UI via the Envoy Gateway:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-argo-cd.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: argo-cd
-  namespace: argocd
-spec:
-  project: default
-  destination:
-    namespace: argocd
-    server: https://kubernetes.default.svc
-  source:
-    chart: argo-cd
-    repoURL: https://argoproj.github.io/argo-helm
-    targetRevision: ${ARGOCD_HELM_CHART_VERSION}
-    helm:
-      values: |
-        global:
-          priorityClassName: critical-priority
-        configs:
-          params:
-            server.insecure: true
-        controller:
-          metrics:
-            enabled: true
-            serviceMonitor:
-              enabled: true
-        server:
-          httproute:
-            enabled: true
-            parentRefs:
-              - name: eg
-                namespace: envoy-gateway-system
-                sectionName: https
-            hostnames:
-              - argocd.${CLUSTER_FQDN}
-          metrics:
-            enabled: true
-            serviceMonitor:
-              enabled: true
-        repoServer:
-          metrics:
-            enabled: true
-            serviceMonitor:
-              enabled: true
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-EOF
-```
-
-Remove the initial Helm release secret so that only ArgoCD manages
-itself going forward (the bootstrap release is no longer needed):
-
-```bash
-kubectl delete secret -n argocd -l owner=helm,name=argo-cd
-```
-
-### Add Storage Classes and Volume Snapshots
-
-Configure persistent storage for your EKS cluster by setting up GP3
-storage classes and volume snapshot capabilities. This ensures encrypted,
-expandable storage with proper backup functionality.
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-storage-snapshot-storageclass-volumesnapshotclass.yml" << EOF | kubectl apply -f -
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: gp3
-  annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-provisioner: ebs.csi.aws.com
-parameters:
-  type: gp3
-  encrypted: "true"
-  kmsKeyId: ${AWS_KMS_KEY_ARN}
-reclaimPolicy: Delete
-allowVolumeExpansion: true
-volumeBindingMode: WaitForFirstConsumer
----
-apiVersion: snapshot.storage.k8s.io/v1
-kind: VolumeSnapshotClass
-metadata:
-  name: ebs-vsc
-  annotations:
-    snapshot.storage.kubernetes.io/is-default-class: "true"
-driver: ebs.csi.aws.com
-deletionPolicy: Delete
-EOF
-```
-
-Delete the `gp2` StorageClass, as `gp3` will be used instead:
-
-```bash
-kubectl delete storageclass gp2 || true
-```
-
-### Karpenter
-
-[Karpenter](https://karpenter.sh/) is a Kubernetes node autoscaler built
-for flexibility, performance, and simplicity.
-
-![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
-
-Install the `karpenter`
-[Helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
-using an ArgoCD Application CRD:
-
-```bash
-# renovate: datasource=github-tags depName=aws/karpenter-provider-aws
-KARPENTER_HELM_CHART_VERSION="1.12.1"
-
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-karpenter.yml" << EOF | kubectl apply -f -
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: karpenter
-  namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-spec:
-  project: default
-  destination:
-    namespace: karpenter
-    server: https://kubernetes.default.svc
-  source:
-    chart: karpenter
-    repoURL: public.ecr.aws/karpenter
-    targetRevision: ${KARPENTER_HELM_CHART_VERSION}
-    helm:
-      values: |
-        settings:
-          clusterName: ${CLUSTER_NAME}
-          eksControlPlane: true
-          interruptionQueue: ${CLUSTER_NAME}
-          featureGates:
-            spotToSpotConsolidation: true
-        serviceMonitor:
-          enabled: true
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-EOF
-```
-
-Wait for the Karpenter ArgoCD Application to be healthy:
-
-```bash
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/karpenter -n argocd --timeout=300s
-```
-
-Configure [Karpenter](https://karpenter.sh/) by applying the following
-provisioner definition:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-nodepool.yml" << EOF | kubectl apply -f -
-apiVersion: karpenter.k8s.aws/v1
-kind: EC2NodeClass
-metadata:
-  name: default
-spec:
-  amiFamily: Bottlerocket
-  amiSelectorTerms:
-    - alias: bottlerocket@latest
-  subnetSelectorTerms:
-    - tags:
-        karpenter.sh/discovery: "${CLUSTER_NAME}"
-  securityGroupSelectorTerms:
-    - tags:
-        karpenter.sh/discovery: "${CLUSTER_NAME}"
-  role: "KarpenterNodeRole-${CLUSTER_NAME}"
-  tags:
-    Name: "${CLUSTER_NAME}-karpenter"
-    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
-  blockDeviceMappings:
-    - deviceName: /dev/xvda
-      ebs:
-        volumeSize: 2Gi
-        volumeType: gp3
-        encrypted: true
-        kmsKeyID: ${AWS_KMS_KEY_ARN}
-    - deviceName: /dev/xvdb
-      ebs:
-        volumeSize: 20Gi
-        volumeType: gp3
-        encrypted: true
-        kmsKeyID: ${AWS_KMS_KEY_ARN}
----
-apiVersion: karpenter.sh/v1
-kind: NodePool
-metadata:
-  name: default
-spec:
-  template:
-    spec:
-      requirements:
-        # keep-sorted start
-        - key: "karpenter.k8s.aws/instance-memory"
-          operator: Gt
-          values: ["4095"]
-        - key: "topology.kubernetes.io/zone"
-          operator: In
-          values: ["${AWS_REGION}a"]
-        - key: karpenter.k8s.aws/instance-family
-          operator: In
-          values: ["t4g", "t3a"]
-        - key: karpenter.sh/capacity-type
-          operator: In
-          values: ["spot", "on-demand"]
-        - key: kubernetes.io/arch
-          operator: In
-          values: ["arm64", "amd64"]
-        # keep-sorted end
-      nodeClassRef:
-        group: karpenter.k8s.aws
-        kind: EC2NodeClass
-        name: default
-EOF
-```
-
 ### cert-manager
 
 [cert-manager](https://cert-manager.io/) adds certificates and certificate
@@ -1179,7 +745,8 @@ EOF
 Wait for the cert-manager ArgoCD Application to be healthy:
 
 ```bash
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
+kubectl wait '--for=jsonpath={.status.health.status}=Healthy' '--for=jsonpath={.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
+kubectl wait --for=condition=Available deployment/cert-manager-webhook -n cert-manager --timeout=120s
 ```
 
 ### Generate a Let's Encrypt production certificate
@@ -1477,6 +1044,550 @@ if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-bac
 fi
 ```
 
+### AWS Load Balancer Controller
+
+[AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
+is a Kubernetes controller that provisions AWS Elastic Load Balancers
+(ALB/NLB) for Services and Ingresses. It watches for Service annotations
+like `service.beta.kubernetes.io/aws-load-balancer-type` and creates the
+corresponding AWS resources.
+
+![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="200"}
+
+Install the `aws-load-balancer-controller`
+[Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/main/helm/aws-load-balancer-controller/values.yaml)
+using an ArgoCD Application CRD:
+
+```bash
+# renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
+AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION="3.3.0"
+
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-aws-load-balancer-controller.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: aws-load-balancer-controller
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: aws-load-balancer-controller
+    server: https://kubernetes.default.svc
+  source:
+    chart: aws-load-balancer-controller
+    repoURL: https://aws.github.io/eks-charts
+    targetRevision: ${AWS_LOAD_BALANCER_CONTROLLER_HELM_CHART_VERSION}
+    helm:
+      values: |
+        serviceAccount:
+          name: aws-load-balancer-controller
+        clusterName: ${CLUSTER_NAME}
+        serviceMonitor:
+          enabled: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+EOF
+```
+
+Wait for the AWS Load Balancer Controller ArgoCD Application to be healthy:
+
+```bash
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/aws-load-balancer-controller -n argocd --timeout=300s
+```
+
+### Envoy Gateway
+
+[Envoy Gateway](https://gateway.envoyproxy.io/) is an implementation of
+the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) built on
+[Envoy Proxy](https://www.envoyproxy.io/) that provides advanced traffic
+management, OIDC authentication, and JWT-based authorization.
+
+![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="250"}
+
+Install Envoy Gateway using an ArgoCD
+[Application](https://gateway.envoyproxy.io/docs/install/install-argocd/)
+CRD. `ServerSideApply` avoids the 262,144-byte annotation size
+limit, and `CreateNamespace` ensures the target namespace exists:
+
+```bash
+# renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
+ENVOY_GATEWAY_HELM_CHART_VERSION="1.8.0"
+
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-envoy-gateway.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: gateway-helm
+    repoURL: docker.io/envoyproxy
+    targetRevision: ${ENVOY_GATEWAY_HELM_CHART_VERSION}
+    helm:
+      values: |
+        deployment:
+          priorityClassName: critical-priority
+  destination:
+    namespace: envoy-gateway-system
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    automated:
+      prune: true
+      selfHeal: true
+EOF
+```
+
+Wait for the Envoy Gateway ArgoCD Application to be healthy:
+
+```bash
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/envoy-gateway -n argocd --timeout=300s
+```
+
+The Helm chart creates the
+[GatewayClass](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gatewayclass)
+via a `certgen` pre-install hook, but ArgoCD's auto-prune can
+remove hook-created resources that are not part of the tracked
+manifests. Following the [official guide](https://gateway.envoyproxy.io/docs/install/install-argocd/),
+apply the GatewayClass explicitly alongside the [EnvoyProxy](https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/),
+[Gateway](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gateway),
+and [SecurityPolicy](https://gateway.envoyproxy.io/docs/tasks/security/oidc/)
+resources. The SecurityPolicy handles the full OIDC authorization
+code flow with Google — redirect, consent, callback, and cookie-based session
+management — plus JWT-based authorization to restrict access to a specific email
+address. No separate proxy pod is needed.
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-envoy-gateway-gateway.yml" << EOF | kubectl apply -f -
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: eg
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: aws-nlb
+  namespace: envoy-gateway-system
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: external
+          service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+          service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+          service.beta.kubernetes.io/aws-load-balancer-name: eks-${CLUSTER_NAME}
+          service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: ${TAGS//\'/}
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-eg-to-cert-manager-secrets
+  namespace: cert-manager
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      namespace: envoy-gateway-system
+  to:
+    - group: ""
+      kind: Secret
+      name: cert-production
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: eg
+  namespace: envoy-gateway-system
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production-dns
+spec:
+  gatewayClassName: eg
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: aws-nlb
+  listeners:
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: "*.${CLUSTER_FQDN}"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: cert-production
+            namespace: cert-manager
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: https-apex
+      port: 443
+      protocol: HTTPS
+      hostname: "${CLUSTER_FQDN}"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: cert-production
+            namespace: cert-manager
+      allowedRoutes:
+        namespaces:
+          from: All
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: google-oidc-client-secret
+  namespace: envoy-gateway-system
+type: Opaque
+stringData:
+  client-secret: "${GOOGLE_CLIENT_SECRET}"
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: google-oidc
+  namespace: envoy-gateway-system
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: eg
+  oidc:
+    provider:
+      issuer: "https://accounts.google.com"
+    clientID: "${GOOGLE_CLIENT_ID}"
+    clientSecret:
+      name: google-oidc-client-secret
+    redirectURL: "https://${CLUSTER_FQDN}/oauth2/callback"
+    scopes:
+      - openid
+      - email
+      - profile
+    cookieNames:
+      accessToken: oidc-access-token
+      idToken: oidc-id-token
+    cookieDomain: "${CLUSTER_FQDN}"
+    logoutPath: "/logout"
+  jwt:
+    providers:
+      - name: google
+        issuer: "https://accounts.google.com"
+        remoteJWKS:
+          uri: "https://www.googleapis.com/oauth2/v3/certs"
+        extractFrom:
+          cookies:
+            - oidc-id-token
+        claimToHeaders:
+          - header: X-Forwarded-Email
+            claim: email
+          - header: X-Forwarded-User
+            claim: name
+  authorization:
+    defaultAction: Deny
+    rules:
+      - name: allow-specific-email
+        action: Allow
+        principal:
+          jwt:
+            provider: google
+            claims:
+              - name: email
+                values:
+                  - "${MY_EMAIL}"
+EOF
+```
+
+All routes through the Envoy Gateway now require Google authentication.
+Only `${MY_EMAIL}` is allowed to access the services.
+
+Create an ArgoCD Application to let ArgoCD manage itself. The `server.httproute`
+section configures an
+[HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
+to expose the ArgoCD UI via the Envoy Gateway:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-argo-cd.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-cd
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  source:
+    chart: argo-cd
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: ${ARGOCD_HELM_CHART_VERSION}
+    helm:
+      values: |
+        global:
+          priorityClassName: critical-priority
+          domain: argocd.${CLUSTER_FQDN}
+        configs:
+          params:
+            server.insecure: true
+            server.disable.auth: true
+          rbac:
+            policy.csv: |
+              g, ${MY_EMAIL}, role:admin
+              g, readonly, role:readonly
+          cm:
+            admin.enabled: "false"
+            accounts.admin: ""
+            accounts.readonly: apiKey
+            url: https://argocd.${CLUSTER_FQDN}
+            auth.proxy.enabled: "true"
+            auth.proxy.header.email: X-Forwarded-Email
+            auth.proxy.header.name: X-Forwarded-User
+        controller:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+        server:
+          httproute:
+            enabled: true
+            parentRefs:
+              - name: eg
+                namespace: envoy-gateway-system
+                sectionName: https
+            hostnames:
+              - argocd.${CLUSTER_FQDN}
+            annotations:
+              gethomepage.dev/enabled: "true"
+              gethomepage.dev/name: ArgoCD
+              gethomepage.dev/description: GitOps Continuous Delivery
+              gethomepage.dev/group: Cluster Management
+              gethomepage.dev/icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/argo-cd.svg
+              gethomepage.dev/href: https://argocd.${CLUSTER_FQDN}
+              gethomepage.dev/pod-selector: app.kubernetes.io/name=argocd-server
+              gethomepage.dev/widget.type: argocd
+              gethomepage.dev/widget.url: http://argo-cd-argocd-server.argocd.svc:80
+              gethomepage.dev/widget.fields: '["apps","synced","outOfSync","healthy"]'
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+        repoServer:
+          metrics:
+            enabled: true
+            serviceMonitor:
+              enabled: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+EOF
+```
+
+Remove the initial Helm release secret so that only ArgoCD manages
+itself going forward (the bootstrap release is no longer needed):
+
+```bash
+kubectl delete secret -n argocd -l owner=helm,name=argo-cd
+```
+
+Generate an API token for the `readonly` account and annotate the ArgoCD
+HTTPRoute so the [Homepage ArgoCD widget](https://gethomepage.dev/widgets/services/argocd/)
+can query application status:
+
+```bash
+ARGOCD_ADMIN_PASSWORD=$(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d)
+ARGOCD_TOKEN=$(kubectl run argocd-token-gen --rm -i --restart=Never --image=curlimages/curl:latest -n argocd -- sh -c "
+  TOKEN=\$(curl -s http://argo-cd-argocd-server.argocd.svc/api/v1/session -H 'Content-Type: application/json' -d '{\"username\":\"admin\",\"password\":\"${ARGOCD_ADMIN_PASSWORD}\"}' | sed 's/.*\"token\":\"\([^\"]*\)\".*/\1/')
+  curl -s http://argo-cd-argocd-server.argocd.svc/api/v1/account/readonly/token -H 'Content-Type: application/json' -H \"Authorization: Bearer \${TOKEN}\" -X POST -d '{}' | sed 's/.*\"token\":\"\([^\"]*\)\".*/\1/'
+")
+kubectl annotate httproute -n argocd argo-cd-argocd-server \
+  gethomepage.dev/widget.key="${ARGOCD_TOKEN}" --overwrite
+```
+
+### Add Storage Classes and Volume Snapshots
+
+Configure persistent storage for your EKS cluster by setting up GP3
+storage classes and volume snapshot capabilities. This ensures encrypted,
+expandable storage with proper backup functionality.
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-storage-snapshot-storageclass-volumesnapshotclass.yml" << EOF | kubectl apply -f -
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: gp3
+  annotations:
+    storageclass.kubernetes.io/is-default-class: "true"
+provisioner: ebs.csi.aws.com
+parameters:
+  type: gp3
+  encrypted: "true"
+  kmsKeyId: ${AWS_KMS_KEY_ARN}
+reclaimPolicy: Delete
+allowVolumeExpansion: true
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: ebs-vsc
+  annotations:
+    snapshot.storage.kubernetes.io/is-default-class: "true"
+driver: ebs.csi.aws.com
+deletionPolicy: Delete
+EOF
+```
+
+Delete the `gp2` StorageClass, as `gp3` will be used instead:
+
+```bash
+kubectl delete storageclass gp2 || true
+```
+
+### Karpenter
+
+[Karpenter](https://karpenter.sh/) is a Kubernetes node autoscaler built
+for flexibility, performance, and simplicity.
+
+![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
+
+Install the `karpenter`
+[Helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
+using an ArgoCD Application CRD:
+
+```bash
+# renovate: datasource=github-tags depName=aws/karpenter-provider-aws
+KARPENTER_HELM_CHART_VERSION="1.12.1"
+
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-karpenter.yml" << EOF | kubectl apply -f -
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: karpenter
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  destination:
+    namespace: karpenter
+    server: https://kubernetes.default.svc
+  source:
+    chart: karpenter
+    repoURL: public.ecr.aws/karpenter
+    targetRevision: ${KARPENTER_HELM_CHART_VERSION}
+    helm:
+      values: |
+        settings:
+          clusterName: ${CLUSTER_NAME}
+          eksControlPlane: true
+          interruptionQueue: ${CLUSTER_NAME}
+          featureGates:
+            spotToSpotConsolidation: true
+        serviceMonitor:
+          enabled: true
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+EOF
+```
+
+Wait for the Karpenter ArgoCD Application to be healthy:
+
+```bash
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/karpenter -n argocd --timeout=300s
+```
+
+Configure [Karpenter](https://karpenter.sh/) by applying the following
+provisioner definition:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-karpenter-nodepool.yml" << EOF | kubectl apply -f -
+apiVersion: karpenter.k8s.aws/v1
+kind: EC2NodeClass
+metadata:
+  name: default
+spec:
+  amiFamily: Bottlerocket
+  amiSelectorTerms:
+    - alias: bottlerocket@latest
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "${CLUSTER_NAME}"
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "${CLUSTER_NAME}"
+  role: "KarpenterNodeRole-${CLUSTER_NAME}"
+  tags:
+    Name: "${CLUSTER_NAME}-karpenter"
+    $(echo "${TAGS}" | sed "s/,/\\n    /g; s/=/: /g")
+  blockDeviceMappings:
+    - deviceName: /dev/xvda
+      ebs:
+        volumeSize: 2Gi
+        volumeType: gp3
+        encrypted: true
+        kmsKeyID: ${AWS_KMS_KEY_ARN}
+    - deviceName: /dev/xvdb
+      ebs:
+        volumeSize: 20Gi
+        volumeType: gp3
+        encrypted: true
+        kmsKeyID: ${AWS_KMS_KEY_ARN}
+---
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: default
+spec:
+  template:
+    spec:
+      requirements:
+        # keep-sorted start
+        - key: "karpenter.k8s.aws/instance-memory"
+          operator: Gt
+          values: ["4095"]
+        - key: "topology.kubernetes.io/zone"
+          operator: In
+          values: ["${AWS_REGION}a"]
+        - key: karpenter.k8s.aws/instance-family
+          operator: In
+          values: ["t4g", "t3a"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["spot", "on-demand"]
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["arm64", "amd64"]
+        # keep-sorted end
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: default
+EOF
+```
+
 ### ExternalDNS
 
 [ExternalDNS](https://github.com/kubernetes-sigs/external-dns)
@@ -1517,6 +1628,11 @@ spec:
         policy: sync
         domainFilters:
           - ${CLUSTER_FQDN}
+        sources:
+          - service
+          - ingress
+          - gateway-httproute
+          - gateway-grpcroute
         serviceMonitor:
           enabled: true
   syncPolicy:
@@ -1615,9 +1731,6 @@ spec:
               - name: blackhole
         grafana:
           enabled: true
-          # Disable Grafana's secret leak detection for values
-          # with Google OIDC client_secret set explicitly
-          assertNoLeakedSecrets: false
           plugins:
             - victoriametrics-logs-datasource
             - victoriametrics-metrics-datasource
@@ -1699,17 +1812,11 @@ spec:
               root_url: https://grafana.${CLUSTER_FQDN}
             auth:
               disable_login_form: true
-            auth.google:
+            auth.proxy:
               enabled: true
-              allow_sign_up: true
-              auto_login: true
-              scopes: openid email profile
-              auth_url: https://accounts.google.com/o/oauth2/v2/auth
-              token_url: https://oauth2.googleapis.com/token
-              api_url: https://www.googleapis.com/oauth2/v2/userinfo
-              client_id: ${GOOGLE_CLIENT_ID}
-              client_secret: ${GOOGLE_CLIENT_SECRET}
-              allowed_domains: ${MY_EMAIL##*@}
+              auto_sign_up: true
+              header_name: X-Forwarded-Email
+              header_property: email
             users:
               auto_assign_org_role: Admin
           serviceMonitor:
@@ -1903,15 +2010,31 @@ kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.
 ```
 
 Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
-to expose Grafana via the Envoy Gateway:
+to expose Grafana via the Envoy Gateway. The Homepage annotations enable
+the [Grafana widget](https://gethomepage.dev/widgets/services/grafana/)
+for automatic service discovery:
 
 ```bash
+GRAFANA_ADMIN_PASSWORD=$(kubectl get secret victoria-metrics-k8s-stack-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 -d)
+
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-grafana-httproute.yml" << EOF | kubectl apply -f -
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: grafana
   namespace: monitoring
+  annotations:
+    gethomepage.dev/enabled: "true"
+    gethomepage.dev/name: Grafana
+    gethomepage.dev/description: Visualization Platform
+    gethomepage.dev/group: Observability
+    gethomepage.dev/icon: grafana.svg
+    gethomepage.dev/href: https://grafana.${CLUSTER_FQDN}
+    gethomepage.dev/widget.type: grafana
+    gethomepage.dev/widget.url: http://victoria-metrics-k8s-stack-grafana.monitoring.svc:80
+    gethomepage.dev/widget.username: admin
+    gethomepage.dev/widget.password: ${GRAFANA_ADMIN_PASSWORD}
+    gethomepage.dev/widget.fields: '["dashboards","datasources","totalalerts","alertstriggered"]'
 spec:
   parentRefs:
     - name: eg
@@ -1963,12 +2086,6 @@ spec:
         config:
           bookmarks:
           services:
-            - Observability:
-                - Grafana:
-                    icon: grafana.svg
-                    href: https://grafana.${CLUSTER_FQDN}
-                    description: Visualization Platform
-                    siteMonitor: http://victoria-metrics-k8s-stack-grafana.monitoring.svc:80
           widgets:
             - logo:
                 icon: kubernetes.svg
@@ -1986,6 +2103,7 @@ spec:
                   showLabel: true
           kubernetes:
             mode: cluster
+            gateway: true
           settings:
             hideVersion: true
             title: ${CLUSTER_FQDN}
@@ -2038,11 +2156,12 @@ EOF
 ![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
 
 Stop Karpenter from launching additional nodes and remove
-Envoy Gateway to release the AWS Load Balancer:
+Envoy Gateway and AWS Load Balancer Controller to release the AWS Load
+Balancer:
 
 ```sh
-kubectl delete application -n argocd karpenter envoy-gateway || true
-kubectl wait --for=delete application/karpenter application/envoy-gateway -n argocd --timeout=300s 2>/dev/null || true
+kubectl delete application -n argocd karpenter envoy-gateway aws-load-balancer-controller || true
+kubectl wait --for=delete application/karpenter application/envoy-gateway application/aws-load-balancer-controller -n argocd --timeout=300s 2>/dev/null || true
 kubectl get pods -n karpenter || true
 ```
 
@@ -2166,7 +2285,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,aws-s3,cloudformation-karpenter,eksctl-${CLUSTER_NAME},k8s-argocd-{argo-cd,cert-manager,external-dns,homepage,envoy-gateway,karpenter,prometheus-operator-crds,velero,victoria-logs-single,victoria-metrics-k8s-stack},k8s-{cert-manager-certificate-production,cert-manager-clusterissuer-production,envoy-gateway-gateway,grafana-httproute,homepage-httproute,karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,aws-s3,cloudformation-karpenter,eksctl-${CLUSTER_NAME},k8s-argocd-{argo-cd,aws-load-balancer-controller,cert-manager,external-dns,homepage,envoy-gateway,karpenter,prometheus-operator-crds,velero,victoria-logs-single,victoria-metrics-k8s-stack},k8s-{cert-manager-certificate-production,cert-manager-clusterissuer-production,envoy-gateway-gateway,grafana-httproute,homepage-httproute,karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else
