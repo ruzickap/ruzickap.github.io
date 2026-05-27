@@ -747,6 +747,10 @@ Wait for the cert-manager ArgoCD Application to be healthy:
 ```bash
 kubectl wait '--for=jsonpath={.status.health.status}=Healthy' '--for=jsonpath={.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
 kubectl wait --for=condition=Available deployment/cert-manager-webhook -n cert-manager --timeout=120s
+until kubectl get --raw /apis/cert-manager.io/v1/clusterissuers 2>/dev/null; do
+  echo "Waiting for cert-manager API to be available..."
+  sleep 5
+done
 ```
 
 ### Generate a Let's Encrypt production certificate
@@ -814,6 +818,7 @@ if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-b
       - "${CLUSTER_FQDN}"
 EOF
   kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate cert-production
+  echo "👉 Certificate successfully created and signed by Let's Encrypt."
 fi
 ```
 
@@ -928,6 +933,7 @@ EOF
   eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
     --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
     --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
+  echo "👉 S3 bucket successfully created."
 fi
 ```
 
@@ -1413,13 +1419,15 @@ HTTPRoute so the [Homepage ArgoCD widget](https://gethomepage.dev/widgets/servic
 can query application status:
 
 ```bash
-ARGOCD_ADMIN_PASSWORD=$(kubectl get secret argocd-initial-admin-secret -n argocd -o jsonpath='{.data.password}' | base64 -d)
-ARGOCD_TOKEN=$(kubectl run argocd-token-gen --rm -i --restart=Never --image=curlimages/curl:latest -n argocd -- sh -c "
-  TOKEN=\$(curl -s http://argo-cd-argocd-server.argocd.svc/api/v1/session -H 'Content-Type: application/json' -d '{\"username\":\"admin\",\"password\":\"${ARGOCD_ADMIN_PASSWORD}\"}' | sed 's/.*\"token\":\"\([^\"]*\)\".*/\1/')
-  curl -s http://argo-cd-argocd-server.argocd.svc/api/v1/account/readonly/token -H 'Content-Type: application/json' -H \"Authorization: Bearer \${TOKEN}\" -X POST -d '{}' | sed 's/.*\"token\":\"\([^\"]*\)\".*/\1/'
-")
-kubectl annotate httproute -n argocd argo-cd-argocd-server \
-  gethomepage.dev/widget.key="${ARGOCD_TOKEN}" --overwrite
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/argo-cd -n argocd --timeout=300s
+sleep 30
+kubectl rollout status deployment/argo-cd-argocd-server -n argocd --timeout=300s
+ARGOCD_SERVER_POD=$(kubectl get pod -n argocd -l app.kubernetes.io/name=argocd-server -o jsonpath='{.items[0].metadata.name}')
+set +x
+ARGOCD_TOKEN=$(kubectl exec -n argocd "${ARGOCD_SERVER_POD}" -- argocd account generate-token --account readonly --server localhost:8080 --plaintext)
+echo "::add-mask::${ARGOCD_TOKEN}"
+kubectl annotate httproute -n argocd argo-cd-argocd-server gethomepage.dev/widget.key="${ARGOCD_TOKEN}" --overwrite
+set -x
 ```
 
 ### Add Storage Classes and Volume Snapshots
@@ -1650,22 +1658,22 @@ EOF
 
 Install [victoria-metrics-k8s-stack](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/)
 which provides a full monitoring stack with [VictoriaMetrics](https://victoriametrics.com/)
-components: VMSingle for metrics storage, VMAgent for scraping,
-VMAlert for alerting rules, the VictoriaMetrics Operator with
-CRDs (VMServiceScrape, VMPodScrape, VMRule, etc.), and
-[Grafana](https://grafana.com/) with preconfigured
-[VictoriaMetrics](https://victoriametrics.com/) and
-[VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)
-datasources. The
-[victoriametrics-metrics-datasource](https://grafana.com/grafana/plugins/victoriametrics-metrics-datasource/)
-and
-[victoriametrics-logs-datasource](https://grafana.com/grafana/plugins/victoriametrics-logs-datasource/)
-Grafana plugins are required for the native VictoriaMetrics
-and VictoriaLogs datasource types:
+components: VMSingle for metrics storage, VMAgent for scraping, VMAlert for
+alerting rules, the VictoriaMetrics Operator with CRDs (VMServiceScrape,
+VMPodScrape, VMRule, etc.), and [Grafana](https://grafana.com/) with
+preconfigured [VictoriaMetrics](https://victoriametrics.com/) and [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/)
+datasources. The [victoriametrics-metrics-datasource](https://grafana.com/grafana/plugins/victoriametrics-metrics-datasource/)
+and [victoriametrics-logs-datasource](https://grafana.com/grafana/plugins/victoriametrics-logs-datasource/)
+Grafana plugins are required for the native VictoriaMetrics and VictoriaLogs
+datasource types:
 
 ```bash
 # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
 VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.80.0"
+set -x
+GRAFANA_ADMIN_PASSWORD=$(openssl rand -base64 24)
+echo "::add-mask::${GRAFANA_ADMIN_PASSWORD}"
+set +x
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-victoria-metrics-k8s-stack.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -1731,6 +1739,7 @@ spec:
               - name: blackhole
         grafana:
           enabled: true
+          adminPassword: "${GRAFANA_ADMIN_PASSWORD}"
           plugins:
             - victoriametrics-logs-datasource
             - victoriametrics-metrics-datasource
@@ -1783,6 +1792,18 @@ spec:
                 gnetId: 20842
                 revision: 3
                 datasource: VictoriaMetrics
+              19993-argocd:
+                gnetId: 19993
+                revision: 7
+                datasource: VictoriaMetrics
+              24192-argocd-overview-v3:
+                gnetId: 24192
+                revision: 1
+                datasource: VictoriaMetrics
+              24460-envoy-gateway-overview:
+                gnetId: 24460
+                revision: 1
+                datasource: VictoriaMetrics
               22171-karpenter-overview:
                 gnetId: 22171
                 revision: 3
@@ -1803,7 +1824,19 @@ spec:
                 gnetId: 23969
                 revision: 1
                 datasource: VictoriaMetrics
-          persistence:
+              12683-victoriametrics-vmagent:
+                gnetId: 12683
+                revision: 36
+                datasource: VictoriaMetrics
+              11176-victoriametrics-vmalert:
+                gnetId: 11176
+                revision: 55
+                datasource: VictoriaMetrics
+              17869-victoriametrics-operator:
+                gnetId: 17869
+                revision: 8
+                datasource: VictoriaMetrics
+           persistence:
             enabled: false
           grafana.ini:
             analytics:
@@ -1823,6 +1856,13 @@ spec:
             enabled: true
           ingress:
             enabled: false
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            periodSeconds: 10
           service:
             type: ClusterIP
             port: 80
@@ -2006,7 +2046,7 @@ EOF
 Wait for monitoring ArgoCD Applications to be healthy:
 
 ```bash
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/victoria-metrics-k8s-stack application/victoria-logs-single -n argocd --timeout=600s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/victoria-metrics-k8s-stack application/victoria-logs-single -n argocd --timeout=300s
 ```
 
 Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
@@ -2015,6 +2055,7 @@ the [Grafana widget](https://gethomepage.dev/widgets/services/grafana/)
 for automatic service discovery:
 
 ```bash
+set +x
 GRAFANA_ADMIN_PASSWORD=$(kubectl get secret victoria-metrics-k8s-stack-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 -d)
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-grafana-httproute.yml" << EOF | kubectl apply -f -
@@ -2047,6 +2088,7 @@ spec:
         - name: victoria-metrics-k8s-stack-grafana
           port: 80
 EOF
+set -x
 ```
 
 ### Homepage
@@ -2165,18 +2207,18 @@ kubectl wait --for=delete application/karpenter application/envoy-gateway applic
 kubectl get pods -n karpenter || true
 ```
 
-Back up the certificate before deleting the cluster (in case it was
-renewed):
-
-{% raw %}
+Back up the production certificate only if it was actually issued or renewed
+by cert-manager (not merely restored from a previous backup). The presence of
+a `CertificateRequest` resource proves that cert-manager contacted Let's
+Encrypt — Velero does not back up or restore `CertificateRequest` resources:
 
 ```sh
-if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
-  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
+if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o name 2>/dev/null | grep -q .; then
+  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
+  velero backup describe "$(kubectl get backup -n velero -l velero.io/schedule-name=velero-monthly-backup-cert-manager-production --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}')"
+  echo "👉 Production cert-manager certificates backed up with Velero"
 fi
 ```
-
-{% endraw %}
 
 Disassociate a Route 53 Resolver query log configuration from an Amazon
 VPC:

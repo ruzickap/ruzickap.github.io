@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Save all output (stdout + stderr) to a log file while still displaying on terminal
+exec > >(tee "/tmp/${MISE_TASK_NAME//[:|]/_}.log") 2>&1
+
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
 # Hostname / FQDN definitions
