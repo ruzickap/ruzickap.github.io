@@ -619,7 +619,7 @@ the cluster. After Envoy Gateway is deployed (providing the Gateway API
 CRDs), ArgoCD takes over managing itself through an Application CRD
 ([Manage Argo CD Using Argo CD](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#manage-argo-cd-using-argo-cd))
 that also configures an
-[HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
+[HTTPRoute](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#httproute)
 to expose the ArgoCD UI:
 
 ```bash
@@ -747,7 +747,7 @@ Wait for the cert-manager ArgoCD Application to be healthy:
 ```bash
 kubectl wait '--for=jsonpath={.status.health.status}=Healthy' '--for=jsonpath={.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
 kubectl wait --for=condition=Available deployment/cert-manager-webhook -n cert-manager --timeout=120s
-until kubectl get --raw /apis/cert-manager.io/v1/clusterissuers 2>/dev/null; do
+until kubectl get --raw /apis/cert-manager.io/v1/clusterissuers 2> /dev/null; do
   echo "Waiting for cert-manager API to be available..."
   sleep 5
 done
@@ -1161,12 +1161,12 @@ kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.
 ```
 
 The Helm chart creates the
-[GatewayClass](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gatewayclass)
+[GatewayClass](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#gatewayclass)
 via a `certgen` pre-install hook, but ArgoCD's auto-prune can
 remove hook-created resources that are not part of the tracked
 manifests. Following the [official guide](https://gateway.envoyproxy.io/docs/install/install-argocd/),
 apply the GatewayClass explicitly alongside the [EnvoyProxy](https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/),
-[Gateway](https://gateway-api.sigs.k8s.io/concepts/api-overview/#gateway),
+[Gateway](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#gateway),
 and [SecurityPolicy](https://gateway.envoyproxy.io/docs/tasks/security/oidc/)
 resources. The SecurityPolicy handles the full OIDC authorization
 code flow with Google — redirect, consent, callback, and cookie-based session
@@ -1323,7 +1323,7 @@ Only `${MY_EMAIL}` is allowed to access the services.
 
 Create an ArgoCD Application to let ArgoCD manage itself. The `server.httproute`
 section configures an
-[HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
+[HTTPRoute](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#httproute)
 to expose the ArgoCD UI via the Envoy Gateway:
 
 ```bash
@@ -2049,7 +2049,7 @@ Wait for monitoring ArgoCD Applications to be healthy:
 kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/victoria-metrics-k8s-stack application/victoria-logs-single -n argocd --timeout=300s
 ```
 
-Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
+Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#httproute)
 to expose Grafana via the Envoy Gateway. The Homepage annotations enable
 the [Grafana widget](https://gethomepage.dev/widgets/services/grafana/)
 for automatic service discovery:
@@ -2169,7 +2169,7 @@ spec:
 EOF
 ```
 
-Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/concepts/api-overview/#httproute)
+Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#httproute)
 to expose Homepage via the Envoy Gateway:
 
 ```bash
@@ -2203,7 +2203,7 @@ Balancer:
 
 ```sh
 kubectl delete application -n argocd karpenter envoy-gateway aws-load-balancer-controller || true
-kubectl wait --for=delete application/karpenter application/envoy-gateway application/aws-load-balancer-controller -n argocd --timeout=300s 2>/dev/null || true
+kubectl wait --for=delete application/karpenter application/envoy-gateway application/aws-load-balancer-controller -n argocd --timeout=300s 2> /dev/null || true
 kubectl get pods -n karpenter || true
 ```
 
@@ -2213,7 +2213,7 @@ a `CertificateRequest` resource proves that cert-manager contacted Let's
 Encrypt — Velero does not back up or restore `CertificateRequest` resources:
 
 ```sh
-if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o name 2>/dev/null | grep -q .; then
+if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o name 2> /dev/null | grep -q .; then
   velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
   velero backup describe "$(kubectl get backup -n velero -l velero.io/schedule-name=velero-monthly-backup-cert-manager-production --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}')"
   echo "👉 Production cert-manager certificates backed up with Velero"
