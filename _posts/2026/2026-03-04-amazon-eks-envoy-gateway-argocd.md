@@ -1,16 +1,18 @@
 ---
-title: Amazon EKS with Argo CD
+title: Amazon EKS with Envoy Gateway deployed using Argo CD
 author: Petr Ruzicka
 date: 2026-03-04
-description: Build Amazon EKS with ArgoCD
+description: Build Amazon EKS with Envoy Gateway deployed using Argo CD
 categories: [Kubernetes, Cloud, Monitoring]
 tags: [amazon-eks, argocd, cert-manager, eks, eksctl, grafana, homepage, envoy-gateway, kubernetes, monitoring, velero, victorialogs, victoriametrics]
 image: https://raw.githubusercontent.com/akuity/awesome-argo/977bf4e5e8b5382325967711d7c3c21e382cba1d/images/argo.png
 ---
 
 I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)
-environment with [Argo CD](https://argoproj.github.io/cd/) as the deployment
-engine, using ArgoCD Application CRDs to manage Helm chart installations.
+environment with [Envoy Gateway](https://gateway.envoyproxy.io/) as the ingress
+and traffic management layer, deployed and managed by
+[Argo CD](https://argoproj.github.io/cd/) using ArgoCD Application CRDs to
+orchestrate Helm chart installations.
 
 The Amazon EKS setup should align with the following criteria:
 
@@ -1682,10 +1684,10 @@ datasource types:
 ```bash
 # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
 VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.80.0"
-set -x
+set +x
 GRAFANA_ADMIN_PASSWORD=$(openssl rand -base64 24)
 echo "::add-mask::${GRAFANA_ADMIN_PASSWORD}"
-set +x
+set -x
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-victoria-metrics-k8s-stack.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
@@ -2215,13 +2217,12 @@ EOF
 
 ![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
 
-Stop Karpenter from launching additional nodes and remove
-Envoy Gateway and AWS Load Balancer Controller to release the AWS Load
-Balancer:
+Stop Karpenter from launching additional nodes and remove Envoy Gateway to
+release the AWS Load Balancer:
 
 ```sh
 kubectl delete gateway eg -n envoy-gateway-system || true
-kubectl delete application -n argocd karpenter envoy-gateway aws-load-balancer-controller || true
+kubectl delete application -n argocd karpenter || true
 ```
 
 Back up the production certificate only if it was actually issued or renewed

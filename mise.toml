@@ -261,15 +261,15 @@ description = 'Delete: Bootstrap EKS Auto Mode Cluster with ACK and kro using Ki
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
-# Amazon EKS with Argo CD
+# Amazon EKS with Envoy Gateway deployed using Argo CD
 #------------------------------------------------------------------------------
-[tasks."create:2026-03-04-eks-argocd"]
-description = 'Create: Amazon EKS with Argo CD'
+[tasks."create:2026-03-04-amazon-eks-envoy-gateway-argocd"]
+description = 'Create: Amazon EKS with Envoy Gateway deployed using Argo CD'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 
-[tasks."delete:2026-03-04-eks-argocd"]
-description = 'Delete: Amazon EKS with Argo CD'
+[tasks."delete:2026-03-04-amazon-eks-envoy-gateway-argocd"]
+description = 'Delete: Amazon EKS with Envoy Gateway deployed using Argo CD'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
