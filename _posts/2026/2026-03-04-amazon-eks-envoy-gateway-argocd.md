@@ -5,7 +5,7 @@ date: 2026-03-04
 description: Build Amazon EKS with Envoy Gateway deployed using Argo CD
 categories: [Kubernetes, Cloud, Monitoring]
 tags: [amazon-eks, argocd, cert-manager, eks, eksctl, grafana, homepage, envoy-gateway, kubernetes, monitoring, velero, victorialogs, victoriametrics]
-image: https://raw.githubusercontent.com/cncf/artwork/8a7776a285f9db6bebd292e5077e410bd0688b55/projects/argo/horizontal/color/argo-horizontal-color.svg
+image: https://raw.githubusercontent.com/cncf/artwork/8a7776a285f9db6bebd292e5077e410bd0688b55/projects/argo/horizontal/color/argo-horizontal-color.png
 ---
 
 I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)
@@ -15,8 +15,8 @@ using ArgoCD Application CRDs to orchestrate Helm chart installations.
 
 The Amazon EKS setup should align with the following criteria:
 
-- Utilize two Availability Zones (AZs), or a single zone if possible, to reduce
-  payments for cross-AZ traffic
+- Use two Availability Zones (AZs) for the VPC and control plane, but schedule
+  workloads in a single AZ to reduce cross-AZ traffic costs
 - Spot instances
 - Less expensive region - `us-east-1`
 - Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
@@ -448,7 +448,7 @@ iam:
               "ec2:DescribeSnapshots",
               "ec2:CreateTags",
               "ec2:CreateSnapshot",
-              "ec2:DeleteSnapshots"
+              "ec2:DeleteSnapshot"
             ]
             Resource:
               - "*"
@@ -608,20 +608,20 @@ EOF
 
 ### ArgoCD
 
-[Argo CD](https://argoproj.github.io/cd/) is a declarative, GitOps
-continuous delivery tool for Kubernetes.
+[Argo CD](https://argoproj.github.io/cd/) is a declarative, GitOps continuous
+delivery tool for Kubernetes.
 
-![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/0f2a88102dcd3212161454f8d431445e1cdee538/docs/assets/argo.png){:width="200"}
+![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/0f2a88102dcd3212161454f8d431445e1cdee538/docs/assets/argo.png){:width="150"}
 
 Install the `argo-cd` [Helm chart](https://artifacthub.io/packages/helm/argo/argo-cd)
 and modify its [default values](https://github.com/argoproj/argo-helm/blob/argo-cd-9.4.12/charts/argo-cd/values.yaml).
 The chart is first installed directly via Helm to bootstrap ArgoCD on
-the cluster. After Envoy Gateway is deployed (providing the Gateway API
-CRDs), ArgoCD takes over managing itself through an Application CRD
+the cluster. Once Envoy Gateway is deployed and the Gateway resource
+exists, ArgoCD takes over managing itself through an Application CRD
 ([Manage Argo CD Using Argo CD](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#manage-argo-cd-using-argo-cd))
 that also configures an
 [HTTPRoute](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#httproute)
-to expose the ArgoCD UI:
+referencing the Gateway to expose the ArgoCD UI:
 
 ```bash
 # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
@@ -1061,9 +1061,10 @@ fi
 
 [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
 is a Kubernetes controller that provisions AWS Elastic Load Balancers
-(ALB/NLB) for Services and Ingresses. It watches for Service annotations
-like `service.beta.kubernetes.io/aws-load-balancer-type` and creates the
-corresponding AWS resources.
+(ALB/NLB) for Services and Ingresses. In this setup, the Envoy Gateway's
+Service uses annotations like
+`service.beta.kubernetes.io/aws-load-balancer-type` to instruct the
+controller to create an internet-facing Network Load Balancer.
 
 ![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="200"}
 
@@ -2212,13 +2213,19 @@ spec:
 EOF
 ```
 
-![Argo CD UI](/assets/img/posts/2026/2026-03-04-amazon-eks-envoy-gateway-argocd/2026-05-28-argocd.avif)
-_Argo CD dashboard showing deployed applications_
+Homepage Screenshot:
 
 ![Homepage dashboard](/assets/img/posts/2026/2026-03-04-amazon-eks-envoy-gateway-argocd/2026-05-28-homepage.avif)
 _Homepage dashboard_
 
+ArgoCD Screenshot:
+
+![Argo CD UI](/assets/img/posts/2026/2026-03-04-amazon-eks-envoy-gateway-argocd/2026-05-28-argocd.avif)
+_Argo CD dashboard showing deployed applications_
+
 ## Clean-up
+
+Remove all deployed resources and the EKS cluster.
 
 ![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
 
