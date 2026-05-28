@@ -5,14 +5,13 @@ date: 2026-03-04
 description: Build Amazon EKS with Envoy Gateway deployed using Argo CD
 categories: [Kubernetes, Cloud, Monitoring]
 tags: [amazon-eks, argocd, cert-manager, eks, eksctl, grafana, homepage, envoy-gateway, kubernetes, monitoring, velero, victorialogs, victoriametrics]
-image: https://raw.githubusercontent.com/akuity/awesome-argo/977bf4e5e8b5382325967711d7c3c21e382cba1d/images/argo.png
+image: https://raw.githubusercontent.com/cncf/artwork/8a7776a285f9db6bebd292e5077e410bd0688b55/projects/argo/horizontal/color/argo-horizontal-color.svg
 ---
 
 I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)
 environment with [Envoy Gateway](https://gateway.envoyproxy.io/) as the ingress
-and traffic management layer, deployed and managed by
-[Argo CD](https://argoproj.github.io/cd/) using ArgoCD Application CRDs to
-orchestrate Helm chart installations.
+and traffic management layer, deployed and managed by [Argo CD](https://argoproj.github.io/cd/)
+using ArgoCD Application CRDs to orchestrate Helm chart installations.
 
 The Amazon EKS setup should align with the following criteria:
 
@@ -612,7 +611,7 @@ EOF
 [Argo CD](https://argoproj.github.io/cd/) is a declarative, GitOps
 continuous delivery tool for Kubernetes.
 
-![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/master/docs/assets/argo.png){:width="200"}
+![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/0f2a88102dcd3212161454f8d431445e1cdee538/docs/assets/argo.png){:width="200"}
 
 Install the `argo-cd` [Helm chart](https://artifacthub.io/packages/helm/argo/argo-cd)
 and modify its [default values](https://github.com/argoproj/argo-helm/blob/argo-cd-9.4.12/charts/argo-cd/values.yaml).
@@ -1122,7 +1121,7 @@ the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) built on
 [Envoy Proxy](https://www.envoyproxy.io/) that provides advanced traffic
 management, OIDC authentication, and JWT-based authorization.
 
-![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="250"}
+![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/85a8328ca85a355e93e843ffe42d060d8992318d/projects/envoy/envoy-gateway/horizontal/color/envoy-gateway-horizontal-color.svg){:width="400"}
 
 Install Envoy Gateway using an ArgoCD
 [Application](https://gateway.envoyproxy.io/docs/install/install-argocd/)
@@ -1394,7 +1393,7 @@ spec:
               gethomepage.dev/name: ArgoCD
               gethomepage.dev/description: GitOps Continuous Delivery
               gethomepage.dev/group: Cluster Management
-              gethomepage.dev/icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/main/svg/argo-cd.svg
+              gethomepage.dev/icon: https://raw.githubusercontent.com/homarr-labs/dashboard-icons/38631ad11695467d7a9e432d5fdec7a39a31e75f/svg/argo-cd.svg
               gethomepage.dev/href: https://argocd.${CLUSTER_FQDN}
               gethomepage.dev/pod-selector: app.kubernetes.io/name=argocd-server
               gethomepage.dev/widget.type: argocd
@@ -1668,7 +1667,7 @@ EOF
 
 ### victoria-metrics-k8s-stack
 
-[![victoria-metrics-k8s-stack](https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/master/docs/victoriametrics/logo.webp){:width="200"}](https://victoriametrics.com/)
+![victoria-metrics-k8s-stack](https://raw.githubusercontent.com/VictoriaMetrics/VictoriaMetrics/f152021521db9f5420944775ed53d38a63d300e5/docs/victoriametrics/logo_white.webp){:width="400"}
 
 Install [victoria-metrics-k8s-stack](https://docs.victoriametrics.com/helm/victoria-metrics-k8s-stack/)
 which provides a full monitoring stack with [VictoriaMetrics](https://victoriametrics.com/)
@@ -2212,6 +2211,12 @@ spec:
           port: 3000
 EOF
 ```
+
+![Argo CD UI](/assets/img/posts/2026/2026-03-04-amazon-eks-envoy-gateway-argocd/2026-05-28-argocd.avif)
+_Argo CD dashboard showing deployed applications_
+
+![Homepage dashboard](/assets/img/posts/2026/2026-03-04-amazon-eks-envoy-gateway-argocd/2026-05-28-homepage.avif)
+_Homepage dashboard_
 
 ## Clean-up
 
