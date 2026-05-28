@@ -1850,7 +1850,7 @@ spec:
                 gnetId: 17869
                 revision: 8
                 datasource: VictoriaMetrics
-           persistence:
+          persistence:
             enabled: false
           grafana.ini:
             analytics:
@@ -2220,6 +2220,7 @@ Envoy Gateway and AWS Load Balancer Controller to release the AWS Load
 Balancer:
 
 ```sh
+kubectl delete gateway eg -n envoy-gateway-system || true
 kubectl delete application -n argocd karpenter envoy-gateway aws-load-balancer-controller || true
 ```
 
