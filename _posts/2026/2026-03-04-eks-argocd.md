@@ -651,6 +651,8 @@ kind: Application
 metadata:
   name: prometheus-operator-crds
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -699,6 +701,8 @@ kind: Application
 metadata:
   name: cert-manager
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -962,6 +966,8 @@ kind: Application
 metadata:
   name: velero
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -1074,6 +1080,8 @@ kind: Application
 metadata:
   name: aws-load-balancer-controller
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -1333,6 +1341,8 @@ kind: Application
 metadata:
   name: argo-cd
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -1618,6 +1628,8 @@ kind: Application
 metadata:
   name: external-dns
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -1681,6 +1693,8 @@ kind: Application
 metadata:
   name: victoria-metrics-k8s-stack
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -1972,6 +1986,8 @@ kind: Application
 metadata:
   name: victoria-logs-single
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -2108,6 +2124,8 @@ kind: Application
 metadata:
   name: homepage
   namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   destination:
@@ -2203,8 +2221,6 @@ Balancer:
 
 ```sh
 kubectl delete application -n argocd karpenter envoy-gateway aws-load-balancer-controller || true
-kubectl wait --for=delete application/karpenter application/envoy-gateway application/aws-load-balancer-controller -n argocd --timeout=300s 2> /dev/null || true
-kubectl get pods -n karpenter || true
 ```
 
 Back up the production certificate only if it was actually issued or renewed
