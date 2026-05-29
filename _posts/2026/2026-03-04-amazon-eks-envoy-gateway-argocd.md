@@ -5,7 +5,7 @@ date: 2026-03-04
 description: Build Amazon EKS with Envoy Gateway deployed using Argo CD
 categories: [Kubernetes, Cloud, Monitoring]
 tags: [amazon-eks, argocd, cert-manager, eks, eksctl, grafana, homepage, envoy-gateway, kubernetes, monitoring, velero, victorialogs, victoriametrics]
-image: https://raw.githubusercontent.com/cncf/artwork/8a7776a285f9db6bebd292e5077e410bd0688b55/projects/argo/horizontal/color/argo-horizontal-color.png
+image: https://raw.githubusercontent.com/cncf/artwork/8a7776a285f9db6bebd292e5077e410bd0688b55/projects/argo/horizontal/color/argo-horizontal-color.svg
 ---
 
 I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)
@@ -13,13 +13,16 @@ environment with [Envoy Gateway](https://gateway.envoyproxy.io/) as the ingress
 and traffic management layer, deployed and managed by [Argo CD](https://argoproj.github.io/cd/)
 using ArgoCD Application CRDs to orchestrate Helm chart installations.
 
+> This setup is intended for testing, learning, and development only.
+> For production use, ArgoCD should follow GitOps practices with a Git
+> repository as the source of truth.
+
 The Amazon EKS setup should align with the following criteria:
 
-- Use two Availability Zones (AZs) for the VPC and control plane, but schedule
-  workloads in a single AZ to reduce cross-AZ traffic costs
-- Spot instances
-- Less expensive region - `us-east-1`
-- Most price efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
+- Use two Availability Zones (AZs) in a less expensive region (`us-east-1`),
+  but schedule workloads in a single AZ to reduce cross-AZ traffic costs
+- Spot instances using the most price efficient EC2 instance type
+  `t4g.medium` (2 x CPU, 4GB RAM) with
   [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
 - Use [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for a
   minimal operating system, CPU, and memory footprint
@@ -31,8 +34,6 @@ The Amazon EKS setup should align with the following criteria:
 - Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
 - [EKS cluster logging](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html)
   to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be configured
-- [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
-  should be enabled where supported
 - [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
   should be used to allow applications and pods to communicate with AWS APIs
 - [ArgoCD](https://argoproj.github.io/cd/) deployed via
@@ -49,6 +50,9 @@ The Amazon EKS setup should align with the following criteria:
   dashboards and visualization
 
 ## Build Amazon EKS
+
+The following steps will guide you through building a fully functional EKS
+cluster with all the necessary components deployed via ArgoCD.
 
 ### Requirements
 
@@ -102,6 +106,9 @@ Install the required tools:
 > The DNS delegation tasks should be executed as a one-time operation.
 {: .prompt-info }
 <!-- prettier-ignore-end -->
+
+![DNS Architecture](/assets/img/posts/2026/2026-03-04-amazon-eks-envoy-gateway-argocd/2026-05-28-architecture.svg)
+_DNS delegation architecture_
 
 Create a DNS zone for the EKS clusters:
 
@@ -505,14 +512,17 @@ EOF
 eksctl create cluster --config-file "${TMP_DIR}/${CLUSTER_FQDN}/eksctl-${CLUSTER_NAME}.yml" --kubeconfig "${KUBECONFIG}" || eksctl utils write-kubeconfig --cluster="${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}"
 ```
 
-Enhance the security posture of the EKS cluster by addressing the
-following concerns:
+Retrieve the VPC ID, default security group ID, and NACL ID for the cluster to
+improve its security posture.
 
 ```bash
 AWS_VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:alpha.eksctl.io/cluster-name,Values=${CLUSTER_NAME}" --query 'Vpcs[*].VpcId' --output text)
 AWS_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=${AWS_VPC_ID}" "Name=group-name,Values=default" --query 'SecurityGroups[*].GroupId' --output text)
 AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_VPC_ID}" --query 'NetworkAcls[*].NetworkAclId' --output text)
 ```
+
+Enhance the security posture of the EKS cluster by addressing the
+following concerns:
 
 - The default security group should have no rules configured:
 
@@ -609,7 +619,9 @@ EOF
 ### ArgoCD
 
 [Argo CD](https://argoproj.github.io/cd/) is a declarative, GitOps continuous
-delivery tool for Kubernetes.
+delivery tool for Kubernetes. As mentioned earlier, ArgoCD will not use the
+GitOps approach in this setup, but instead will be installed and managed
+directly on the cluster using its Helm chart and Application CRDs.
 
 ![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/0f2a88102dcd3212161454f8d431445e1cdee538/docs/assets/argo.png){:width="150"}
 
@@ -672,12 +684,6 @@ spec:
       - ServerSideApply=true
       - Replace=true
 EOF
-```
-
-Wait for the Prometheus Operator CRDs ArgoCD Application
-to be healthy and synced:
-
-```bash
 kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/prometheus-operator-crds -n argocd --timeout=300s
 ```
 
@@ -745,17 +751,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
 EOF
-```
-
-Wait for the cert-manager ArgoCD Application to be healthy:
-
-```bash
-kubectl wait '--for=jsonpath={.status.health.status}=Healthy' '--for=jsonpath={.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
-kubectl wait --for=condition=Available deployment/cert-manager-webhook -n cert-manager --timeout=120s
-until kubectl get --raw /apis/cert-manager.io/v1/clusterissuers 2> /dev/null; do
-  echo "Waiting for cert-manager API to be available..."
-  sleep 5
-done
+kubectl wait --for=jsonpath='{.status.health.status}=Healthy' --for=jsonpath='{.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
 ```
 
 ### Generate a Let's Encrypt production certificate
@@ -1031,15 +1027,10 @@ spec:
     syncOptions:
     - CreateNamespace=true
 EOF
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/velero -n argocd --timeout=300s
 ```
 
 {% endraw %}
-
-Wait for the Velero ArgoCD Application to be healthy:
-
-```bash
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/velero -n argocd --timeout=300s
-```
 
 Wait for Velero to sync with the S3 bucket and be ready for backup and restore
 operations:
@@ -1061,10 +1052,7 @@ fi
 
 [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
 is a Kubernetes controller that provisions AWS Elastic Load Balancers
-(ALB/NLB) for Services and Ingresses. In this setup, the Envoy Gateway's
-Service uses annotations like
-`service.beta.kubernetes.io/aws-load-balancer-type` to instruct the
-controller to create an internet-facing Network Load Balancer.
+(ALB/NLB) for Kubernetes Services.
 
 ![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="200"}
 
@@ -1107,11 +1095,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
 EOF
-```
-
-Wait for the AWS Load Balancer Controller ArgoCD Application to be healthy:
-
-```bash
 kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/aws-load-balancer-controller -n argocd --timeout=300s
 ```
 
@@ -1126,8 +1109,7 @@ management, OIDC authentication, and JWT-based authorization.
 
 Install Envoy Gateway using an ArgoCD
 [Application](https://gateway.envoyproxy.io/docs/install/install-argocd/)
-CRD. `ServerSideApply` avoids the 262,144-byte annotation size
-limit, and `CreateNamespace` ensures the target namespace exists:
+CRD.
 
 ```bash
 # renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
@@ -1162,26 +1144,20 @@ spec:
       prune: true
       selfHeal: true
 EOF
-```
-
-Wait for the Envoy Gateway ArgoCD Application to be healthy:
-
-```bash
 kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/envoy-gateway -n argocd --timeout=300s
 ```
 
-The Helm chart creates the
+The Helm chart does not include the
 [GatewayClass](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#gatewayclass)
-via a `certgen` pre-install hook, but ArgoCD's auto-prune can
-remove hook-created resources that are not part of the tracked
-manifests. Following the [official guide](https://gateway.envoyproxy.io/docs/install/install-argocd/),
+resource — it must be created separately.
+Following the [official guide](https://gateway.envoyproxy.io/docs/install/install-argocd/),
 apply the GatewayClass explicitly alongside the [EnvoyProxy](https://gateway.envoyproxy.io/docs/tasks/operations/customize-envoyproxy/),
 [Gateway](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#gateway),
 and [SecurityPolicy](https://gateway.envoyproxy.io/docs/tasks/security/oidc/)
 resources. The SecurityPolicy handles the full OIDC authorization
-code flow with Google — redirect, consent, callback, and cookie-based session
-management — plus JWT-based authorization to restrict access to a specific email
-address. No separate proxy pod is needed.
+code flow with Google - redirect, consent, callback, and cookie-based session
+management - plus JWT-based authorization to restrict access to a specific email
+address.
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-envoy-gateway-gateway.yml" << EOF | kubectl apply -f -
@@ -1386,6 +1362,8 @@ spec:
             parentRefs:
               - name: eg
                 namespace: envoy-gateway-system
+                group: gateway.networking.k8s.io
+                kind: Gateway
                 sectionName: https
             hostnames:
               - argocd.${CLUSTER_FQDN}
@@ -1417,6 +1395,7 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
 EOF
+kubectl wait --for=jsonpath='{.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/argo-cd -n argocd --timeout=300s
 ```
 
 Remove the initial Helm release secret so that only ArgoCD manages
@@ -1431,9 +1410,6 @@ HTTPRoute so the [Homepage ArgoCD widget](https://gethomepage.dev/widgets/servic
 can query application status:
 
 ```bash
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/argo-cd -n argocd --timeout=300s
-sleep 30
-kubectl rollout status deployment/argo-cd-argocd-server -n argocd --timeout=300s
 ARGOCD_SERVER_POD=$(kubectl get pod -n argocd -l app.kubernetes.io/name=argocd-server -o jsonpath='{.items[0].metadata.name}')
 set +x
 ARGOCD_TOKEN=$(kubectl exec -n argocd "${ARGOCD_SERVER_POD}" -- argocd account generate-token --account readonly --server localhost:8080 --plaintext)
@@ -1444,7 +1420,7 @@ set -x
 
 ### Add Storage Classes and Volume Snapshots
 
-Configure persistent storage for your EKS cluster by setting up GP3
+Configure persistent storage for your EKS cluster by setting up [gp3](https://aws.amazon.com/ebs/general-purpose/)
 storage classes and volume snapshot capabilities. This ensures encrypted,
 expandable storage with proper backup functionality.
 
@@ -1531,11 +1507,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
 EOF
-```
-
-Wait for the Karpenter ArgoCD Application to be healthy:
-
-```bash
 kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/karpenter -n argocd --timeout=300s
 ```
 
@@ -2059,11 +2030,6 @@ spec:
     syncOptions:
     - CreateNamespace=true
 EOF
-```
-
-Wait for monitoring ArgoCD Applications to be healthy:
-
-```bash
 kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/victoria-metrics-k8s-stack application/victoria-logs-single -n argocd --timeout=300s
 ```
 
