@@ -7,7 +7,7 @@ on:
       posts:
         type: choice
         description: Select post
-        default: 2026-01-13-amazon-eks-grafana-stack
+        default: 2026-03-04-amazon-eks-envoy-gateway-argocd
         options:
           - 2022-11-27-cheapest-amazon-eks
           - 2022-12-24-amazon-eks-karpenter-tests|2022-11-27-cheapest-amazon-eks
@@ -47,6 +47,7 @@ env:
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
+  MISE_NO_ENV: 1
 
 permissions: read-all
 
