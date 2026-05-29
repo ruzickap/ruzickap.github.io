@@ -47,7 +47,8 @@ env:
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
-  MISE_NO_ENV: 1
+  # Disable mise hooks to prevent fnox-env plugin from resolving secrets via AWS Parameter Store
+  MISE_NO_HOOKS: 1
 
 permissions: read-all
 
