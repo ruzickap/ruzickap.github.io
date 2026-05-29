@@ -1081,10 +1081,10 @@ Install the `homepage` [Helm chart](https://github.com/jameswynn/helm-charts/tre
 and modify its [default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.0.1/charts/homepage/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=homepage registryUrl=http://jameswynn.github.io/helm-charts
+# renovate: datasource=helm depName=homepage registryUrl=https://jameswynn.github.io/helm-charts
 HOMEPAGE_HELM_CHART_VERSION="2.0.1"
 
-helm repo add --force-update jameswynn http://jameswynn.github.io/helm-charts
+helm repo add --force-update jameswynn https://jameswynn.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" << EOF
 enableRbac: true
 serviceAccount:

@@ -6,12 +6,12 @@
 ##############################################################################
 [tools]
 # keep-sorted start
-"ubi:aws-cloudformation/rain" = "1.24.4"
-"ubi:harehare/mq" = "0.5.28"
-aws = "2.34.44"
+"github:aws-cloudformation/rain" = "1.24.4"
+"github:cilium/cilium-cli" = "0.19.2"
+aws = { version = "2.34.45", symlink_bins = "true" }
 aws-copilot = "1.34.1"
-cilium-cli = "0.19.2"
 eksctl = "0.226.0"
+fnox = "1.24.0"
 helm = "4.1.4"
 kind = "0.31.0"
 kubectl = "1.36.0"
@@ -19,17 +19,30 @@ velero = "1.18.0"
 yq = "4.53.2"
 # keep-sorted end
 
+[tools."github:harehare/mq"]
+version = "0.5.29"
+bin = "mq"
+
+[tools."github:harehare/mq".platforms]
+linux-x64 = { asset_pattern = "mq-x86_64-unknown-linux-gnu" }
+linux-arm64 = { asset_pattern = "mq-aarch64-unknown-linux-gnu" }
+macos-arm64 = { asset_pattern = "mq-aarch64-apple-darwin" }
+
+##############################################################################
+# Plugins
+##############################################################################
+[plugins]
+fnox-env = "https://github.com/jdx/mise-env-fnox"
+
 ##############################################################################
 # Global Settings
-##############################################################################
 [settings]
 jobs = 1
-trusted_config_paths = ["/"]
 
 ##############################################################################
 # Environment Variables
-##############################################################################
 [env]
+_.fnox-env = { tools = true }
 FORCE_COLOR = 1
 
 ##############################################################################
@@ -51,7 +64,6 @@ run = '''
 cat <<EOF
 $(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
 
-eval "\$(aws sts assume-role --role-arn "\${AWS_ROLE_TO_ASSUME}" --role-session-name "\${USER}@\$(hostname -f)-\$(date +%s)" --duration-seconds 7200 | jq -r '.Credentials | "export AWS_ACCESS_KEY_ID=\(.AccessKeyId)\nexport AWS_SECRET_ACCESS_KEY=\(.SecretAccessKey)\nexport AWS_SESSION_TOKEN=\(.SessionToken)\n"')"
 export KUBECONFIG="/tmp/kubeconfig-\${CLUSTER_NAME}-\$\$.conf"
 aws eks update-kubeconfig --name "\${CLUSTER_NAME}" --kubeconfig "\${KUBECONFIG}"
 EOF
@@ -83,11 +95,11 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 # Velero and cert-manager
 #------------------------------------------------------------------------------
 [tasks."create:2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
-description = "Create: Velero and cert-manager"
+description = 'Create: Velero and cert-manager'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2023-03-20-velero-and-cert-manager|2022-11-27-cheapest-amazon-eks"]
-description = "Delete: Velero and cert-manager"
+description = 'Delete: Velero and cert-manager'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
@@ -238,7 +250,7 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 #------------------------------------------------------------------------------
 [tasks."create:2026-01-13-amazon-eks-grafana-stack"]
 description = 'Create: Amazon EKS and Grafana stack'
-run = ["./scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}"]
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2026-01-13-amazon-eks-grafana-stack"]
 description = 'Delete: Amazon EKS and Grafana stack'
@@ -249,10 +261,22 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 #------------------------------------------------------------------------------
 [tasks."create:2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero"]
 description = 'Create: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind'
-run = ["./scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}"]
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero"]
 description = 'Delete: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS with Envoy Gateway deployed using Argo CD
+#------------------------------------------------------------------------------
+[tasks."create:2026-03-04-amazon-eks-envoy-gateway-argocd"]
+description = 'Create: Amazon EKS with Envoy Gateway deployed using Argo CD'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+
+[tasks."delete:2026-03-04-amazon-eks-envoy-gateway-argocd"]
+description = 'Delete: Amazon EKS with Envoy Gateway deployed using Argo CD'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------

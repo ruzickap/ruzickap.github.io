@@ -1,147 +1,160 @@
 # AI Agent Guidelines
 
-## Overview
-
 Jekyll blog (Chirpy theme) deployed to GitHub Pages / Cloudflare Pages.
-Primary content: Markdown blog posts with executable shell code blocks
-tested as E2E integration tests against AWS EKS clusters.
+Posts double as **executable E2E tests** against AWS EKS: shell code blocks
+inside `_posts/**/*.md` are extracted by `mq` and run by `mise` tasks.
 
-## Build / Lint / Test Commands
+See `README.md` (long; high-level overview) and `NOTES` (scratch file, not
+authoritative) for context. `_config.yml` is the Jekyll config.
+
+## Critical conventions
+
+### Code block language tags drive E2E execution
+
+Inside posts under `_posts/`, fence language is **not cosmetic**:
+
+- ` ```bash` -- extracted and executed by `create:*` tasks (provisioning)
+- ` ```sh`    -- extracted and executed by `delete:*` tasks (teardown)
+- ` ```shell` -- **display only**, never executed
+
+Mechanism: `scripts/mise-create-delete-posts.sh` runs
+`mq 'select(.code.lang == "bash" | "sh") | to_text()'` over the post files
+and pipes the result into a generated script under `tmp/`.
+
+### Mise task names use `|` to chain post dependencies
+
+A task like
+`create:2025-05-27-mcp-servers-k8s|2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto`
+is **one task name** -- the `|`-separated slugs are prerequisite posts
+whose `bash`/`sh` blocks are concatenated in order. Always quote the whole
+task name and copy it verbatim from `mise tasks` or `mise.toml`. Do not
+guess; many posts have no standalone task.
 
 ```bash
-# Install Ruby dependencies
+mise tasks                  # list real task names
+mise run "<exact-task-name>"
+```
+
+### EKS session bootstrap
+
+```bash
+eval "$(mise run a)"   # alias for `eks-access`; run ONCE per shell session
+```
+
+This sources `bash` blocks from the EKS post defined in
+`mise.toml` (`EKS_POST_FILE`, currently the 2026 Grafana post), then sets
+`KUBECONFIG=/tmp/kubeconfig-<CLUSTER_NAME>-$$.conf` and runs
+`aws eks update-kubeconfig`. Requires `CLUSTER_NAME` to already be in the
+environment -- it is loaded from `.env.yaml` via the `fnox-env` mise plugin
+(see `mise.toml` `[env]` section and `fnox.toml`). Without `.env.yaml` /
+AWS creds the helper fails.
+
+### tmp/ artifact directory
+
+`scripts/mise-create-delete-posts.sh` writes generated scripts and
+kubeconfigs under `./tmp/`. After a `delete:*` run, if `tmp/` is not empty
+the script `exit 2`s -- treat leftover files as a real cleanup failure to
+investigate, not as noise.
+
+## Build, lint, test
+
+```bash
 bundle install
-
-# Build the Jekyll site
 bundle exec jekyll build --destination public
-
-# Test built site (HTML validation, internal links)
 bundle exec htmlproofer public \
   --disable-external \
   --ignore-urls "/127.0.0.1/,/0.0.0.0/,/localhost/,/.local/"
 
-# Run MegaLinter (shellcheck, shfmt, rumdl, lychee, checkov, etc.)
+# Full lint suite (Docker) -- mirrors CI
 mega-linter-runner --remove-container \
   --container-name="mega-linter" \
   --env VALIDATE_ALL_CODEBASE=true
 
-# Run a single post E2E test (requires AWS credentials + mise)
-mise run "create:<post-date-slug>"
-mise run "delete:<post-date-slug>"
-
-# Run all post E2E tests
-mise run "create-delete:posts:all"
-
-# Individual linters
-actionlint                                            # GH Actions
-rumdl file.md                                         # Markdown
-shellcheck script.sh                                  # Shell lint
-shfmt --case-indent --indent 2 --space-redirects file # Shell fmt
-lychee --root-dir . --verbose file.md                 # Links
+# Individual linters used by CI (see .mega-linter.yml)
+rumdl file.md                                           # Markdown
+shellcheck script.sh                                    # excludes SC2317
+shfmt --case-indent --indent 2 --space-redirects file
+lychee --root-dir . --verbose file.md                   # config: lychee.toml
+actionlint                                              # GH Actions
+jsonlint --comments file.json
 ```
 
-## Repository Structure
+`CHANGELOG.md` is auto-generated and excluded from all linters
+(`FILTER_REGEX_EXCLUDE` in `.mega-linter.yml`).
+`.devcontainer/devcontainer.json` is excluded from `jsonlint`.
 
-- `_posts/YYYY/` -- Blog posts (Markdown with YAML front matter)
-- `_tabs/` -- Navigation pages (about, archives, categories, tags)
-- `_data/` -- Site data (authors, contact, share config)
-- `_plugins/` -- Jekyll Ruby plugins
-- `assets/img/` -- Images (favicons, per-post `.avif` files)
-- `scripts/` -- Shell scripts for testing and project generation
-- `mise.toml` -- Tool versions and E2E test task definitions
-- `.github/workflows/` -- CI/CD workflow files
+### Run all post E2E tests
 
-## Blog Post Conventions
+```bash
+mise run create-delete:posts:all
+```
 
-Every post requires YAML front matter with: `title`, `author`, `date`,
-`description`, `categories` (array), `tags` (array), `image`.
-File naming: `_posts/YYYY/YYYY-MM-DD-slug-title.md`
+Walks every `create:*` / `delete:*` task in `mise.toml` (parsed with `sed`).
+Expensive -- spins up real AWS infra.
 
-### Code Block Language Tags (Critical)
+## Repo layout (only the non-obvious bits)
 
-Code blocks in posts drive the E2E test system:
+- `_posts/YYYY/` -- blog posts; filename `YYYY-MM-DD-slug.md`
+- `_plugins/` -- Jekyll Ruby plugins (custom)
+- `_data/` -- site data (authors, contact, share config)
+- `scripts/mise-create-delete-posts.sh` -- the E2E test runner
+- `scripts/generate-projects.sh` -- regenerates `_tabs/projects.md` from GitHub
+- `mise.toml` -- tool pins + task definitions (source of truth for E2E)
+- `fnox.toml` + `.env.yaml` -- secret/env loading via `fnox` mise plugin
+- `.pre-commit-config.yaml` -- **symlink** to `../my-git-projects/...`
+  (shared across the author's repos; editing it touches another repo)
 
-- `` ```bash `` -- Executed during **create** (provisioning)
-- `` ```shell `` -- **Display only**, never executed
-- `` ```sh `` -- Executed during **delete** (cleanup/teardown)
+## Post front matter
 
-## Shell Scripts
+Required: `title`, `author`, `date`, `description`, `categories` (array),
+`tags` (array), `image`. Use Chirpy admonitions:
+`{: .prompt-info }`, `{: .prompt-tip }`, `{: .prompt-warning }`,
+`{: .prompt-danger }`.
 
-- **Shebang**: `#!/usr/bin/env bash`
-- **Strict mode**: `set -euo pipefail` (or `set -euxo pipefail`)
-- **Variables**: UPPERCASE with braces: `${MY_VARIABLE}`
-- **Required var checks**: `: "${VAR:?Error: VAR is not set!}"`
-- **Defaults**: `${VAR:-default_value}`
-- **Linting**: Must pass `shellcheck` (SC2317 excluded)
-- **Formatting**: `shfmt --case-indent --indent 2 --space-redirects`
-- **Indentation**: 2 spaces, no tabs
+## Shell scripts
 
-## Markdown Files
+- `#!/usr/bin/env bash`, `set -euo pipefail` (or `-euxo`)
+- Variables UPPERCASE with braces: `${MY_VAR}`
+- Required: `: "${VAR:?Error: VAR is not set!}"`
+- Format: `shfmt --case-indent --indent 2 --space-redirects`; lint:
+  `shellcheck` (SC2317 excluded)
+- 2-space indent, no tabs
 
-- Must pass `rumdl` checks (MD036 and MD041 disabled globally)
-- Wrap lines at 80 characters
-- Use proper heading hierarchy (no skipped levels)
-- Include language identifiers in all code fences
-- Shell code blocks inside Markdown are extracted and validated
-  by `shellcheck` and `shfmt` during CI
-- Use Chirpy admonitions: `{: .prompt-info }`, `{: .prompt-tip }`,
-  `{: .prompt-warning }`, `{: .prompt-danger }`
+## Markdown
 
-## JSON Files
-
-- Must pass `jsonlint --comments` validation
-- `.devcontainer/devcontainer.json` is excluded from linting
-
-## Terraform Files
-
-- Must pass `tflint`, `checkov`, and `trivy` scans
-- Only HIGH/CRITICAL severity issues fail the build
+- Must pass `rumdl` (config `.rumdl.toml`; MD036, MD041 disabled globally)
+- Wrap at 80 chars; always tag code fences with a language
+- Shell blocks inside `.md` are extracted by CI and re-linted with
+  `shellcheck` + `shfmt`
+- See "Code block language tags" above before changing fence languages
+  inside `_posts/`
 
 ## GitHub Actions
 
-- **Pin actions** to full SHA commits, not tags
-- **Permissions**: `permissions: read-all` default; grant only
-  what is needed per job
-- **Validate** every workflow change with `actionlint`
-- **Runner**: Prefer `ubuntu-24.04-arm` for cost efficiency
+- Pin actions to full SHA, never tags
+- Default `permissions: read-all`; widen only per-job as needed
+- Prefer runner `ubuntu-24.04-arm`
+- Validate every workflow change with `actionlint`
+- Zizmor and lychee are allowed access to `GITHUB_TOKEN`
+  (`*_UNSECURED_ENV_VARIABLES` in `.mega-linter.yml`)
 
-## Security and Link Scanning
+## Security scanners (CI)
 
-CI runs: Checkov (`CKV_GHA_7` skipped), DevSkim (DS162092/DS137138
-ignored), Trivy (HIGH/CRITICAL, ignores unfixed),
-Gitleaks, Secretlint. Link checking via `lychee` (config in
-`lychee.toml`); accepts 200/429; caching enabled; excludes template
-variables, shell variables, private IPs, `CHANGELOG.md`.
+Checkov (`--quiet`; `CKV_GHA_7` skipped), DevSkim (DS162092, DS137138
+ignored; CHANGELOG excluded), Trivy (HIGH/CRITICAL only, `--ignore-unfixed`),
+Gitleaks, Secretlint. Disabled in `.mega-linter.yml`:
+`COPYPASTE_JSCPD`, `MARKDOWN_MARKDOWNLINT` (rumdl is used instead),
+`REPOSITORY_KINGFISHER`, `REPOSITORY_OSV_SCANNER` (no lockfiles),
+`SPELL_CSPELL`, `TERRAFORM_TERRASCAN`.
 
-## Version Control
+## Terraform (when present)
 
-### Commit Messages
+Must pass `tflint`, `checkov`, `trivy`; only HIGH/CRITICAL fail the build.
 
-- **Format**: `<type>: <description>` (conventional commits)
-- **Types**: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`,
-  `style`, `perf`, `ci`, `build`, `revert`
-- **Subject**: imperative mood, lowercase, no period, max 72 chars
-- **Body**: wrap at 72 chars, explain what and why
-- **References**: use `Fixes`, `Closes`, or `Resolves` keywords
+## Version control
 
-### Branching
-
-[Conventional Branch](https://conventional-branch.github.io/) format:
-`feature/`, `feat/`, `bugfix/`, `fix/`, `hotfix/`, `release/`,
-`chore/`. Lowercase, hyphens only, no consecutive/leading/trailing
-hyphens.
-
-### Pull Requests
-
-- Always create as **draft** initially
-- Title must follow conventional commit format
-- Include clear description and link related issues
-
-## Quality Checklist
-
-- [ ] Two spaces for indentation (no tabs)
-- [ ] Shell code blocks pass `shellcheck` and `shfmt`
-- [ ] Markdown passes `rumdl`
-- [ ] Links are valid (`lychee`)
-- [ ] Actions pinned to SHA; validated with `actionlint`
-- [ ] Atomic, focused commits with conventional messages
+- Conventional commits: `<type>: <description>`; subject lowercase, no
+  period, <=72 chars; body wrapped at 72; use `Fixes` / `Closes` / `Resolves`
+- Branches per [Conventional Branch](https://conventional-branch.github.io/):
+  `feature/`, `feat/`, `bugfix/`, `fix/`, `hotfix/`, `release/`, `chore/`
+- PRs: **open as draft**, title in conventional-commit form

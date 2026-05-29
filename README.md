@@ -12,7 +12,10 @@ Personal blog and website built with Jekyll using the Chirpy theme.
 [**ruzickap.github.io**](https://ruzickap.github.io/)
 
 - Main Page: <https://ruzickap.github.io>
+
 - Dev Page: <https://ruzickap-github-io.pages.dev>
+
+- [DeepWiki](https://deepwiki.com/ruzickap/ruzickap.github.io)
 
 ## Categories and Tags
 
@@ -143,7 +146,7 @@ mega-linter-runner --remove-container \
   --env VALIDATE_ALL_CODEBASE=true
 ```
 
-## Tests
+## Tests - not working
 
 ```bash
 docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock" \

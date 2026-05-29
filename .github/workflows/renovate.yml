@@ -51,13 +51,15 @@ jobs:
       - uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         id: app-token
         with:
-          client-id: ${{ secrets.MY_RENOVATE_GITHUB_APP_ID }}
+          client-id: ${{ secrets.MY_RENOVATE_GITHUB_CLIENT_ID }}
           private-key: ${{ secrets.MY_RENOVATE_GITHUB_PRIVATE_KEY }}
           permission-contents: write
           permission-pull-requests: write
           permission-issues: write
           permission-checks: read
           permission-metadata: read
+          permission-statuses: write
+          permission-workflows: write
 
       - name: 💡 Self-hosted Renovate
         uses: renovatebot/github-action@693b9ef15eec82123529a37c782242f091365961 # v46.1.14
