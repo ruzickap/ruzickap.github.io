@@ -15,7 +15,7 @@ fnox = "1.24.1"
 helm = "4.1.4"
 kind = "0.31.0"
 kubectl = "1.36.1"
-velero = "1.18.0"
+velero = "1.18.1"
 yq = "4.53.2"
 # keep-sorted end
 
