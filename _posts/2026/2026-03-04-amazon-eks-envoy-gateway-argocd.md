@@ -638,7 +638,7 @@ referencing the Gateway to expose the ArgoCD UI:
 
 ```bash
 # renovate: datasource=helm depName=argo-cd registryUrl=https://argoproj.github.io/argo-helm
-ARGOCD_HELM_CHART_VERSION="9.5.15"
+ARGOCD_HELM_CHART_VERSION="9.5.16"
 
 helm repo add --force-update argo https://argoproj.github.io/argo-helm
 helm upgrade --install --version "${ARGOCD_HELM_CHART_VERSION}" --namespace argocd --create-namespace --wait argo-cd argo/argo-cd
@@ -1656,7 +1656,7 @@ datasource types:
 
 ```bash
 # renovate: datasource=helm depName=victoria-metrics-k8s-stack registryUrl=https://victoriametrics.github.io/helm-charts
-VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.80.0"
+VICTORIA_METRICS_K8S_STACK_HELM_CHART_VERSION="0.81.0"
 set +x
 GRAFANA_ADMIN_PASSWORD=$(openssl rand -base64 24)
 echo "::add-mask::${GRAFANA_ADMIN_PASSWORD}"
@@ -1953,7 +1953,7 @@ DaemonSet that collects logs from all pods:
 
 ```bash
 # renovate: datasource=helm depName=victoria-logs-single registryUrl=https://victoriametrics.github.io/helm-charts
-VICTORIA_LOGS_SINGLE_HELM_CHART_VERSION="0.12.5"
+VICTORIA_LOGS_SINGLE_HELM_CHART_VERSION="0.13.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-victoria-logs-single.yml" << EOF | kubectl apply -f -
 apiVersion: argoproj.io/v1alpha1
