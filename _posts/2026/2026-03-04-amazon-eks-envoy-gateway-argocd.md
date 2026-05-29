@@ -478,6 +478,7 @@ addons:
           $(echo "${TAGS}" | sed "s/,/\\n          /g; s/=/: /g")
         loggingFormat: json
   - name: vpc-cni
+    useDefaultPodIdentityAssociations: true
     configurationValues: |-
       enableNetworkPolicy: "true"
       env:
@@ -768,6 +769,7 @@ needed for a new cluster.
 Create a Let's Encrypt production `ClusterIssuer`:
 
 ```bash
+kubectl wait --namespace cert-manager --for=condition=Available deployment/cert-manager-webhook --timeout=300s
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-production.yml" << EOF | kubectl apply -f -
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
