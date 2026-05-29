@@ -627,7 +627,7 @@ directly on the cluster using its Helm chart and Application CRDs.
 ![Argo CD](https://raw.githubusercontent.com/argoproj/argo-cd/0f2a88102dcd3212161454f8d431445e1cdee538/docs/assets/argo.png){:width="150"}
 
 Install the `argo-cd` [Helm chart](https://artifacthub.io/packages/helm/argo/argo-cd)
-and modify its [default values](https://github.com/argoproj/argo-helm/blob/argo-cd-9.4.12/charts/argo-cd/values.yaml).
+and modify its [default values](https://github.com/argoproj/argo-helm/blob/argo-cd-9.5.15/charts/argo-cd/values.yaml).
 The chart is first installed directly via Helm to bootstrap ArgoCD on
 the cluster. Once Envoy Gateway is deployed and the Gateway resource
 exists, ArgoCD takes over managing itself through an Application CRD
@@ -652,7 +652,7 @@ operator resources. These CRDs are required before installing ServiceMonitor
 resources.
 
 Install the `prometheus-operator-crds`
-[Helm chart](https://github.com/prometheus-community/helm-charts/tree/prometheus-operator-crds-28.0.0/charts/prometheus-operator-crds)
+[Helm chart](https://github.com/prometheus-community/helm-charts/tree/prometheus-operator-crds-29.0.0/charts/prometheus-operator-crds)
 to set up the necessary CRDs:
 
 ```bash
