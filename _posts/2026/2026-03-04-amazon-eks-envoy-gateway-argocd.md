@@ -685,7 +685,8 @@ spec:
       - ServerSideApply=true
       - Replace=true
 EOF
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/prometheus-operator-crds -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.sync.status}=Synced' application/prometheus-operator-crds -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/prometheus-operator-crds -n argocd --timeout=300s
 ```
 
 ### cert-manager
@@ -752,7 +753,8 @@ spec:
     syncOptions:
       - CreateNamespace=true
 EOF
-kubectl wait --for=jsonpath='{.status.health.status}=Healthy' --for=jsonpath='{.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
+kubectl wait --for=jsonpath='{.status.sync.status}=Synced' application/cert-manager -n argocd --timeout=300s
+kubectl wait --for=jsonpath='{.status.health.status}=Healthy' application/cert-manager -n argocd --timeout=300s
 ```
 
 ### Generate a Let's Encrypt production certificate
@@ -1029,7 +1031,8 @@ spec:
     syncOptions:
     - CreateNamespace=true
 EOF
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/velero -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.sync.status}=Synced' application/velero -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/velero -n argocd --timeout=300s
 ```
 
 {% endraw %}
@@ -1097,7 +1100,8 @@ spec:
     syncOptions:
       - CreateNamespace=true
 EOF
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/aws-load-balancer-controller -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.sync.status}=Synced' application/aws-load-balancer-controller -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/aws-load-balancer-controller -n argocd --timeout=300s
 ```
 
 ### Envoy Gateway
@@ -1146,7 +1150,8 @@ spec:
       prune: true
       selfHeal: true
 EOF
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/envoy-gateway -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.sync.status}=Synced' application/envoy-gateway -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/envoy-gateway -n argocd --timeout=300s
 ```
 
 The Helm chart does not include the
@@ -1397,7 +1402,8 @@ spec:
       - CreateNamespace=true
       - ServerSideApply=true
 EOF
-kubectl wait --for=jsonpath='{.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/argo-cd -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.sync.status}=Synced' application/argo-cd -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/argo-cd -n argocd --timeout=300s
 ```
 
 Remove the initial Helm release secret so that only ArgoCD manages
@@ -1509,7 +1515,8 @@ spec:
     syncOptions:
       - CreateNamespace=true
 EOF
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/karpenter -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.sync.status}=Synced' application/karpenter -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/karpenter -n argocd --timeout=300s
 ```
 
 Configure [Karpenter](https://karpenter.sh/) by applying the following
@@ -2032,7 +2039,8 @@ spec:
     syncOptions:
     - CreateNamespace=true
 EOF
-kubectl wait --for='jsonpath={.status.health.status}=Healthy' --for='jsonpath={.status.sync.status}=Synced' application/victoria-metrics-k8s-stack application/victoria-logs-single -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.sync.status}=Synced' application/victoria-metrics-k8s-stack application/victoria-logs-single -n argocd --timeout=300s
+kubectl wait --for='jsonpath={.status.health.status}=Healthy' application/victoria-metrics-k8s-stack application/victoria-logs-single -n argocd --timeout=300s
 ```
 
 Configure an [HTTPRoute](https://gateway-api.sigs.k8s.io/docs/concepts/api-overview/#httproute)
@@ -2085,7 +2093,7 @@ Install [Homepage](https://gethomepage.dev/) as a unified dashboard for
 cluster services:
 
 ```bash
-# renovate: datasource=helm depName=homepage registryUrl=http://jameswynn.github.io/helm-charts
+# renovate: datasource=helm depName=homepage registryUrl=https://jameswynn.github.io/helm-charts
 HOMEPAGE_HELM_CHART_VERSION="2.1.0"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-argocd-homepage.yml" << EOF | kubectl apply -f -
@@ -2103,7 +2111,7 @@ spec:
     server: https://kubernetes.default.svc
   source:
     chart: homepage
-    repoURL: http://jameswynn.github.io/helm-charts
+    repoURL: https://jameswynn.github.io/helm-charts
     targetRevision: ${HOMEPAGE_HELM_CHART_VERSION}
     helm:
       values: |

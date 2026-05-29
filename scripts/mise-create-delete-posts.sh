@@ -61,6 +61,7 @@ if grep -Eq 'CLUSTER_FQDN' "${RUN_FILE}"; then
   (
     echo "😇 <https://${CLUSTER_FQDN}>"
     echo '```'
+    echo "export AWS_REGION=\"${AWS_REGION}\" CLUSTER_FQDN=\"${CLUSTER_FQDN}\""
     echo "eval \"\$(mise run a)\""
     echo '```'
   ) | tee "${GITHUB_STEP_SUMMARY}"

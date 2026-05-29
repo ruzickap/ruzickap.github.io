@@ -1821,11 +1821,6 @@ dashboards:
       gnetId: 14314
       revision: 2
       datasource: Mimir
-    23969-external-dns:
-      # renovate: depName="External DNS"
-      gnetId: 23969
-      revision: 1
-      datasource: Mimir
     15757-kubernetes-views-global:
       # renovate: depName="Kubernetes / Views / Global"
       gnetId: 15757
@@ -1992,11 +1987,6 @@ dashboards:
       gnetId: 20842
       revision: 3
       datasource: Mimir
-    22184-cert-manager2:
-      # renovate: depName="cert-manager2"
-      gnetId: 22184
-      revision: 3
-      datasource: Mimir
     22171-kubernetes-autoscaling-karpenter-overview:
       # renovate: depName="Kubernetes / Autoscaling / Karpenter / Overview"
       gnetId: 22171
@@ -2012,6 +2002,11 @@ dashboards:
       gnetId: 22173
       revision: 3
       datasource: Mimir
+    22184-cert-manager2:
+      # renovate: depName="cert-manager2"
+      gnetId: 22184
+      revision: 3
+      datasource: Mimir
     23471-karpenter-cluster-cost-estimate:
       # renovate: depName="Karpenter Cluster Cost Estimate"
       gnetId: 23471
@@ -2020,6 +2015,11 @@ dashboards:
     23838-velero-overview:
       # renovate: depName="Velero Overview"
       gnetId: 23838
+      revision: 1
+      datasource: Mimir
+    23969-external-dns:
+      # renovate: depName="External DNS"
+      gnetId: 23969
       revision: 1
       datasource: Mimir
     # keep-sorted end
@@ -2155,10 +2155,10 @@ Install the `homepage` [Helm chart](https://github.com/jameswynn/helm-charts/tre
 and modify its [default values](https://github.com/jameswynn/helm-charts/blob/homepage-2.1.0/charts/homepage/values.yaml):
 
 ```bash
-# renovate: datasource=helm depName=homepage registryUrl=http://jameswynn.github.io/helm-charts
+# renovate: datasource=helm depName=homepage registryUrl=https://jameswynn.github.io/helm-charts
 HOMEPAGE_HELM_CHART_VERSION="2.1.0"
 
-helm repo add --force-update jameswynn http://jameswynn.github.io/helm-charts
+helm repo add --force-update jameswynn https://jameswynn.github.io/helm-charts
 cat > "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-homepage.yml" << EOF
 enableRbac: true
 serviceAccount:
