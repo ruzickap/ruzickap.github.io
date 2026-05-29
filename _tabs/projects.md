@@ -316,7 +316,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os)
 
-### [ansible-role-my_common_defaults](https://github.com/ruzickap/ansible-role-my_common_defaults)
+### [ansible-role-my_common_defaults](https://github.com/ruzickap/ansible-role-my_common_defaults) (archived)
 
 - Description: My Ansible role which sets some "favorite" defaults on the server
   (CentOS / Ubuntu / Windows)
@@ -354,7 +354,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults)
 
-### [ansible-role-proxy_settings](https://github.com/ruzickap/ansible-role-proxy_settings)
+### [ansible-role-proxy_settings](https://github.com/ruzickap/ansible-role-proxy_settings) (archived)
 
 - Description: Ansible role for configuring proxy settings for Linux based
   systems
@@ -395,7 +395,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings)
 
-### [ansible-role-virtio-win](https://github.com/ruzickap/ansible-role-virtio-win)
+### [ansible-role-virtio-win](https://github.com/ruzickap/ansible-role-virtio-win) (archived)
 
 - Description: Ansible role which installs VirtIO Drivers and SPICE Guest Tools
   for Windows
@@ -435,7 +435,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win)
 
-### [ansible-role-vmwaretools](https://github.com/ruzickap/ansible-role-vmwaretools)
+### [ansible-role-vmwaretools](https://github.com/ruzickap/ansible-role-vmwaretools) (archived)
 
 - Description: Ansible role will help you with installing original vmware-tools
   form Vmware or fallback to Open VMware Tools (open-vm-tools)
@@ -664,7 +664,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans)
 
-### [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
+### [k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate) (archived)
 
 - Description: Notes from Amazon EKS Bottlerocket and Fargate testing
 - Website: <https://ruzickap.github.io/k8s-eks-bottlerocket-fargate/>
@@ -702,7 +702,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate)
 
-### [k8s-eks-flux](https://github.com/ruzickap/k8s-eks-flux)
+### [k8s-eks-flux](https://github.com/ruzickap/k8s-eks-flux) (archived)
 
 - Description: Notes from using Amazon EKS and Flux
 - Website: <https://ruzickap.github.io/k8s-eks-flux/>
@@ -739,7 +739,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux)
 
-### [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux)
+### [k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux) (archived)
 
 - Description: Blue Green deployment with Flagger, Flux and Istio
 - Website: <https://ruzickap.github.io/k8s-flagger-istio-flux/>
@@ -777,7 +777,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux)
 
-### [k8s-flux-istio-gitlab-harbor](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
+### [k8s-flux-istio-gitlab-harbor](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor) (archived)
 
 - Description: Install services using Flux + Istio + Gitlab + Harbor inside Kops
   cluster running on AWS
@@ -815,7 +815,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor)
 
-### [k8s-harbor](https://github.com/ruzickap/k8s-harbor)
+### [k8s-harbor](https://github.com/ruzickap/k8s-harbor) (archived)
 
 - Description: Harbor in Kubernetes
 - Website: <https://ruzickap.github.io/k8s-harbor/>
@@ -852,7 +852,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor)
 
-### [k8s-harbor-presentation](https://github.com/ruzickap/k8s-harbor-presentation)
+### [k8s-harbor-presentation](https://github.com/ruzickap/k8s-harbor-presentation) (archived)
 
 - Description: Presentation about Harbor project
 - Website: <https://ruzickap.github.io/k8s-harbor-presentation/>
@@ -886,7 +886,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation)
 
-### [k8s-istio-webinar](https://github.com/ruzickap/k8s-istio-webinar)
+### [k8s-istio-webinar](https://github.com/ruzickap/k8s-istio-webinar) (archived)
 
 - Description: Istio webinar
 - Website: <https://ruzickap.github.io/k8s-istio-webinar>
@@ -923,7 +923,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar)
 
-### [k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x)
+### [k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x) (archived)
 
 - Description: Kubernetes + Jenkins X + Sockshop
 - Website: <https://ruzickap.github.io/k8s-jenkins-x/>
@@ -959,7 +959,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x)
 
-### [k8s-knative-gitlab-harbor](https://github.com/ruzickap/k8s-knative-gitlab-harbor)
+### [k8s-knative-gitlab-harbor](https://github.com/ruzickap/k8s-knative-gitlab-harbor) (archived)
 
 - Description: Build container images with Knative + Gitlab + Harbor inside Kops
   cluster running on AWS
@@ -997,7 +997,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor)
 
-### [k8s-postgresql](https://github.com/ruzickap/k8s-postgresql)
+### [k8s-postgresql](https://github.com/ruzickap/k8s-postgresql) (archived)
 
 - Description: PostgreSQL on Kubernetes
 - Website: <https://ruzickap.github.io/k8s-postgresql/>
@@ -1034,7 +1034,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql)
 
-### [k8s-sockshop](https://github.com/ruzickap/k8s-sockshop)
+### [k8s-sockshop](https://github.com/ruzickap/k8s-sockshop) (archived)
 
 - Description: Build and deploy Sockshop application using Flagger + Flux
 - Website: <https://ruzickap.github.io/k8s-sockshop/>
@@ -1115,7 +1115,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container)
 
-### [packer-templates](https://github.com/ruzickap/packer-templates)
+### [packer-templates](https://github.com/ruzickap/packer-templates) (archived)
 
 - Description: Scripts and Templates used for generating Vagrant images
 - Topics: packer, templates, vagrant, libvirt, virtualbox, ansible,
@@ -1156,7 +1156,7 @@ order: 4
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates)
 
-### [packer-virt-sysprep](https://github.com/ruzickap/packer-virt-sysprep)
+### [packer-virt-sysprep](https://github.com/ruzickap/packer-virt-sysprep) (archived)
 
 - Description: Reproduce the functionality of virt-sysprep for use with Packer
   builds
