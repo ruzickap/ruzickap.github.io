@@ -54,7 +54,7 @@ esac
 
 mq "select(.code.lang == \"${MQ_CODE_BLOCK}\") | to_text()" "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
 
-if grep -Eq '(^| )eksctl ' "${RUN_FILE}"; then
+if grep -Eq 'CLUSTER_FQDN' "${RUN_FILE}"; then
   if eksctl get clusters --name="${CLUSTER_NAME}" && [[ "${1%:*}" = "delete" ]]; then
     aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
   fi
