@@ -47,8 +47,6 @@ env:
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
-  # Disable mise hooks to prevent fnox-env plugin from resolving secrets via AWS Parameter Store
-  MISE_NO_HOOKS: 1
 
 permissions: read-all
 
@@ -76,6 +74,9 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           persist-credentials: false
+
+      - name: Remove fnox.toml to skip fnox-env secret resolution in CI
+        run: rm -f fnox.toml
 
       - name: Install mise and dependencies
         env:
