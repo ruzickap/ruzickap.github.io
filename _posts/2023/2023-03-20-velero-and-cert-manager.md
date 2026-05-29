@@ -18,7 +18,7 @@ certificates, it can be handy to back them up and restore them if the cluster
 needs to be recreated.
 
 Here are a few steps on how to install [Velero](https://velero.io/) and the
-[backup and restore](https://cert-manager.io/docs/tutorials/backup/) procedure
+[backup and restore](https://cert-manager.io/docs/devops-tips/backup/) procedure
 for cert-manager objects.
 
 Links:

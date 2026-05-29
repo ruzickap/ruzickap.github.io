@@ -197,7 +197,7 @@ uci set rainbow.@led[-1].status=auto
 ```
 
 Add favorite packages and configure [Midnight
-Commander](https://www.midnight-commander.org/),
+Commander](https://midnight-commander.org/),
 [screen](https://www.gnu.org/software/screen/) and email.
 
 ```bash
@@ -274,7 +274,7 @@ uci set 'ddns.myddns.update_url=http://www.duckdns.org/update?domains=[DOMAIN]&t
 ```
 
 Modify the lighttpd web server to enable ssl (https), serve personal pages and
-[Transmission](https://www.transmissionbt.com/):
+[Transmission](https://transmissionbt.com/):
 
 ```bash
 opkg install lighttpd-mod-proxy
@@ -503,7 +503,7 @@ Here is the example how the stats look like:
 
 ![vnStat network traffic statistics screenshot](https://github.com/ruzickap/linux.xvx.cz/raw/gh-pages/pics/turris/screenshot-gate-xvx-cz-myadmin-vnstat.png)
 
-[Transmission](https://www.transmissionbt.com/) bittorrent client configuration:
+[Transmission](https://transmissionbt.com/) bittorrent client configuration:
 
 ```bash
 opkg install transmission-remote transmission-web
@@ -573,7 +573,7 @@ EOF
 ```
 
 To access the transmission using RPC (for example from Android [Transdroid
-client](https://www.transdroid.org/)) you need to specify the following:
+client](https://transdroid.org/)) you need to specify the following:
 `https://ruzickap@gate.xvx.cz:443/myadmin/transmission/rpc`
 
 Save and reboot to apply all changes:
