@@ -70,19 +70,6 @@ AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) &&
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
-Verify that all necessary variables have been set:
-
-```bash
-: "${AWS_ACCESS_KEY_ID?}"
-: "${AWS_REGION?}"
-: "${AWS_SECRET_ACCESS_KEY?}"
-: "${AWS_ROLE_TO_ASSUME?}"
-: "${GOOGLE_CLIENT_ID?}"
-: "${GOOGLE_CLIENT_SECRET?}"
-
-echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
-```
-
 Install the necessary tools:
 
 <!-- prettier-ignore-start -->
