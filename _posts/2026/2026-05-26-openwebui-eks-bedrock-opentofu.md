@@ -1,0 +1,2064 @@
+---
+title: Amazon EKS with Open WebUI and AWS Bedrock managed by OpenTofu
+author: Petr Ruzicka
+date: 2026-05-26
+description: Deploy Open WebUI on Amazon EKS with AWS Bedrock as the LLM backend, provisioned with OpenTofu
+categories: [Kubernetes, Cloud, Monitoring]
+tags: [amazon-eks, amazon-bedrock, cert-manager, envoy-ai-gateway, envoy-gateway, kubernetes, open-webui, opentofu, velero]
+image: https://raw.githubusercontent.com/open-webui/open-webui/14a6c1f4963892c163821765efcc10c5c4578454/static/static/favicon.svg
+---
+
+I will outline the steps for setting up an [Amazon EKS](https://aws.amazon.com/eks/)
+environment that hosts [Open WebUI](https://openwebui.com/) backed by
+[AWS Bedrock](https://aws.amazon.com/bedrock/) as the LLM provider. All
+infrastructure - from the VPC up to the Helm releases - is provisioned by
+[OpenTofu](https://opentofu.org/) using widely adopted community modules
+([terraform-aws-modules](https://github.com/terraform-aws-modules)) and the
+official [`hashicorp/helm`](https://registry.terraform.io/providers/hashicorp/helm/latest/docs)
+provider for chart installations.
+
+The setup should align with the following criteria:
+
+- Utilize two Availability Zones (AZs) to reduce cross-AZ traffic costs
+- Spot instances
+- Less expensive region - `us-east-1`
+- Most price-efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
+  [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
+- [Bottlerocket OS](https://github.com/bottlerocket-os/bottlerocket) for the
+  worker nodes
+- [Network Load Balancer (NLB)](https://aws.amazon.com/elasticloadbalancing/network-load-balancer/)
+  for highly cost-effective and optimized load balancing
+- [Karpenter](https://karpenter.sh/) for automatic node scaling
+- The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
+- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
+- [EKS cluster logging](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html)
+  to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be configured
+- [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+  should be enabled
+- [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
+  for AWS API access (including [AWS Bedrock](https://aws.amazon.com/bedrock/))
+- [OpenTofu](https://opentofu.org/) drives the full stack via the
+  [`terraform-aws-modules`](https://github.com/terraform-aws-modules) collection
+  and [`helm_release`](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release)
+  for every chart installation
+- [Envoy Gateway](https://gateway.envoyproxy.io/) as the Gateway API
+  implementation with OIDC authentication and JWT-based authorization
+  via Google for protecting web endpoints
+- [Envoy AI Gateway](https://aigateway.envoyproxy.io/) translating
+  OpenAI-compatible API calls into
+  [AWS Bedrock](https://aws.amazon.com/bedrock/) invocations with SigV4
+  credential injection via EKS Pod Identity
+- [Open WebUI](https://openwebui.com/) as the chat front-end consuming the
+  Envoy AI Gateway endpoint
+
+## Build Amazon EKS
+
+### Requirements
+
+You will need to configure the [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html)
+and set up other necessary secrets and variables:
+
+```shell
+# AWS Credentials
+export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
+export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+export AWS_SESSION_TOKEN="xxxxxxxx"
+```
+
+If you plan to follow this document and its tasks, you will need to set up
+a few environment variables, such as:
+
+```bash
+# Google OIDC credentials used by Envoy Gateway for authentication
+export TF_VAR_google_client_id="${GOOGLE_CLIENT_ID}"
+export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
+
+# AWS Region
+export AWS_REGION="${AWS_REGION:-us-east-1}"
+# export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+export CLUSTER_FQDN="k02.k8s.mylabs.dev"
+# OpenTofu variables
+export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
+export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
+# Derived shell variables
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
+cd "${TMP_DIR}/${CLUSTER_FQDN}"
+```
+
+Install the required tools:
+
+<!-- prettier-ignore-start -->
+> You can bypass these procedures if you already have all the essential
+> software installed.
+{: .prompt-tip }
+<!-- prettier-ignore-end -->
+
+- [OpenTofu](https://opentofu.org/)
+- [AWS CLI](https://aws.amazon.com/cli/)
+- [kubectl](https://kubernetes.io/docs/reference/kubectl/)
+- [Velero CLI](https://velero.io/docs/latest/basic-install/#install-the-cli)
+
+### Configure AWS Route 53 Domain delegation
+
+<!-- prettier-ignore-start -->
+> The DNS delegation tasks should be executed as a one-time operation.
+{: .prompt-info }
+<!-- prettier-ignore-end -->
+
+Create a DNS zone for the EKS clusters:
+
+```shell
+export CLOUDFLARE_EMAIL="petr.ruzicka@gmail.com"
+export CLOUDFLARE_API_KEY="1xxxxxxxxx0"
+
+aws route53 create-hosted-zone --output json \
+  --name "${BASE_DOMAIN}" \
+  --caller-reference "$(date)" \
+  --hosted-zone-config="{\"Comment\": \"Created by petr.ruzicka@gmail.com\", \"PrivateZone\": false}" | jq
+```
+
+Utilize your domain registrar to update the nameservers for your zone
+(e.g., `mylabs.dev`) to point to Amazon Route 53 nameservers. Discover the
+required Route 53 nameservers:
+
+```shell
+NEW_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${BASE_DOMAIN}.\`].Id" --output text)
+NEW_ZONE_NS=$(aws route53 get-hosted-zone --output json --id "${NEW_ZONE_ID}" --query "DelegationSet.NameServers")
+NEW_ZONE_NS1=$(echo "${NEW_ZONE_NS}" | jq -r ".[0]")
+NEW_ZONE_NS2=$(echo "${NEW_ZONE_NS}" | jq -r ".[1]")
+```
+
+Establish the NS record in `k8s.mylabs.dev` (your `BASE_DOMAIN`) for proper
+zone delegation. I use Cloudflare and employ Ansible for automation:
+
+```shell
+ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS1} solo=true proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
+ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS2} solo=false proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
+```
+
+Create the EC2 Spot service-linked role if it does not yet exist in this account
+(it is a one-time, account-wide resource):
+
+```shell
+aws iam create-service-linked-role --aws-service-name spot.amazonaws.com 2>/dev/null || true
+```
+
+### Create S3 bucket for Amazon EKS backups and Tofu state
+
+Create an S3 bucket to store Amazon EKS backups and OpenTofu remote state
+using CloudFormation. The bucket uses KMS encryption, lifecycle policies, and
+blocks all public access:
+
+```bash
+if ! aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2>/dev/null; then
+  tee "${TMP_DIR}/${CLUSTER_FQDN}/s3.yaml" << \EOF
+AWSTemplateFormatVersion: "2010-09-09"
+Description: S3 bucket for Amazon EKS backups and OpenTofu state files
+Parameters:
+  Name:
+    Description: Name of the S3 bucket
+    Type: String
+Resources:
+  TerraformRemoteStateS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref Name
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: MultipartUploadLifecycleRule
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+  TerraformRemoteStateS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref TerraformRemoteStateS3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ForceSSLOnlyAccess
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt TerraformRemoteStateS3Bucket.Arn
+              - !Sub ${TerraformRemoteStateS3Bucket.Arn}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+Outputs:
+  TerraformRemoteStateS3Bucket:
+    Value: !Ref TerraformRemoteStateS3Bucket
+EOF
+
+  aws cloudformation deploy --region "${AWS_REGION}" \
+    --stack-name "${CLUSTER_FQDN//./-}" \
+    --parameter-overrides "Name=${CLUSTER_FQDN}" \
+    --template-file "${TMP_DIR}/${CLUSTER_FQDN}/s3.yaml"
+fi
+```
+
+## OpenTofu Code
+
+All resources from this point onwards are managed by [OpenTofu](https://opentofu.org/).
+Create the working directory and the provider/version files:
+
+![OpenTofu](https://raw.githubusercontent.com/opentofu/brand-artifacts/45131c91b81dc05ac2b18de01d18e7be8c715137/full/transparent/SVG/on-light.svg){:width="400"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/versions.tf" << EOF
+terraform {
+  required_version = ">= 1.9.0"
+
+  backend "s3" {
+    bucket       = "${CLUSTER_FQDN}"
+    key          = "terraform.tfstate"
+    use_lockfile = true
+  }
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.46"
+    }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 3.1"
+    }
+    kubectl = {
+      source  = "alekc/kubectl"
+      version = "~> 2.4"
+    }
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.5"
+    }
+  }
+}
+EOF
+```
+
+Define the input variables. Values are provided via `TF_VAR_` environment
+variables — no defaults are baked into the configuration:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/variables.tf" << \EOF
+variable "cluster_fqdn" {
+  description = "FQDN of the EKS cluster (e.g. k01.k8s.mylabs.dev)"
+  type        = string
+}
+
+variable "my_email" {
+  description = "Email address used for tagging and Let's Encrypt registration"
+  type        = string
+}
+
+variable "google_client_id" {
+  description = "Google OAuth Client ID for OIDC authentication"
+  type        = string
+}
+
+variable "google_client_secret" {
+  description = "Google OAuth Client Secret for OIDC authentication"
+  type        = string
+  sensitive   = true
+}
+
+locals {
+  cluster_name = split(".", var.cluster_fqdn)[0]
+  base_domain  = join(".", slice(split(".", var.cluster_fqdn), 1, length(split(".", var.cluster_fqdn))))
+  tags = {
+    Owner       = var.my_email
+    Environment = "dev"
+    Cluster     = var.cluster_fqdn
+    Managed-by  = "opentofu"
+  }
+  rag_documents = {
+    "open-webui-README.md" = "https://raw.githubusercontent.com/open-webui/open-webui/main/README.md"
+    "opentofu-README.md"  = "https://raw.githubusercontent.com/opentofu/opentofu/main/README.md"
+    "karpenter-README.md" = "https://raw.githubusercontent.com/aws/karpenter-provider-aws/main/README.md"
+  }
+}
+EOF
+```
+
+Configure the providers. The Kubernetes/Helm providers pull authentication data
+straight from the EKS module outputs, so OpenTofu can create the cluster and
+the workloads in a single run:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/providers.tf" << \EOF
+provider "aws" {
+  default_tags {
+    tags = local.tags
+  }
+}
+
+data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}
+
+data "aws_eks_cluster_auth" "this" {
+  name = module.eks.cluster_name
+}
+
+provider "kubectl" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  token                  = data.aws_eks_cluster_auth.this.token
+  load_config_file       = false
+}
+
+provider "helm" {
+  kubernetes = {
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    token                  = data.aws_eks_cluster_auth.this.token
+  }
+}
+EOF
+```
+
+### Amazon Bedrock
+
+<!-- prettier-ignore-start -->
+> Enabling Bedrock foundation models is a one-time operation per account/region.
+> Use the [Bedrock console](https://console.aws.amazon.com/bedrock/) to opt in
+> to the models you intend to use (Anthropic Claude, Meta Llama, Mistral, …).
+{: .prompt-info }
+<!-- prettier-ignore-end -->
+
+Enable model invocation logging so every Bedrock request is captured in
+CloudWatch. An IAM role is required to allow Bedrock to write log events to
+the log group:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock.tf" << \EOF
+resource "aws_cloudwatch_log_group" "bedrock" {
+  name              = "/aws/bedrock/${local.cluster_name}"
+  retention_in_days = 1
+  kms_key_id        = module.kms.key_arn
+}
+
+data "aws_iam_policy_document" "bedrock_logging_trust" {
+  statement {
+    principals {
+      type        = "Service"
+      identifiers = ["bedrock.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "bedrock_logging" {
+  statement {
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+    ]
+    resources = ["${aws_cloudwatch_log_group.bedrock.arn}:*"]
+  }
+}
+
+resource "aws_iam_role" "bedrock_logging" {
+  name               = "${local.cluster_name}-bedrock-logging"
+  assume_role_policy = data.aws_iam_policy_document.bedrock_logging_trust.json
+}
+
+resource "aws_iam_role_policy" "bedrock_logging" {
+  name   = "${local.cluster_name}-bedrock-logging"
+  role   = aws_iam_role.bedrock_logging.id
+  policy = data.aws_iam_policy_document.bedrock_logging.json
+}
+
+resource "aws_bedrock_model_invocation_logging_configuration" "this" {
+  logging_config {
+    cloudwatch_config {
+      log_group_name = aws_cloudwatch_log_group.bedrock.name
+      role_arn       = aws_iam_role.bedrock_logging.arn
+    }
+    embedding_data_delivery_enabled = true
+    image_data_delivery_enabled     = true
+    text_data_delivery_enabled      = true
+  }
+}
+EOF
+```
+
+#### Bedrock Knowledge Base (RAG)
+
+Create a private, KMS-encrypted S3 bucket for RAG documents and an
+[Amazon S3 Vectors](https://aws.amazon.com/s3/features/vectors/) vector bucket
+(with a 1 024-dimension index matching
+[Amazon Titan Embed Text V2](https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html))
+as the vector store for the Bedrock Knowledge Base. S3 Vectors is a native
+`hashicorp/aws` resource — no extra Terraform provider is required — and costs
+far less than the OpenSearch Serverless alternative (~$700+/month for 2 OCUs):
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock-rag.tf" << \EOF
+module "s3_rag" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 5.13"
+
+  bucket        = "${var.cluster_fqdn}-rag"
+  force_destroy = true
+
+  attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = module.kms.key_arn
+      }
+    }
+  }
+}
+
+resource "aws_s3vectors_vector_bucket" "rag" {
+  vector_bucket_name = "${local.cluster_name}-rag-vectors"
+  force_destroy      = true
+
+  encryption_configuration {
+    sse_type    = "aws:kms"
+    kms_key_arn = module.kms.key_arn
+  }
+}
+
+resource "aws_s3vectors_index" "rag" {
+  vector_bucket_name = aws_s3vectors_vector_bucket.rag.vector_bucket_name
+  index_name         = "rag-index"
+  data_type          = "float32"
+  dimension          = 1024
+  distance_metric    = "cosine"
+
+  encryption_configuration {
+    sse_type    = "aws:kms"
+    kms_key_arn = module.kms.key_arn
+  }
+}
+
+data "aws_iam_policy_document" "bedrock_kb_trust" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["bedrock.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "bedrock_kb" {
+  statement {
+    sid       = "BedrockInvokeModel"
+    actions   = ["bedrock:InvokeModel"]
+    resources = ["arn:aws:bedrock:${data.aws_region.current.region}::foundation-model/amazon.titan-embed-text-v2:0"]
+  }
+  statement {
+    sid = "S3DataSource"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+    resources = [
+      module.s3_rag.s3_bucket_arn,
+      "${module.s3_rag.s3_bucket_arn}/*",
+    ]
+  }
+  statement {
+    sid       = "S3Vectors"
+    actions   = ["s3vectors:*"]
+    resources = [aws_s3vectors_index.rag.index_arn]
+  }
+  statement {
+    sid = "KMSDecrypt"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+    ]
+    resources = [module.kms.key_arn]
+  }
+}
+
+resource "aws_iam_role" "bedrock_kb" {
+  name               = "${local.cluster_name}-bedrock-kb"
+  assume_role_policy = data.aws_iam_policy_document.bedrock_kb_trust.json
+}
+
+resource "aws_iam_role_policy" "bedrock_kb" {
+  name   = "${local.cluster_name}-bedrock-kb"
+  role   = aws_iam_role.bedrock_kb.id
+  policy = data.aws_iam_policy_document.bedrock_kb.json
+}
+
+resource "aws_bedrockagent_knowledge_base" "rag" {
+  name        = "${local.cluster_name}-rag-kb"
+  description = "RAG Knowledge Base for ${local.cluster_name} using S3 Vectors"
+  role_arn    = aws_iam_role.bedrock_kb.arn
+
+  knowledge_base_configuration {
+    type = "VECTOR"
+    vector_knowledge_base_configuration {
+      embedding_model_arn = "arn:aws:bedrock:${data.aws_region.current.region}::foundation-model/amazon.titan-embed-text-v2:0"
+      embedding_model_configuration {
+        bedrock_embedding_model_configuration {
+          dimensions          = 1024
+          embedding_data_type = "FLOAT32"
+        }
+      }
+    }
+  }
+
+  storage_configuration {
+    type = "S3_VECTORS"
+    s3_vectors_configuration {
+      index_arn = aws_s3vectors_index.rag.index_arn
+    }
+  }
+}
+
+resource "aws_bedrockagent_data_source" "rag" {
+  knowledge_base_id = aws_bedrockagent_knowledge_base.rag.id
+  name              = "${local.cluster_name}-rag-s3"
+
+  data_source_configuration {
+    type = "S3"
+    s3_configuration {
+      bucket_arn = module.s3_rag.s3_bucket_arn
+    }
+  }
+
+  server_side_encryption_configuration {
+    kms_key_arn = module.kms.key_arn
+  }
+}
+
+data "http" "rag_docs" {
+  for_each = local.rag_documents
+  url      = each.value
+}
+
+resource "aws_s3_object" "rag_docs" {
+  for_each     = local.rag_documents
+  bucket       = module.s3_rag.s3_bucket_id
+  key          = "docs/${each.key}"
+  content      = data.http.rag_docs[each.key].response_body
+  content_type = "text/markdown"
+}
+
+data "aws_iam_policy_document" "lambda_bedrock_sync" {
+  statement {
+    actions   = ["bedrock:StartIngestionJob"]
+    resources = [aws_bedrockagent_knowledge_base.rag.arn]
+  }
+}
+
+resource "local_file" "lambda_bedrock_sync" {
+  filename = "${path.module}/lambda_bedrock_sync/index.py"
+  content  = <<-PYTHON
+    import boto3
+    import os
+
+
+    def handler(event, context):
+        boto3.client("bedrock-agent").start_ingestion_job(
+            knowledgeBaseId=os.environ["KNOWLEDGE_BASE_ID"],
+            dataSourceId=os.environ["DATA_SOURCE_ID"],
+        )
+  PYTHON
+}
+
+module "lambda_bedrock_sync" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "~> 7.20"
+
+  function_name = "${local.cluster_name}-bedrock-kb-sync"
+  handler       = "index.handler"
+  runtime       = "python3.13"
+  timeout       = 30
+  publish       = true
+
+  source_path = dirname(local_file.lambda_bedrock_sync.filename)
+
+  depends_on = [local_file.lambda_bedrock_sync]
+
+  environment_variables = {
+    KNOWLEDGE_BASE_ID = aws_bedrockagent_knowledge_base.rag.id
+    DATA_SOURCE_ID    = aws_bedrockagent_data_source.rag.data_source_id
+  }
+
+  attach_policy_json = true
+  policy_json        = data.aws_iam_policy_document.lambda_bedrock_sync.json
+
+  allowed_triggers = {
+    s3 = {
+      principal  = "s3.amazonaws.com"
+      source_arn = module.s3_rag.s3_bucket_arn
+    }
+  }
+}
+
+resource "aws_s3_bucket_notification" "rag" {
+  bucket = module.s3_rag.s3_bucket_id
+
+  lambda_function {
+    lambda_function_arn = module.lambda_bedrock_sync.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "docs/"
+  }
+}
+EOF
+```
+
+### Route53 and KMS key
+
+Use the [`terraform-aws-modules`](https://github.com/terraform-aws-modules)
+collection to provision the Route 53 hosted zone for `${CLUSTER_FQDN}`,
+delegate it from the parent zone, and create the KMS key for EKS secrets and
+EBS volume encryption:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/infra-aws.tf" << \EOF
+data "aws_route53_zone" "base" {
+  name         = "${local.base_domain}."
+  private_zone = false
+}
+
+data "aws_s3_objects" "velero_backup" {
+  bucket   = var.cluster_fqdn
+  prefix   = "velero/backups/"
+  max_keys = 1
+}
+
+module "route53_zone" {
+  source  = "terraform-aws-modules/route53/aws"
+  version = "~> 6.5"
+
+  name          = var.cluster_fqdn
+  force_destroy = true
+}
+
+resource "aws_route53_record" "ns_delegation" {
+  zone_id = data.aws_route53_zone.base.zone_id
+  name    = var.cluster_fqdn
+  type    = "NS"
+  ttl     = 60
+  records = module.route53_zone.name_servers
+}
+
+module "kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  version = "~> 4.2"
+
+  description             = "KMS key for ${local.cluster_name} Amazon EKS"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  aliases                 = ["eks-${local.cluster_name}"]
+
+  key_statements = [
+    {
+      sid = "AllowEBSEncryptionViaEC2Service"
+      principals = [{ type = "AWS", identifiers = ["*"] }]
+      actions = [
+        "kms:Encrypt", "kms:Decrypt", "kms:ReEncrypt*",
+        "kms:GenerateDataKey*", "kms:CreateGrant", "kms:DescribeKey",
+      ]
+      resources = ["*"]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["ec2.${data.aws_region.current.region}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+      ]
+    },
+    {
+      sid = "AllowS3VectorsIndexing"
+      principals = [{ type = "Service", identifiers = ["indexing.s3vectors.amazonaws.com"] }]
+      actions = [
+        "kms:Decrypt", "kms:GenerateDataKey", "kms:DescribeKey", "kms:CreateGrant",
+      ]
+      resources = ["*"]
+    },
+    {
+      sid = "AllowCloudWatchLogs"
+      principals = [{ type = "Service", identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"] }]
+      actions = [
+        "kms:Encrypt*", "kms:Decrypt*", "kms:ReEncrypt*",
+        "kms:GenerateDataKey*", "kms:Describe*",
+      ]
+      resources = ["*"]
+      condition = [{
+        test     = "ArnLike"
+        variable = "kms:EncryptionContext:aws:logs:arn"
+        values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+      }]
+    },
+  ]
+}
+EOF
+```
+
+### Amazon EKS
+
+Provision the cluster with
+[`terraform-aws-modules/eks/aws`](https://github.com/terraform-aws-modules/terraform-aws-eks).
+The module wires up the OIDC provider, addons, EKS managed node group (with
+Bottlerocket on Graviton), and the Pod Identity associations consumed by the
+addons further down the page.
+
+![terraform-aws-modules/eks](https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-eks/dde5e1cfbb1c33dbafb39ad62d77fadb22a3e63a/.header/header.png){:width="500"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/eks.tf" << \EOF
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 6.0"
+
+  name = local.cluster_name
+  cidr = "192.168.0.0/16"
+
+  azs             = ["${data.aws_region.current.region}a", "${data.aws_region.current.region}b"]
+  private_subnets = ["192.168.0.0/19", "192.168.32.0/19"]
+  public_subnets  = ["192.168.64.0/19", "192.168.96.0/19"]
+
+  enable_nat_gateway   = true
+  single_nat_gateway   = true
+  enable_dns_hostnames = true
+
+  manage_default_security_group  = true
+  default_security_group_ingress = []
+  default_security_group_egress  = []
+
+  manage_default_network_acl = true
+  default_network_acl_ingress = [
+    {
+      rule_no    = 89
+      action     = "deny"
+      from_port  = 22
+      to_port    = 22
+      protocol   = "tcp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no    = 90
+      action     = "deny"
+      from_port  = 3389
+      to_port    = 3389
+      protocol   = "tcp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no    = 100
+      action     = "allow"
+      from_port  = 0
+      to_port    = 0
+      protocol   = "-1"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no         = 101
+      action          = "allow"
+      from_port       = 0
+      to_port         = 0
+      protocol        = "-1"
+      ipv6_cidr_block = "::/0"
+    },
+  ]
+
+  public_subnet_tags = {
+    "kubernetes.io/role/elb" = 1
+  }
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb" = 1
+    "karpenter.sh/discovery"          = local.cluster_name
+  }
+}
+
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 21.0"
+
+  name                   = local.cluster_name
+  kubernetes_version     = "1.35"
+  endpoint_public_access = true
+
+  vpc_id                   = module.vpc.vpc_id
+  subnet_ids               = module.vpc.private_subnets
+  control_plane_subnet_ids = module.vpc.private_subnets
+
+  create_kms_key    = false
+  encryption_config = {
+    provider_key_arn = module.kms.key_arn
+    resources        = ["secrets"]
+  }
+
+  enable_cluster_creator_admin_permissions = true
+
+  addons = {
+    coredns                = {}
+    kube-proxy             = {}
+    eks-pod-identity-agent = {}
+    snapshot-controller    = {}
+    aws-ebs-csi-driver = {
+      configuration_values = jsonencode({
+        defaultStorageClass = { enabled = false }
+        controller          = { loggingFormat = "json" }
+      })
+    }
+    vpc-cni = {
+      before_compute = true
+      configuration_values = jsonencode({
+        enableNetworkPolicy = "true"
+        env                 = { ENABLE_PREFIX_DELEGATION = "true" }
+      })
+    }
+  }
+
+  eks_managed_node_groups = {
+    mng01 = {
+      name           = "${local.cluster_name}-mng01"
+      ami_type       = "BOTTLEROCKET_ARM_64"
+      instance_types = ["t4g.medium"]
+      capacity_type  = "ON_DEMAND"
+      min_size       = 2
+      max_size       = 3
+      desired_size   = 2
+      subnet_ids     = [module.vpc.private_subnets[0]]
+
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 20
+            volume_type           = "gp3"
+            encrypted             = true
+            kms_key_id            = module.kms.key_arn
+            delete_on_termination = true
+          }
+        }
+      }
+
+      labels = { "node.kubernetes.io/lifecycle" = "on-demand" }
+    }
+  }
+
+  cloudwatch_log_group_retention_in_days = 1
+  cloudwatch_log_group_kms_key_id        = module.kms.key_arn
+  enabled_log_types                      = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
+  node_security_group_tags = {
+    "karpenter.sh/discovery" = local.cluster_name
+  }
+}
+
+module "ebs_csi_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "~> 2.8"
+
+  name                      = "${local.cluster_name}-ebs-csi"
+  attach_aws_ebs_csi_policy = true
+  aws_ebs_csi_kms_arns      = [module.kms.key_arn]
+
+  associations = {
+    main = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "kube-system"
+      service_account = "ebs-csi-controller-sa"
+    }
+  }
+}
+EOF
+
+exit
+```
+
+#### cert-manager
+
+[cert-manager](https://cert-manager.io/) adds certificates and certificate
+issuers as resource types in Kubernetes clusters and simplifies the process of
+obtaining, renewing, and using those certificates.
+
+![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="150"}
+
+Provision the Pod Identity role granted to the `cert-manager` ServiceAccount
+(scoped to the `${CLUSTER_FQDN}` hosted zone) and install the
+[cert-manager Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager):
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/cert-manager.tf" << \EOF
+module "cert_manager_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "~> 2.8"
+
+  name                       = "${local.cluster_name}-cert-manager"
+  attach_cert_manager_policy = true
+  cert_manager_hosted_zone_arns = [
+    module.route53_zone.arn,
+  ]
+
+  associations = {
+    main = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "cert-manager"
+      service_account = "cert-manager"
+    }
+  }
+}
+
+resource "helm_release" "cert_manager" {
+  # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io extractVersion=^(?<version>.+)$
+  version          = "v1.19.1"
+  name             = "cert-manager"
+  repository       = "https://charts.jetstack.io"
+  chart            = "cert-manager"
+  namespace        = "cert-manager"
+  create_namespace = true
+
+  values = [<<-YAML
+    crds:
+      enabled: true
+    extraArgs:
+      - --enable-certificate-owner-ref=true
+    serviceAccount:
+      name: cert-manager
+    enableCertificateOwnerRef: true
+    webhook:
+      replicaCount: 2
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: cert-manager
+                  app.kubernetes.io/component: webhook
+              topologyKey: kubernetes.io/hostname
+  YAML
+  ]
+
+  depends_on = [
+    module.cert_manager_pod_identity,
+  ]
+}
+EOF
+```
+
+Create the `ClusterIssuer` and `Certificate` resources through OpenTofu using the
+[`alekc/kubectl`](https://registry.terraform.io/providers/alekc/kubectl/latest/docs)
+provider:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/cert-manager-letsencrypt.tf" << \EOF
+resource "kubectl_manifest" "letsencrypt_production_dns" {
+  yaml_body = <<-YAML
+    apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: letsencrypt-production-dns
+      namespace: cert-manager
+      labels:
+        letsencrypt: production
+    spec:
+      acme:
+        server: https://acme-v02.api.letsencrypt.org/directory
+        email: ${var.my_email}
+        privateKeySecretRef:
+          name: letsencrypt-production-dns
+        solvers:
+          - selector:
+              dnsZones:
+                - ${var.cluster_fqdn}
+            dns01:
+              route53: {}
+  YAML
+
+  depends_on = [helm_release.cert_manager]
+}
+
+resource "kubectl_manifest" "cert_production" {
+  count = length(data.aws_s3_objects.velero_backup.keys) == 0 ? 1 : 0
+
+  yaml_body = <<-YAML
+    apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: cert-production
+      namespace: cert-manager
+      labels:
+        letsencrypt: production
+    spec:
+      secretName: cert-production
+      secretTemplate:
+        labels:
+          letsencrypt: production
+      issuerRef:
+        name: letsencrypt-production-dns
+        kind: ClusterIssuer
+      commonName: "*.${var.cluster_fqdn}"
+      dnsNames:
+        - "*.${var.cluster_fqdn}"
+        - "${var.cluster_fqdn}"
+  YAML
+
+  depends_on = [kubectl_manifest.letsencrypt_production_dns]
+}
+EOF
+```
+
+#### Velero
+
+[Velero](https://velero.io/) is an open-source tool for backing up and
+restoring Kubernetes cluster resources and persistent volumes.
+
+![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/Velero.svg){:width="400"}
+
+##### S3 bucket for Velero backups (if not already exists)
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/velero.tf" << \EOF
+module "s3_velero" {
+  count = length(data.aws_s3_objects.velero_backup.keys) == 0 ? 1 : 0
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 5.0"
+
+  bucket        = var.cluster_fqdn
+  force_destroy = true
+
+  attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm     = "aws:kms"
+        kms_master_key_id = "alias/aws/s3"
+      }
+    }
+  }
+
+  lifecycle_rule = [{
+    id      = "transition-and-expire"
+    enabled = true
+    transition = [{
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }]
+    expiration = { days = 120 }
+  }]
+}
+
+data "aws_iam_policy_document" "velero" {
+  statement {
+    actions = [
+      "ec2:DescribeVolumes",
+      "ec2:DescribeSnapshots",
+      "ec2:CreateTags",
+      "ec2:CreateSnapshot",
+      "ec2:DeleteSnapshot",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    actions   = ["s3:ListBucket", "s3:GetBucketLocation", "s3:ListBucketMultipartUploads"]
+    resources = [module.s3_velero[0].s3_bucket_arn]
+  }
+  statement {
+    actions   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject", "s3:ListMultipartUploadParts", "s3:AbortMultipartUpload"]
+    resources = ["${module.s3_velero[0].s3_bucket_arn}/*"]
+  }
+}
+
+module "velero_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "~> 2.8"
+
+  name                    = "${local.cluster_name}-velero"
+  attach_custom_policy    = true
+  source_policy_documents = [data.aws_iam_policy_document.velero.json]
+
+  associations = {
+    main = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "velero"
+      service_account = "velero"
+    }
+  }
+}
+
+resource "helm_release" "velero" {
+  # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
+  version          = "12.0.1"
+  name             = "velero"
+  repository       = "https://vmware-tanzu.github.io/helm-charts"
+  chart            = "velero"
+  namespace        = "velero"
+  create_namespace = true
+
+  values = [<<-YAML
+    initContainers:
+      # renovate: datasource=github-tags depName=vmware-tanzu/velero-plugin-for-aws extractVersion=^(?<version>.+)$
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.14.1
+        volumeMounts:
+          - mountPath: /target
+            name: plugins
+    configuration:
+      backupStorageLocation:
+        - provider: aws
+          bucket: ${module.s3_velero[0].s3_bucket_id}
+          prefix: velero
+          config:
+            region: ${data.aws_region.current.region}
+      volumeSnapshotLocation:
+        - provider: aws
+          config:
+            region: ${data.aws_region.current.region}
+    serviceAccount:
+      server:
+        name: velero
+    credentials:
+      useSecret: false
+    schedules:
+      monthly-backup-cert-manager-production:
+        labels:
+          letsencrypt: production
+        schedule: "@monthly"
+        template:
+          ttl: 2160h
+          includedNamespaces:
+            - cert-manager
+          includedResources:
+            - certificates.cert-manager.io
+            - secrets
+          labelSelector:
+            matchLabels:
+              letsencrypt: production
+  YAML
+  ]
+
+  depends_on = [
+    module.velero_pod_identity,
+    helm_release.aws_load_balancer_controller,
+  ]
+}
+EOF
+```
+
+#### AWS Load Balancer Controller
+
+[AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
+provisions ELBv2 resources (ALB/NLB) for Services and Ingresses.
+
+![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="200"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-load-balancer-controller.tf" << \EOF
+module "aws_lb_controller_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "~> 2.8"
+
+  name                            = "${local.cluster_name}-aws-lbc"
+  attach_aws_lb_controller_policy = true
+
+  associations = {
+    main = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "aws-load-balancer-controller"
+      service_account = "aws-load-balancer-controller"
+    }
+  }
+}
+
+resource "helm_release" "aws_load_balancer_controller" {
+  # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
+  version          = "3.3.0"
+  name             = "aws-load-balancer-controller"
+  repository       = "https://aws.github.io/eks-charts"
+  chart            = "aws-load-balancer-controller"
+  namespace        = "aws-load-balancer-controller"
+  create_namespace = true
+
+  values = [<<-YAML
+    clusterName: ${local.cluster_name}
+    serviceAccount:
+      name: aws-load-balancer-controller
+  YAML
+  ]
+
+  depends_on = [
+    module.aws_lb_controller_pod_identity,
+  ]
+}
+EOF
+```
+
+#### Envoy Gateway
+
+[Envoy Gateway](https://gateway.envoyproxy.io/) is an implementation of the
+[Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) built on Envoy
+Proxy. It will terminate TLS, run the OIDC flow against Google, and forward
+authenticated requests to Open WebUI and other services.
+
+![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="250"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/envoy-gateway.tf" << \EOF
+resource "helm_release" "envoy_gateway" {
+  # renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
+  version          = "1.8.0"
+  name             = "envoy-gateway"
+  repository       = "oci://docker.io/envoyproxy"
+  chart            = "gateway-helm"
+  namespace        = "envoy-gateway-system"
+  create_namespace = true
+
+  depends_on = [
+    helm_release.aws_load_balancer_controller,
+  ]
+}
+
+resource "kubectl_manifest" "google_oidc_client_secret" {
+  yaml_body = <<-YAML
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: google-oidc-client-secret
+      namespace: envoy-gateway-system
+    type: Opaque
+    stringData:
+      client-secret: ${var.google_client_secret}
+  YAML
+  sensitive_fields = ["stringData"]
+  depends_on       = [helm_release.envoy_gateway]
+}
+
+resource "kubectl_manifest" "gatewayclass" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: GatewayClass
+    metadata:
+      name: eg
+    spec:
+      controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  YAML
+  depends_on = [helm_release.envoy_gateway]
+}
+
+resource "kubectl_manifest" "envoy_proxy_nlb" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: EnvoyProxy
+    metadata:
+      name: aws-nlb
+      namespace: envoy-gateway-system
+    spec:
+      provider:
+        type: Kubernetes
+        kubernetes:
+          envoyService:
+            annotations:
+              service.beta.kubernetes.io/aws-load-balancer-type: external
+              service.beta.kubernetes.io/aws-load-balancer-scheme: internet-facing
+              service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
+              service.beta.kubernetes.io/aws-load-balancer-name: eks-${local.cluster_name}
+  YAML
+  depends_on = [kubectl_manifest.gatewayclass]
+}
+
+resource "kubectl_manifest" "ref_grant_cert_secret" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1beta1
+    kind: ReferenceGrant
+    metadata:
+      name: allow-eg-to-cert-manager-secrets
+      namespace: cert-manager
+    spec:
+      from:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          namespace: envoy-gateway-system
+      to:
+        - group: ""
+          kind: Secret
+          name: cert-production
+  YAML
+  depends_on = [kubectl_manifest.envoy_proxy_nlb]
+}
+
+resource "kubectl_manifest" "gateway" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: Gateway
+    metadata:
+      name: eg
+      namespace: envoy-gateway-system
+    spec:
+      gatewayClassName: eg
+      infrastructure:
+        parametersRef:
+          group: gateway.envoyproxy.io
+          kind: EnvoyProxy
+          name: aws-nlb
+      listeners:
+        - name: https
+          port: 443
+          protocol: HTTPS
+          hostname: "*.${var.cluster_fqdn}"
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - name: cert-production
+                namespace: cert-manager
+          allowedRoutes:
+            namespaces:
+              from: All
+        - name: https-apex
+          port: 443
+          protocol: HTTPS
+          hostname: "${var.cluster_fqdn}"
+          tls:
+            mode: Terminate
+            certificateRefs:
+              - name: cert-production
+                namespace: cert-manager
+          allowedRoutes:
+            namespaces:
+              from: All
+  YAML
+  depends_on = [kubectl_manifest.ref_grant_cert_secret]
+}
+
+resource "kubectl_manifest" "security_policy_oidc" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: SecurityPolicy
+    metadata:
+      name: google-oidc
+      namespace: envoy-gateway-system
+    spec:
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: eg
+      oidc:
+        provider:
+          issuer: "https://accounts.google.com"
+        clientID: "${var.google_client_id}"
+        clientSecret:
+          name: google-oidc-client-secret
+        redirectURL: "https://${var.cluster_fqdn}/oauth2/callback"
+        scopes: [openid, email, profile]
+        cookieNames:
+          accessToken: oidc-access-token
+          idToken: oidc-id-token
+        cookieDomain: "${var.cluster_fqdn}"
+        logoutPath: "/logout"
+      jwt:
+        providers:
+          - name: google
+            issuer: "https://accounts.google.com"
+            remoteJWKS:
+              uri: "https://www.googleapis.com/oauth2/v3/certs"
+            extractFrom:
+              cookies: [oidc-id-token]
+            claimToHeaders:
+              - { header: X-Forwarded-Email, claim: email }
+              - { header: X-Forwarded-User,  claim: name  }
+      authorization:
+        defaultAction: Deny
+        rules:
+          - name: allow-specific-email
+            action: Allow
+            principal:
+              jwt:
+                provider: google
+                claims:
+                  - name: email
+                    values: ["${var.my_email}"]
+  YAML
+  depends_on = [
+    kubectl_manifest.gateway,
+    kubectl_manifest.google_oidc_client_secret,
+  ]
+}
+EOF
+```
+
+All routes through the Envoy Gateway now require Google authentication. Only
+`${MY_EMAIL}` is allowed to access the services.
+
+#### Karpenter
+
+[Karpenter](https://karpenter.sh/) automatically scales the node pool based on
+pending pod requirements. The EKS module provisions the IAM roles via the
+[`karpenter`](https://github.com/terraform-aws-modules/terraform-aws-eks/tree/master/modules/karpenter)
+sub-module.
+
+![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/karpenter.tf" << \EOF
+module "karpenter" {
+  source  = "terraform-aws-modules/eks/aws//modules/karpenter"
+  version = "~> 21.0"
+
+  cluster_name = module.eks.cluster_name
+
+  namespace       = "karpenter"
+  service_account = "karpenter"
+
+  node_iam_role_use_name_prefix = false
+  node_iam_role_name            = "KarpenterNodeRole-${local.cluster_name}"
+
+  queue_managed_sse_enabled = false
+  queue_kms_master_key_id   = module.kms.key_id
+}
+
+resource "helm_release" "karpenter" {
+  # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
+  version          = "1.12.1"
+  name             = "karpenter"
+  repository       = "oci://public.ecr.aws/karpenter"
+  chart            = "karpenter"
+  namespace        = "karpenter"
+  create_namespace = true
+
+  values = [<<-YAML
+    settings:
+      clusterName: ${module.eks.cluster_name}
+      eksControlPlane: true
+      interruptionQueue: ${module.karpenter.queue_name}
+      featureGates:
+        spotToSpotConsolidation: true
+    serviceAccount:
+      name: karpenter
+  YAML
+  ]
+
+  depends_on = [
+    module.karpenter,
+  ]
+}
+
+resource "kubectl_manifest" "ec2_nodeclass_default" {
+  yaml_body = <<-YAML
+    apiVersion: karpenter.k8s.aws/v1
+    kind: EC2NodeClass
+    metadata:
+      name: default
+    spec:
+      amiFamily: Bottlerocket
+      amiSelectorTerms:
+        - alias: bottlerocket@latest
+      subnetSelectorTerms:
+        - tags:
+            karpenter.sh/discovery: "${local.cluster_name}"
+      securityGroupSelectorTerms:
+        - tags:
+            karpenter.sh/discovery: "${local.cluster_name}"
+      role: "KarpenterNodeRole-${local.cluster_name}"
+      tags:
+        Name: "${local.cluster_name}-karpenter"
+        Cluster: "${var.cluster_fqdn}"
+      blockDeviceMappings:
+        - deviceName: /dev/xvda
+          ebs:
+            volumeSize: 2Gi
+            volumeType: gp3
+            encrypted: true
+            kmsKeyID: ${module.kms.key_arn}
+        - deviceName: /dev/xvdb
+          ebs:
+            volumeSize: 20Gi
+            volumeType: gp3
+            encrypted: true
+            kmsKeyID: ${module.kms.key_arn}
+  YAML
+  depends_on = [helm_release.karpenter]
+}
+
+resource "kubectl_manifest" "nodepool_default" {
+  yaml_body = <<-YAML
+    apiVersion: karpenter.sh/v1
+    kind: NodePool
+    metadata:
+      name: default
+    spec:
+      template:
+        spec:
+          requirements:
+            - key: "karpenter.k8s.aws/instance-memory"
+              operator: Gt
+              values: ["4095"]
+            - key: "topology.kubernetes.io/zone"
+              operator: In
+              values: ["${data.aws_region.current.region}a"]
+            - key: "karpenter.k8s.aws/instance-family"
+              operator: In
+              values: ["t4g", "t3a"]
+            - key: "karpenter.sh/capacity-type"
+              operator: In
+              values: ["spot", "on-demand"]
+            - key: "kubernetes.io/arch"
+              operator: In
+              values: ["arm64", "amd64"]
+          nodeClassRef:
+            group: karpenter.k8s.aws
+            kind: EC2NodeClass
+            name: default
+  YAML
+  depends_on = [kubectl_manifest.ec2_nodeclass_default]
+}
+EOF
+```
+
+#### ExternalDNS
+
+[ExternalDNS](https://github.com/kubernetes-sigs/external-dns) synchronises
+Kubernetes Services, Ingresses, and Gateway API routes with Route 53.
+
+![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="200"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/external-dns.tf" << \EOF
+module "external_dns_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "~> 2.8"
+
+  name                       = "${local.cluster_name}-external-dns"
+  attach_external_dns_policy = true
+  external_dns_hosted_zone_arns = [
+    module.route53_zone.arn,
+  ]
+
+  associations = {
+    main = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "external-dns"
+      service_account = "external-dns"
+    }
+  }
+}
+
+resource "helm_release" "external_dns" {
+  # renovate: datasource=helm depName=external-dns registryUrl=https://kubernetes-sigs.github.io/external-dns/
+  version          = "1.21.1"
+  name             = "external-dns"
+  repository       = "https://kubernetes-sigs.github.io/external-dns/"
+  chart            = "external-dns"
+  namespace        = "external-dns"
+  create_namespace = true
+
+  values = [<<-YAML
+    serviceAccount:
+      name: external-dns
+    interval: 20s
+    policy: sync
+    domainFilters:
+      - ${var.cluster_fqdn}
+    sources:
+      - service
+      - ingress
+      - gateway-httproute
+      - gateway-grpcroute
+  YAML
+  ]
+
+  depends_on = [
+    module.external_dns_pod_identity,
+  ]
+}
+EOF
+
+
+exit
+```
+
+### Open WebUI
+
+This section deploys the chat stack:
+[Envoy AI Gateway](https://aigateway.envoyproxy.io/) extends the Envoy Gateway
+already running in the cluster with OpenAI-to-Bedrock schema translation and
+automatic SigV4 credential injection via
+[EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html).
+[Open WebUI](https://openwebui.com/) talks to the AI Gateway's
+OpenAI-compatible `/v1/chat/completions` endpoint — no extra proxy deployment
+or database is needed.
+
+![Envoy AI Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="100"}
+![Open WebUI](https://raw.githubusercontent.com/open-webui/open-webui/14a6c1f4963892c163821765efcc10c5c4578454/static/static/favicon.svg){:width="80"}
+
+Create a dedicated IAM role granting the Envoy AI Gateway data-plane pod
+permission to call the Bedrock Converse/InvokeModel APIs, and associate it with
+the `ai-gateway-dataplane-aws` ServiceAccount through EKS Pod Identity:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock-pod-identity.tf" << \EOF
+data "aws_iam_policy_document" "bedrock_invoke" {
+  statement {
+    sid = "BedrockInvoke"
+    actions = [
+      "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream",
+      "bedrock:Converse",
+      "bedrock:ConverseStream",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid = "BedrockListAndGet"
+    actions = [
+      "bedrock:ListFoundationModels",
+      "bedrock:GetFoundationModel",
+      "bedrock:ListInferenceProfiles",
+      "bedrock:GetInferenceProfile",
+    ]
+    resources = ["*"]
+  }
+}
+
+module "ai_gateway_bedrock_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  version = "~> 2.8"
+
+  name                    = "${local.cluster_name}-ai-gw-bedrock"
+  attach_custom_policy    = true
+  source_policy_documents = [data.aws_iam_policy_document.bedrock_invoke.json]
+
+  associations = {
+    main = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "envoy-gateway-system"
+      service_account = "ai-gateway-dataplane-aws"
+    }
+  }
+}
+EOF
+```
+
+[Envoy AI Gateway](https://aigateway.envoyproxy.io/) is built on top of
+[Envoy Gateway](https://gateway.envoyproxy.io/) and adds AI-specific
+capabilities: schema translation (OpenAI <-> AWS Bedrock), automatic SigV4
+credential injection, model-based routing, and token-aware observability.
+It runs as an extension processor alongside the existing Envoy data plane —
+no separate proxy pod is needed.
+
+Install the [Envoy AI Gateway Helm chart](https://github.com/envoyproxy/ai-gateway)
+and configure the CRDs that wire up the Bedrock backend with Pod
+Identity-based authentication:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/envoy-ai-gateway.tf" << \EOF
+resource "helm_release" "envoy_ai_gateway" {
+  # renovate: datasource=github-tags depName=envoyproxy/ai-gateway
+  version          = "0.6.0"
+  name             = "ai-gateway"
+  repository       = "oci://docker.io/envoyproxy"
+  chart            = "ai-gateway-helm"
+  namespace        = "envoy-gateway-system"
+
+  depends_on = [helm_release.envoy_gateway]
+}
+
+resource "kubectl_manifest" "ai_gateway_dataplane_aws" {
+  yaml_body = <<-YAML
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      name: ai-gateway-dataplane-aws
+      namespace: envoy-gateway-system
+  YAML
+  depends_on = [helm_release.envoy_ai_gateway]
+}
+
+resource "kubectl_manifest" "ai_service_backend_bedrock" {
+  yaml_body = <<-YAML
+    apiVersion: aigateway.envoyproxy.io/v1beta1
+    kind: AIServiceBackend
+    metadata:
+      name: bedrock
+      namespace: default
+    spec:
+      schema:
+        name: AWSBedrock
+      backendRef:
+        name: bedrock
+        kind: Backend
+        group: gateway.envoyproxy.io
+  YAML
+  depends_on = [helm_release.envoy_ai_gateway]
+}
+
+resource "kubectl_manifest" "backend_bedrock" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: Backend
+    metadata:
+      name: bedrock
+      namespace: default
+    spec:
+      endpoints:
+        - fqdn:
+            hostname: bedrock-runtime.${data.aws_region.current.region}.amazonaws.com
+            port: 443
+  YAML
+  depends_on = [helm_release.envoy_ai_gateway]
+}
+
+resource "kubectl_manifest" "backend_security_policy_bedrock" {
+  yaml_body = <<-YAML
+    apiVersion: aigateway.envoyproxy.io/v1beta1
+    kind: BackendSecurityPolicy
+    metadata:
+      name: bedrock-auth
+      namespace: default
+    spec:
+      targetRefs:
+        - group: aigateway.envoyproxy.io
+          kind: AIServiceBackend
+          name: bedrock
+      type: AWSCredentials
+      awsCredentials:
+        region: ${data.aws_region.current.region}
+  YAML
+  depends_on = [
+    kubectl_manifest.ai_service_backend_bedrock,
+    module.ai_gateway_bedrock_pod_identity,
+  ]
+}
+
+resource "kubectl_manifest" "ai_gateway_route" {
+  yaml_body = <<-YAML
+    apiVersion: aigateway.envoyproxy.io/v1beta1
+    kind: AIGatewayRoute
+    metadata:
+      name: bedrock-models
+      namespace: default
+    spec:
+      parentRefs:
+        - name: eg
+          namespace: envoy-gateway-system
+          kind: Gateway
+          group: gateway.networking.k8s.io
+      rules:
+        - matches:
+            - headers:
+                - type: Exact
+                  name: x-ai-eg-model
+                  value: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+          backendRefs:
+            - name: bedrock
+        - matches:
+            - headers:
+                - type: Exact
+                  name: x-ai-eg-model
+                  value: us.anthropic.claude-3-haiku-20240307-v1:0
+          backendRefs:
+            - name: bedrock
+        - matches:
+            - headers:
+                - type: Exact
+                  name: x-ai-eg-model
+                  value: us.meta.llama3-70b-instruct-v1:0
+          backendRefs:
+            - name: bedrock
+        - matches:
+            - headers:
+                - type: Exact
+                  name: x-ai-eg-model
+                  value: us.mistral.mistral-large-2402-v1:0
+          backendRefs:
+            - name: bedrock
+  YAML
+  depends_on = [
+    kubectl_manifest.backend_security_policy_bedrock,
+    kubectl_manifest.gateway,
+  ]
+}
+EOF
+```
+
+[Open WebUI](https://openwebui.com/) is a user-friendly web interface for
+chat-style interactions with LLMs. Point it at the Envoy AI Gateway's
+in-cluster OpenAI-compatible endpoint and expose it through the Envoy Gateway:
+
+![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="250"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/open-webui.tf" << \EOF
+resource "helm_release" "open_webui" {
+  # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com
+  version          = "8.5.0"
+  name             = "open-webui"
+  repository       = "https://helm.openwebui.com"
+  chart            = "open-webui"
+  namespace        = "open-webui"
+  create_namespace = true
+
+  values = [<<-YAML
+    ollama:
+      enabled: false
+    pipelines:
+      enabled: false
+    websocket:
+      enabled: true
+    persistence:
+      enabled: true
+      size: 5Gi
+      storageClass: gp3
+    openaiBaseApiUrl: http://envoy-ai-gateway.envoy-gateway-system.svc/v1
+    extraEnvVars:
+      - name: OPENAI_API_KEY
+        value: not-needed
+      - name: WEBUI_AUTH
+        value: "false"
+      - name: ENABLE_SIGNUP
+        value: "false"
+      - name: DEFAULT_MODELS
+        value: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+      - name: WEBUI_AUTH_TRUSTED_EMAIL_HEADER
+        value: X-Forwarded-Email
+      - name: WEBUI_AUTH_TRUSTED_NAME_HEADER
+        value: X-Forwarded-User
+    extraEnvFrom: []
+  YAML
+  ]
+
+  depends_on = [
+    helm_release.envoy_ai_gateway,
+    kubectl_manifest.gp3,
+  ]
+}
+
+resource "kubectl_manifest" "openwebui_httproute" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: open-webui
+      namespace: open-webui
+    spec:
+      parentRefs:
+        - name: eg
+          namespace: envoy-gateway-system
+          sectionName: https
+      hostnames:
+        - chat.${var.cluster_fqdn}
+      rules:
+        - backendRefs:
+            - name: open-webui
+              port: 80
+  YAML
+  depends_on = [
+    helm_release.open_webui,
+    kubectl_manifest.gateway,
+  ]
+}
+EOF
+```
+
+## OpenTofu Code - apply
+
+Add the storage classes and apply the full OpenTofu configuration:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/storage.tf" << \EOF
+resource "kubectl_manifest" "gp3" {
+  yaml_body = <<-YAML
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: gp3
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: ebs.csi.aws.com
+    reclaimPolicy: Delete
+    allowVolumeExpansion: true
+    volumeBindingMode: WaitForFirstConsumer
+    parameters:
+      type: gp3
+      encrypted: "true"
+      kmsKeyId: ${module.kms.key_arn}
+  YAML
+}
+
+resource "kubectl_manifest" "vsc_ebs" {
+  yaml_body = <<-YAML
+    apiVersion: snapshot.storage.k8s.io/v1
+    kind: VolumeSnapshotClass
+    metadata:
+      name: ebs-vsc
+      annotations:
+        snapshot.storage.kubernetes.io/is-default-class: "true"
+    driver: ebs.csi.aws.com
+    deletionPolicy: Delete
+  YAML
+  depends_on = [module.eks]
+}
+EOF
+```
+
+Initialise the OpenTofu working directory and apply the entire configuration
+in a single run:
+
+```bash
+tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
+tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
+```
+
+Configure `kubectl` access and perform post-apply steps:
+
+```bash
+aws eks update-kubeconfig --name "${CLUSTER_NAME}" --region "${AWS_REGION}" --kubeconfig "${KUBECONFIG}"
+
+kubectl wait --for=condition=Ready --timeout=10m certificate cert-production -n cert-manager
+kubectl label secret --namespace cert-manager cert-production letsencrypt=production --overwrite
+kubectl delete storageclass gp2 || true
+```
+
+Restore the cert-manager certificates if a previous Velero backup exists:
+
+```bash
+while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}' 2>/dev/null)" ]; do sleep 5; done
+
+if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
+  velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
+fi
+```
+
+Visit `https://chat.${CLUSTER_FQDN}` — you should be redirected through the
+Google OIDC flow by Envoy Gateway, and then land in Open WebUI with the
+Bedrock-backed Claude, Llama, and Mistral models available in the model picker:
+
+```bash
+echo "Open WebUI: https://chat.${CLUSTER_FQDN}"
+```
+
+## Clean-up
+
+![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
+
+Set environment variables:
+
+```sh
+
+export AWS_REGION="${AWS_REGION:-us-east-1}"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k02.k8s.mylabs.dev}"
+export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
+export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
+export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
+export TF_VAR_google_client_id="${GOOGLE_CLIENT_ID}"
+export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
+```
+
+Back up the cert-manager certificate before tearing the cluster down (only if
+it has been renewed since the last backup):
+
+{% raw %}
+
+```sh
+if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
+  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
+fi
+```
+
+{% endraw %}
+
+Stop Karpenter from launching additional nodes and remove the Envoy Gateway /
+AWS LB Controller so the NLB is released before OpenTofu tries to destroy the
+VPC:
+
+```sh
+# tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=helm_release.karpenter -target=helm_release.envoy_gateway -target=helm_release.aws_load_balancer_controller -auto-approve || true
+```
+
+Remove any remaining EC2 instances provisioned by Karpenter:
+
+```sh
+# for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" "Name=tag:karpenter.sh/nodepool,Values=*" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
+#   echo "*** Removing Karpenter EC2: ${EC2}"
+#   aws ec2 terminate-instances --instance-ids "${EC2}"
+# done
+```
+
+Destroy the remaining infrastructure with OpenTofu:
+
+```sh
+if tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -auto-approve; then
+  aws s3api delete-objects --bucket "${CLUSTER_FQDN}" --no-cli-pager --delete "$(aws s3api list-object-versions --bucket "${CLUSTER_FQDN}" --prefix "terraform.tfstate" --output json --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')"
+fi
+```
+
+Remove EBS volumes and snapshots related to the cluster (as a precaution):
+
+```sh
+for VOLUME in $(aws ec2 describe-volumes --filter "Name=tag:KubernetesCluster,Values=${CLUSTER_NAME}" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Volumes[].VolumeId' --output text); do
+  echo "*** Removing Volume: ${VOLUME}"
+  aws ec2 delete-volume --volume-id "${VOLUME}"
+done
+
+for SNAPSHOT in $(aws ec2 describe-snapshots --owner-ids self --filter "Name=tag:Name,Values=${CLUSTER_NAME}-dynamic-snapshot*" "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" --query 'Snapshots[].SnapshotId' --output text); do
+  echo "*** Removing Snapshot: ${SNAPSHOT}"
+  aws ec2 delete-snapshot --snapshot-id "${SNAPSHOT}"
+done
+```
+
+Remove the CloudWatch log group:
+
+```sh
+if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
+  aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
+fi
+```
+
+Remove the working directory:
+
+```sh
+if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
+  rm -rf "${TMP_DIR}/${CLUSTER_FQDN}"
+fi
+```
+
+Enjoy ... 😉

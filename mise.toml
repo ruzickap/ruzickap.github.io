@@ -71,6 +71,25 @@ EOF
 '''
 
 #------------------------------------------------------------------------------
+# Terraform Run
+#------------------------------------------------------------------------------
+[tasks."tofu-run"]
+description = 'Terraform Run - eval "$(mise run t)"'
+alias = "t"
+quiet = true
+env.EKS_POST_FILE = "./_posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu.md"
+run = '''
+cat <<EOF
+set -x
+$(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
+
+tofu -chdir="${TMP_DIR}/\${CLUSTER_FQDN}" init
+tofu -chdir="${TMP_DIR}/\${CLUSTER_FQDN}" apply
+set +x
+EOF
+'''
+
+#------------------------------------------------------------------------------
 # Run the cheapest Amazon EKS
 #------------------------------------------------------------------------------
 [tasks."create:2022-11-27-cheapest-amazon-eks"]
@@ -278,6 +297,18 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 [tasks."delete:2026-03-04-amazon-eks-envoy-gateway-argocd"]
 description = 'Delete: Amazon EKS with Envoy Gateway deployed using Argo CD'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS with Open WebUI and AWS Bedrock managed by OpenTofu
+#------------------------------------------------------------------------------
+[tasks."create:2026-05-26-openwebui-eks-bedrock-opentofu"]
+description = 'Create: Amazon EKS with Open WebUI and AWS Bedrock managed by OpenTofu'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+
+[tasks."delete:2026-05-26-openwebui-eks-bedrock-opentofu"]
+description = 'Delete: Amazon EKS with Open WebUI and AWS Bedrock managed by OpenTofu'
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
