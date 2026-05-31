@@ -2225,7 +2225,20 @@ helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace ho
 
 ## Clean-up
 
+Remove all deployed resources and the EKS cluster.
+
 ![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
+
+Set environment variables:
+
+```sh
+export AWS_REGION="${AWS_REGION:-us-east-1}"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
+```
 
 Back up the certificate before deleting the cluster (in case it was renewed):
 
