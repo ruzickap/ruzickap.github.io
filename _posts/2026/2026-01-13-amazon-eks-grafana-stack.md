@@ -74,19 +74,6 @@ AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text) &&
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
 
-Confirm that all essential variables have been properly configured:
-
-```bash
-: "${AWS_ACCESS_KEY_ID?}"
-: "${AWS_REGION?}"
-: "${AWS_SECRET_ACCESS_KEY?}"
-: "${AWS_ROLE_TO_ASSUME?}"
-: "${GOOGLE_CLIENT_ID?}"
-: "${GOOGLE_CLIENT_SECRET?}"
-
-echo -e "${MY_EMAIL} | ${CLUSTER_NAME} | ${BASE_DOMAIN} | ${CLUSTER_FQDN}\n${TAGS}"
-```
-
 Install the required tools:
 
 <!-- prettier-ignore-start -->
@@ -2225,7 +2212,20 @@ helm upgrade --install --version "${HOMEPAGE_HELM_CHART_VERSION}" --namespace ho
 
 ## Clean-up
 
+Remove all deployed resources and the EKS cluster.
+
 ![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
+
+Set environment variables:
+
+```sh
+export AWS_REGION="${AWS_REGION:-us-east-1}"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
+```
 
 Back up the certificate before deleting the cluster (in case it was renewed):
 
@@ -2239,7 +2239,8 @@ fi
 
 {% endraw %}
 
-Stop Karpenter from launching additional nodes:
+Stop Karpenter from launching additional nodes and remove ingress-nginx
+to release the AWS Load Balancer:
 
 ```sh
 helm uninstall -n karpenter karpenter || true
