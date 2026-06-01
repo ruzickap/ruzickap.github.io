@@ -75,14 +75,13 @@ export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
-# export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
-export CLUSTER_FQDN="k02.k8s.mylabs.dev"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # OpenTofu variables
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
 # Derived shell variables
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
-export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig.conf}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 cd "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
@@ -161,7 +160,7 @@ Parameters:
     Description: Name of the S3 bucket
     Type: String
 Resources:
-  TerraformRemoteStateS3Bucket:
+  ClusterS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Ref Name
@@ -176,15 +175,19 @@ Resources:
             Status: Enabled
             AbortIncompleteMultipartUpload:
               DaysAfterInitiation: 1
+          - Id: VeleroExpiration
+            Status: Enabled
+            Prefix: velero/
+            ExpirationInDays: 120
       BucketEncryption:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: aws:kms
               KMSMasterKeyID: alias/aws/s3
-  TerraformRemoteStateS3BucketPolicy:
+  ClusterS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
-      Bucket: !Ref TerraformRemoteStateS3Bucket
+      Bucket: !Ref ClusterS3Bucket
       PolicyDocument:
         Version: "2012-10-17"
         Statement:
@@ -193,18 +196,19 @@ Resources:
             Principal: "*"
             Action: s3:*
             Resource:
-              - !GetAtt TerraformRemoteStateS3Bucket.Arn
-              - !Sub ${TerraformRemoteStateS3Bucket.Arn}/*
+              - !GetAtt ClusterS3Bucket.Arn
+              - !Sub ${ClusterS3Bucket.Arn}/*
             Condition:
               Bool:
                 aws:SecureTransport: "false"
 Outputs:
-  TerraformRemoteStateS3Bucket:
-    Value: !Ref TerraformRemoteStateS3Bucket
+  ClusterS3Bucket:
+    Value: !Ref ClusterS3Bucket
 EOF
 
   aws cloudformation deploy --region "${AWS_REGION}" \
-    --stack-name "${CLUSTER_FQDN//./-}" \
+    --stack-name "${CLUSTER_FQDN//./-}-s3" \
+    --tags "Owner=${TF_VAR_my_email}" "Environment=dev" "Cluster=${CLUSTER_FQDN}" \
     --parameter-overrides "Name=${CLUSTER_FQDN}" \
     --template-file "${TMP_DIR}/${CLUSTER_FQDN}/s3.yaml"
 fi
@@ -220,7 +224,7 @@ Create the working directory and the provider/version files:
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/versions.tf" << EOF
 terraform {
-  required_version = ">= 1.9.0"
+  required_version = ">= 1.12.0"
 
   backend "s3" {
     bucket       = "${CLUSTER_FQDN}"
@@ -231,19 +235,23 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~> 6.46"
+      # renovate: datasource=terraform-provider depName=hashicorp/aws
+      version = "6.47.0"
     }
     helm = {
       source  = "hashicorp/helm"
-      version = "~> 3.1"
+      # renovate: datasource=terraform-provider depName=hashicorp/helm
+      version = "3.1.2"
     }
     kubectl = {
       source  = "alekc/kubectl"
-      version = "~> 2.4"
+      # renovate: datasource=terraform-provider depName=alekc/kubectl
+      version = "2.4.0"
     }
     http = {
       source  = "hashicorp/http"
-      version = "~> 3.5"
+      # renovate: datasource=terraform-provider depName=hashicorp/http
+      version = "3.6.0"
     }
   }
 }
@@ -318,7 +326,7 @@ provider "kubectl" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
   token                  = data.aws_eks_cluster_auth.this.token
-  load_config_file       = false
+  lazy_load              = true
 }
 
 provider "helm" {
@@ -416,7 +424,8 @@ far less than the OpenSearch Serverless alternative (~$700+/month for 2 OCUs):
 tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock-rag.tf" << \EOF
 module "s3_rag" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 5.13"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/s3-bucket/aws
+  version = "5.13.0"
 
   bucket        = "${var.cluster_fqdn}-rag"
   force_destroy = true
@@ -599,7 +608,8 @@ resource "local_file" "lambda_bedrock_sync" {
 
 module "lambda_bedrock_sync" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 7.20"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/lambda/aws
+  version = "8.8.0"
 
   function_name = "${local.cluster_name}-bedrock-kb-sync"
   handler       = "index.handler"
@@ -661,7 +671,8 @@ data "aws_s3_objects" "velero_backup" {
 
 module "route53_zone" {
   source  = "terraform-aws-modules/route53/aws"
-  version = "~> 6.5"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/route53/aws
+  version = "6.5.0"
 
   name          = var.cluster_fqdn
   force_destroy = true
@@ -677,7 +688,8 @@ resource "aws_route53_record" "ns_delegation" {
 
 module "kms" {
   source  = "terraform-aws-modules/kms/aws"
-  version = "~> 4.2"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/kms/aws
+  version = "4.2.0"
 
   description             = "KMS key for ${local.cluster_name} Amazon EKS"
   deletion_window_in_days = 7
@@ -747,7 +759,8 @@ addons further down the page.
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eks.tf" << \EOF
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 6.0"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/vpc/aws
+  version = "6.6.1"
 
   name = local.cluster_name
   cidr = "192.168.0.0/16"
@@ -811,7 +824,8 @@ module "vpc" {
 
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 21.0"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks/aws
+  version = "21.15.1"
 
   name                   = local.cluster_name
   kubernetes_version     = "1.35"
@@ -888,7 +902,8 @@ module "eks" {
 
 module "ebs_csi_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "~> 2.8"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
+  version = "2.8.0"
 
   name                      = "${local.cluster_name}-ebs-csi"
   attach_aws_ebs_csi_policy = true
@@ -903,8 +918,6 @@ module "ebs_csi_pod_identity" {
   }
 }
 EOF
-
-exit
 ```
 
 #### cert-manager
@@ -923,7 +936,8 @@ Provision the Pod Identity role granted to the `cert-manager` ServiceAccount
 tee "${TMP_DIR}/${CLUSTER_FQDN}/cert-manager.tf" << \EOF
 module "cert_manager_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "~> 2.8"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
+  version = "2.8.0"
 
   name                       = "${local.cluster_name}-cert-manager"
   attach_cert_manager_policy = true
@@ -942,7 +956,7 @@ module "cert_manager_pod_identity" {
 
 resource "helm_release" "cert_manager" {
   # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io extractVersion=^(?<version>.+)$
-  version          = "v1.19.1"
+  version          = "v1.20.2"
   name             = "cert-manager"
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager"
@@ -1037,6 +1051,9 @@ resource "kubectl_manifest" "cert_production" {
   depends_on = [kubectl_manifest.letsencrypt_production_dns]
 }
 EOF
+
+
+exit
 ```
 
 #### Velero
@@ -1053,7 +1070,8 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/velero.tf" << \EOF
 module "s3_velero" {
   count = length(data.aws_s3_objects.velero_backup.keys) == 0 ? 1 : 0
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 5.0"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/s3-bucket/aws
+  version = "5.13.0"
 
   bucket        = var.cluster_fqdn
   force_destroy = true
@@ -1109,7 +1127,8 @@ data "aws_iam_policy_document" "velero" {
 
 module "velero_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "~> 2.8"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
+  version = "2.8.0"
 
   name                    = "${local.cluster_name}-velero"
   attach_custom_policy    = true
@@ -1137,7 +1156,7 @@ resource "helm_release" "velero" {
     initContainers:
       # renovate: datasource=github-tags depName=vmware-tanzu/velero-plugin-for-aws extractVersion=^(?<version>.+)$
       - name: velero-plugin-for-aws
-        image: velero/velero-plugin-for-aws:v1.14.1
+        image: velero/velero-plugin-for-aws:v1.14.0
         volumeMounts:
           - mountPath: /target
             name: plugins
@@ -1194,7 +1213,8 @@ provisions ELBv2 resources (ALB/NLB) for Services and Ingresses.
 tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-load-balancer-controller.tf" << \EOF
 module "aws_lb_controller_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "~> 2.8"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
+  version = "2.8.0"
 
   name                            = "${local.cluster_name}-aws-lbc"
   attach_aws_lb_controller_policy = true
@@ -1439,7 +1459,8 @@ sub-module.
 tee "${TMP_DIR}/${CLUSTER_FQDN}/karpenter.tf" << \EOF
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "~> 21.0"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks/aws
+  version = "21.15.1"
 
   cluster_name = module.eks.cluster_name
 
@@ -1562,7 +1583,8 @@ Kubernetes Services, Ingresses, and Gateway API routes with Route 53.
 tee "${TMP_DIR}/${CLUSTER_FQDN}/external-dns.tf" << \EOF
 module "external_dns_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "~> 2.8"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
+  version = "2.8.0"
 
   name                       = "${local.cluster_name}-external-dns"
   attach_external_dns_policy = true
@@ -1658,7 +1680,8 @@ data "aws_iam_policy_document" "bedrock_invoke" {
 
 module "ai_gateway_bedrock_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "~> 2.8"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
+  version = "2.8.0"
 
   name                    = "${local.cluster_name}-ai-gw-bedrock"
   attach_custom_policy    = true
@@ -1827,7 +1850,7 @@ in-cluster OpenAI-compatible endpoint and expose it through the Envoy Gateway:
 tee "${TMP_DIR}/${CLUSTER_FQDN}/open-webui.tf" << \EOF
 resource "helm_release" "open_webui" {
   # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com
-  version          = "8.5.0"
+  version          = "14.6.0"
   name             = "open-webui"
   repository       = "https://helm.openwebui.com"
   chart            = "open-webui"
@@ -1982,7 +2005,7 @@ Set environment variables:
 ```sh
 
 export AWS_REGION="${AWS_REGION:-us-east-1}"
-export CLUSTER_FQDN="${CLUSTER_FQDN:-k02.k8s.mylabs.dev}"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"

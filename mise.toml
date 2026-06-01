@@ -15,6 +15,7 @@ fnox = "1.25.1"
 helm = "4.2.0"
 kind = "0.31.0"
 kubectl = "1.36.1"
+opentofu = "1.12.0"
 velero = "1.18.1"
 yq = "4.53.2"
 # keep-sorted end
@@ -80,12 +81,10 @@ quiet = true
 env.EKS_POST_FILE = "./_posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu.md"
 run = '''
 cat <<EOF
-set -x
 $(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
 
-tofu -chdir="${TMP_DIR}/\${CLUSTER_FQDN}" init
-tofu -chdir="${TMP_DIR}/\${CLUSTER_FQDN}" apply
-set +x
+tofu -chdir="\${TMP_DIR}/\${CLUSTER_FQDN}" init
+tofu -chdir="\${TMP_DIR}/\${CLUSTER_FQDN}" apply
 EOF
 '''
 
