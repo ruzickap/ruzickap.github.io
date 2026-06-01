@@ -5,14 +5,7 @@ set -euo pipefail
 # Save all output (stdout + stderr) to a log file while still displaying on terminal
 exec > >(tee "/tmp/${MISE_TASK_NAME//[:|]/_}.log") 2>&1
 
-# # AWS Region
-# export AWS_REGION="${AWS_REGION:-us-east-1}"
-# # Hostname / FQDN definitions
-# export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
-# # Cluster Name: k01
-# export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
-# export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
 
 # Try a simple AWS STS call to validate credentials
 if aws sts get-caller-identity > /dev/null 2>&1; then
@@ -53,19 +46,6 @@ case "${1%:*}" in
 esac
 
 mq "select(.code.lang == \"${MQ_CODE_BLOCK}\") | to_text()" "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
-
-# if grep -Eq 'CLUSTER_FQDN' "${RUN_FILE}"; then
-#   if eksctl get clusters --name="${CLUSTER_NAME}" && [[ "${1%:*}" = "delete" ]]; then
-#     aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
-#   fi
-#   (
-#     echo "😇 <https://${CLUSTER_FQDN}>"
-#     echo '```'
-#     echo "export AWS_REGION=\"${AWS_REGION}\" CLUSTER_FQDN=\"${CLUSTER_FQDN}\""
-#     echo "eval \"\$(mise run a)\""
-#     echo '```'
-#   ) | tee "${GITHUB_STEP_SUMMARY}"
-# fi
 
 chmod a+x "${RUN_FILE}"
 echo "⏰ *** $(date)"

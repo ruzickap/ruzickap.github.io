@@ -1084,6 +1084,25 @@ export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
+Stop Karpenter from launching additional nodes and delete all Ingress
+resources to release the AWS Load Balancer before removing the cluster:
+
+```sh
+helm uninstall -n karpenter karpenter || true
+kubectl delete ingress --all-namespaces --all || true
+```
+
+Remove any orphan EC2 instances created by Karpenter before deleting the
+cluster -- their ENIs and security group attachments block VPC deletion:
+
+```sh
+for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
+  echo "Removing EC2: ${EC2}"
+  aws ec2 terminate-instances --instance-ids "${EC2}"
+done
+aws ec2 wait instance-terminated --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" || true
+```
+
 Remove the EKS cluster and its created components:
 
 ```sh
@@ -1105,15 +1124,6 @@ if [[ -n "${CLUSTER_FQDN_ZONE_ID}" ]]; then
         --output text --query 'ChangeInfo.Id'
     done
 fi
-```
-
-Remove any orphan EC2 instances created by Karpenter:
-
-```sh
-for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
-  echo "Removing EC2: ${EC2}"
-  aws ec2 terminate-instances --instance-ids "${EC2}"
-done
 ```
 
 Remove the CloudWatch log group:

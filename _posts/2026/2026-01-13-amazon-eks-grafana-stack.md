@@ -2239,7 +2239,8 @@ fi
 
 {% endraw %}
 
-Stop Karpenter from launching additional nodes:
+Stop Karpenter from launching additional nodes and remove ingress-nginx
+to release the AWS Load Balancer:
 
 ```sh
 helm uninstall -n karpenter karpenter || true

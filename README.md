@@ -146,11 +146,10 @@ mega-linter-runner --remove-container \
   --env VALIDATE_ALL_CODEBASE=true
 ```
 
-## Tests - not working
+## Tests
 
 ```bash
-docker run --rm -it -v "$PWD:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock" \
-  --env AWS_ACCESS_KEY_ID --env AWS_SECRET_ACCESS_KEY --env AWS_ROLE_TO_ASSUME \
+docker run --rm -it -v "${PWD}:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock" -v "${HOME}/.aws:/root/.aws" \
   --env GOOGLE_CLIENT_ID --env GOOGLE_CLIENT_SECRET --env FORCE_COLOR=1 --env USER \
   --workdir /mnt \
   ubuntu bash -c 'set -euo pipefail && \

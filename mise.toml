@@ -38,6 +38,7 @@ fnox-env = "https://github.com/jdx/mise-env-fnox"
 # Global Settings
 [settings]
 jobs = 1
+trusted_config_paths = ["/"]
 
 ##############################################################################
 # Environment Variables

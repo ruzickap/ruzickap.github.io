@@ -33,10 +33,11 @@ Install Krew, the plugin manager for the kubectl command-line tool:
 
 ```bash
 TMP_DIR="${TMP_DIR:-${PWD}}"
-ARCH="amd64"
-curl -sL "https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-linux_${ARCH}.tar.gz" | tar -xvzf - -C "${TMP_DIR}" --no-same-owner --strip-components=1 --wildcards "*/krew-linux*"
-"${TMP_DIR}/krew-linux_${ARCH}" install krew
-rm "${TMP_DIR}/krew-linux_${ARCH}"
+KREW_OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+KREW_ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')"
+curl -sL "https://github.com/kubernetes-sigs/krew/releases/download/v0.4.5/krew-${KREW_OS}_${KREW_ARCH}.tar.gz" | tar -xvzf - -C "${TMP_DIR}" --no-same-owner --strip-components=1 --wildcards "*/krew-${KREW_OS}*"
+"${TMP_DIR}/krew-${KREW_OS}_${KREW_ARCH}" install krew
+rm "${TMP_DIR}/krew-${KREW_OS}_${KREW_ARCH}"
 export PATH="${HOME}/.krew/bin:${PATH}"
 ```
 
@@ -996,7 +997,7 @@ currently using: [aks](https://github.com/Azure/kubectl-aks),
 Remove files from the `${TMP_DIR}` directory:
 
 ```sh
-for FILE in "${TMP_DIR}"/{krew-linux_amd64,rbac.html}; do
+for FILE in "${TMP_DIR}"/{krew-linux_*,rbac.html}; do
   if [[ -f "${FILE}" ]]; then
     rm -v "${FILE}"
   else
