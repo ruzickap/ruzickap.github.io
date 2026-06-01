@@ -81,7 +81,6 @@ export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
 # Derived shell variables
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
-export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig.conf}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
 cd "${TMP_DIR}/${CLUSTER_FQDN}"
 ```
@@ -246,7 +245,7 @@ terraform {
     kubectl = {
       source  = "alekc/kubectl"
       # renovate: datasource=terraform-provider depName=alekc/kubectl
-      version = "2.4.0"
+      version = "2.4.1"
     }
     http = {
       source  = "hashicorp/http"
@@ -326,6 +325,7 @@ provider "kubectl" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
   token                  = data.aws_eks_cluster_auth.this.token
+  load_config_file       = false
   lazy_load              = true
 }
 
@@ -425,7 +425,7 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock-rag.tf" << \EOF
 module "s3_rag" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/s3-bucket/aws
-  version = "5.13.0"
+  version = "5.14.0"
 
   bucket        = "${var.cluster_fqdn}-rag"
   force_destroy = true
@@ -645,6 +645,8 @@ resource "aws_s3_bucket_notification" "rag" {
     events              = ["s3:ObjectCreated:*"]
     filter_prefix       = "docs/"
   }
+
+  depends_on = [module.lambda_bedrock_sync]
 }
 EOF
 ```
@@ -670,10 +672,9 @@ data "aws_s3_objects" "velero_backup" {
 }
 
 module "route53_zone" {
-  source  = "terraform-aws-modules/route53/aws"
+  source        = "terraform-aws-modules/route53/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/route53/aws
-  version = "6.5.0"
-
+  version       = "6.5.0"
   name          = var.cluster_fqdn
   force_destroy = true
 }
@@ -825,7 +826,7 @@ module "vpc" {
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks/aws
-  version = "21.15.1"
+  version = "21.23.0"
 
   name                   = local.cluster_name
   kubernetes_version     = "1.35"
@@ -903,7 +904,7 @@ module "eks" {
 module "ebs_csi_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
-  version = "2.8.0"
+  version = "2.8.1"
 
   name                      = "${local.cluster_name}-ebs-csi"
   attach_aws_ebs_csi_policy = true
@@ -916,6 +917,92 @@ module "ebs_csi_pod_identity" {
       service_account = "ebs-csi-controller-sa"
     }
   }
+}
+
+resource "kubectl_manifest" "gp3" {
+  yaml_body = <<-YAML
+    apiVersion: storage.k8s.io/v1
+    kind: StorageClass
+    metadata:
+      name: gp3
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: ebs.csi.aws.com
+    reclaimPolicy: Delete
+    allowVolumeExpansion: true
+    volumeBindingMode: WaitForFirstConsumer
+    parameters:
+      type: gp3
+      encrypted: "true"
+      kmsKeyId: ${module.kms.key_arn}
+  YAML
+  depends_on = [module.eks]
+}
+
+resource "kubectl_manifest" "vsc_ebs" {
+  yaml_body = <<-YAML
+    apiVersion: snapshot.storage.k8s.io/v1
+    kind: VolumeSnapshotClass
+    metadata:
+      name: ebs-vsc
+      annotations:
+        snapshot.storage.kubernetes.io/is-default-class: "true"
+    driver: ebs.csi.aws.com
+    deletionPolicy: Delete
+  YAML
+  depends_on = [module.eks]
+}
+EOF
+```
+
+#### AWS Load Balancer Controller
+
+[AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
+provisions ELBv2 resources (ALB/NLB) for Services and Ingresses.
+
+![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="200"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-load-balancer-controller.tf" << \EOF
+module "aws_lb_controller_pod_identity" {
+  source  = "terraform-aws-modules/eks-pod-identity/aws"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
+  version = "2.8.1"
+
+  name                            = "${local.cluster_name}-aws-lbc"
+  attach_aws_lb_controller_policy = true
+
+  associations = {
+    main = {
+      cluster_name    = module.eks.cluster_name
+      namespace       = "aws-load-balancer-controller"
+      service_account = "aws-load-balancer-controller"
+    }
+  }
+}
+
+resource "helm_release" "aws_load_balancer_controller" {
+  # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
+  version          = "3.3.0"
+  name             = "aws-load-balancer-controller"
+  repository       = "https://aws.github.io/eks-charts"
+  chart            = "aws-load-balancer-controller"
+  namespace        = "aws-load-balancer-controller"
+  create_namespace = true
+
+  values = [<<-YAML
+    clusterName: ${local.cluster_name}
+    vpcId: ${module.vpc.vpc_id}
+    serviceAccount:
+      name: aws-load-balancer-controller
+  YAML
+  ]
+  wait = true
+
+  depends_on = [
+    module.aws_lb_controller_pod_identity,
+    module.eks,
+  ]
 }
 EOF
 ```
@@ -937,7 +1024,7 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/cert-manager.tf" << \EOF
 module "cert_manager_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
-  version = "2.8.0"
+  version = "2.8.1"
 
   name                       = "${local.cluster_name}-cert-manager"
   attach_cert_manager_policy = true
@@ -985,7 +1072,12 @@ resource "helm_release" "cert_manager" {
   ]
 
   depends_on = [
+    module.eks,
     module.cert_manager_pod_identity,
+    # Ensure AWS LB Controller webhook is ready before creating Services
+    # otherwise the mutating webhook "mservice.elbv2.k8s.aws" rejects requests
+    # with "no endpoints available" if the controller pod is not yet running
+    helm_release.aws_load_balancer_controller,
   ]
 }
 EOF
@@ -1051,9 +1143,6 @@ resource "kubectl_manifest" "cert_production" {
   depends_on = [kubectl_manifest.letsencrypt_production_dns]
 }
 EOF
-
-
-exit
 ```
 
 #### Velero
@@ -1067,43 +1156,6 @@ restoring Kubernetes cluster resources and persistent volumes.
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/velero.tf" << \EOF
-module "s3_velero" {
-  count = length(data.aws_s3_objects.velero_backup.keys) == 0 ? 1 : 0
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/s3-bucket/aws
-  version = "5.13.0"
-
-  bucket        = var.cluster_fqdn
-  force_destroy = true
-
-  attach_deny_insecure_transport_policy = true
-  attach_require_latest_tls_policy      = true
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
-  server_side_encryption_configuration = {
-    rule = {
-      apply_server_side_encryption_by_default = {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = "alias/aws/s3"
-      }
-    }
-  }
-
-  lifecycle_rule = [{
-    id      = "transition-and-expire"
-    enabled = true
-    transition = [{
-      days          = 30
-      storage_class = "STANDARD_IA"
-    }]
-    expiration = { days = 120 }
-  }]
-}
-
 data "aws_iam_policy_document" "velero" {
   statement {
     actions = [
@@ -1117,18 +1169,18 @@ data "aws_iam_policy_document" "velero" {
   }
   statement {
     actions   = ["s3:ListBucket", "s3:GetBucketLocation", "s3:ListBucketMultipartUploads"]
-    resources = [module.s3_velero[0].s3_bucket_arn]
+    resources = ["arn:aws:s3:::${var.cluster_fqdn}"]
   }
   statement {
     actions   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject", "s3:ListMultipartUploadParts", "s3:AbortMultipartUpload"]
-    resources = ["${module.s3_velero[0].s3_bucket_arn}/*"]
+    resources = ["arn:aws:s3:::${var.cluster_fqdn}/*"]
   }
 }
 
 module "velero_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
-  version = "2.8.0"
+  version = "2.8.1"
 
   name                    = "${local.cluster_name}-velero"
   attach_custom_policy    = true
@@ -1145,7 +1197,7 @@ module "velero_pod_identity" {
 
 resource "helm_release" "velero" {
   # renovate: datasource=helm depName=velero registryUrl=https://vmware-tanzu.github.io/helm-charts
-  version          = "12.0.1"
+  version          = "12.0.2"
   name             = "velero"
   repository       = "https://vmware-tanzu.github.io/helm-charts"
   chart            = "velero"
@@ -1154,19 +1206,14 @@ resource "helm_release" "velero" {
 
   values = [<<-YAML
     initContainers:
-      # renovate: datasource=github-tags depName=vmware-tanzu/velero-plugin-for-aws extractVersion=^(?<version>.+)$
       - name: velero-plugin-for-aws
-        image: velero/velero-plugin-for-aws:v1.14.0
+        # renovate: datasource=github-tags depName=vmware-tanzu/velero-plugin-for-aws extractVersion=^(?<version>.+)$
+        image: velero/velero-plugin-for-aws:v1.14.1
         volumeMounts:
           - mountPath: /target
             name: plugins
     configuration:
-      backupStorageLocation:
-        - provider: aws
-          bucket: ${module.s3_velero[0].s3_bucket_id}
-          prefix: velero
-          config:
-            region: ${data.aws_region.current.region}
+      backupStorageLocation: []
       volumeSnapshotLocation:
         - provider: aws
           config:
@@ -1195,57 +1242,65 @@ resource "helm_release" "velero" {
   ]
 
   depends_on = [
+    module.eks,
     module.velero_pod_identity,
-    helm_release.aws_load_balancer_controller,
   ]
 }
-EOF
-```
 
-#### AWS Load Balancer Controller
+resource "kubectl_manifest" "velero_bsl" {
+  yaml_body = <<-YAML
+    apiVersion: velero.io/v1
+    kind: BackupStorageLocation
+    metadata:
+      name: default
+      namespace: velero
+    spec:
+      provider: aws
+      default: true
+      objectStorage:
+        bucket: ${var.cluster_fqdn}
+        prefix: velero
+      config:
+        region: ${data.aws_region.current.region}
+  YAML
 
-[AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
-provisions ELBv2 resources (ALB/NLB) for Services and Ingresses.
-
-![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="200"}
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-load-balancer-controller.tf" << \EOF
-module "aws_lb_controller_pod_identity" {
-  source  = "terraform-aws-modules/eks-pod-identity/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
-  version = "2.8.0"
-
-  name                            = "${local.cluster_name}-aws-lbc"
-  attach_aws_lb_controller_policy = true
-
-  associations = {
-    main = {
-      cluster_name    = module.eks.cluster_name
-      namespace       = "aws-load-balancer-controller"
-      service_account = "aws-load-balancer-controller"
+  wait_for {
+    field {
+      key   = "status.phase"
+      value = "Available"
     }
   }
-}
-
-resource "helm_release" "aws_load_balancer_controller" {
-  # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
-  version          = "3.3.0"
-  name             = "aws-load-balancer-controller"
-  repository       = "https://aws.github.io/eks-charts"
-  chart            = "aws-load-balancer-controller"
-  namespace        = "aws-load-balancer-controller"
-  create_namespace = true
-
-  values = [<<-YAML
-    clusterName: ${local.cluster_name}
-    serviceAccount:
-      name: aws-load-balancer-controller
-  YAML
-  ]
 
   depends_on = [
-    module.aws_lb_controller_pod_identity,
+    helm_release.velero,
+  ]
+}
+
+resource "kubectl_manifest" "velero_restore_cert" {
+  count = length(data.aws_s3_objects.velero_backup.keys) > 0 ? 1 : 0
+
+  yaml_body = <<-YAML
+    apiVersion: velero.io/v1
+    kind: Restore
+    metadata:
+      name: restore-cert-manager-production
+      namespace: velero
+      labels:
+        letsencrypt: production
+    spec:
+      scheduleName: velero-monthly-backup-cert-manager-production
+      existingResourcePolicy: update
+  YAML
+
+  wait_for {
+    field {
+      key   = "status.phase"
+      value = "Completed"
+    }
+  }
+
+  depends_on = [
+    kubectl_manifest.velero_bsl,
   ]
 }
 EOF
@@ -1321,7 +1376,7 @@ resource "kubectl_manifest" "envoy_proxy_nlb" {
               service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
               service.beta.kubernetes.io/aws-load-balancer-name: eks-${local.cluster_name}
   YAML
-  depends_on = [kubectl_manifest.gatewayclass]
+  depends_on = [helm_release.envoy_gateway]
 }
 
 resource "kubectl_manifest" "ref_grant_cert_secret" {
@@ -1341,7 +1396,7 @@ resource "kubectl_manifest" "ref_grant_cert_secret" {
           kind: Secret
           name: cert-production
   YAML
-  depends_on = [kubectl_manifest.envoy_proxy_nlb]
+  depends_on = [helm_release.envoy_gateway]
 }
 
 resource "kubectl_manifest" "gateway" {
@@ -1384,7 +1439,11 @@ resource "kubectl_manifest" "gateway" {
             namespaces:
               from: All
   YAML
-  depends_on = [kubectl_manifest.ref_grant_cert_secret]
+  depends_on = [
+    kubectl_manifest.ref_grant_cert_secret,
+    kubectl_manifest.envoy_proxy_nlb,
+    kubectl_manifest.gatewayclass,
+  ]
 }
 
 resource "kubectl_manifest" "security_policy_oidc" {
@@ -1440,11 +1499,111 @@ resource "kubectl_manifest" "security_policy_oidc" {
     kubectl_manifest.google_oidc_client_secret,
   ]
 }
-EOF
-```
 
-All routes through the Envoy Gateway now require Google authentication. Only
-`${MY_EMAIL}` is allowed to access the services.
+resource "kubectl_manifest" "access_denied_page" {
+  yaml_body = <<-YAML
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: access-denied-page
+      namespace: envoy-gateway-system
+    data:
+      response.body: |
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Access Denied</title>
+          <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              min-height: 100vh;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: #333;
+            }
+            .container {
+              background: white;
+              border-radius: 16px;
+              padding: 48px;
+              max-width: 440px;
+              width: 90%;
+              text-align: center;
+              box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            }
+            .icon { font-size: 64px; margin-bottom: 24px; }
+            h1 { font-size: 24px; margin-bottom: 12px; color: #1a1a2e; }
+            p { color: #555; line-height: 1.6; margin-bottom: 32px; }
+            .logout-btn {
+              display: inline-block;
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              color: white;
+              text-decoration: none;
+              padding: 14px 36px;
+              border-radius: 8px;
+              font-size: 16px;
+              font-weight: 600;
+              transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .logout-btn:hover {
+              transform: translateY(-2px);
+              box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="icon">&#128683;</div>
+            <h1>Access Denied</h1>
+            <p>
+              Your account is not authorized to access this application.
+              Only pre-approved email addresses are permitted.
+              Please sign out and try with a different account.
+            </p>
+            <a href="/logout" class="logout-btn">Sign Out</a>
+          </div>
+        </body>
+        </html>
+  YAML
+  depends_on = [helm_release.envoy_gateway]
+}
+
+resource "kubectl_manifest" "denied_response_override" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.envoyproxy.io/v1alpha1
+    kind: BackendTrafficPolicy
+    metadata:
+      name: denied-response-override
+      namespace: envoy-gateway-system
+    spec:
+      targetRefs:
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: eg
+      responseOverride:
+        - match:
+            statusCodes:
+              - type: Value
+                value: 403
+          response:
+            contentType: text/html
+            body:
+              type: ValueRef
+              valueRef:
+                group: ""
+                kind: ConfigMap
+                name: access-denied-page
+  YAML
+  depends_on = [kubectl_manifest.gateway]
+}
+EOF
+
+exit
+```
 
 #### Karpenter
 
@@ -1460,7 +1619,7 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/karpenter.tf" << \EOF
 module "karpenter" {
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks/aws
-  version = "21.15.1"
+  version = "21.23.0"
 
   cluster_name = module.eks.cluster_name
 
@@ -1584,7 +1743,7 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/external-dns.tf" << \EOF
 module "external_dns_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
-  version = "2.8.0"
+  version = "2.8.1"
 
   name                       = "${local.cluster_name}-external-dns"
   attach_external_dns_policy = true
@@ -1627,12 +1786,10 @@ resource "helm_release" "external_dns" {
 
   depends_on = [
     module.external_dns_pod_identity,
+    kubectl_manifest.nodepool_default,
   ]
 }
 EOF
-
-
-exit
 ```
 
 ### Open WebUI
@@ -1681,7 +1838,7 @@ data "aws_iam_policy_document" "bedrock_invoke" {
 module "ai_gateway_bedrock_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
-  version = "2.8.0"
+  version = "2.8.1"
 
   name                    = "${local.cluster_name}-ai-gw-bedrock"
   attach_custom_policy    = true
@@ -1719,7 +1876,10 @@ resource "helm_release" "envoy_ai_gateway" {
   chart            = "ai-gateway-helm"
   namespace        = "envoy-gateway-system"
 
-  depends_on = [helm_release.envoy_gateway]
+  depends_on = [
+    helm_release.envoy_gateway,
+    kubectl_manifest.nodepool_default,
+  ]
 }
 
 resource "kubectl_manifest" "ai_gateway_dataplane_aws" {
@@ -1886,10 +2046,7 @@ resource "helm_release" "open_webui" {
   YAML
   ]
 
-  depends_on = [
-    helm_release.envoy_ai_gateway,
-    kubectl_manifest.gp3,
-  ]
+  depends_on = [helm_release.envoy_ai_gateway]
 }
 
 resource "kubectl_manifest" "openwebui_httproute" {
@@ -1921,71 +2078,12 @@ EOF
 
 ## OpenTofu Code - apply
 
-Add the storage classes and apply the full OpenTofu configuration:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/storage.tf" << \EOF
-resource "kubectl_manifest" "gp3" {
-  yaml_body = <<-YAML
-    apiVersion: storage.k8s.io/v1
-    kind: StorageClass
-    metadata:
-      name: gp3
-      annotations:
-        storageclass.kubernetes.io/is-default-class: "true"
-    provisioner: ebs.csi.aws.com
-    reclaimPolicy: Delete
-    allowVolumeExpansion: true
-    volumeBindingMode: WaitForFirstConsumer
-    parameters:
-      type: gp3
-      encrypted: "true"
-      kmsKeyId: ${module.kms.key_arn}
-  YAML
-}
-
-resource "kubectl_manifest" "vsc_ebs" {
-  yaml_body = <<-YAML
-    apiVersion: snapshot.storage.k8s.io/v1
-    kind: VolumeSnapshotClass
-    metadata:
-      name: ebs-vsc
-      annotations:
-        snapshot.storage.kubernetes.io/is-default-class: "true"
-    driver: ebs.csi.aws.com
-    deletionPolicy: Delete
-  YAML
-  depends_on = [module.eks]
-}
-EOF
-```
-
 Initialise the OpenTofu working directory and apply the entire configuration
 in a single run:
 
 ```bash
 tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
 tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
-```
-
-Configure `kubectl` access and perform post-apply steps:
-
-```bash
-aws eks update-kubeconfig --name "${CLUSTER_NAME}" --region "${AWS_REGION}" --kubeconfig "${KUBECONFIG}"
-
-kubectl wait --for=condition=Ready --timeout=10m certificate cert-production -n cert-manager
-kubectl label secret --namespace cert-manager cert-production letsencrypt=production --overwrite
-kubectl delete storageclass gp2 || true
-```
-
-Restore the cert-manager certificates if a previous Velero backup exists:
-
-```bash
-while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}' 2>/dev/null)" ]; do sleep 5; done
-
-if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
-  velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
-fi
 ```
 
 Visit `https://chat.${CLUSTER_FQDN}` — you should be redirected through the
@@ -2003,7 +2101,6 @@ echo "Open WebUI: https://chat.${CLUSTER_FQDN}"
 Set environment variables:
 
 ```sh
-
 export AWS_REGION="${AWS_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
@@ -2022,9 +2119,9 @@ it has been renewed since the last backup):
 {% raw %}
 
 ```sh
-if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
-  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
-fi
+# if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
+#   velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
+# fi
 ```
 
 {% endraw %}
@@ -2034,7 +2131,8 @@ AWS LB Controller so the NLB is released before OpenTofu tries to destroy the
 VPC:
 
 ```sh
-# tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=helm_release.karpenter -target=helm_release.envoy_gateway -target=helm_release.aws_load_balancer_controller -auto-approve || true
+tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
+tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=helm_release.karpenter -target=helm_release.envoy_gateway -target=helm_release.aws_load_balancer_controller -auto-approve || true
 ```
 
 Remove any remaining EC2 instances provisioned by Karpenter:
