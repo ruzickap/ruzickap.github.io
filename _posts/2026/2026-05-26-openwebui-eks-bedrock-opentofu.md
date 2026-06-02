@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2026-05-26
 description: Deploy Open WebUI on Amazon EKS with AWS Bedrock as the LLM backend, provisioned with OpenTofu
 categories: [Kubernetes, Cloud, Monitoring]
-tags: [amazon-eks, amazon-bedrock, cert-manager, envoy-ai-gateway, envoy-gateway, kubernetes, open-webui, opentofu, velero]
+tags: [amazon-eks, amazon-bedrock, bifrost, cert-manager, envoy-gateway, kubernetes, open-webui, opentofu, velero]
 image: https://raw.githubusercontent.com/open-webui/open-webui/14a6c1f4963892c163821765efcc10c5c4578454/static/static/favicon.svg
 ---
 
@@ -216,12 +216,13 @@ fi
 ## OpenTofu Code
 
 All resources from this point onwards are managed by [OpenTofu](https://opentofu.org/).
-Create the working directory and the provider/version files:
+Create the working directory and the main configuration file with provider
+versions, backend, and provider settings:
 
 ![OpenTofu](https://raw.githubusercontent.com/opentofu/brand-artifacts/45131c91b81dc05ac2b18de01d18e7be8c715137/full/transparent/SVG/on-light.svg){:width="400"}
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/versions.tf" << EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/main.tf" << EOF
 terraform {
   required_version = ">= 1.12.0"
 
@@ -251,6 +252,40 @@ terraform {
       source  = "hashicorp/http"
       # renovate: datasource=terraform-provider depName=hashicorp/http
       version = "3.6.0"
+    }
+  }
+}
+
+provider "aws" {
+  default_tags {
+    tags = local.tags
+  }
+}
+
+data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}
+
+provider "kubectl" {
+  host                   = module.eks.cluster_endpoint
+  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+  load_config_file       = false
+  lazy_load              = true
+  exec {
+    api_version = "client.authentication.k8s.io/v1beta1"
+    command     = "aws"
+    args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
+  }
+}
+
+provider "helm" {
+  kubernetes = {
+    host                   = module.eks.cluster_endpoint
+    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
+    exec = {
+      api_version = "client.authentication.k8s.io/v1beta1"
+      command     = "aws"
+      args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
     }
   }
 }
@@ -301,44 +336,6 @@ locals {
 EOF
 ```
 
-Configure the providers. The Kubernetes/Helm providers pull authentication data
-straight from the EKS module outputs, so OpenTofu can create the cluster and
-the workloads in a single run:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/providers.tf" << \EOF
-provider "aws" {
-  default_tags {
-    tags = local.tags
-  }
-}
-
-data "aws_region" "current" {}
-
-data "aws_caller_identity" "current" {}
-
-data "aws_eks_cluster_auth" "this" {
-  name = module.eks.cluster_name
-}
-
-provider "kubectl" {
-  host                   = module.eks.cluster_endpoint
-  cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-  token                  = data.aws_eks_cluster_auth.this.token
-  load_config_file       = false
-  lazy_load              = true
-}
-
-provider "helm" {
-  kubernetes = {
-    host                   = module.eks.cluster_endpoint
-    cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
-    token                  = data.aws_eks_cluster_auth.this.token
-  }
-}
-EOF
-```
-
 ### Amazon Bedrock
 
 <!-- prettier-ignore-start -->
@@ -349,64 +346,73 @@ EOF
 <!-- prettier-ignore-end -->
 
 Enable model invocation logging so every Bedrock request is captured in
-CloudWatch. An IAM role is required to allow Bedrock to write log events to
-the log group:
+CloudWatch, and define a guardrail that the IAM policy will reference to
+enforce guardrail usage. An IAM role is required to allow Bedrock to write
+log events to the log group:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock.tf" << \EOF
-resource "aws_cloudwatch_log_group" "bedrock" {
-  name              = "/aws/bedrock/${local.cluster_name}"
-  retention_in_days = 1
-  kms_key_id        = module.kms.key_arn
-}
-
-data "aws_iam_policy_document" "bedrock_logging_trust" {
-  statement {
-    principals {
-      type        = "Service"
-      identifiers = ["bedrock.amazonaws.com"]
-    }
-    actions = ["sts:AssumeRole"]
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-  }
-}
-
-data "aws_iam_policy_document" "bedrock_logging" {
-  statement {
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-    resources = ["${aws_cloudwatch_log_group.bedrock.arn}:*"]
-  }
-}
-
-resource "aws_iam_role" "bedrock_logging" {
-  name               = "${local.cluster_name}-bedrock-logging"
-  assume_role_policy = data.aws_iam_policy_document.bedrock_logging_trust.json
-}
-
-resource "aws_iam_role_policy" "bedrock_logging" {
-  name   = "${local.cluster_name}-bedrock-logging"
-  role   = aws_iam_role.bedrock_logging.id
-  policy = data.aws_iam_policy_document.bedrock_logging.json
-}
-
-resource "aws_bedrock_model_invocation_logging_configuration" "this" {
-  logging_config {
-    cloudwatch_config {
-      log_group_name = aws_cloudwatch_log_group.bedrock.name
-      role_arn       = aws_iam_role.bedrock_logging.arn
-    }
-    embedding_data_delivery_enabled = true
-    image_data_delivery_enabled     = true
-    text_data_delivery_enabled      = true
-  }
-}
+# resource "aws_cloudwatch_log_group" "bedrock" {
+#   name              = "/aws/bedrock/${local.cluster_name}"
+#   retention_in_days = 1
+#   kms_key_id        = module.kms.key_arn
+# }
+#
+# data "aws_iam_policy_document" "bedrock_logging_trust" {
+#   statement {
+#     principals {
+#       type        = "Service"
+#       identifiers = ["bedrock.amazonaws.com"]
+#     }
+#     actions = ["sts:AssumeRole"]
+#     condition {
+#       test     = "StringEquals"
+#       variable = "aws:SourceAccount"
+#       values   = [data.aws_caller_identity.current.account_id]
+#     }
+#   }
+# }
+#
+# data "aws_iam_policy_document" "bedrock_logging" {
+#   statement {
+#     actions = [
+#       "logs:CreateLogStream",
+#       "logs:PutLogEvents",
+#     ]
+#     resources = ["${aws_cloudwatch_log_group.bedrock.arn}:*"]
+#   }
+# }
+#
+# resource "aws_iam_role" "bedrock_logging" {
+#   name               = "${local.cluster_name}-bedrock-logging"
+#   assume_role_policy = data.aws_iam_policy_document.bedrock_logging_trust.json
+# }
+#
+# resource "aws_iam_role_policy" "bedrock_logging" {
+#   name   = "${local.cluster_name}-bedrock-logging"
+#   role   = aws_iam_role.bedrock_logging.id
+#   policy = data.aws_iam_policy_document.bedrock_logging.json
+# }
+#
+# resource "aws_bedrock_model_invocation_logging_configuration" "this" {
+#   logging_config {
+#     cloudwatch_config {
+#       log_group_name = aws_cloudwatch_log_group.bedrock.name
+#       role_arn       = aws_iam_role.bedrock_logging.arn
+#     }
+#     embedding_data_delivery_enabled = true
+#     image_data_delivery_enabled     = true
+#     text_data_delivery_enabled      = true
+#   }
+# }
+#
+# resource "aws_bedrock_guardrail" "ai_safety" {
+#   name                      = "${local.cluster_name}-ai-safety"
+#   description               = "Guardrail for AI model safety and compliance"
+#   blocked_input_messaging   = "Your request contains content that violates our AI usage policy."
+#   blocked_outputs_messaging = "The AI response was blocked due to policy violations."
+#   tags                      = local.tags
+# }
 EOF
 ```
 
@@ -667,7 +673,7 @@ data "aws_route53_zone" "base" {
 
 data "aws_s3_objects" "velero_backup" {
   bucket   = var.cluster_fqdn
-  prefix   = "velero/backups/"
+  prefix   = "velero/backups/cert-manager-production"
   max_keys = 1
 }
 
@@ -989,6 +995,7 @@ resource "helm_release" "aws_load_balancer_controller" {
   chart            = "aws-load-balancer-controller"
   namespace        = "aws-load-balancer-controller"
   create_namespace = true
+  wait = true
 
   values = [<<-YAML
     clusterName: ${local.cluster_name}
@@ -997,7 +1004,6 @@ resource "helm_release" "aws_load_balancer_controller" {
       name: aws-load-balancer-controller
   YAML
   ]
-  wait = true
 
   depends_on = [
     module.aws_lb_controller_pod_identity,
@@ -1049,6 +1055,7 @@ resource "helm_release" "cert_manager" {
   chart            = "cert-manager"
   namespace        = "cert-manager"
   create_namespace = true
+  wait             = true
 
   values = [<<-YAML
     crds:
@@ -1203,6 +1210,7 @@ resource "helm_release" "velero" {
   chart            = "velero"
   namespace        = "velero"
   create_namespace = true
+  wait             = true
 
   values = [<<-YAML
     initContainers:
@@ -1223,21 +1231,6 @@ resource "helm_release" "velero" {
         name: velero
     credentials:
       useSecret: false
-    schedules:
-      monthly-backup-cert-manager-production:
-        labels:
-          letsencrypt: production
-        schedule: "@monthly"
-        template:
-          ttl: 2160h
-          includedNamespaces:
-            - cert-manager
-          includedResources:
-            - certificates.cert-manager.io
-            - secrets
-          labelSelector:
-            matchLabels:
-              letsencrypt: production
   YAML
   ]
 
@@ -1247,6 +1240,8 @@ resource "helm_release" "velero" {
   ]
 }
 
+# Create BSL separately so we can use wait_for to confirm Velero has
+# completed at least one backup sync cycle (status.lastSyncedTime is set).
 resource "kubectl_manifest" "velero_bsl" {
   yaml_body = <<-YAML
     apiVersion: velero.io/v1
@@ -1266,14 +1261,13 @@ resource "kubectl_manifest" "velero_bsl" {
 
   wait_for {
     field {
-      key   = "status.phase"
-      value = "Available"
+      key        = "status.lastSyncedTime"
+      value      = ".+"
+      value_type = "regex"
     }
   }
 
-  depends_on = [
-    helm_release.velero,
-  ]
+  depends_on = [helm_release.velero]
 }
 
 resource "kubectl_manifest" "velero_restore_cert" {
@@ -1325,6 +1319,7 @@ resource "helm_release" "envoy_gateway" {
   chart            = "gateway-helm"
   namespace        = "envoy-gateway-system"
   create_namespace = true
+  wait             = true
 
   depends_on = [
     helm_release.aws_load_balancer_controller,
@@ -1458,6 +1453,11 @@ resource "kubectl_manifest" "security_policy_oidc" {
         - group: gateway.networking.k8s.io
           kind: Gateway
           name: eg
+          sectionName: https
+        - group: gateway.networking.k8s.io
+          kind: Gateway
+          name: eg
+          sectionName: https-apex
       oidc:
         provider:
           issuer: "https://accounts.google.com"
@@ -1500,109 +1500,30 @@ resource "kubectl_manifest" "security_policy_oidc" {
   ]
 }
 
-resource "kubectl_manifest" "access_denied_page" {
+resource "kubectl_manifest" "apex_httproute" {
   yaml_body = <<-YAML
-    apiVersion: v1
-    kind: ConfigMap
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
     metadata:
-      name: access-denied-page
-      namespace: envoy-gateway-system
-    data:
-      response.body: |
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Access Denied</title>
-          <style>
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-              min-height: 100vh;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: #333;
-            }
-            .container {
-              background: white;
-              border-radius: 16px;
-              padding: 48px;
-              max-width: 440px;
-              width: 90%;
-              text-align: center;
-              box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            }
-            .icon { font-size: 64px; margin-bottom: 24px; }
-            h1 { font-size: 24px; margin-bottom: 12px; color: #1a1a2e; }
-            p { color: #555; line-height: 1.6; margin-bottom: 32px; }
-            .logout-btn {
-              display: inline-block;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              text-decoration: none;
-              padding: 14px 36px;
-              border-radius: 8px;
-              font-size: 16px;
-              font-weight: 600;
-              transition: transform 0.2s, box-shadow 0.2s;
-            }
-            .logout-btn:hover {
-              transform: translateY(-2px);
-              box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-            }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="icon">&#128683;</div>
-            <h1>Access Denied</h1>
-            <p>
-              Your account is not authorized to access this application.
-              Only pre-approved email addresses are permitted.
-              Please sign out and try with a different account.
-            </p>
-            <a href="/logout" class="logout-btn">Sign Out</a>
-          </div>
-        </body>
-        </html>
-  YAML
-  depends_on = [helm_release.envoy_gateway]
-}
-
-resource "kubectl_manifest" "denied_response_override" {
-  yaml_body = <<-YAML
-    apiVersion: gateway.envoyproxy.io/v1alpha1
-    kind: BackendTrafficPolicy
-    metadata:
-      name: denied-response-override
+      name: apex
       namespace: envoy-gateway-system
     spec:
-      targetRefs:
-        - group: gateway.networking.k8s.io
-          kind: Gateway
-          name: eg
-      responseOverride:
-        - match:
-            statusCodes:
-              - type: Value
-                value: 403
-          response:
-            contentType: text/html
-            body:
-              type: ValueRef
-              valueRef:
-                group: ""
-                kind: ConfigMap
-                name: access-denied-page
+      parentRefs:
+        - name: eg
+          namespace: envoy-gateway-system
+          sectionName: https-apex
+      hostnames:
+        - ${var.cluster_fqdn}
+      rules:
+        - filters:
+            - type: RequestRedirect
+              requestRedirect:
+                hostname: chat.${var.cluster_fqdn}
+                statusCode: 302
   YAML
   depends_on = [kubectl_manifest.gateway]
 }
 EOF
-
-exit
 ```
 
 #### Karpenter
@@ -1641,6 +1562,7 @@ resource "helm_release" "karpenter" {
   chart            = "karpenter"
   namespace        = "karpenter"
   create_namespace = true
+  wait             = true
 
   values = [<<-YAML
     settings:
@@ -1795,23 +1717,23 @@ EOF
 ### Open WebUI
 
 This section deploys the chat stack:
-[Envoy AI Gateway](https://aigateway.envoyproxy.io/) extends the Envoy Gateway
-already running in the cluster with OpenAI-to-Bedrock schema translation and
-automatic SigV4 credential injection via
-[EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html).
-[Open WebUI](https://openwebui.com/) talks to the AI Gateway's
-OpenAI-compatible `/v1/chat/completions` endpoint — no extra proxy deployment
-or database is needed.
+[Bifrost](https://github.com/maximhq/bifrost) is a high-performance Go-based
+AI gateway that provides an OpenAI-compatible API over
+[Amazon Bedrock](https://aws.amazon.com/bedrock/) with automatic SigV4 signing.
+It uses [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
+for authentication.
+[Open WebUI](https://openwebui.com/) connects to Bifrost's `/v1` endpoint
+for chat interactions — no IAM users, databases, or long-term credentials are
+needed.
 
-![Envoy AI Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="100"}
 ![Open WebUI](https://raw.githubusercontent.com/open-webui/open-webui/14a6c1f4963892c163821765efcc10c5c4578454/static/static/favicon.svg){:width="80"}
 
-Create a dedicated IAM role granting the Envoy AI Gateway data-plane pod
-permission to call the Bedrock Converse/InvokeModel APIs, and associate it with
-the `ai-gateway-dataplane-aws` ServiceAccount through EKS Pod Identity:
+Create a dedicated IAM role granting the Bifrost pod permission to call the
+Bedrock Converse/InvokeModel APIs, and associate it with the `bifrost`
+ServiceAccount through EKS Pod Identity:
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock-pod-identity.tf" << \EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/bifrost.tf" << \EOF
 data "aws_iam_policy_document" "bedrock_invoke" {
   statement {
     sid = "BedrockInvoke"
@@ -1821,7 +1743,10 @@ data "aws_iam_policy_document" "bedrock_invoke" {
       "bedrock:Converse",
       "bedrock:ConverseStream",
     ]
-    resources = ["*"]
+    resources = [
+      "arn:aws:bedrock:*::foundation-model/*",
+      "arn:aws:bedrock:*:*:inference-profile/*",
+    ]
   }
   statement {
     sid = "BedrockListAndGet"
@@ -1835,174 +1760,71 @@ data "aws_iam_policy_document" "bedrock_invoke" {
   }
 }
 
-module "ai_gateway_bedrock_pod_identity" {
+module "bifrost_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
   version = "2.8.1"
 
-  name                    = "${local.cluster_name}-ai-gw-bedrock"
+  name                    = "${local.cluster_name}-bifrost"
   attach_custom_policy    = true
   source_policy_documents = [data.aws_iam_policy_document.bedrock_invoke.json]
 
   associations = {
     main = {
       cluster_name    = module.eks.cluster_name
-      namespace       = "envoy-gateway-system"
-      service_account = "ai-gateway-dataplane-aws"
+      namespace       = "bifrost"
+      service_account = "bifrost"
     }
   }
 }
-EOF
-```
 
-[Envoy AI Gateway](https://aigateway.envoyproxy.io/) is built on top of
-[Envoy Gateway](https://gateway.envoyproxy.io/) and adds AI-specific
-capabilities: schema translation (OpenAI <-> AWS Bedrock), automatic SigV4
-credential injection, model-based routing, and token-aware observability.
-It runs as an extension processor alongside the existing Envoy data plane —
-no separate proxy pod is needed.
+resource "helm_release" "bifrost" {
+  # renovate: datasource=helm depName=bifrost registryUrl=https://maximhq.github.io/bifrost/helm-charts
+  version          = "2.1.20"
+  name             = "bifrost"
+  repository       = "https://maximhq.github.io/bifrost/helm-charts"
+  chart            = "bifrost"
+  namespace        = "bifrost"
+  create_namespace = true
 
-Install the [Envoy AI Gateway Helm chart](https://github.com/envoyproxy/ai-gateway)
-and configure the CRDs that wire up the Bedrock backend with Pod
-Identity-based authentication:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/envoy-ai-gateway.tf" << \EOF
-resource "helm_release" "envoy_ai_gateway" {
-  # renovate: datasource=github-tags depName=envoyproxy/ai-gateway
-  version          = "0.6.0"
-  name             = "ai-gateway"
-  repository       = "oci://docker.io/envoyproxy"
-  chart            = "ai-gateway-helm"
-  namespace        = "envoy-gateway-system"
+  values = [<<-YAML
+    image:
+      # renovate: datasource=docker depName=ghcr.io/maximhq/bifrost-go
+      tag: v1.5.3
+    serviceAccount:
+      create: true
+      name: bifrost
+    bifrost:
+      authConfig:
+        isEnabled: false
+        disableAuthOnInference: true
+      client:
+        enforceAuthOnInference: false
+      providers:
+        bedrock:
+          keys:
+            - name: bedrock-default
+              value: ""
+              weight: 1
+              models: ["anthropic.claude-haiku-4-5-20251001-v1:0"]
+              bedrock_key_config:
+                region: ${data.aws_region.current.region}
+              aliases:
+                anthropic.claude-haiku-4-5-20251001-v1:0: us.anthropic.claude-haiku-4-5-20251001-v1:0
+  YAML
+  ]
 
   depends_on = [
-    helm_release.envoy_gateway,
     kubectl_manifest.nodepool_default,
-  ]
-}
-
-resource "kubectl_manifest" "ai_gateway_dataplane_aws" {
-  yaml_body = <<-YAML
-    apiVersion: v1
-    kind: ServiceAccount
-    metadata:
-      name: ai-gateway-dataplane-aws
-      namespace: envoy-gateway-system
-  YAML
-  depends_on = [helm_release.envoy_ai_gateway]
-}
-
-resource "kubectl_manifest" "ai_service_backend_bedrock" {
-  yaml_body = <<-YAML
-    apiVersion: aigateway.envoyproxy.io/v1beta1
-    kind: AIServiceBackend
-    metadata:
-      name: bedrock
-      namespace: default
-    spec:
-      schema:
-        name: AWSBedrock
-      backendRef:
-        name: bedrock
-        kind: Backend
-        group: gateway.envoyproxy.io
-  YAML
-  depends_on = [helm_release.envoy_ai_gateway]
-}
-
-resource "kubectl_manifest" "backend_bedrock" {
-  yaml_body = <<-YAML
-    apiVersion: gateway.envoyproxy.io/v1alpha1
-    kind: Backend
-    metadata:
-      name: bedrock
-      namespace: default
-    spec:
-      endpoints:
-        - fqdn:
-            hostname: bedrock-runtime.${data.aws_region.current.region}.amazonaws.com
-            port: 443
-  YAML
-  depends_on = [helm_release.envoy_ai_gateway]
-}
-
-resource "kubectl_manifest" "backend_security_policy_bedrock" {
-  yaml_body = <<-YAML
-    apiVersion: aigateway.envoyproxy.io/v1beta1
-    kind: BackendSecurityPolicy
-    metadata:
-      name: bedrock-auth
-      namespace: default
-    spec:
-      targetRefs:
-        - group: aigateway.envoyproxy.io
-          kind: AIServiceBackend
-          name: bedrock
-      type: AWSCredentials
-      awsCredentials:
-        region: ${data.aws_region.current.region}
-  YAML
-  depends_on = [
-    kubectl_manifest.ai_service_backend_bedrock,
-    module.ai_gateway_bedrock_pod_identity,
-  ]
-}
-
-resource "kubectl_manifest" "ai_gateway_route" {
-  yaml_body = <<-YAML
-    apiVersion: aigateway.envoyproxy.io/v1beta1
-    kind: AIGatewayRoute
-    metadata:
-      name: bedrock-models
-      namespace: default
-    spec:
-      parentRefs:
-        - name: eg
-          namespace: envoy-gateway-system
-          kind: Gateway
-          group: gateway.networking.k8s.io
-      rules:
-        - matches:
-            - headers:
-                - type: Exact
-                  name: x-ai-eg-model
-                  value: us.anthropic.claude-3-5-sonnet-20240620-v1:0
-          backendRefs:
-            - name: bedrock
-        - matches:
-            - headers:
-                - type: Exact
-                  name: x-ai-eg-model
-                  value: us.anthropic.claude-3-haiku-20240307-v1:0
-          backendRefs:
-            - name: bedrock
-        - matches:
-            - headers:
-                - type: Exact
-                  name: x-ai-eg-model
-                  value: us.meta.llama3-70b-instruct-v1:0
-          backendRefs:
-            - name: bedrock
-        - matches:
-            - headers:
-                - type: Exact
-                  name: x-ai-eg-model
-                  value: us.mistral.mistral-large-2402-v1:0
-          backendRefs:
-            - name: bedrock
-  YAML
-  depends_on = [
-    kubectl_manifest.backend_security_policy_bedrock,
-    kubectl_manifest.gateway,
+    module.bifrost_pod_identity,
   ]
 }
 EOF
 ```
 
 [Open WebUI](https://openwebui.com/) is a user-friendly web interface for
-chat-style interactions with LLMs. Point it at the Envoy AI Gateway's
-in-cluster OpenAI-compatible endpoint and expose it through the Envoy Gateway:
+chat-style interactions with LLMs. Point it at Bifrost's in-cluster
+OpenAI-compatible endpoint and expose it through the Envoy Gateway:
 
 ![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="250"}
 
@@ -2025,19 +1847,21 @@ resource "helm_release" "open_webui" {
     websocket:
       enabled: true
     persistence:
-      enabled: true
-      size: 5Gi
-      storageClass: gp3
-    openaiBaseApiUrl: http://envoy-ai-gateway.envoy-gateway-system.svc/v1
+      enabled: false
+    openaiBaseApiUrl: http://bifrost.bifrost.svc:8080/v1
     extraEnvVars:
       - name: OPENAI_API_KEY
-        value: not-needed
+        value: sk-not-needed
       - name: WEBUI_AUTH
         value: "false"
       - name: ENABLE_SIGNUP
         value: "false"
+      - name: ENABLE_UPDATE_CHECK
+        value: "false"
+      - name: ENABLE_EVALUATION_ARENA_MODELS
+        value: "false"
       - name: DEFAULT_MODELS
-        value: us.anthropic.claude-3-5-sonnet-20240620-v1:0
+        value: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
       - name: WEBUI_AUTH_TRUSTED_EMAIL_HEADER
         value: X-Forwarded-Email
       - name: WEBUI_AUTH_TRUSTED_NAME_HEADER
@@ -2046,7 +1870,32 @@ resource "helm_release" "open_webui" {
   YAML
   ]
 
-  depends_on = [helm_release.envoy_ai_gateway]
+  depends_on = [helm_release.bifrost]
+}
+
+resource "kubectl_manifest" "bifrost_httproute" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: bifrost
+      namespace: bifrost
+    spec:
+      parentRefs:
+        - name: eg
+          namespace: envoy-gateway-system
+          sectionName: https
+      hostnames:
+        - bifrost.${var.cluster_fqdn}
+      rules:
+        - backendRefs:
+            - name: bifrost
+              port: 8080
+  YAML
+  depends_on = [
+    helm_release.bifrost,
+    kubectl_manifest.gateway,
+  ]
 }
 
 resource "kubectl_manifest" "openwebui_httproute" {
@@ -2074,6 +1923,9 @@ resource "kubectl_manifest" "openwebui_httproute" {
   ]
 }
 EOF
+
+
+exit
 ```
 
 ## OpenTofu Code - apply
@@ -2083,7 +1935,10 @@ in a single run:
 
 ```bash
 tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
-tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
+
+if [[ ! ${MISE_TASK_NAME:-} =~ delete: ]]; then
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
+fi
 ```
 
 Visit `https://chat.${CLUSTER_FQDN}` — you should be redirected through the
@@ -2091,10 +1946,12 @@ Google OIDC flow by Envoy Gateway, and then land in Open WebUI with the
 Bedrock-backed Claude, Llama, and Mistral models available in the model picker:
 
 ```bash
-echo "Open WebUI: https://chat.${CLUSTER_FQDN}"
+echo "✳️ Open WebUI: https://chat.${CLUSTER_FQDN}"
 ```
 
 ## Clean-up
+
+Remove the cluster and all related resources with OpenTofu.
 
 ![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
 
@@ -2109,7 +1966,8 @@ export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
 export TF_VAR_google_client_id="${GOOGLE_CLIENT_ID}"
 export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
-export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
+export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig.conf}"
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
@@ -2120,17 +1978,40 @@ it has been renewed since the last backup):
 
 ```sh
 # if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
-#   velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
+# kubectl apply -f - << EOF
+# apiVersion: velero.io/v1
+# kind: Backup
+# metadata:
+#   name: cert-manager-production
+#   namespace: velero
+# spec:
+#   ttl: 2160h
+#   includedNamespaces:
+#     - cert-manager
+#   includedResources:
+#     - certificates.cert-manager.io
+#     - secrets
+#   labelSelector:
+#     matchLabels:
+#       letsencrypt: production
+# EOF
 # fi
 ```
 
 {% endraw %}
+
+Recreate the OpenTofu code files:
+
+```sh
+mise run "create:${MISE_TASK_NAME##*:}"
+```
 
 Stop Karpenter from launching additional nodes and remove the Envoy Gateway /
 AWS LB Controller so the NLB is released before OpenTofu tries to destroy the
 VPC:
 
 ```sh
+############################### TODO - remove tofu init - not needed - it is in "apply" mode
 tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
 tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=helm_release.karpenter -target=helm_release.envoy_gateway -target=helm_release.aws_load_balancer_controller -auto-approve || true
 ```
@@ -2138,10 +2019,10 @@ tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=helm_release.karpenter 
 Remove any remaining EC2 instances provisioned by Karpenter:
 
 ```sh
-# for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" "Name=tag:karpenter.sh/nodepool,Values=*" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
-#   echo "*** Removing Karpenter EC2: ${EC2}"
-#   aws ec2 terminate-instances --instance-ids "${EC2}"
-# done
+for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" "Name=tag:karpenter.sh/nodepool,Values=*" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
+  echo "*** Removing Karpenter EC2: ${EC2}"
+  aws ec2 terminate-instances --instance-ids "${EC2}"
+done
 ```
 
 Destroy the remaining infrastructure with OpenTofu:
