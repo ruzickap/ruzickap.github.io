@@ -75,7 +75,7 @@ export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
-export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k02.k8s.mylabs.dev}"
 # OpenTofu variables
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
@@ -336,6 +336,114 @@ locals {
 EOF
 ```
 
+### Route53 and KMS key
+
+Use the [`terraform-aws-modules`](https://github.com/terraform-aws-modules)
+collection to provision the Route 53 hosted zone for `${CLUSTER_FQDN}`,
+delegate it from the parent zone, and create the KMS key for EKS secrets and
+EBS volume encryption:
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/infra-aws.tf" << \EOF
+data "aws_route53_zone" "base" {
+  name         = "${local.base_domain}."
+  private_zone = false
+}
+
+data "aws_s3_objects" "velero_backup" {
+  bucket   = var.cluster_fqdn
+  prefix   = "velero/backups/cert-manager-production"
+  max_keys = 1
+}
+
+module "route53_zone" {
+  source        = "terraform-aws-modules/route53/aws"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/route53/aws
+  version       = "6.5.0"
+  name          = var.cluster_fqdn
+  force_destroy = true
+}
+
+resource "aws_route53_record" "ns_delegation" {
+  zone_id = data.aws_route53_zone.base.zone_id
+  name    = var.cluster_fqdn
+  type    = "NS"
+  ttl     = 60
+  records = module.route53_zone.name_servers
+}
+
+module "kms" {
+  source  = "terraform-aws-modules/kms/aws"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/kms/aws
+  version = "4.2.0"
+
+  description             = "KMS key for ${local.cluster_name} Amazon EKS"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+  aliases                 = ["eks-${local.cluster_name}"]
+
+  key_statements = [
+    {
+      sid = "AllowEBSEncryptionViaEC2Service"
+      principals = [{ type = "AWS", identifiers = ["*"] }]
+      actions = [
+        "kms:Encrypt", "kms:Decrypt", "kms:ReEncrypt*",
+        "kms:GenerateDataKey*", "kms:CreateGrant", "kms:DescribeKey",
+      ]
+      resources = ["*"]
+      condition = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["ec2.${data.aws_region.current.region}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        },
+      ]
+    },
+    {
+      sid = "AllowS3VectorsIndexing"
+      principals = [{ type = "Service", identifiers = ["indexing.s3vectors.amazonaws.com"] }]
+      actions = [
+        "kms:Decrypt", "kms:GenerateDataKey", "kms:DescribeKey", "kms:CreateGrant",
+      ]
+      resources = ["*"]
+    },
+    {
+      sid = "AllowS3SQSEncryption"
+      principals = [{ type = "Service", identifiers = ["s3.amazonaws.com"] }]
+      actions = [
+        "kms:Decrypt", "kms:GenerateDataKey",
+      ]
+      resources = ["*"]
+      condition = [{
+        test     = "ArnEquals"
+        variable = "aws:SourceArn"
+        values   = ["arn:aws:s3:::${var.cluster_fqdn}-rag"]
+      }]
+    },
+    {
+      sid = "AllowCloudWatchLogs"
+      principals = [{ type = "Service", identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"] }]
+      actions = [
+        "kms:Encrypt*", "kms:Decrypt*", "kms:ReEncrypt*",
+        "kms:GenerateDataKey*", "kms:Describe*",
+      ]
+      resources = ["*"]
+      condition = [{
+        test     = "ArnLike"
+        variable = "kms:EncryptionContext:aws:logs:arn"
+        values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
+      }]
+    },
+  ]
+}
+EOF
+```
+
 ### Amazon Bedrock
 
 <!-- prettier-ignore-start -->
@@ -471,6 +579,11 @@ resource "aws_s3vectors_index" "rag" {
   dimension          = 1024
   distance_metric    = "cosine"
 
+  # Bedrock's per-chunk metadata (AMAZON_BEDROCK_TEXT, AMAZON_BEDROCK_METADATA) exceeds the 2048-byte filterable limit; marking them non-filterable allows up to 40 KB per vector instead.
+  metadata_configuration {
+    non_filterable_metadata_keys = ["AMAZON_BEDROCK_TEXT", "AMAZON_BEDROCK_METADATA"]
+  }
+
   encryption_configuration {
     sse_type    = "aws:kms"
     kms_key_arn = module.kms.key_arn
@@ -544,12 +657,6 @@ resource "aws_bedrockagent_knowledge_base" "rag" {
     type = "VECTOR"
     vector_knowledge_base_configuration {
       embedding_model_arn = "arn:aws:bedrock:${data.aws_region.current.region}::foundation-model/amazon.titan-embed-text-v2:0"
-      embedding_model_configuration {
-        bedrock_embedding_model_configuration {
-          dimensions          = 1024
-          embedding_data_type = "FLOAT32"
-        }
-      }
     }
   }
 
@@ -562,8 +669,9 @@ resource "aws_bedrockagent_knowledge_base" "rag" {
 }
 
 resource "aws_bedrockagent_data_source" "rag" {
-  knowledge_base_id = aws_bedrockagent_knowledge_base.rag.id
-  name              = "${local.cluster_name}-rag-s3"
+  knowledge_base_id    = aws_bedrockagent_knowledge_base.rag.id
+  name                 = "${local.cluster_name}-rag-s3"
+  data_deletion_policy = "RETAIN"
 
   data_source_configuration {
     type = "S3"
@@ -577,23 +685,55 @@ resource "aws_bedrockagent_data_source" "rag" {
   }
 }
 
-data "http" "rag_docs" {
-  for_each = local.rag_documents
-  url      = each.value
-}
-
-resource "aws_s3_object" "rag_docs" {
-  for_each     = local.rag_documents
-  bucket       = module.s3_rag.s3_bucket_id
-  key          = "docs/${each.key}"
-  content      = data.http.rag_docs[each.key].response_body
-  content_type = "text/markdown"
-}
-
 data "aws_iam_policy_document" "lambda_bedrock_sync" {
   statement {
     actions   = ["bedrock:StartIngestionJob"]
     resources = [aws_bedrockagent_knowledge_base.rag.arn]
+  }
+  statement {
+    actions = [
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+    ]
+    resources = [module.sqs_rag_sync.queue_arn]
+  }
+  statement {
+    actions   = ["kms:Decrypt"]
+    resources = [module.kms.key_arn]
+  }
+}
+
+module "sqs_rag_sync" {
+  source  = "terraform-aws-modules/sqs/aws"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/sqs/aws
+  version = "5.2.2"
+
+  name = "${local.cluster_name}-rag-sync"
+  # Lambda runs sequentially (reserved_concurrent_executions = 1).
+  # visibility_timeout must be >= 6x Lambda timeout (AWS best practice).
+  # Messages survive the full upload window so every minute gets a batch.
+  visibility_timeout_seconds = 180
+  message_retention_seconds  = 900
+
+  kms_master_key_id                 = module.kms.key_id
+  kms_data_key_reuse_period_seconds = 300
+
+  create_queue_policy = true
+  queue_policy_statements = {
+    s3 = {
+      sid     = "AllowS3SendMessage"
+      actions = ["sqs:SendMessage"]
+      principals = [{
+        type        = "Service"
+        identifiers = ["s3.amazonaws.com"]
+      }]
+      condition = [{
+        test     = "ArnEquals"
+        variable = "aws:SourceArn"
+        values   = [module.s3_rag.s3_bucket_arn]
+      }]
+    }
   }
 }
 
@@ -602,13 +742,20 @@ resource "local_file" "lambda_bedrock_sync" {
   content  = <<-PYTHON
     import boto3
     import os
+    from botocore.exceptions import ClientError
 
 
     def handler(event, context):
-        boto3.client("bedrock-agent").start_ingestion_job(
-            knowledgeBaseId=os.environ["KNOWLEDGE_BASE_ID"],
-            dataSourceId=os.environ["DATA_SOURCE_ID"],
-        )
+        try:
+            boto3.client("bedrock-agent").start_ingestion_job(
+                knowledgeBaseId=os.environ["KNOWLEDGE_BASE_ID"],
+                dataSourceId=os.environ["DATA_SOURCE_ID"],
+            )
+        except ClientError as e:
+            if e.response["Error"]["Code"] == "ConflictException":
+                print("Ingestion job already running - skipping")
+            else:
+                raise
   PYTHON
 }
 
@@ -623,6 +770,8 @@ module "lambda_bedrock_sync" {
   timeout       = 30
   publish       = true
 
+  reserved_concurrent_executions = 1
+
   source_path = dirname(local_file.lambda_bedrock_sync.filename)
 
   depends_on = [local_file.lambda_bedrock_sync]
@@ -635,10 +784,11 @@ module "lambda_bedrock_sync" {
   attach_policy_json = true
   policy_json        = data.aws_iam_policy_document.lambda_bedrock_sync.json
 
-  allowed_triggers = {
-    s3 = {
-      principal  = "s3.amazonaws.com"
-      source_arn = module.s3_rag.s3_bucket_arn
+  event_source_mapping = {
+    sqs = {
+      event_source_arn                   = module.sqs_rag_sync.queue_arn
+      batch_size                         = 10000
+      maximum_batching_window_in_seconds = 60
     }
   }
 }
@@ -646,108 +796,28 @@ module "lambda_bedrock_sync" {
 resource "aws_s3_bucket_notification" "rag" {
   bucket = module.s3_rag.s3_bucket_id
 
-  lambda_function {
-    lambda_function_arn = module.lambda_bedrock_sync.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_prefix       = "docs/"
+  queue {
+    queue_arn     = module.sqs_rag_sync.queue_arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "docs/"
   }
 
-  depends_on = [module.lambda_bedrock_sync]
-}
-EOF
-```
-
-### Route53 and KMS key
-
-Use the [`terraform-aws-modules`](https://github.com/terraform-aws-modules)
-collection to provision the Route 53 hosted zone for `${CLUSTER_FQDN}`,
-delegate it from the parent zone, and create the KMS key for EKS secrets and
-EBS volume encryption:
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/infra-aws.tf" << \EOF
-data "aws_route53_zone" "base" {
-  name         = "${local.base_domain}."
-  private_zone = false
+  depends_on = [module.sqs_rag_sync]
 }
 
-data "aws_s3_objects" "velero_backup" {
-  bucket   = var.cluster_fqdn
-  prefix   = "velero/backups/cert-manager-production"
-  max_keys = 1
+data "http" "rag_docs" {
+  for_each = local.rag_documents
+  url      = each.value
 }
 
-module "route53_zone" {
-  source        = "terraform-aws-modules/route53/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/route53/aws
-  version       = "6.5.0"
-  name          = var.cluster_fqdn
-  force_destroy = true
-}
+resource "aws_s3_object" "rag_docs" {
+  for_each     = local.rag_documents
+  bucket       = module.s3_rag.s3_bucket_id
+  key          = "docs/${each.key}"
+  content      = data.http.rag_docs[each.key].response_body
+  content_type = "text/markdown"
 
-resource "aws_route53_record" "ns_delegation" {
-  zone_id = data.aws_route53_zone.base.zone_id
-  name    = var.cluster_fqdn
-  type    = "NS"
-  ttl     = 60
-  records = module.route53_zone.name_servers
-}
-
-module "kms" {
-  source  = "terraform-aws-modules/kms/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/kms/aws
-  version = "4.2.0"
-
-  description             = "KMS key for ${local.cluster_name} Amazon EKS"
-  deletion_window_in_days = 7
-  enable_key_rotation     = true
-  aliases                 = ["eks-${local.cluster_name}"]
-
-  key_statements = [
-    {
-      sid = "AllowEBSEncryptionViaEC2Service"
-      principals = [{ type = "AWS", identifiers = ["*"] }]
-      actions = [
-        "kms:Encrypt", "kms:Decrypt", "kms:ReEncrypt*",
-        "kms:GenerateDataKey*", "kms:CreateGrant", "kms:DescribeKey",
-      ]
-      resources = ["*"]
-      condition = [
-        {
-          test     = "StringEquals"
-          variable = "kms:ViaService"
-          values   = ["ec2.${data.aws_region.current.region}.amazonaws.com"]
-        },
-        {
-          test     = "StringEquals"
-          variable = "kms:CallerAccount"
-          values   = [data.aws_caller_identity.current.account_id]
-        },
-      ]
-    },
-    {
-      sid = "AllowS3VectorsIndexing"
-      principals = [{ type = "Service", identifiers = ["indexing.s3vectors.amazonaws.com"] }]
-      actions = [
-        "kms:Decrypt", "kms:GenerateDataKey", "kms:DescribeKey", "kms:CreateGrant",
-      ]
-      resources = ["*"]
-    },
-    {
-      sid = "AllowCloudWatchLogs"
-      principals = [{ type = "Service", identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"] }]
-      actions = [
-        "kms:Encrypt*", "kms:Decrypt*", "kms:ReEncrypt*",
-        "kms:GenerateDataKey*", "kms:Describe*",
-      ]
-      resources = ["*"]
-      condition = [{
-        test     = "ArnLike"
-        variable = "kms:EncryptionContext:aws:logs:arn"
-        values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:*"]
-      }]
-    },
-  ]
+  depends_on = [aws_s3_bucket_notification.rag]
 }
 EOF
 ```
@@ -925,6 +995,7 @@ module "ebs_csi_pod_identity" {
   }
 }
 
+# Custom gp3 StorageClass with KMS encryption replaces the default gp2 class. The EBS CSI addon has defaultStorageClass disabled so this takes precedence.
 resource "kubectl_manifest" "gp3" {
   yaml_body = <<-YAML
     apiVersion: storage.k8s.io/v1
@@ -945,6 +1016,7 @@ resource "kubectl_manifest" "gp3" {
   depends_on = [module.eks]
 }
 
+# Default VolumeSnapshotClass for the EBS CSI driver, required by Velero to create EBS snapshots when backing up PersistentVolumes.
 resource "kubectl_manifest" "vsc_ebs" {
   yaml_body = <<-YAML
     apiVersion: snapshot.storage.k8s.io/v1
@@ -967,6 +1039,11 @@ EOF
 provisions ELBv2 resources (ALB/NLB) for Services and Ingresses.
 
 ![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="200"}
+
+Install the `aws-load-balancer-controller`
+[Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
+and customize its
+[default values](https://github.com/kubernetes-sigs/aws-load-balancer-controller/blob/v2.14.0/helm/aws-load-balancer-controller/values.yaml):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/aws-load-balancer-controller.tf" << \EOF
@@ -1021,9 +1098,12 @@ obtaining, renewing, and using those certificates.
 
 ![cert-manager](https://raw.githubusercontent.com/cert-manager/cert-manager/7f15787f0f146149d656b6877a6fbf4394fe9965/logo/logo.svg){:width="150"}
 
+Install the `cert-manager`
+[Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager)
+and customize its
+[default values](https://github.com/cert-manager/cert-manager/blob/v1.20.2/deploy/charts/cert-manager/values.yaml).
 Provision the Pod Identity role granted to the `cert-manager` ServiceAccount
-(scoped to the `${CLUSTER_FQDN}` hosted zone) and install the
-[cert-manager Helm chart](https://artifacthub.io/packages/helm/cert-manager/cert-manager):
+(scoped to the `${CLUSTER_FQDN}` hosted zone):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/cert-manager.tf" << \EOF
@@ -1092,7 +1172,17 @@ EOF
 
 Create the `ClusterIssuer` and `Certificate` resources through OpenTofu using the
 [`alekc/kubectl`](https://registry.terraform.io/providers/alekc/kubectl/latest/docs)
-provider:
+provider.
+
+- ClusterIssuer configuring Let's Encrypt production ACME with DNS-01 challenges
+  solved via Route 53 (using cert-manager's Pod Identity for AWS API access).
+
+- Wildcard TLS certificate for `*.cluster_fqdn` issued by Let's Encrypt.
+  Only created when no Velero backup exists (count condition) — on subsequent
+  runs the certificate+secret are restored from the Velero backup instead,
+  avoiding unnecessary ACME rate-limit consumption.
+  wait_for blocks until cert-manager reports the certificate as Ready so that
+  downstream resources (Gateway TLS listeners) can reference the secret.
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/cert-manager-letsencrypt.tf" << \EOF
@@ -1147,6 +1237,13 @@ resource "kubectl_manifest" "cert_production" {
         - "${var.cluster_fqdn}"
   YAML
 
+  wait_for {
+    field {
+      key   = "status.conditions.[0].status"
+      value = "True"
+    }
+  }
+
   depends_on = [kubectl_manifest.letsencrypt_production_dns]
 }
 EOF
@@ -1158,6 +1255,11 @@ EOF
 restoring Kubernetes cluster resources and persistent volumes.
 
 ![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/Velero.svg){:width="400"}
+
+Install the `velero`
+[Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
+and customize its
+[default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-12.0.2/charts/velero/values.yaml):
 
 ##### S3 bucket for Velero backups (if not already exists)
 
@@ -1282,7 +1384,7 @@ resource "kubectl_manifest" "velero_restore_cert" {
       labels:
         letsencrypt: production
     spec:
-      scheduleName: velero-monthly-backup-cert-manager-production
+      backupName: cert-manager-production
       existingResourcePolicy: update
   YAML
 
@@ -1308,6 +1410,11 @@ Proxy. It will terminate TLS, run the OIDC flow against Google, and forward
 authenticated requests to Open WebUI and other services.
 
 ![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="250"}
+
+Install the `gateway-helm`
+[Helm chart](https://github.com/envoyproxy/gateway/tree/main/charts/gateway-helm)
+and customize its
+[default values](https://github.com/envoyproxy/gateway/blob/v1.8.0/charts/gateway-helm/values.yaml):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/envoy-gateway.tf" << \EOF
@@ -1535,6 +1642,11 @@ sub-module.
 
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
 
+Install the `karpenter`
+[Helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
+and customize its
+[default values](https://github.com/aws/karpenter-provider-aws/blob/v1.12.1/charts/karpenter/values.yaml):
+
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/karpenter.tf" << \EOF
 module "karpenter" {
@@ -1660,6 +1772,11 @@ Kubernetes Services, Ingresses, and Gateway API routes with Route 53.
 
 ![ExternalDNS](https://raw.githubusercontent.com/kubernetes-sigs/external-dns/afe3b09f45a241750ec3ddceef59ceaf84c096d0/docs/img/external-dns.png){:width="200"}
 
+Install the `external-dns`
+[Helm chart](https://artifacthub.io/packages/helm/external-dns/external-dns)
+and customize its
+[default values](https://github.com/kubernetes-sigs/external-dns/blob/external-dns-helm-chart-1.21.1/charts/external-dns/values.yaml):
+
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/external-dns.tf" << \EOF
 module "external_dns_pod_identity" {
@@ -1714,20 +1831,20 @@ resource "helm_release" "external_dns" {
 EOF
 ```
 
-### Open WebUI
+### Bifrost
 
-This section deploys the chat stack:
 [Bifrost](https://github.com/maximhq/bifrost) is a high-performance Go-based
 AI gateway that provides an OpenAI-compatible API over
 [Amazon Bedrock](https://aws.amazon.com/bedrock/) with automatic SigV4 signing.
 It uses [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
-for authentication.
-[Open WebUI](https://openwebui.com/) connects to Bifrost's `/v1` endpoint
-for chat interactions — no IAM users, databases, or long-term credentials are
-needed.
+for authentication — no IAM users or long-term credentials are needed.
 
-![Open WebUI](https://raw.githubusercontent.com/open-webui/open-webui/14a6c1f4963892c163821765efcc10c5c4578454/static/static/favicon.svg){:width="80"}
+![Bifrost](https://raw.githubusercontent.com/maximhq/bifrost/0d4d2cc7f4aec6745aab5e03af8b101bfc0b0c02/docs/media/bifrost-logo-dark.png){:width="500"}
 
+Install the `bifrost`
+[Helm chart](https://github.com/maximhq/bifrost/tree/main/helm-charts/bifrost)
+and customize its
+[default values](https://github.com/maximhq/bifrost/blob/bifrost-2.1.20/helm-charts/bifrost/values.yaml).
 Create a dedicated IAM role granting the Bifrost pod permission to call the
 Bedrock Converse/InvokeModel APIs, and associate it with the `bifrost`
 ServiceAccount through EKS Pod Identity:
@@ -1790,7 +1907,7 @@ resource "helm_release" "bifrost" {
   values = [<<-YAML
     image:
       # renovate: datasource=docker depName=ghcr.io/maximhq/bifrost-go
-      tag: v1.5.3
+      tag: v1.5.7
     serviceAccount:
       create: true
       name: bifrost
@@ -1822,9 +1939,15 @@ resource "helm_release" "bifrost" {
 EOF
 ```
 
+### Open WebUI
+
 [Open WebUI](https://openwebui.com/) is a user-friendly web interface for
-chat-style interactions with LLMs. Point it at Bifrost's in-cluster
-OpenAI-compatible endpoint and expose it through the Envoy Gateway:
+chat-style interactions with LLMs. Install the `open-webui`
+[Helm chart](https://github.com/open-webui/helm-charts/tree/main/charts/open-webui)
+and customize its
+[default values](https://github.com/open-webui/helm-charts/blob/open-webui-14.6.0/charts/open-webui/values.yaml).
+Point it at Bifrost's in-cluster OpenAI-compatible endpoint and expose it
+through the Envoy Gateway:
 
 ![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="250"}
 
@@ -1856,7 +1979,7 @@ resource "helm_release" "open_webui" {
         value: "false"
       - name: ENABLE_SIGNUP
         value: "false"
-      - name: ENABLE_UPDATE_CHECK
+      - name: ENABLE_VERSION_UPDATE_CHECK
         value: "false"
       - name: ENABLE_EVALUATION_ARENA_MODELS
         value: "false"
@@ -1923,9 +2046,6 @@ resource "kubectl_manifest" "openwebui_httproute" {
   ]
 }
 EOF
-
-
-exit
 ```
 
 ## OpenTofu Code - apply
@@ -1935,8 +2055,7 @@ in a single run:
 
 ```bash
 tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
-
-if [[ ! ${MISE_TASK_NAME:-} =~ delete: ]]; then
+if [[ ! ${MY_TASK:-} =~ delete: ]]; then
   tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
 fi
 ```
@@ -1944,10 +2063,6 @@ fi
 Visit `https://chat.${CLUSTER_FQDN}` — you should be redirected through the
 Google OIDC flow by Envoy Gateway, and then land in Open WebUI with the
 Bedrock-backed Claude, Llama, and Mistral models available in the model picker:
-
-```bash
-echo "✳️ Open WebUI: https://chat.${CLUSTER_FQDN}"
-```
 
 ## Clean-up
 
@@ -1959,7 +2074,7 @@ Set environment variables:
 
 ```sh
 export AWS_REGION="${AWS_REGION:-us-east-1}"
-export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k02.k8s.mylabs.dev}"
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
@@ -1972,30 +2087,32 @@ aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --ku
 ```
 
 Back up the cert-manager certificate before tearing the cluster down (only if
-it has been renewed since the last backup):
+it was issued/renewed during this cluster's lifetime — a completed
+CertificateRequest with the `letsencrypt: production` label only exists when
+cert-manager performed the ACME flow, not after a Velero restore):
 
 {% raw %}
 
 ```sh
-# if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
-# kubectl apply -f - << EOF
-# apiVersion: velero.io/v1
-# kind: Backup
-# metadata:
-#   name: cert-manager-production
-#   namespace: velero
-# spec:
-#   ttl: 2160h
-#   includedNamespaces:
-#     - cert-manager
-#   includedResources:
-#     - certificates.cert-manager.io
-#     - secrets
-#   labelSelector:
-#     matchLabels:
-#       letsencrypt: production
-# EOF
-# fi
+if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}' | grep -q "True"; then
+  kubectl apply -f - << EOF
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: cert-manager-production
+  namespace: velero
+spec:
+  ttl: 2160h
+  includedNamespaces:
+    - cert-manager
+  includedResources:
+    - certificates.cert-manager.io
+    - secrets
+  labelSelector:
+    matchLabels:
+      letsencrypt: production
+EOF
+fi
 ```
 
 {% endraw %}
@@ -2003,6 +2120,7 @@ it has been renewed since the last backup):
 Recreate the OpenTofu code files:
 
 ```sh
+export MY_TASK="${MISE_TASK_NAME}"
 mise run "create:${MISE_TASK_NAME##*:}"
 ```
 
@@ -2011,8 +2129,6 @@ AWS LB Controller so the NLB is released before OpenTofu tries to destroy the
 VPC:
 
 ```sh
-############################### TODO - remove tofu init - not needed - it is in "apply" mode
-tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
 tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=helm_release.karpenter -target=helm_release.envoy_gateway -target=helm_release.aws_load_balancer_controller -auto-approve || true
 ```
 
@@ -2030,6 +2146,7 @@ Destroy the remaining infrastructure with OpenTofu:
 ```sh
 if tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -auto-approve; then
   aws s3api delete-objects --bucket "${CLUSTER_FQDN}" --no-cli-pager --delete "$(aws s3api list-object-versions --bucket "${CLUSTER_FQDN}" --prefix "terraform.tfstate" --output json --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')"
+  rm -rf "${TMP_DIR}/${CLUSTER_FQDN}"
 fi
 ```
 
@@ -2052,14 +2169,6 @@ Remove the CloudWatch log group:
 ```sh
 if [[ "$(aws logs describe-log-groups --query "logGroups[?logGroupName==\`/aws/eks/${CLUSTER_NAME}/cluster\`] | [0].logGroupName" --output text)" = "/aws/eks/${CLUSTER_NAME}/cluster" ]]; then
   aws logs delete-log-group --log-group-name "/aws/eks/${CLUSTER_NAME}/cluster"
-fi
-```
-
-Remove the working directory:
-
-```sh
-if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  rm -rf "${TMP_DIR}/${CLUSTER_FQDN}"
 fi
 ```
 
