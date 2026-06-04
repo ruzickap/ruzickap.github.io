@@ -149,7 +149,7 @@ using CloudFormation. The bucket uses KMS encryption, lifecycle policies, and
 blocks all public access:
 
 ```bash
-if ! aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2>/dev/null; then
+if ! aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
   tee "${TMP_DIR}/${CLUSTER_FQDN}/s3.yaml" << \EOF
 AWSTemplateFormatVersion: "2010-09-09"
 Description: S3 bucket for Amazon EKS backups and OpenTofu state files
@@ -421,7 +421,8 @@ EOF
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-![Amazon Bedrock](https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/aa30729ab2e125f13526020fa98ed5eb0ed86cc1/dist/ArtificialIntelligence/Bedrock.png){:width="200"}
+![Amazon Bedrock](https://raw.githubusercontent.com/Wikolabs/wikolabs/31080b0174a4c27af9dc482e5b36cbe95d1cbf09/public/logos/bedrock.svg){:width="200"}
+![Amazon Bedrock](https://raw.githubusercontent.com/aws-samples/generative-ai-demo-on-miro/c9ee08f37aea1fd0f2f48e46f4ae1a21e3bae2a7/frontend/src/assets/bedrocklogo.svg){:width="200"}
 
 Enable model invocation logging so every Bedrock request is captured in
 CloudWatch, and define a guardrail that the IAM policy will reference to
@@ -484,13 +485,12 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock.tf" << \EOF
 #   }
 # }
 #
-# resource "aws_bedrock_guardrail" "ai_safety" {
-#   name                      = "${local.cluster_name}-ai-safety"
-#   description               = "Guardrail for AI model safety and compliance"
-#   blocked_input_messaging   = "Your request contains content that violates our AI usage policy."
-#   blocked_outputs_messaging = "The AI response was blocked due to policy violations."
-#   tags                      = local.tags
-# }
+resource "aws_bedrock_guardrail" "ai_safety" {
+  name                      = "${local.cluster_name}-ai-safety"
+  description               = "Guardrail for AI model safety and compliance"
+  blocked_input_messaging   = "Your request contains content that violates our AI usage policy."
+  blocked_outputs_messaging = "The AI response was blocked due to policy violations."
+}
 EOF
 ```
 
@@ -522,45 +522,69 @@ module "vpc" {
   single_nat_gateway   = true
   enable_dns_hostnames = true
 
-  ##### manage_default_security_group  = true
-  ##### default_security_group_ingress = []
-  ##### default_security_group_egress  = []
+  manage_default_security_group  = true
+  default_security_group_ingress = []
+  default_security_group_egress  = []
 
-  # manage_default_network_acl = true
-  # default_network_acl_ingress = [
-  #   {
-  #     rule_no    = 89
-  #     action     = "deny"
-  #     from_port  = 22
-  #     to_port    = 22
-  #     protocol   = "tcp"
-  #     cidr_block = "0.0.0.0/0"
-  #   },
-  #   {
-  #     rule_no    = 90
-  #     action     = "deny"
-  #     from_port  = 3389
-  #     to_port    = 3389
-  #     protocol   = "tcp"
-  #     cidr_block = "0.0.0.0/0"
-  #   },
-  #   {
-  #     rule_no    = 100
-  #     action     = "allow"
-  #     from_port  = 0
-  #     to_port    = 0
-  #     protocol   = "-1"
-  #     cidr_block = "0.0.0.0/0"
-  #   },
-  #   {
-  #     rule_no         = 101
-  #     action          = "allow"
-  #     from_port       = 0
-  #     to_port         = 0
-  #     protocol        = "-1"
-  #     ipv6_cidr_block = "::/0"
-  #   },
-  # ]
+  manage_default_network_acl = true
+  default_network_acl_ingress = [
+    {
+      rule_no    = 89
+      action     = "deny"
+      from_port  = 22
+      to_port    = 22
+      protocol   = "tcp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no    = 90
+      action     = "deny"
+      from_port  = 3389
+      to_port    = 3389
+      protocol   = "tcp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no    = 100
+      action     = "allow"
+      from_port  = 443
+      to_port    = 443
+      protocol   = "tcp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no    = 110
+      action     = "allow"
+      from_port  = 1024
+      to_port    = 65535
+      protocol   = "tcp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no    = 120
+      action     = "allow"
+      from_port  = 53
+      to_port    = 53
+      protocol   = "udp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no    = 130
+      action     = "allow"
+      from_port  = 123
+      to_port    = 123
+      protocol   = "udp"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      rule_no    = 140
+      action     = "allow"
+      from_port  = 1024
+      to_port    = 65535
+      protocol   = "udp"
+      cidr_block = "0.0.0.0/0"
+    },
+  ]
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = 1
@@ -626,6 +650,16 @@ module "eks" {
       block_device_mappings = {
         xvda = {
           device_name = "/dev/xvda"
+          ebs = {
+            volume_size           = 2
+            volume_type           = "gp3"
+            encrypted             = true
+            kms_key_id            = module.kms.key_arn
+            delete_on_termination = true
+          }
+        }
+        xvdb = {
+          device_name = "/dev/xvdb"
           ebs = {
             volume_size           = 20
             volume_type           = "gp3"
@@ -710,7 +744,7 @@ EOF
 [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
 provisions ELBv2 resources (ALB/NLB) for Services and Ingresses.
 
-![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="200"}
+![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
 
 Install the `aws-load-balancer-controller`
 [Helm chart](https://github.com/kubernetes-sigs/aws-load-balancer-controller/tree/main/helm/aws-load-balancer-controller)
@@ -926,7 +960,7 @@ EOF
 [Velero](https://velero.io/) is an open-source tool for backing up and
 restoring Kubernetes cluster resources and persistent volumes.
 
-![velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/Velero.svg){:width="400"}
+![velero](https://raw.githubusercontent.com/cncf/artwork/4e4ae478e358fec7c3483f8244c896f4589222ac/projects/velero/horizontal/color/velero-horizontal-color.svg){:width="400"}
 
 Install the `velero`
 [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
@@ -1519,7 +1553,7 @@ AI gateway that provides an OpenAI-compatible API over
 It uses [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
 for authentication — no IAM users or long-term credentials are needed.
 
-![Bifrost](https://raw.githubusercontent.com/maximhq/bifrost/0d4d2cc7f4aec6745aab5e03af8b101bfc0b0c02/docs/media/bifrost-logo-dark.png){:width="400"}
+![Bifrost](https://raw.githubusercontent.com/maximhq/bifrost/0d4d2cc7f4aec6745aab5e03af8b101bfc0b0c02/docs/media/bifrost-logo-dark.png){:width="300"}
 
 Install the `bifrost`
 [Helm chart](https://github.com/maximhq/bifrost/tree/main/helm-charts/bifrost)
@@ -1544,6 +1578,11 @@ data "aws_iam_policy_document" "bedrock_invoke" {
       "arn:aws:bedrock:*::foundation-model/*",
       "arn:aws:bedrock:*:*:inference-profile/*",
     ]
+    condition {
+      test     = "StringEquals"
+      variable = "bedrock:GuardrailIdentifier"
+      values   = [aws_bedrock_guardrail.ai_safety.guardrail_arn]
+    }
   }
   statement {
     sid = "BedrockListAndGet"
@@ -1615,6 +1654,32 @@ resource "helm_release" "bifrost" {
     module.bifrost_pod_identity,
   ]
 }
+
+# HTTPRoute exposes Bifrost UI/API through the Envoy Gateway at bifrost.${cluster_fqdn}
+resource "kubectl_manifest" "bifrost_httproute" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: bifrost
+      namespace: bifrost
+    spec:
+      parentRefs:
+        - name: eg
+          namespace: envoy-gateway-system
+          sectionName: https
+      hostnames:
+        - bifrost.${var.cluster_fqdn}
+      rules:
+        - backendRefs:
+            - name: bifrost
+              port: 8080
+  YAML
+  depends_on = [
+    helm_release.bifrost,
+    kubectl_manifest.gateway,
+  ]
+}
 EOF
 ```
 
@@ -1628,7 +1693,7 @@ and customize its
 Point it at Bifrost's in-cluster OpenAI-compatible endpoint and expose it
 through the Envoy Gateway:
 
-![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="200"}
+![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/763ec157507501e64253a1a857d3ab9810a078f0/static/images/favicon.png){:width="200"}
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/open-webui.tf" << \EOF
