@@ -82,7 +82,7 @@ export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
 # Derived shell variables
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-cd "${TMP_DIR}/${CLUSTER_FQDN}"
+cd "${TMP_DIR}/${CLUSTER_FQDN}" || exit
 ```
 
 Install the required tools:
@@ -139,7 +139,7 @@ Create the EC2 Spot service-linked role if it does not yet exist in this account
 (it is a one-time, account-wide resource):
 
 ```shell
-aws iam create-service-linked-role --aws-service-name spot.amazonaws.com 2>/dev/null || true
+aws iam create-service-linked-role --aws-service-name spot.amazonaws.com 2> /dev/null || true
 ```
 
 ### Create S3 bucket for Amazon EKS backups and Tofu state
@@ -421,6 +421,8 @@ EOF
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
+![Amazon Bedrock](https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/aa30729ab2e125f13526020fa98ed5eb0ed86cc1/dist/ArtificialIntelligence/Bedrock.png){:width="200"}
+
 Enable model invocation logging so every Bedrock request is captured in
 CloudWatch, and define a guardrail that the IAM policy will reference to
 enforce guardrail usage. An IAM role is required to allow Bedrock to write
@@ -500,7 +502,7 @@ The module wires up the OIDC provider, addons, EKS managed node group (with
 Bottlerocket on Graviton), and the Pod Identity associations consumed by the
 addons further down the page.
 
-![terraform-aws-modules/eks](https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-eks/7cd3be3fbbb695105a447b37c4653a00b0b51b94/docs/assets/logo.png){:width="200"}
+![terraform-aws-modules/eks](https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-eks/7cd3be3fbbb695105a447b37c4653a00b0b51b94/docs/assets/logo.png){:width="100"}
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eks.tf" << \EOF
@@ -1078,7 +1080,7 @@ EOF
 Proxy. It will terminate TLS, run the OIDC flow against Google, and forward
 authenticated requests to Open WebUI and other services.
 
-![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/main/projects/envoy/envoy-gateway/icon/color/envoy-gateway-icon-color.svg){:width="250"}
+![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/85a8328ca85a355e93e843ffe42d060d8992318d/projects/envoy/envoy-gateway/horizontal/color/envoy-gateway-horizontal-color.svg){:width="400"}
 
 Install the `gateway-helm`
 [Helm chart](https://github.com/envoyproxy/gateway/tree/main/charts/gateway-helm)
@@ -1517,7 +1519,7 @@ AI gateway that provides an OpenAI-compatible API over
 It uses [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
 for authentication — no IAM users or long-term credentials are needed.
 
-![Bifrost](https://raw.githubusercontent.com/maximhq/bifrost/0d4d2cc7f4aec6745aab5e03af8b101bfc0b0c02/docs/media/bifrost-logo-dark.png){:width="500"}
+![Bifrost](https://raw.githubusercontent.com/maximhq/bifrost/0d4d2cc7f4aec6745aab5e03af8b101bfc0b0c02/docs/media/bifrost-logo-dark.png){:width="400"}
 
 Install the `bifrost`
 [Helm chart](https://github.com/maximhq/bifrost/tree/main/helm-charts/bifrost)
@@ -1626,7 +1628,7 @@ and customize its
 Point it at Bifrost's in-cluster OpenAI-compatible endpoint and expose it
 through the Envoy Gateway:
 
-![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="250"}
+![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/5360cb5d50f7adf34a4e218fc36087192dbccc00/static/images/logo-dark.png){:width="200"}
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/open-webui.tf" << \EOF
@@ -1794,7 +1796,7 @@ Destroy the remaining infrastructure with OpenTofu:
 ```sh
 if tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -auto-approve; then
   aws s3api delete-objects --bucket "${CLUSTER_FQDN}" --no-cli-pager --delete "$(aws s3api list-object-versions --bucket "${CLUSTER_FQDN}" --prefix "terraform.tfstate" --output json --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')"
-  rm -rf "${TMP_DIR}/${CLUSTER_FQDN}"
+  rm -rf "${TMP_DIR:?}/${CLUSTER_FQDN:?}"
 fi
 ```
 
