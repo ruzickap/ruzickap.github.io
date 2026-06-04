@@ -30,7 +30,7 @@ The setup should align with the following criteria:
   for highly cost-effective and optimized load balancing
 - [Karpenter](https://karpenter.sh/) for automatic node scaling
 - The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
-- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
+- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-encryption.html)
 - [EKS cluster logging](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html)
   to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be configured
 - [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
@@ -44,9 +44,9 @@ The setup should align with the following criteria:
 - [Envoy Gateway](https://gateway.envoyproxy.io/) as the Gateway API
   implementation with OIDC authentication and JWT-based authorization
   via Google for protecting web endpoints
-- [Envoy AI Gateway](https://aigateway.envoyproxy.io/) translating
-  OpenAI-compatible API calls into
-  [AWS Bedrock](https://aws.amazon.com/bedrock/) invocations with SigV4
+- [Bifrost](https://github.com/maximhq/bifrost) translating
+  OpenAI-compatible API calls into [AWS Bedrock](https://aws.amazon.com/bedrock/)
+  invocations with SigV4
   credential injection via EKS Pod Identity
 - [Open WebUI](https://openwebui.com/) as the chat front-end consuming the
   Envoy AI Gateway endpoint
@@ -94,9 +94,8 @@ Install the required tools:
 <!-- prettier-ignore-end -->
 
 - [OpenTofu](https://opentofu.org/)
-- [AWS CLI](https://aws.amazon.com/cli/)
+- [AWS CLI](https://builder.aws.com/build/tools)
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
-- [Velero CLI](https://velero.io/docs/latest/basic-install/#install-the-cli)
 
 ### Configure AWS Route 53 Domain delegation
 
@@ -219,7 +218,7 @@ All resources from this point onwards are managed by [OpenTofu](https://opentofu
 Create the working directory and the main configuration file with provider
 versions, backend, and provider settings:
 
-![OpenTofu](https://raw.githubusercontent.com/opentofu/brand-artifacts/45131c91b81dc05ac2b18de01d18e7be8c715137/full/transparent/SVG/on-light.svg){:width="400"}
+![OpenTofu](https://raw.githubusercontent.com/opentofu/brand-artifacts/af744ad2e454fc47cc7d3c6399aaac15c5c0eeac/full/transparent/SVG/on-dark.svg){:width="400"}
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/main.tf" << EOF
@@ -247,11 +246,6 @@ terraform {
       source  = "alekc/kubectl"
       # renovate: datasource=terraform-provider depName=alekc/kubectl
       version = "2.4.1"
-    }
-    http = {
-      source  = "hashicorp/http"
-      # renovate: datasource=terraform-provider depName=hashicorp/http
-      version = "3.6.0"
     }
   }
 }
@@ -289,6 +283,17 @@ provider "helm" {
     }
   }
 }
+
+locals {
+  cluster_name = split(".", var.cluster_fqdn)[0]
+  base_domain  = join(".", slice(split(".", var.cluster_fqdn), 1, length(split(".", var.cluster_fqdn))))
+  tags = {
+    Owner       = var.my_email
+    Environment = "dev"
+    Cluster     = var.cluster_fqdn
+    Managed-by  = "opentofu"
+  }
+}
 EOF
 ```
 
@@ -316,22 +321,6 @@ variable "google_client_secret" {
   description = "Google OAuth Client Secret for OIDC authentication"
   type        = string
   sensitive   = true
-}
-
-locals {
-  cluster_name = split(".", var.cluster_fqdn)[0]
-  base_domain  = join(".", slice(split(".", var.cluster_fqdn), 1, length(split(".", var.cluster_fqdn))))
-  tags = {
-    Owner       = var.my_email
-    Environment = "dev"
-    Cluster     = var.cluster_fqdn
-    Managed-by  = "opentofu"
-  }
-  rag_documents = {
-    "open-webui-README.md" = "https://raw.githubusercontent.com/open-webui/open-webui/main/README.md"
-    "opentofu-README.md"  = "https://raw.githubusercontent.com/opentofu/opentofu/main/README.md"
-    "karpenter-README.md" = "https://raw.githubusercontent.com/aws/karpenter-provider-aws/main/README.md"
-  }
 }
 EOF
 ```
@@ -405,27 +394,6 @@ module "kms" {
       ]
     },
     {
-      sid = "AllowS3VectorsIndexing"
-      principals = [{ type = "Service", identifiers = ["indexing.s3vectors.amazonaws.com"] }]
-      actions = [
-        "kms:Decrypt", "kms:GenerateDataKey", "kms:DescribeKey", "kms:CreateGrant",
-      ]
-      resources = ["*"]
-    },
-    {
-      sid = "AllowS3SQSEncryption"
-      principals = [{ type = "Service", identifiers = ["s3.amazonaws.com"] }]
-      actions = [
-        "kms:Decrypt", "kms:GenerateDataKey",
-      ]
-      resources = ["*"]
-      condition = [{
-        test     = "ArnEquals"
-        variable = "aws:SourceArn"
-        values   = ["arn:aws:s3:::${var.cluster_fqdn}-rag"]
-      }]
-    },
-    {
       sid = "AllowCloudWatchLogs"
       principals = [{ type = "Service", identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"] }]
       actions = [
@@ -448,7 +416,7 @@ EOF
 
 <!-- prettier-ignore-start -->
 > Enabling Bedrock foundation models is a one-time operation per account/region.
-> Use the [Bedrock console](https://console.aws.amazon.com/bedrock/) to opt in
+> Use the [Bedrock console](https://console.aws.amazon.com/bedrock) to opt in
 > to the models you intend to use (Anthropic Claude, Meta Llama, Mistral, …).
 {: .prompt-info }
 <!-- prettier-ignore-end -->
@@ -524,304 +492,6 @@ tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock.tf" << \EOF
 EOF
 ```
 
-#### Bedrock Knowledge Base (RAG)
-
-Create a private, KMS-encrypted S3 bucket for RAG documents and an
-[Amazon S3 Vectors](https://aws.amazon.com/s3/features/vectors/) vector bucket
-(with a 1 024-dimension index matching
-[Amazon Titan Embed Text V2](https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html))
-as the vector store for the Bedrock Knowledge Base. S3 Vectors is a native
-`hashicorp/aws` resource — no extra Terraform provider is required — and costs
-far less than the OpenSearch Serverless alternative (~$700+/month for 2 OCUs):
-
-```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock-rag.tf" << \EOF
-module "s3_rag" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/s3-bucket/aws
-  version = "5.14.0"
-
-  bucket        = "${var.cluster_fqdn}-rag"
-  force_destroy = true
-
-  attach_deny_insecure_transport_policy = true
-  attach_require_latest_tls_policy      = true
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
-  server_side_encryption_configuration = {
-    rule = {
-      apply_server_side_encryption_by_default = {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = module.kms.key_arn
-      }
-    }
-  }
-}
-
-resource "aws_s3vectors_vector_bucket" "rag" {
-  vector_bucket_name = "${local.cluster_name}-rag-vectors"
-  force_destroy      = true
-
-  encryption_configuration {
-    sse_type    = "aws:kms"
-    kms_key_arn = module.kms.key_arn
-  }
-}
-
-resource "aws_s3vectors_index" "rag" {
-  vector_bucket_name = aws_s3vectors_vector_bucket.rag.vector_bucket_name
-  index_name         = "rag-index"
-  data_type          = "float32"
-  dimension          = 1024
-  distance_metric    = "cosine"
-
-  # Bedrock's per-chunk metadata (AMAZON_BEDROCK_TEXT, AMAZON_BEDROCK_METADATA) exceeds the 2048-byte filterable limit; marking them non-filterable allows up to 40 KB per vector instead.
-  metadata_configuration {
-    non_filterable_metadata_keys = ["AMAZON_BEDROCK_TEXT", "AMAZON_BEDROCK_METADATA"]
-  }
-
-  encryption_configuration {
-    sse_type    = "aws:kms"
-    kms_key_arn = module.kms.key_arn
-  }
-}
-
-data "aws_iam_policy_document" "bedrock_kb_trust" {
-  statement {
-    actions = ["sts:AssumeRole"]
-    principals {
-      type        = "Service"
-      identifiers = ["bedrock.amazonaws.com"]
-    }
-    condition {
-      test     = "StringEquals"
-      variable = "aws:SourceAccount"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-  }
-}
-
-data "aws_iam_policy_document" "bedrock_kb" {
-  statement {
-    sid       = "BedrockInvokeModel"
-    actions   = ["bedrock:InvokeModel"]
-    resources = ["arn:aws:bedrock:${data.aws_region.current.region}::foundation-model/amazon.titan-embed-text-v2:0"]
-  }
-  statement {
-    sid = "S3DataSource"
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket",
-    ]
-    resources = [
-      module.s3_rag.s3_bucket_arn,
-      "${module.s3_rag.s3_bucket_arn}/*",
-    ]
-  }
-  statement {
-    sid       = "S3Vectors"
-    actions   = ["s3vectors:*"]
-    resources = [aws_s3vectors_index.rag.index_arn]
-  }
-  statement {
-    sid = "KMSDecrypt"
-    actions = [
-      "kms:Decrypt",
-      "kms:GenerateDataKey",
-    ]
-    resources = [module.kms.key_arn]
-  }
-}
-
-resource "aws_iam_role" "bedrock_kb" {
-  name               = "${local.cluster_name}-bedrock-kb"
-  assume_role_policy = data.aws_iam_policy_document.bedrock_kb_trust.json
-}
-
-resource "aws_iam_role_policy" "bedrock_kb" {
-  name   = "${local.cluster_name}-bedrock-kb"
-  role   = aws_iam_role.bedrock_kb.id
-  policy = data.aws_iam_policy_document.bedrock_kb.json
-}
-
-resource "aws_bedrockagent_knowledge_base" "rag" {
-  name        = "${local.cluster_name}-rag-kb"
-  description = "RAG Knowledge Base for ${local.cluster_name} using S3 Vectors"
-  role_arn    = aws_iam_role.bedrock_kb.arn
-
-  knowledge_base_configuration {
-    type = "VECTOR"
-    vector_knowledge_base_configuration {
-      embedding_model_arn = "arn:aws:bedrock:${data.aws_region.current.region}::foundation-model/amazon.titan-embed-text-v2:0"
-    }
-  }
-
-  storage_configuration {
-    type = "S3_VECTORS"
-    s3_vectors_configuration {
-      index_arn = aws_s3vectors_index.rag.index_arn
-    }
-  }
-}
-
-resource "aws_bedrockagent_data_source" "rag" {
-  knowledge_base_id    = aws_bedrockagent_knowledge_base.rag.id
-  name                 = "${local.cluster_name}-rag-s3"
-  data_deletion_policy = "RETAIN"
-
-  data_source_configuration {
-    type = "S3"
-    s3_configuration {
-      bucket_arn = module.s3_rag.s3_bucket_arn
-    }
-  }
-
-  server_side_encryption_configuration {
-    kms_key_arn = module.kms.key_arn
-  }
-}
-
-data "aws_iam_policy_document" "lambda_bedrock_sync" {
-  statement {
-    actions   = ["bedrock:StartIngestionJob"]
-    resources = [aws_bedrockagent_knowledge_base.rag.arn]
-  }
-  statement {
-    actions = [
-      "sqs:ReceiveMessage",
-      "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes",
-    ]
-    resources = [module.sqs_rag_sync.queue_arn]
-  }
-  statement {
-    actions   = ["kms:Decrypt"]
-    resources = [module.kms.key_arn]
-  }
-}
-
-module "sqs_rag_sync" {
-  source  = "terraform-aws-modules/sqs/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/sqs/aws
-  version = "5.2.2"
-
-  name = "${local.cluster_name}-rag-sync"
-  # Lambda runs sequentially (reserved_concurrent_executions = 1).
-  # visibility_timeout must be >= 6x Lambda timeout (AWS best practice).
-  # Messages survive the full upload window so every minute gets a batch.
-  visibility_timeout_seconds = 180
-  message_retention_seconds  = 900
-
-  kms_master_key_id                 = module.kms.key_id
-  kms_data_key_reuse_period_seconds = 300
-
-  create_queue_policy = true
-  queue_policy_statements = {
-    s3 = {
-      sid     = "AllowS3SendMessage"
-      actions = ["sqs:SendMessage"]
-      principals = [{
-        type        = "Service"
-        identifiers = ["s3.amazonaws.com"]
-      }]
-      condition = [{
-        test     = "ArnEquals"
-        variable = "aws:SourceArn"
-        values   = [module.s3_rag.s3_bucket_arn]
-      }]
-    }
-  }
-}
-
-resource "local_file" "lambda_bedrock_sync" {
-  filename = "${path.module}/lambda_bedrock_sync/index.py"
-  content  = <<-PYTHON
-    import boto3
-    import os
-    from botocore.exceptions import ClientError
-
-
-    def handler(event, context):
-        try:
-            boto3.client("bedrock-agent").start_ingestion_job(
-                knowledgeBaseId=os.environ["KNOWLEDGE_BASE_ID"],
-                dataSourceId=os.environ["DATA_SOURCE_ID"],
-            )
-        except ClientError as e:
-            if e.response["Error"]["Code"] == "ConflictException":
-                print("Ingestion job already running - skipping")
-            else:
-                raise
-  PYTHON
-}
-
-module "lambda_bedrock_sync" {
-  source  = "terraform-aws-modules/lambda/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/lambda/aws
-  version = "8.8.0"
-
-  function_name = "${local.cluster_name}-bedrock-kb-sync"
-  handler       = "index.handler"
-  runtime       = "python3.13"
-  timeout       = 30
-  publish       = true
-
-  reserved_concurrent_executions = 1
-
-  source_path = dirname(local_file.lambda_bedrock_sync.filename)
-
-  depends_on = [local_file.lambda_bedrock_sync]
-
-  environment_variables = {
-    KNOWLEDGE_BASE_ID = aws_bedrockagent_knowledge_base.rag.id
-    DATA_SOURCE_ID    = aws_bedrockagent_data_source.rag.data_source_id
-  }
-
-  attach_policy_json = true
-  policy_json        = data.aws_iam_policy_document.lambda_bedrock_sync.json
-
-  event_source_mapping = {
-    sqs = {
-      event_source_arn                   = module.sqs_rag_sync.queue_arn
-      batch_size                         = 10000
-      maximum_batching_window_in_seconds = 60
-    }
-  }
-}
-
-resource "aws_s3_bucket_notification" "rag" {
-  bucket = module.s3_rag.s3_bucket_id
-
-  queue {
-    queue_arn     = module.sqs_rag_sync.queue_arn
-    events        = ["s3:ObjectCreated:*"]
-    filter_prefix = "docs/"
-  }
-
-  depends_on = [module.sqs_rag_sync]
-}
-
-data "http" "rag_docs" {
-  for_each = local.rag_documents
-  url      = each.value
-}
-
-resource "aws_s3_object" "rag_docs" {
-  for_each     = local.rag_documents
-  bucket       = module.s3_rag.s3_bucket_id
-  key          = "docs/${each.key}"
-  content      = data.http.rag_docs[each.key].response_body
-  content_type = "text/markdown"
-
-  depends_on = [aws_s3_bucket_notification.rag]
-}
-EOF
-```
-
 ### Amazon EKS
 
 Provision the cluster with
@@ -830,7 +500,7 @@ The module wires up the OIDC provider, addons, EKS managed node group (with
 Bottlerocket on Graviton), and the Pod Identity associations consumed by the
 addons further down the page.
 
-![terraform-aws-modules/eks](https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-eks/dde5e1cfbb1c33dbafb39ad62d77fadb22a3e63a/.header/header.png){:width="500"}
+![terraform-aws-modules/eks](https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-eks/7cd3be3fbbb695105a447b37c4653a00b0b51b94/docs/assets/logo.png){:width="200"}
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eks.tf" << \EOF
@@ -850,45 +520,45 @@ module "vpc" {
   single_nat_gateway   = true
   enable_dns_hostnames = true
 
-  manage_default_security_group  = true
-  default_security_group_ingress = []
-  default_security_group_egress  = []
+  ##### manage_default_security_group  = true
+  ##### default_security_group_ingress = []
+  ##### default_security_group_egress  = []
 
-  manage_default_network_acl = true
-  default_network_acl_ingress = [
-    {
-      rule_no    = 89
-      action     = "deny"
-      from_port  = 22
-      to_port    = 22
-      protocol   = "tcp"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no    = 90
-      action     = "deny"
-      from_port  = 3389
-      to_port    = 3389
-      protocol   = "tcp"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no    = 100
-      action     = "allow"
-      from_port  = 0
-      to_port    = 0
-      protocol   = "-1"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no         = 101
-      action          = "allow"
-      from_port       = 0
-      to_port         = 0
-      protocol        = "-1"
-      ipv6_cidr_block = "::/0"
-    },
-  ]
+  # manage_default_network_acl = true
+  # default_network_acl_ingress = [
+  #   {
+  #     rule_no    = 89
+  #     action     = "deny"
+  #     from_port  = 22
+  #     to_port    = 22
+  #     protocol   = "tcp"
+  #     cidr_block = "0.0.0.0/0"
+  #   },
+  #   {
+  #     rule_no    = 90
+  #     action     = "deny"
+  #     from_port  = 3389
+  #     to_port    = 3389
+  #     protocol   = "tcp"
+  #     cidr_block = "0.0.0.0/0"
+  #   },
+  #   {
+  #     rule_no    = 100
+  #     action     = "allow"
+  #     from_port  = 0
+  #     to_port    = 0
+  #     protocol   = "-1"
+  #     cidr_block = "0.0.0.0/0"
+  #   },
+  #   {
+  #     rule_no         = 101
+  #     action          = "allow"
+  #     from_port       = 0
+  #     to_port         = 0
+  #     protocol        = "-1"
+  #     ipv6_cidr_block = "::/0"
+  #   },
+  # ]
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = 1
@@ -1342,8 +1012,7 @@ resource "helm_release" "velero" {
   ]
 }
 
-# Create BSL separately so we can use wait_for to confirm Velero has
-# completed at least one backup sync cycle (status.lastSyncedTime is set).
+# Create BSL separately so we can use wait_for to confirm Velero has completed at least one backup sync cycle (status.lastSyncedTime is set).
 resource "kubectl_manifest" "velero_bsl" {
   yaml_body = <<-YAML
     apiVersion: velero.io/v1
@@ -1414,7 +1083,7 @@ authenticated requests to Open WebUI and other services.
 Install the `gateway-helm`
 [Helm chart](https://github.com/envoyproxy/gateway/tree/main/charts/gateway-helm)
 and customize its
-[default values](https://github.com/envoyproxy/gateway/blob/v1.8.0/charts/gateway-helm/values.yaml):
+[default values](https://github.com/envoyproxy/gateway/blob/v1.8.0/charts/gateway-helm/values.tmpl.yaml):
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/envoy-gateway.tf" << \EOF
@@ -1433,6 +1102,7 @@ resource "helm_release" "envoy_gateway" {
   ]
 }
 
+# Kubernetes Secret holding the Google OAuth client secret, referenced by the SecurityPolicy OIDC configuration to authenticate users via Google.
 resource "kubectl_manifest" "google_oidc_client_secret" {
   yaml_body = <<-YAML
     apiVersion: v1
@@ -1448,6 +1118,7 @@ resource "kubectl_manifest" "google_oidc_client_secret" {
   depends_on       = [helm_release.envoy_gateway]
 }
 
+# GatewayClass registers Envoy Gateway as the controller for Gateway API resources. All Gateway objects referencing the "eg" class are reconciled by the Envoy Gateway controller.
 resource "kubectl_manifest" "gatewayclass" {
   yaml_body = <<-YAML
     apiVersion: gateway.networking.k8s.io/v1
@@ -1460,6 +1131,7 @@ resource "kubectl_manifest" "gatewayclass" {
   depends_on = [helm_release.envoy_gateway]
 }
 
+# EnvoyProxy customizes the data-plane Service created by the Gateway. Annotations instruct the AWS Load Balancer Controller to provision an internet-facing NLB with IP-mode targets.
 resource "kubectl_manifest" "envoy_proxy_nlb" {
   yaml_body = <<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -1481,6 +1153,7 @@ resource "kubectl_manifest" "envoy_proxy_nlb" {
   depends_on = [helm_release.envoy_gateway]
 }
 
+# ReferenceGrant allows the Gateway in envoy-gateway-system to reference the "cert-production" TLS Secret in the cert-manager namespace. Without this, cross-namespace Secret references are rejected by the Gateway API.
 resource "kubectl_manifest" "ref_grant_cert_secret" {
   yaml_body = <<-YAML
     apiVersion: gateway.networking.k8s.io/v1beta1
@@ -1501,6 +1174,7 @@ resource "kubectl_manifest" "ref_grant_cert_secret" {
   depends_on = [helm_release.envoy_gateway]
 }
 
+# Central Gateway resource that terminates TLS for both the wildcard (*.cluster_fqdn) and apex (cluster_fqdn) hostnames. It references the NLB-backed EnvoyProxy for infrastructure and the Let's Encrypt certificate from cert-manager for TLS. All HTTPRoutes in any namespace can attach to this Gateway.
 resource "kubectl_manifest" "gateway" {
   yaml_body = <<-YAML
     apiVersion: gateway.networking.k8s.io/v1
@@ -1548,6 +1222,7 @@ resource "kubectl_manifest" "gateway" {
   ]
 }
 
+# SecurityPolicy attached to both Gateway listeners that enforces Google OIDC authentication and JWT-based authorization. Only the email specified in var.my_email is allowed access. Authenticated user identity is forwarded to backends via X-Forwarded-Email and X-Forwarded-User headers.
 resource "kubectl_manifest" "security_policy_oidc" {
   yaml_body = <<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -1607,6 +1282,7 @@ resource "kubectl_manifest" "security_policy_oidc" {
   ]
 }
 
+# HTTPRoute for the apex domain (cluster_fqdn) that redirects all traffic to the chat subdomain (chat.cluster_fqdn) with a 302 status code, providing a convenient entry point.
 resource "kubectl_manifest" "apex_httproute" {
   yaml_body = <<-YAML
     apiVersion: gateway.networking.k8s.io/v1
@@ -1693,6 +1369,7 @@ resource "helm_release" "karpenter" {
   ]
 }
 
+# EC2NodeClass defines the AWS-specific node configuration for Karpenter-provisioned instances: Bottlerocket AMI, VPC subnets/security groups discovered via tags, the Karpenter IAM role, and KMS-encrypted gp3 EBS volumes.
 resource "kubectl_manifest" "ec2_nodeclass_default" {
   yaml_body = <<-YAML
     apiVersion: karpenter.k8s.aws/v1
@@ -1730,6 +1407,7 @@ resource "kubectl_manifest" "ec2_nodeclass_default" {
   depends_on = [helm_release.karpenter]
 }
 
+# NodePool defines the scheduling constraints for Karpenter: instances must have >4 GiB RAM, run in a single AZ to minimize cross-AZ costs, use cost-efficient t4g/t3a families, and prefer spot capacity with on-demand fallback.
 resource "kubectl_manifest" "nodepool_default" {
   yaml_body = <<-YAML
     apiVersion: karpenter.sh/v1
@@ -1844,7 +1522,7 @@ for authentication — no IAM users or long-term credentials are needed.
 Install the `bifrost`
 [Helm chart](https://github.com/maximhq/bifrost/tree/main/helm-charts/bifrost)
 and customize its
-[default values](https://github.com/maximhq/bifrost/blob/bifrost-2.1.20/helm-charts/bifrost/values.yaml).
+[default values](https://github.com/maximhq/bifrost/blob/helm-chart-v2.1.21/helm-charts/bifrost/values.yaml).
 Create a dedicated IAM role granting the Bifrost pod permission to call the
 Bedrock Converse/InvokeModel APIs, and associate it with the `bifrost`
 ServiceAccount through EKS Pod Identity:
@@ -1909,7 +1587,6 @@ resource "helm_release" "bifrost" {
       # renovate: datasource=docker depName=ghcr.io/maximhq/bifrost-go
       tag: v1.5.7
     serviceAccount:
-      create: true
       name: bifrost
     bifrost:
       authConfig:
@@ -1945,7 +1622,7 @@ EOF
 chat-style interactions with LLMs. Install the `open-webui`
 [Helm chart](https://github.com/open-webui/helm-charts/tree/main/charts/open-webui)
 and customize its
-[default values](https://github.com/open-webui/helm-charts/blob/open-webui-14.6.0/charts/open-webui/values.yaml).
+[default values](https://github.com/open-webui/helm-charts/blob/open-webui-14.8.0/charts/open-webui/values.yaml).
 Point it at Bifrost's in-cluster OpenAI-compatible endpoint and expose it
 through the Envoy Gateway:
 
@@ -1955,7 +1632,7 @@ through the Envoy Gateway:
 tee "${TMP_DIR}/${CLUSTER_FQDN}/open-webui.tf" << \EOF
 resource "helm_release" "open_webui" {
   # renovate: datasource=helm depName=open-webui registryUrl=https://helm.openwebui.com
-  version          = "14.6.0"
+  version          = "14.8.0"
   name             = "open-webui"
   repository       = "https://helm.openwebui.com"
   chart            = "open-webui"
@@ -1967,8 +1644,6 @@ resource "helm_release" "open_webui" {
       enabled: false
     pipelines:
       enabled: false
-    websocket:
-      enabled: true
     persistence:
       enabled: false
     openaiBaseApiUrl: http://bifrost.bifrost.svc:8080/v1
@@ -1979,8 +1654,6 @@ resource "helm_release" "open_webui" {
         value: "false"
       - name: ENABLE_SIGNUP
         value: "false"
-      - name: ENABLE_VERSION_UPDATE_CHECK
-        value: "false"
       - name: ENABLE_EVALUATION_ARENA_MODELS
         value: "false"
       - name: DEFAULT_MODELS
@@ -1989,38 +1662,13 @@ resource "helm_release" "open_webui" {
         value: X-Forwarded-Email
       - name: WEBUI_AUTH_TRUSTED_NAME_HEADER
         value: X-Forwarded-User
-    extraEnvFrom: []
   YAML
   ]
 
   depends_on = [helm_release.bifrost]
 }
 
-resource "kubectl_manifest" "bifrost_httproute" {
-  yaml_body = <<-YAML
-    apiVersion: gateway.networking.k8s.io/v1
-    kind: HTTPRoute
-    metadata:
-      name: bifrost
-      namespace: bifrost
-    spec:
-      parentRefs:
-        - name: eg
-          namespace: envoy-gateway-system
-          sectionName: https
-      hostnames:
-        - bifrost.${var.cluster_fqdn}
-      rules:
-        - backendRefs:
-            - name: bifrost
-              port: 8080
-  YAML
-  depends_on = [
-    helm_release.bifrost,
-    kubectl_manifest.gateway,
-  ]
-}
-
+# HTTPRoute exposing Open WebUI at chat.<cluster_fqdn>, the primary user-facing endpoint. Traffic passes through OIDC authentication enforced by the SecurityPolicy on the Gateway before reaching the Open WebUI Service.
 resource "kubectl_manifest" "openwebui_httproute" {
   yaml_body = <<-YAML
     apiVersion: gateway.networking.k8s.io/v1
