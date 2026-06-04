@@ -247,6 +247,11 @@ terraform {
       # renovate: datasource=terraform-provider depName=alekc/kubectl
       version = "2.4.1"
     }
+    random = {
+      source  = "hashicorp/random"
+      # renovate: datasource=terraform-provider depName=hashicorp/random
+      version = "3.7.2"
+    }
   }
 }
 
@@ -1640,13 +1645,42 @@ module "litellm_pod_identity" {
   }
 }
 
+# Pre-create the master key secret with a known value so both LiteLLM and
+# Open WebUI can reference the same API key deterministically.
+resource "random_password" "litellm_master_key" {
+  length  = 32
+  special = false
+}
+
+resource "kubectl_manifest" "litellm_namespace" {
+  yaml_body = <<-YAML
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: litellm
+  YAML
+}
+
+resource "kubectl_manifest" "litellm_masterkey" {
+  yaml_body = <<-YAML
+    apiVersion: v1
+    kind: Secret
+    metadata:
+      name: litellm-masterkey
+      namespace: litellm
+    stringData:
+      masterkey: sk-${random_password.litellm_master_key.result}
+  YAML
+  depends_on = [kubectl_manifest.litellm_namespace]
+}
+
 resource "helm_release" "litellm" {
   # renovate: datasource=docker depName=docker.litellm.ai/berriai/litellm-helm
   version          = "1.87.0"
   name             = "litellm"
   chart            = "oci://docker.litellm.ai/berriai/litellm-helm"
   namespace        = "litellm"
-  create_namespace = true
+  create_namespace = false
   wait             = true
 
   values = [<<-YAML
@@ -1657,7 +1691,8 @@ resource "helm_release" "litellm" {
     resources:
       requests:
         memory: 1Gi
-    masterKeySecretValue: sk-litellm-master-key
+    masterkeySecretName: litellm-masterkey
+    masterkeySecretKey: masterkey
     serviceAccount:
       create: true
       name: litellm
@@ -1666,11 +1701,18 @@ resource "helm_release" "litellm" {
     db:
       deployStandalone: true
     postgresql:
+      image:
+        tag: latest
       auth:
         password: litellm-pg-pass
         postgres-password: litellm-pg-pass
     migrationJob:
       enabled: true
+      resources:
+        requests:
+          memory: 512Mi
+        limits:
+          memory: 512Mi
     proxy_config:
       model_list:
         - model_name: us.anthropic.claude-haiku-4-5-20251001-v1:0
@@ -1687,6 +1729,7 @@ resource "helm_release" "litellm" {
   ]
 
   depends_on = [
+    kubectl_manifest.litellm_masterkey,
     kubectl_manifest.nodepool_default,
     module.litellm_pod_identity,
   ]
@@ -1750,13 +1793,15 @@ resource "helm_release" "open_webui" {
       enabled: false
     persistence:
       enabled: false
+    resources:
+      requests:
+        memory: 1Gi
+      limits:
+        memory: 2Gi
     openaiBaseApiUrl: http://litellm.litellm.svc:4000/v1
     extraEnvVars:
       - name: OPENAI_API_KEY
-        valueFrom:
-          secretKeyRef:
-            name: litellm-masterkey
-            key: masterkey
+        value: sk-${random_password.litellm_master_key.result}
       - name: WEBUI_AUTH
         value: "false"
       - name: ENABLE_SIGNUP
