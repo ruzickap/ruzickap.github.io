@@ -1579,7 +1579,7 @@ inline in the Bedrock Converse API call, satisfying the IAM
 for authentication — no IAM users or long-term credentials are needed.
 No database is required — models are configured via a static YAML file.
 
-![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/main/docs/my-website/img/litellm_logo.png){:width="300"}
+![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/dc16e47df640b0e66ec91c9c802be3d8b0869cd4/ui/litellm-dashboard/public/assets/logos/litellm.jpg){:width="200"}
 
 Install `litellm` using
 [Helm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
