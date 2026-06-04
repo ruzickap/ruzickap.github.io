@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2026-05-26
 description: Deploy Open WebUI on Amazon EKS with AWS Bedrock as the LLM backend, provisioned with OpenTofu
 categories: [Kubernetes, Cloud, Monitoring]
-tags: [amazon-eks, amazon-bedrock, bifrost, cert-manager, envoy-gateway, kubernetes, open-webui, opentofu, velero]
+tags: [amazon-eks, amazon-bedrock, litellm, cert-manager, envoy-gateway, kubernetes, open-webui, opentofu, velero]
 image: https://raw.githubusercontent.com/open-webui/open-webui/14a6c1f4963892c163821765efcc10c5c4578454/static/static/favicon.svg
 ---
 
@@ -44,9 +44,9 @@ The setup should align with the following criteria:
 - [Envoy Gateway](https://gateway.envoyproxy.io/) as the Gateway API
   implementation with OIDC authentication and JWT-based authorization
   via Google for protecting web endpoints
-- [Bifrost](https://github.com/maximhq/bifrost) translating
-  OpenAI-compatible API calls into [AWS Bedrock](https://aws.amazon.com/bedrock/)
-  invocations with SigV4
+- [LiteLLM](https://github.com/BerriAI/litellm) providing an
+  OpenAI-compatible API over [AWS Bedrock](https://aws.amazon.com/bedrock/)
+  with inline guardrail enforcement and SigV4
   credential injection via EKS Pod Identity
 - [Open WebUI](https://openwebui.com/) as the chat front-end consuming the
   Envoy AI Gateway endpoint
@@ -421,7 +421,6 @@ EOF
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-![Amazon Bedrock](https://raw.githubusercontent.com/Wikolabs/wikolabs/31080b0174a4c27af9dc482e5b36cbe95d1cbf09/public/logos/bedrock.svg){:width="200"}
 ![Amazon Bedrock](https://raw.githubusercontent.com/aws-samples/generative-ai-demo-on-miro/c9ee08f37aea1fd0f2f48e46f4ae1a21e3bae2a7/frontend/src/assets/bedrocklogo.svg){:width="200"}
 
 Enable model invocation logging so every Bedrock request is captured in
@@ -490,6 +489,14 @@ resource "aws_bedrock_guardrail" "ai_safety" {
   description               = "Guardrail for AI model safety and compliance"
   blocked_input_messaging   = "Your request contains content that violates our AI usage policy."
   blocked_outputs_messaging = "The AI response was blocked due to policy violations."
+
+  content_policy_config {
+    filters_config {
+      type            = "SEXUAL"
+      input_strength  = "HIGH"
+      output_strength = "HIGH"
+    }
+  }
 }
 EOF
 ```
@@ -502,7 +509,7 @@ The module wires up the OIDC provider, addons, EKS managed node group (with
 Bottlerocket on Graviton), and the Pod Identity associations consumed by the
 addons further down the page.
 
-![terraform-aws-modules/eks](https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-eks/7cd3be3fbbb695105a447b37c4653a00b0b51b94/docs/assets/logo.png){:width="100"}
+![terraform-aws-modules/eks](https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-eks/7cd3be3fbbb695105a447b37c4653a00b0b51b94/docs/assets/logo.png){:width="150"}
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/eks.tf" << \EOF
@@ -677,6 +684,17 @@ module "eks" {
   cloudwatch_log_group_retention_in_days = 1
   cloudwatch_log_group_kms_key_id        = module.kms.key_arn
   enabled_log_types                      = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+
+  node_security_group_additional_rules = {
+    ingress_self_443 = {
+      description = "Node to node HTTPS (webhooks, metrics-server, etc.)"
+      protocol    = "tcp"
+      from_port   = 443
+      to_port     = 443
+      type        = "ingress"
+      self        = true
+    }
+  }
 
   node_security_group_tags = {
     "karpenter.sh/discovery" = local.cluster_name
@@ -960,7 +978,7 @@ EOF
 [Velero](https://velero.io/) is an open-source tool for backing up and
 restoring Kubernetes cluster resources and persistent volumes.
 
-![velero](https://raw.githubusercontent.com/cncf/artwork/4e4ae478e358fec7c3483f8244c896f4589222ac/projects/velero/horizontal/color/velero-horizontal-color.svg){:width="400"}
+![Velero](https://raw.githubusercontent.com/vmware-tanzu/velero/c663ce15ab468b21a19336dcc38acf3280853361/site/static/img/Velero.svg){:width="400"}
 
 Install the `velero`
 [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
@@ -1114,7 +1132,7 @@ EOF
 Proxy. It will terminate TLS, run the OIDC flow against Google, and forward
 authenticated requests to Open WebUI and other services.
 
-![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/85a8328ca85a355e93e843ffe42d060d8992318d/projects/envoy/envoy-gateway/horizontal/color/envoy-gateway-horizontal-color.svg){:width="400"}
+![Envoy Gateway](https://raw.githubusercontent.com/cncf/artwork/85a8328ca85a355e93e843ffe42d060d8992318d/projects/envoy/envoy-gateway/horizontal/color/envoy-gateway-horizontal-color.svg){:width="300"}
 
 Install the `gateway-helm`
 [Helm chart](https://github.com/envoyproxy/gateway/tree/main/charts/gateway-helm)
@@ -1352,7 +1370,7 @@ pending pod requirements. The EKS module provisions the IAM roles via the
 [`karpenter`](https://github.com/terraform-aws-modules/terraform-aws-eks/tree/master/modules/karpenter)
 sub-module.
 
-![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
+![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="400"}
 
 Install the `karpenter`
 [Helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
@@ -1456,7 +1474,7 @@ resource "kubectl_manifest" "nodepool_default" {
           requirements:
             - key: "karpenter.k8s.aws/instance-memory"
               operator: Gt
-              values: ["4095"]
+              values: ["8191"]
             - key: "topology.kubernetes.io/zone"
               operator: In
               values: ["${data.aws_region.current.region}a"]
@@ -1545,26 +1563,29 @@ resource "helm_release" "external_dns" {
 EOF
 ```
 
-### Bifrost
+### LiteLLM
 
-[Bifrost](https://github.com/maximhq/bifrost) is a high-performance Go-based
-AI gateway that provides an OpenAI-compatible API over
-[Amazon Bedrock](https://aws.amazon.com/bedrock/) with automatic SigV4 signing.
-It uses [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
+[LiteLLM](https://github.com/BerriAI/litellm) is an OpenAI-compatible proxy
+that supports 100+ LLM providers including
+[Amazon Bedrock](https://aws.amazon.com/bedrock/). It passes `guardrailConfig`
+inline in the Bedrock Converse API call, satisfying the IAM
+`bedrock:GuardrailIdentifier` condition. It uses
+[EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
 for authentication — no IAM users or long-term credentials are needed.
+No database is required — models are configured via a static YAML file.
 
-![Bifrost](https://raw.githubusercontent.com/maximhq/bifrost/0d4d2cc7f4aec6745aab5e03af8b101bfc0b0c02/docs/media/bifrost-logo-dark.png){:width="300"}
+![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/main/docs/my-website/img/litellm_logo.png){:width="300"}
 
-Install the `bifrost`
-[Helm chart](https://github.com/maximhq/bifrost/tree/main/helm-charts/bifrost)
+Install `litellm` using
+[Helm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
 and customize its
-[default values](https://github.com/maximhq/bifrost/blob/helm-chart-v2.1.21/helm-charts/bifrost/values.yaml).
-Create a dedicated IAM role granting the Bifrost pod permission to call the
-Bedrock Converse/InvokeModel APIs, and associate it with the `bifrost`
-ServiceAccount through EKS Pod Identity:
+[default values](https://github.com/BerriAI/litellm/blob/main/deploy/charts/litellm-helm/values.yaml).
+Create a dedicated IAM role granting the LiteLLM pod permission to call the
+Bedrock Converse/InvokeModel APIs with guardrail enforcement, and associate it
+with the `litellm` ServiceAccount through EKS Pod Identity:
 
 ```bash
-tee "${TMP_DIR}/${CLUSTER_FQDN}/bifrost.tf" << \EOF
+tee "${TMP_DIR}/${CLUSTER_FQDN}/litellm.tf" << \EOF
 data "aws_iam_policy_document" "bedrock_invoke" {
   statement {
     sid = "BedrockInvoke"
@@ -1585,6 +1606,11 @@ data "aws_iam_policy_document" "bedrock_invoke" {
     }
   }
   statement {
+    sid       = "BedrockApplyGuardrail"
+    actions   = ["bedrock:ApplyGuardrail"]
+    resources = [aws_bedrock_guardrail.ai_safety.guardrail_arn]
+  }
+  statement {
     sid = "BedrockListAndGet"
     actions = [
       "bedrock:ListFoundationModels",
@@ -1596,87 +1622,98 @@ data "aws_iam_policy_document" "bedrock_invoke" {
   }
 }
 
-module "bifrost_pod_identity" {
+module "litellm_pod_identity" {
   source  = "terraform-aws-modules/eks-pod-identity/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/eks-pod-identity/aws
   version = "2.8.1"
 
-  name                    = "${local.cluster_name}-bifrost"
+  name                    = "${local.cluster_name}-litellm"
   attach_custom_policy    = true
   source_policy_documents = [data.aws_iam_policy_document.bedrock_invoke.json]
 
   associations = {
     main = {
       cluster_name    = module.eks.cluster_name
-      namespace       = "bifrost"
-      service_account = "bifrost"
+      namespace       = "litellm"
+      service_account = "litellm"
     }
   }
 }
 
-resource "helm_release" "bifrost" {
-  # renovate: datasource=helm depName=bifrost registryUrl=https://maximhq.github.io/bifrost/helm-charts
-  version          = "2.1.20"
-  name             = "bifrost"
-  repository       = "https://maximhq.github.io/bifrost/helm-charts"
-  chart            = "bifrost"
-  namespace        = "bifrost"
+resource "helm_release" "litellm" {
+  # renovate: datasource=docker depName=docker.litellm.ai/berriai/litellm-helm
+  version          = "1.87.0"
+  name             = "litellm"
+  chart            = "oci://docker.litellm.ai/berriai/litellm-helm"
+  namespace        = "litellm"
   create_namespace = true
+  wait             = true
 
   values = [<<-YAML
+    replicaCount: 1
     image:
-      # renovate: datasource=docker depName=ghcr.io/maximhq/bifrost-go
-      tag: v1.5.7
+      repository: ghcr.io/berriai/litellm-database
+      pullPolicy: Always
+    resources:
+      requests:
+        memory: 1Gi
+    masterKeySecretValue: sk-litellm-master-key
     serviceAccount:
-      name: bifrost
-    bifrost:
-      authConfig:
-        isEnabled: false
-        disableAuthOnInference: true
-      client:
-        enforceAuthOnInference: false
-      providers:
-        bedrock:
-          keys:
-            - name: bedrock-default
-              value: ""
-              weight: 1
-              models: ["anthropic.claude-haiku-4-5-20251001-v1:0"]
-              bedrock_key_config:
-                region: ${data.aws_region.current.region}
-              aliases:
-                anthropic.claude-haiku-4-5-20251001-v1:0: us.anthropic.claude-haiku-4-5-20251001-v1:0
+      create: true
+      name: litellm
+    service:
+      port: 4000
+    db:
+      deployStandalone: true
+    postgresql:
+      auth:
+        password: litellm-pg-pass
+        postgres-password: litellm-pg-pass
+    migrationJob:
+      enabled: true
+    proxy_config:
+      model_list:
+        - model_name: us.anthropic.claude-haiku-4-5-20251001-v1:0
+          litellm_params:
+            model: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
+            aws_region_name: ${data.aws_region.current.region}
+            guardrailConfig:
+              guardrailIdentifier: ${aws_bedrock_guardrail.ai_safety.guardrail_arn}
+              guardrailVersion: "DRAFT"
+              trace: "disabled"
+      litellm_settings:
+        drop_params: true
   YAML
   ]
 
   depends_on = [
     kubectl_manifest.nodepool_default,
-    module.bifrost_pod_identity,
+    module.litellm_pod_identity,
   ]
 }
 
-# HTTPRoute exposes Bifrost UI/API through the Envoy Gateway at bifrost.${cluster_fqdn}
-resource "kubectl_manifest" "bifrost_httproute" {
+# HTTPRoute exposes LiteLLM API through the Envoy Gateway at litellm.${cluster_fqdn}
+resource "kubectl_manifest" "litellm_httproute" {
   yaml_body = <<-YAML
     apiVersion: gateway.networking.k8s.io/v1
     kind: HTTPRoute
     metadata:
-      name: bifrost
-      namespace: bifrost
+      name: litellm
+      namespace: litellm
     spec:
       parentRefs:
         - name: eg
           namespace: envoy-gateway-system
           sectionName: https
       hostnames:
-        - bifrost.${var.cluster_fqdn}
+        - litellm.${var.cluster_fqdn}
       rules:
         - backendRefs:
-            - name: bifrost
-              port: 8080
+            - name: litellm
+              port: 4000
   YAML
   depends_on = [
-    helm_release.bifrost,
+    helm_release.litellm,
     kubectl_manifest.gateway,
   ]
 }
@@ -1690,10 +1727,10 @@ chat-style interactions with LLMs. Install the `open-webui`
 [Helm chart](https://github.com/open-webui/helm-charts/tree/main/charts/open-webui)
 and customize its
 [default values](https://github.com/open-webui/helm-charts/blob/open-webui-14.8.0/charts/open-webui/values.yaml).
-Point it at Bifrost's in-cluster OpenAI-compatible endpoint and expose it
+Point it at LiteLLM's in-cluster OpenAI-compatible endpoint and expose it
 through the Envoy Gateway:
 
-![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/763ec157507501e64253a1a857d3ab9810a078f0/static/images/favicon.png){:width="200"}
+![Open WebUI](https://raw.githubusercontent.com/open-webui/docs/763ec157507501e64253a1a857d3ab9810a078f0/static/images/favicon.png){:width="150"}
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/open-webui.tf" << \EOF
@@ -1713,10 +1750,13 @@ resource "helm_release" "open_webui" {
       enabled: false
     persistence:
       enabled: false
-    openaiBaseApiUrl: http://bifrost.bifrost.svc:8080/v1
+    openaiBaseApiUrl: http://litellm.litellm.svc:4000/v1
     extraEnvVars:
       - name: OPENAI_API_KEY
-        value: sk-not-needed
+        valueFrom:
+          secretKeyRef:
+            name: litellm-masterkey
+            key: masterkey
       - name: WEBUI_AUTH
         value: "false"
       - name: ENABLE_SIGNUP
@@ -1724,7 +1764,7 @@ resource "helm_release" "open_webui" {
       - name: ENABLE_EVALUATION_ARENA_MODELS
         value: "false"
       - name: DEFAULT_MODELS
-        value: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
+        value: us.anthropic.claude-haiku-4-5-20251001-v1:0
       - name: WEBUI_AUTH_TRUSTED_EMAIL_HEADER
         value: X-Forwarded-Email
       - name: WEBUI_AUTH_TRUSTED_NAME_HEADER
@@ -1732,7 +1772,7 @@ resource "helm_release" "open_webui" {
   YAML
   ]
 
-  depends_on = [helm_release.bifrost]
+  depends_on = [helm_release.litellm]
 }
 
 # HTTPRoute exposing Open WebUI at chat.<cluster_fqdn>, the primary user-facing endpoint. Traffic passes through OIDC authentication enforced by the SecurityPolicy on the Gateway before reaching the Open WebUI Service.
