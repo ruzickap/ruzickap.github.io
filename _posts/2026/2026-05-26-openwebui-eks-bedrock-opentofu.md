@@ -75,7 +75,7 @@ export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
-export CLUSTER_FQDN="${CLUSTER_FQDN:-k02.k8s.mylabs.dev}"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 # OpenTofu variables
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
@@ -298,6 +298,27 @@ locals {
     Cluster     = var.cluster_fqdn
     Managed-by  = "opentofu"
   }
+  pii_block = [
+    "PASSWORD", "CREDIT_DEBIT_CARD_NUMBER", "PIN",
+    "INTERNATIONAL_BANK_ACCOUNT_NUMBER", "SWIFT_CODE",
+    "AWS_ACCESS_KEY", "AWS_SECRET_KEY",
+    "US_SOCIAL_SECURITY_NUMBER", "US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER",
+    "US_BANK_ACCOUNT_NUMBER", "US_BANK_ROUTING_NUMBER",
+    "CA_HEALTH_NUMBER", "CA_SOCIAL_INSURANCE_NUMBER",
+    "UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER", "UK_NATIONAL_INSURANCE_NUMBER",
+    "UK_NATIONAL_HEALTH_SERVICE_NUMBER",
+  ]
+  pii_anonymize = ["PHONE", "EMAIL", "ADDRESS", "DRIVER_ID", "LICENSE_PLATE", "VEHICLE_IDENTIFICATION_NUMBER", "MAC_ADDRESS"]
+  # [rule_no, action, from_port, to_port, protocol]
+  nacl_ingress = [
+    [89, "deny", 22, 22, "tcp"],
+    [90, "deny", 3389, 3389, "tcp"],
+    [100, "allow", 443, 443, "tcp"],
+    [110, "allow", 1024, 65535, "tcp"],
+    [120, "allow", 53, 53, "udp"],
+    [130, "allow", 123, 123, "udp"],
+    [140, "allow", 1024, 65535, "udp"],
+  ]
 }
 EOF
 ```
@@ -426,7 +447,7 @@ EOF
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-![Amazon Bedrock](https://raw.githubusercontent.com/aws-samples/generative-ai-demo-on-miro/c9ee08f37aea1fd0f2f48e46f4ae1a21e3bae2a7/frontend/src/assets/bedrocklogo.svg){:width="200"}
+![Amazon Bedrock](https://raw.githubusercontent.com/aws-samples/generative-ai-demo-on-miro/c9ee08f37aea1fd0f2f48e46f4ae1a21e3bae2a7/frontend/src/assets/bedrocklogo.svg){:width="150"}
 
 Enable model invocation logging so every Bedrock request is captured in
 CloudWatch, and define a guardrail that the IAM policy will reference to
@@ -435,71 +456,39 @@ log events to the log group:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/bedrock.tf" << \EOF
-# resource "aws_cloudwatch_log_group" "bedrock" {
-#   name              = "/aws/bedrock/${local.cluster_name}"
-#   retention_in_days = 1
-#   kms_key_id        = module.kms.key_arn
-# }
-#
-# data "aws_iam_policy_document" "bedrock_logging_trust" {
-#   statement {
-#     principals {
-#       type        = "Service"
-#       identifiers = ["bedrock.amazonaws.com"]
-#     }
-#     actions = ["sts:AssumeRole"]
-#     condition {
-#       test     = "StringEquals"
-#       variable = "aws:SourceAccount"
-#       values   = [data.aws_caller_identity.current.account_id]
-#     }
-#   }
-# }
-#
-# data "aws_iam_policy_document" "bedrock_logging" {
-#   statement {
-#     actions = [
-#       "logs:CreateLogStream",
-#       "logs:PutLogEvents",
-#     ]
-#     resources = ["${aws_cloudwatch_log_group.bedrock.arn}:*"]
-#   }
-# }
-#
-# resource "aws_iam_role" "bedrock_logging" {
-#   name               = "${local.cluster_name}-bedrock-logging"
-#   assume_role_policy = data.aws_iam_policy_document.bedrock_logging_trust.json
-# }
-#
-# resource "aws_iam_role_policy" "bedrock_logging" {
-#   name   = "${local.cluster_name}-bedrock-logging"
-#   role   = aws_iam_role.bedrock_logging.id
-#   policy = data.aws_iam_policy_document.bedrock_logging.json
-# }
-#
-# resource "aws_bedrock_model_invocation_logging_configuration" "this" {
-#   logging_config {
-#     cloudwatch_config {
-#       log_group_name = aws_cloudwatch_log_group.bedrock.name
-#       role_arn       = aws_iam_role.bedrock_logging.arn
-#     }
-#     embedding_data_delivery_enabled = true
-#     image_data_delivery_enabled     = true
-#     text_data_delivery_enabled      = true
-#   }
-# }
-#
 resource "aws_bedrock_guardrail" "ai_safety" {
   name                      = "${local.cluster_name}-ai-safety"
   description               = "Guardrail for AI model safety and compliance"
-  blocked_input_messaging   = "Your request contains content that violates our AI usage policy."
-  blocked_outputs_messaging = "The AI response was blocked due to policy violations."
+  blocked_input_messaging   = "Input contains blocked PII"
+  blocked_outputs_messaging = "Output contains blocked PII"
 
   content_policy_config {
     filters_config {
       type            = "SEXUAL"
       input_strength  = "HIGH"
       output_strength = "HIGH"
+    }
+    filters_config {
+      type            = "PROMPT_ATTACK"
+      input_strength  = "HIGH"
+      output_strength = "NONE"
+    }
+  }
+
+  sensitive_information_policy_config {
+    dynamic "pii_entities_config" {
+      for_each = local.pii_block
+      content {
+        type   = pii_entities_config.value
+        action = "BLOCK"
+      }
+    }
+    dynamic "pii_entities_config" {
+      for_each = local.pii_anonymize
+      content {
+        type   = pii_entities_config.value
+        action = "ANONYMIZE"
+      }
     }
   }
 }
@@ -538,65 +527,18 @@ module "vpc" {
   default_security_group_ingress = []
   default_security_group_egress  = []
 
+  # CIS AWS Foundations Benchmark v7.0 - 6.2: Ensure no Network ACLs allow
+  # ingress from 0.0.0.0/0 to remote server administration ports (SSH/RDP)
+  # https://docs.aws.amazon.com/securityhub/latest/userguide/ec2-controls.html#ec2-21
   manage_default_network_acl = true
-  default_network_acl_ingress = [
-    {
-      rule_no    = 89
-      action     = "deny"
-      from_port  = 22
-      to_port    = 22
-      protocol   = "tcp"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no    = 90
-      action     = "deny"
-      from_port  = 3389
-      to_port    = 3389
-      protocol   = "tcp"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no    = 100
-      action     = "allow"
-      from_port  = 443
-      to_port    = 443
-      protocol   = "tcp"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no    = 110
-      action     = "allow"
-      from_port  = 1024
-      to_port    = 65535
-      protocol   = "tcp"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no    = 120
-      action     = "allow"
-      from_port  = 53
-      to_port    = 53
-      protocol   = "udp"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no    = 130
-      action     = "allow"
-      from_port  = 123
-      to_port    = 123
-      protocol   = "udp"
-      cidr_block = "0.0.0.0/0"
-    },
-    {
-      rule_no    = 140
-      action     = "allow"
-      from_port  = 1024
-      to_port    = 65535
-      protocol   = "udp"
-      cidr_block = "0.0.0.0/0"
-    },
-  ]
+  default_network_acl_ingress = [for r in local.nacl_ingress : {
+    rule_no    = r[0]
+    action     = r[1]
+    from_port  = r[2]
+    to_port    = r[3]
+    protocol   = r[4]
+    cidr_block = "0.0.0.0/0"
+  }]
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = 1
@@ -605,6 +547,23 @@ module "vpc" {
     "kubernetes.io/role/internal-elb" = 1
     "karpenter.sh/discovery"          = local.cluster_name
   }
+}
+
+# Enable Route53 DNS Resolver Logging for VPC
+resource "aws_cloudwatch_log_group" "route53_resolver" {
+  name              = "/aws/route53/${local.cluster_name}"
+  retention_in_days = 1
+  kms_key_id        = module.kms.key_arn
+}
+
+resource "aws_route53_resolver_query_log_config" "this" {
+  name            = "${local.cluster_name}-dns-query-logging"
+  destination_arn = aws_cloudwatch_log_group.route53_resolver.arn
+}
+
+resource "aws_route53_resolver_query_log_config_association" "this" {
+  resolver_query_log_config_id = aws_route53_resolver_query_log_config.this.id
+  resource_id                  = module.vpc.vpc_id
 }
 
 module "eks" {
@@ -1579,7 +1538,7 @@ inline in the Bedrock Converse API call, satisfying the IAM
 for authentication — no IAM users or long-term credentials are needed.
 No database is required — models are configured via a static YAML file.
 
-![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/dc16e47df640b0e66ec91c9c802be3d8b0869cd4/ui/litellm-dashboard/public/assets/logos/litellm.jpg){:width="200"}
+![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/dc16e47df640b0e66ec91c9c802be3d8b0869cd4/ui/litellm-dashboard/public/assets/logos/litellm.jpg){:width="400"}
 
 Install `litellm` using
 [Helm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
@@ -1652,35 +1611,13 @@ resource "random_password" "litellm_master_key" {
   special = false
 }
 
-resource "kubectl_manifest" "litellm_namespace" {
-  yaml_body = <<-YAML
-    apiVersion: v1
-    kind: Namespace
-    metadata:
-      name: litellm
-  YAML
-}
-
-resource "kubectl_manifest" "litellm_masterkey" {
-  yaml_body = <<-YAML
-    apiVersion: v1
-    kind: Secret
-    metadata:
-      name: litellm-masterkey
-      namespace: litellm
-    stringData:
-      masterkey: sk-${random_password.litellm_master_key.result}
-  YAML
-  depends_on = [kubectl_manifest.litellm_namespace]
-}
-
 resource "helm_release" "litellm" {
   # renovate: datasource=docker depName=docker.litellm.ai/berriai/litellm-helm
   version          = "1.87.0"
   name             = "litellm"
   chart            = "oci://docker.litellm.ai/berriai/litellm-helm"
   namespace        = "litellm"
-  create_namespace = false
+  create_namespace = true
   wait             = true
 
   values = [<<-YAML
@@ -1691,8 +1628,7 @@ resource "helm_release" "litellm" {
     resources:
       requests:
         memory: 1Gi
-    masterkeySecretName: litellm-masterkey
-    masterkeySecretKey: masterkey
+    masterkey: sk-${random_password.litellm_master_key.result}
     serviceAccount:
       create: true
       name: litellm
@@ -1704,8 +1640,8 @@ resource "helm_release" "litellm" {
       image:
         tag: latest
       auth:
-        password: litellm-pg-pass
-        postgres-password: litellm-pg-pass
+        password: ${random_password.litellm_master_key.result}
+        postgres-password: ${random_password.litellm_master_key.result}
     migrationJob:
       enabled: true
       resources:
@@ -1729,7 +1665,6 @@ resource "helm_release" "litellm" {
   ]
 
   depends_on = [
-    kubectl_manifest.litellm_masterkey,
     kubectl_manifest.nodepool_default,
     module.litellm_pod_identity,
   ]
@@ -1874,7 +1809,7 @@ Set environment variables:
 
 ```sh
 export AWS_REGION="${AWS_REGION:-us-east-1}"
-export CLUSTER_FQDN="${CLUSTER_FQDN:-k02.k8s.mylabs.dev}"
+export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
