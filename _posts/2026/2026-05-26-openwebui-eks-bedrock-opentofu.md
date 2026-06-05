@@ -862,7 +862,6 @@ resource "helm_release" "cert_manager" {
   ]
 
   depends_on = [
-    module.eks,
     module.cert_manager_pod_identity,
     # Ensure AWS LB Controller webhook is ready before creating Services otherwise the mutating webhook "mservice.elbv2.k8s.aws" rejects requests with "no endpoints available" if the controller pod is not yet running
     helm_release.aws_load_balancer_controller,
@@ -1037,7 +1036,7 @@ resource "helm_release" "velero" {
   ]
 
   depends_on = [
-    module.eks,
+    helm_release.cert_manager,
     module.velero_pod_identity,
   ]
 }
@@ -1128,7 +1127,7 @@ resource "helm_release" "envoy_gateway" {
   wait             = true
 
   depends_on = [
-    helm_release.aws_load_balancer_controller,
+    helm_release.cert_manager,
   ]
 }
 
@@ -1395,6 +1394,7 @@ resource "helm_release" "karpenter" {
   ]
 
   depends_on = [
+    helm_release.cert_manager,
     module.karpenter,
   ]
 }
@@ -1532,10 +1532,9 @@ resource "helm_release" "external_dns" {
   ]
 
   depends_on = [
-    module.external_dns_pod_identity,
+    helm_release.cert_manager,
     kubectl_manifest.nodepool_default,
-    # Ensure AWS LB Controller webhook is ready before creating Services otherwise the mutating webhook "mservice.elbv2.k8s.aws" rejects requests with "no endpoints available" if the controller pod is not yet running
-    helm_release.aws_load_balancer_controller,
+    module.external_dns_pod_identity,
   ]
 }
 EOF
@@ -1682,8 +1681,7 @@ resource "helm_release" "litellm" {
   depends_on = [
     kubectl_manifest.nodepool_default,
     module.litellm_pod_identity,
-    # Ensure AWS LB Controller webhook is ready before creating Services otherwise the mutating webhook "mservice.elbv2.k8s.aws" rejects requests with "no endpoints available" if the controller pod is not yet running
-    helm_release.aws_load_balancer_controller,
+    helm_release.cert_manager,
   ]
 }
 
