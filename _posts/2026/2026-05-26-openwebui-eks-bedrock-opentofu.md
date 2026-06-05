@@ -21,7 +21,7 @@ The setup should align with the following criteria:
 
 - Single Availability Zone for worker nodes to eliminate cross-AZ data transfer
   costs (VPC spans two AZs for EKS control plane high availability)
-- Spot instances with on-demand fallback
+- Spot instances (via Karpenter) with an on-demand baseline node group
 - Less expensive region - `us-east-1`
 - Most price-efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
   [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
