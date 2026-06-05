@@ -778,6 +778,10 @@ resource "helm_release" "aws_load_balancer_controller" {
     vpcId: ${module.vpc.vpc_id}
     serviceAccount:
       name: aws-load-balancer-controller
+    defaultTags:
+      Owner: ${var.my_email}
+      Environment: dev
+      Cluster: ${var.cluster_fqdn}
   YAML
   ]
 
@@ -1870,15 +1874,14 @@ export MY_TASK="${MISE_TASK_NAME}"
 mise run "create:${MISE_TASK_NAME##*:}"
 ```
 
-Stop Karpenter from launching additional nodes and remove the Envoy Gateway /
-AWS LB Controller so the NLB is released before OpenTofu tries to destroy the
-VPC:
+Remove the Gateway resource so the AWS Load Balancer Controller can properly
+delete the NLB and its security groups while still running:
 
 ```sh
-tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=helm_release.karpenter -target=helm_release.envoy_gateway -target=helm_release.aws_load_balancer_controller -auto-approve || true
+tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=kubectl_manifest.nodepool_default -target=kubectl_manifest.gateway -auto-approve || true
 ```
 
-Remove any remaining EC2 instances provisioned by Karpenter:
+Terminate EC2 instances provisioned by Karpenter:
 
 ```sh
 for EC2 in $(aws ec2 describe-instances --filters "Name=tag:kubernetes.io/cluster/${CLUSTER_NAME},Values=owned" "Name=tag:karpenter.sh/nodepool,Values=*" Name=instance-state-name,Values=running --query "Reservations[].Instances[].InstanceId" --output text); do
