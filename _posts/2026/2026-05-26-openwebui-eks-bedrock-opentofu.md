@@ -1656,13 +1656,9 @@ resource "helm_release" "litellm" {
       auth:
         password: ${random_password.litellm_master_key.result}
         postgres-password: ${random_password.litellm_master_key.result}
+    disableSchemaUpdate: false
     migrationJob:
-      enabled: true
-      resources:
-        requests:
-          memory: 1Gi
-        limits:
-          memory: 1Gi
+      enabled: false
     proxy_config:
       model_list:
         - model_name: us.anthropic.claude-haiku-4-5-20251001-v1:0
