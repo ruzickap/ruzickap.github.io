@@ -357,8 +357,8 @@ EOF
 
 ### Route53 and KMS key
 
-![Route53](https://raw.githubusercontent.com/weibeld/aws-icons-svg/5e0e14e5472f1eefed879d7ea7e1d79652858d14/q1-2022/Architecture-Service-Icons_01312022/Arch_Networking-Content-Delivery/64/Arch_Amazon-Route-53_64.svg){:width="100"}
-![KMS](https://raw.githubusercontent.com/weibeld/aws-icons-svg/5e0e14e5472f1eefed879d7ea7e1d79652858d14/q1-2022/Architecture-Service-Icons_01312022/Arch_Security-Identity-Compliance/64/Arch_AWS-Key-Management-Service_64.svg){:width="100"}
+![Route53](https://raw.githubusercontent.com/weibeld/aws-icons-svg/5e0e14e5472f1eefed879d7ea7e1d79652858d14/q1-2022/Architecture-Service-Icons_01312022/Arch_Networking-Content-Delivery/64/Arch_Amazon-Route-53_64.svg){:width="50"}
+![KMS](https://raw.githubusercontent.com/weibeld/aws-icons-svg/5e0e14e5472f1eefed879d7ea7e1d79652858d14/q1-2022/Architecture-Service-Icons_01312022/Arch_Security-Identity-Compliance/64/Arch_AWS-Key-Management-Service_64.svg){:width="50"}
 
 Use the [`terraform-aws-modules`](https://github.com/terraform-aws-modules)
 collection to provision the Route 53 hosted zone for `${CLUSTER_FQDN}`,
@@ -959,7 +959,7 @@ Install the `velero`
 and customize its
 [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-12.0.2/charts/velero/values.yaml):
 
-##### S3 bucket for Velero backups (if not already exists)
+##### S3 bucket for Velero backups (if it does not already exist)
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/velero.tf" << \EOF
