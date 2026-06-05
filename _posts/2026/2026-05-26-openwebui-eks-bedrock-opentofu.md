@@ -19,7 +19,8 @@ provider for chart installations.
 
 The setup should align with the following criteria:
 
-- Single Availability Zone to eliminate cross-AZ data transfer costs
+- Single Availability Zone for worker nodes to eliminate cross-AZ data transfer
+  costs (VPC spans two AZs for EKS control plane high availability)
 - Spot instances with on-demand fallback
 - Less expensive region - `us-east-1`
 - Most price-efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
@@ -75,9 +76,10 @@ export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
+# Hostname / FQDN definitions
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
-# shellcheck disable=SC2155
-export BASE_DOMAIN="${BASE_DOMAIN:-$(echo "${CLUSTER_FQDN}" | sed 's/^[^.]*\.//')}"
+# Base Domain: k8s.mylabs.dev
+export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 # OpenTofu variables
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
@@ -355,6 +357,9 @@ EOF
 
 ### Route53 and KMS key
 
+![Route53](https://raw.githubusercontent.com/weibeld/aws-icons-svg/5e0e14e5472f1eefed879d7ea7e1d79652858d14/q1-2022/Architecture-Service-Icons_01312022/Arch_Networking-Content-Delivery/64/Arch_Amazon-Route-53_64.svg){:width="100"}
+![KMS](https://raw.githubusercontent.com/weibeld/aws-icons-svg/5e0e14e5472f1eefed879d7ea7e1d79652858d14/q1-2022/Architecture-Service-Icons_01312022/Arch_Security-Identity-Compliance/64/Arch_AWS-Key-Management-Service_64.svg){:width="100"}
+
 Use the [`terraform-aws-modules`](https://github.com/terraform-aws-modules)
 collection to provision the Route 53 hosted zone for `${CLUSTER_FQDN}`,
 delegate it from the parent zone, and create the KMS key for EKS secrets and
@@ -448,6 +453,10 @@ EOF
 > to the models you intend to use (Anthropic Claude, Meta Llama, Mistral, …).
 {: .prompt-info }
 <!-- prettier-ignore-end -->
+
+[Amazon Bedrock](https://aws.amazon.com/bedrock/) is a fully managed service
+that provides access to high-performing foundation models from leading AI
+companies (Anthropic, Meta, Mistral, Amazon, and others) through a unified API.
 
 ![Amazon Bedrock](https://raw.githubusercontent.com/aws-samples/generative-ai-demo-on-miro/c9ee08f37aea1fd0f2f48e46f4ae1a21e3bae2a7/frontend/src/assets/bedrocklogo.svg){:width="150"}
 
@@ -1883,7 +1892,7 @@ Destroy the remaining infrastructure with OpenTofu:
 
 ```sh
 if tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -auto-approve; then
-  aws s3api delete-objects --bucket "${CLUSTER_FQDN}" --no-cli-pager --delete "$(aws s3api list-object-versions --bucket "${CLUSTER_FQDN}" --prefix "terraform.tfstate" --output json --query='{Objects: Versions[].{Key:Key,VersionId:VersionId}}')"
+  aws s3 rm "s3://${CLUSTER_FQDN}/terraform.tfstate" --recursive
   rm -rf "${TMP_DIR:?}/${CLUSTER_FQDN:?}"
 fi
 ```
