@@ -891,7 +891,6 @@ resource "kubectl_manifest" "letsencrypt_production_dns" {
     kind: ClusterIssuer
     metadata:
       name: letsencrypt-production-dns
-      namespace: cert-manager
       labels:
         letsencrypt: production
     spec:
