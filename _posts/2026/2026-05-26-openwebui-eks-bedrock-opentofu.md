@@ -19,8 +19,8 @@ provider for chart installations.
 
 The setup should align with the following criteria:
 
-- Utilize two Availability Zones (AZs) to reduce cross-AZ traffic costs
-- Spot instances
+- Single Availability Zone to eliminate cross-AZ data transfer costs
+- Spot instances with on-demand fallback
 - Less expensive region - `us-east-1`
 - Most price-efficient EC2 instance type `t4g.medium` (2 x CPU, 4GB RAM) using
   [AWS Graviton](https://aws.amazon.com/ec2/graviton/) based on ARM
@@ -49,7 +49,7 @@ The setup should align with the following criteria:
   with inline guardrail enforcement and SigV4
   credential injection via EKS Pod Identity
 - [Open WebUI](https://openwebui.com/) as the chat front-end consuming the
-  Envoy AI Gateway endpoint
+  LiteLLM OpenAI-compatible endpoint (exposed via Envoy Gateway)
 
 ## Build Amazon EKS
 
@@ -76,6 +76,8 @@ export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
+# shellcheck disable=SC2155
+export BASE_DOMAIN="${BASE_DOMAIN:-$(echo "${CLUSTER_FQDN}" | sed 's/^[^.]*\.//')}"
 # OpenTofu variables
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
 export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
@@ -271,7 +273,7 @@ provider "kubectl" {
   load_config_file       = false
   lazy_load              = true
   exec {
-    api_version = "client.authentication.k8s.io/v1beta1"
+    api_version = "client.authentication.k8s.io/v1"
     command     = "aws"
     args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
   }
@@ -282,7 +284,7 @@ provider "helm" {
     host                   = module.eks.cluster_endpoint
     cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
     exec = {
-      api_version = "client.authentication.k8s.io/v1beta1"
+      api_version = "client.authentication.k8s.io/v1"
       command     = "aws"
       args        = ["eks", "get-token", "--cluster-name", module.eks.cluster_name]
     }
@@ -1425,7 +1427,7 @@ resource "kubectl_manifest" "ec2_nodeclass_default" {
   depends_on = [helm_release.karpenter]
 }
 
-# NodePool defines the scheduling constraints for Karpenter: instances must have >4 GiB RAM, run in a single AZ to minimize cross-AZ costs, use cost-efficient t4g/t3a families, and prefer spot capacity with on-demand fallback.
+# NodePool defines the scheduling constraints for Karpenter: instances must have >=4 GiB RAM, run in a single AZ to minimize cross-AZ costs, use cost-efficient t4g/t3a families, and prefer spot capacity with on-demand fallback.
 resource "kubectl_manifest" "nodepool_default" {
   yaml_body = <<-YAML
     apiVersion: karpenter.sh/v1
@@ -1438,7 +1440,7 @@ resource "kubectl_manifest" "nodepool_default" {
           requirements:
             - key: "karpenter.k8s.aws/instance-memory"
               operator: Gt
-              values: ["8191"]
+              values: ["4095"]
             - key: "topology.kubernetes.io/zone"
               operator: In
               values: ["${data.aws_region.current.region}a"]
@@ -1536,7 +1538,8 @@ inline in the Bedrock Converse API call, satisfying the IAM
 `bedrock:GuardrailIdentifier` condition. It uses
 [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
 for authentication — no IAM users or long-term credentials are needed.
-No database is required — models are configured via a static YAML file.
+A standalone PostgreSQL database is deployed alongside LiteLLM for storing
+usage data and configuration — models are configured via a static YAML file.
 
 ![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/dc16e47df640b0e66ec91c9c802be3d8b0869cd4/ui/litellm-dashboard/public/assets/logos/litellm.jpg){:width="400"}
 
