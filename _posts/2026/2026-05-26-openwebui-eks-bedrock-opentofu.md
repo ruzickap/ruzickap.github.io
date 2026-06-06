@@ -50,7 +50,41 @@ The setup should align with the following criteria:
   with inline guardrail enforcement and SigV4
   credential injection via EKS Pod Identity
 - [Open WebUI](https://openwebui.com/) as the chat front-end consuming the
-  LiteLLM OpenAI-compatible endpoint (exposed via Envoy Gateway)
+  LiteLLM OpenAI-compatible endpoint
+
+```mermaid
+flowchart LR
+  User(["fa:fa-user User / Browser"])
+  R53["fa:fa-globe Route 53"]
+  NLB["fa:fa-network-wired Network Load Balancer"]
+  EG["fa:fa-shield-alt Envoy Gateway"]
+  OW["fa:fa-comments Open WebUI"]
+  LL["fa:fa-robot LiteLLM"]
+  BR["fa:fa-brain Amazon Bedrock"]
+  GR["fa:fa-lock Bedrock Guardrail"]
+  Google["fa:fa-key Google OIDC"]
+
+  User -- HTTPS --> R53
+  R53 --> NLB
+  NLB --> EG
+  EG -- OIDC flow --> Google
+  EG -- Authenticated --> OW
+  OW -- OpenAI API --> LL
+  LL -- SigV4 --> BR
+  BR --> GR
+
+  subgraph AWS["fa:fa-cloud AWS us-east-1"]
+    R53
+    NLB
+    BR
+    GR
+    subgraph EKS["fa:fa-dharmachakra Amazon EKS"]
+      EG
+      OW
+      LL
+    end
+  end
+```
 
 ## Build Amazon EKS
 
