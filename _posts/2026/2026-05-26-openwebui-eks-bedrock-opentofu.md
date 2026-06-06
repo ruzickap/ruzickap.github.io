@@ -5,6 +5,7 @@ date: 2026-05-26
 description: Deploy Open WebUI on Amazon EKS with AWS Bedrock as the LLM backend, provisioned with OpenTofu
 categories: [Kubernetes, Cloud, Monitoring]
 tags: [amazon-eks, amazon-bedrock, litellm, cert-manager, envoy-gateway, kubernetes, open-webui, opentofu, velero]
+mermaid: true
 image: https://raw.githubusercontent.com/open-webui/open-webui/14a6c1f4963892c163821765efcc10c5c4578454/static/static/favicon.svg
 ---
 
