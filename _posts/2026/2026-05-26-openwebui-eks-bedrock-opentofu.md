@@ -114,20 +114,15 @@ export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 # OpenTofu variables
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
-export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
+export MY_EMAIL="${MY_EMAIL:-petr.ruzicka@gmail.com}"
+export TF_VAR_tags="{\"Owner\":\"${MY_EMAIL}\",\"Environment\":\"dev\",\"Base-Domain\":\"${BASE_DOMAIN}\",\"Managed-by\":\"opentofu\"}"
 # Derived shell variables
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-cd "${TMP_DIR}/${CLUSTER_FQDN}" || exit
+########################### cd "${TMP_DIR}/${CLUSTER_FQDN}" || exit
 ```
 
 Install the required tools:
-
-<!-- prettier-ignore-start -->
-> You can bypass these procedures if you already have all the essential
-> software installed.
-{: .prompt-tip }
-<!-- prettier-ignore-end -->
 
 - [OpenTofu](https://opentofu.org/)
 - [AWS CLI](https://builder.aws.com/build/tools)
@@ -140,43 +135,107 @@ Install the required tools:
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
-Create a DNS zone for the EKS clusters:
+```mermaid
+flowchart LR
+  CF["fa:fa-cloud Cloudflare\nmylabs.dev"]
+  R53B["fa:fa-globe Route 53\nk8s.mylabs.dev"]
+  R53C["fa:fa-globe Route 53\nk01.k8s.mylabs.dev"]
+  ED["fa:fa-sync ExternalDNS"]
+  NLB["fa:fa-network-wired NLB"]
 
-```shell
-export CLOUDFLARE_EMAIL="petr.ruzicka@gmail.com"
-export CLOUDFLARE_API_KEY="1xxxxxxxxx0"
-
-aws route53 create-hosted-zone --output json \
-  --name "${BASE_DOMAIN}" \
-  --caller-reference "$(date)" \
-  --hosted-zone-config="{\"Comment\": \"Created by petr.ruzicka@gmail.com\", \"PrivateZone\": false}" | jq
+  CF -- "NS delegation" --> R53B
+  R53B -- "NS delegation" --> R53C
+  ED -- "manages records" --> R53C
+  R53C -- "*.k01.k8s.mylabs.dev" --> NLB
 ```
 
-Utilize your domain registrar to update the nameservers for your zone
-(e.g., `mylabs.dev`) to point to Amazon Route 53 nameservers. Discover the
-required Route 53 nameservers:
+Create a Route 53 DNS zone for the EKS clusters and delegate it from
+Cloudflare using a standalone OpenTofu configuration with the
+[AWS](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) and
+[Cloudflare](https://registry.terraform.io/providers/cloudflare/cloudflare/latest/docs)
+providers:
 
 ```shell
-NEW_ZONE_ID=$(aws route53 list-hosted-zones --query "HostedZones[?Name==\`${BASE_DOMAIN}.\`].Id" --output text)
-NEW_ZONE_NS=$(aws route53 get-hosted-zone --output json --id "${NEW_ZONE_ID}" --query "DelegationSet.NameServers")
-NEW_ZONE_NS1=$(echo "${NEW_ZONE_NS}" | jq -r ".[0]")
-NEW_ZONE_NS2=$(echo "${NEW_ZONE_NS}" | jq -r ".[1]")
+export CLOUDFLARE_API_TOKEN="your-api-token-here"
+CLOUDFLARE_TF_DIR="${TMP_DIR}/${BASE_DOMAIN}"
+mkdir -p "${CLOUDFLARE_TF_DIR}"
+
+tee "${CLOUDFLARE_TF_DIR}/main.tf" << \EOF
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      # renovate: datasource=terraform-provider depName=hashicorp/aws
+      version = "6.49.0"
+    }
+    cloudflare = {
+      source  = "cloudflare/cloudflare"
+      # renovate: datasource=terraform-provider depName=cloudflare/cloudflare
+      version = "5.19.0"
+    }
+  }
+}
+
+provider "aws" {
+  default_tags {
+    tags = var.tags
+  }
+}
+
+# Cloudflare provider reads CLOUDFLARE_EMAIL and CLOUDFLARE_API_KEY from environment
+provider "cloudflare" {}
+
+variable "tags" {
+  description = "Tags applied to all AWS resources"
+  type        = map(string)
+}
+
+locals {
+  parent_domain = join(".", slice(split(".", var.tags["Base-Domain"]), 1, length(split(".", var.tags["Base-Domain"]))))
+}
+
+# Create Route 53 hosted zone for the base domain
+resource "aws_route53_zone" "base" {
+  name    = var.tags["Base-Domain"]
+  comment = "Created by ${var.tags["Owner"]} [${var.tags["Environment"]}, ${var.tags["Managed-by"]}]"
+}
+
+# Look up the zone ID for the parent domain in Cloudflare
+data "cloudflare_zone" "zone" {
+  filter = { name = local.parent_domain }
+}
+
+# Create NS records in Cloudflare pointing the subdomain to Route 53 nameservers
+resource "cloudflare_dns_record" "ns" {
+  # Hardcoded because aws_route53_zone.base.name_servers is unknown at plan time
+  count   = 4
+  zone_id = data.cloudflare_zone.zone.zone_id
+  name    = var.tags["Base-Domain"]
+  type    = "NS"
+  content = aws_route53_zone.base.name_servers[count.index]
+  ttl     = 3600
+}
+
+# Create the EC2 Spot service-linked role if it does not yet exist
+resource "aws_iam_service_linked_role" "spot" {
+  aws_service_name = "spot.amazonaws.com"
+}
+EOF
+
+tofu -chdir="${CLOUDFLARE_TF_DIR}" init
+tofu -chdir="${CLOUDFLARE_TF_DIR}" apply
+rm -rf "${CLOUDFLARE_TF_DIR}"
 ```
 
-Establish the NS record in `k8s.mylabs.dev` (your `BASE_DOMAIN`) for proper
-zone delegation. I use Cloudflare and employ Ansible for automation:
+The OpenTofu configuration above creates a Route 53 hosted zone for
+`k8s.mylabs.dev` and adds four NS records in the Cloudflare `mylabs.dev` zone
+that delegate DNS queries for the subdomain to the Route 53 nameservers:
 
-```shell
-ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS1} solo=true proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
-ansible -m cloudflare_dns -c local -i "localhost," localhost -a "zone=mylabs.dev record=${BASE_DOMAIN} type=NS value=${NEW_ZONE_NS2} solo=false proxied=no account_email=${CLOUDFLARE_EMAIL} account_api_token=${CLOUDFLARE_API_KEY}"
-```
+![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
+_CloudFlare mylabs.dev zone — NS records delegating k8s.mylabs.dev to Route 53_
 
-Create the EC2 Spot service-linked role if it does not yet exist in this account
-(it is a one-time, account-wide resource):
-
-```shell
-aws iam create-service-linked-role --aws-service-name spot.amazonaws.com 2> /dev/null || true
-```
+![Route53 k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedones-k8s.mylabs.dev-2.avif)
+_Route53 k8s.mylabs.dev zone — hosted zone with NS and SOA records_
 
 ### Create S3 bucket for Amazon EKS backups and Tofu state
 
@@ -242,7 +301,7 @@ EOF
 
   aws cloudformation deploy --region "${AWS_REGION}" \
     --stack-name "${CLUSTER_FQDN//./-}-s3" \
-    --tags "Owner=${TF_VAR_my_email}" "Environment=dev" "Cluster=${CLUSTER_FQDN}" \
+    --tags "Owner=${MY_EMAIL}" "Environment=dev" "Cluster=${CLUSTER_FQDN}" \
     --parameter-overrides "Name=${CLUSTER_FQDN}" \
     --template-file "${TMP_DIR}/${CLUSTER_FQDN}/s3.yaml"
 fi
@@ -293,7 +352,7 @@ terraform {
 
 provider "aws" {
   default_tags {
-    tags = local.tags
+    tags = merge(var.tags, { Cluster = var.cluster_fqdn })
   }
 }
 
@@ -328,12 +387,6 @@ provider "helm" {
 locals {
   cluster_name = split(".", var.cluster_fqdn)[0]
   base_domain  = join(".", slice(split(".", var.cluster_fqdn), 1, length(split(".", var.cluster_fqdn))))
-  tags = {
-    Owner       = var.my_email
-    Environment = "dev"
-    Cluster     = var.cluster_fqdn
-    Managed-by  = "opentofu"
-  }
   pii_block = [
     "PASSWORD", "CREDIT_DEBIT_CARD_NUMBER", "PIN",
     "INTERNATIONAL_BANK_ACCOUNT_NUMBER", "SWIFT_CODE",
@@ -369,11 +422,6 @@ variable "cluster_fqdn" {
   type        = string
 }
 
-variable "my_email" {
-  description = "Email address used for tagging and Let's Encrypt registration"
-  type        = string
-}
-
 variable "google_client_id" {
   description = "Google OAuth Client ID for OIDC authentication"
   type        = string
@@ -383,6 +431,11 @@ variable "google_client_secret" {
   description = "Google OAuth Client Secret for OIDC authentication"
   type        = string
   sensitive   = true
+}
+
+variable "tags" {
+  description = "Tags applied to all AWS resources"
+  type        = map(string)
 }
 EOF
 ```
@@ -811,7 +864,7 @@ resource "helm_release" "aws_load_balancer_controller" {
     serviceAccount:
       name: aws-load-balancer-controller
     defaultTags:
-      Owner: ${var.my_email}
+      Owner: ${var.tags["Owner"]}
       Environment: dev
       Cluster: ${var.cluster_fqdn}
   YAML
@@ -929,7 +982,7 @@ resource "kubectl_manifest" "letsencrypt_production_dns" {
     spec:
       acme:
         server: https://acme-v02.api.letsencrypt.org/directory
-        email: ${var.my_email}
+        email: ${var.tags["Owner"]}
         privateKeySecretRef:
           name: letsencrypt-production-dns
         solvers:
@@ -1283,7 +1336,7 @@ resource "kubectl_manifest" "gateway" {
   ]
 }
 
-# SecurityPolicy attached to both Gateway listeners that enforces Google OIDC authentication and JWT-based authorization. Only the email specified in var.my_email is allowed access. Authenticated user identity is forwarded to backends via X-Forwarded-Email and X-Forwarded-User headers.
+# SecurityPolicy attached to both Gateway listeners that enforces Google OIDC authentication and JWT-based authorization. Only the email specified in var.tags["Owner"] is allowed access. Authenticated user identity is forwarded to backends via X-Forwarded-Email and X-Forwarded-User headers.
 resource "kubectl_manifest" "security_policy_oidc" {
   yaml_body = <<-YAML
     apiVersion: gateway.envoyproxy.io/v1alpha1
@@ -1335,7 +1388,7 @@ resource "kubectl_manifest" "security_policy_oidc" {
                 provider: google
                 claims:
                   - name: email
-                    values: ["${var.my_email}"]
+                    values: ["${var.tags["Owner"]}"]
   YAML
   depends_on = [
     kubectl_manifest.gateway,
@@ -1854,8 +1907,10 @@ Set environment variables:
 export AWS_REGION="${AWS_REGION:-us-east-1}"
 export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export TF_VAR_cluster_fqdn="${CLUSTER_FQDN}"
+export BASE_DOMAIN="${CLUSTER_FQDN#*.}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
-export TF_VAR_my_email="${TF_VAR_my_email:-petr.ruzicka@gmail.com}"
+export MY_EMAIL="${MY_EMAIL:-petr.ruzicka@gmail.com}"
+export TF_VAR_tags="{\"Owner\":\"${MY_EMAIL}\",\"Environment\":\"dev\",\"Base-Domain\":\"${BASE_DOMAIN}\",\"Managed-by\":\"opentofu\"}"
 export TF_VAR_google_client_id="${GOOGLE_CLIENT_ID}"
 export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
