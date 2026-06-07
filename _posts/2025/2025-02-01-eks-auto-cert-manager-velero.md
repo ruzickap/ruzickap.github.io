@@ -34,7 +34,7 @@ Links:
 
 - An Amazon EKS Auto Mode cluster (as described in
   "[Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %})")
-- [AWS CLI](https://aws.amazon.com/cli/)
+- [AWS CLI](https://builder.aws.com/build/tools)
 - [eksctl](https://eksctl.io/)
 - [Helm](https://helm.sh)
 - [kubectl](https://github.com/kubernetes/kubectl)
@@ -74,7 +74,6 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-production-dns
-  namespace: cert-manager
   labels:
     letsencrypt: production
 spec:

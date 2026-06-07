@@ -83,7 +83,7 @@ Install the required tools:
 {: .prompt-tip }
 <!-- prettier-ignore-end -->
 
-- [AWS CLI](https://aws.amazon.com/cli/)
+- [AWS CLI](https://builder.aws.com/build/tools)
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
@@ -1072,7 +1072,6 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-staging-dns
-  namespace: cert-manager
   labels:
     letsencrypt: staging
 spec:
