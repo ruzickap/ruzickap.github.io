@@ -66,7 +66,7 @@ MARIADB_ROOT_PASSWORD=$(openssl rand -base64 12)
 # renovate: currentValue=master
 wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/aws-codebuild-samples/00284b828a360aa89ac635a44d84c5a748af03d3/ci_tools/vpc_cloudformation_template.yml
 # renovate:
-wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/amazon-ec2-nice-dcv-samples/9ae94412ff1b4da8eb947516f84a17b11226d174/cfn/KaliLinux-NICE-DCV.yaml
+wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/amazon-ec2-nice-dcv-samples/25dea48de7c12ddc8dadb0c6dcaee8037451a78f/cfn/KaliLinux-NICE-DCV.yaml
 # renovate:
 wget --continue -q -P "${TMP_DIR}" https://raw.githubusercontent.com/aws-samples/ec2-lamp-server/1f3539b5dc2745a974c99a3ed911da00f59534bd/AmazonLinux-2023-LAMP-server.yaml
 
