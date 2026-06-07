@@ -818,7 +818,7 @@ EOF
 #### AWS Load Balancer Controller
 
 [AWS Load Balancer Controller](https://kubernetes-sigs.github.io/aws-load-balancer-controller/)
-provisions ELBv2 resources (ALB/NLB) for Services and Ingresses.
+provisions ELBv2 resources (ALB/NLB) for Services, Ingresses, and Gateways.
 
 ![AWS Load Balancer Controller](https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/05071ecd0f2c240c7e6b815c0fdf731df799005a/docs/assets/images/aws_load_balancer_icon.svg){:width="150"}
 
