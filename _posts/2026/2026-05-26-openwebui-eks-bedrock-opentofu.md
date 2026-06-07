@@ -119,7 +119,6 @@ export TF_VAR_tags="{\"Owner\":\"${MY_EMAIL}\",\"Environment\":\"dev\",\"Base-Do
 # Derived shell variables
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}"
-########################### cd "${TMP_DIR}/${CLUSTER_FQDN}" || exit
 ```
 
 Install the required tools:
@@ -1756,6 +1755,9 @@ resource "helm_release" "litellm" {
               trace: "disabled"
       litellm_settings:
         drop_params: true
+      general_settings:
+        store_model_in_db: true
+        store_prompts_in_spend_logs: true
   YAML
   ]
 
@@ -1894,6 +1896,12 @@ fi
 Visit `https://chat.${CLUSTER_FQDN}` — you should be redirected through the
 Google OIDC flow by Envoy Gateway, and then land in Open WebUI with the
 Bedrock-backed Claude, Llama, and Mistral models available in the model picker:
+
+![LiteLLM](/assets/img/posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu/2026-05-26-litellm.avif)
+_LiteLLM_
+
+![Open WebUI](/assets/img/posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu/2026-05-26-openwebui.avif)
+_Open WebUI_
 
 ## Clean-up
 
