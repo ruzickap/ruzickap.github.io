@@ -170,7 +170,7 @@ terraform {
     cloudflare = {
       source  = "cloudflare/cloudflare"
       # renovate: datasource=terraform-provider depName=cloudflare/cloudflare
-      version = "5.19.0"
+      version = "5.19.1"
     }
   }
 }
@@ -328,12 +328,12 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       # renovate: datasource=terraform-provider depName=hashicorp/aws
-      version = "6.47.0"
+      version = "6.49.0"
     }
     helm = {
       source  = "hashicorp/helm"
       # renovate: datasource=terraform-provider depName=hashicorp/helm
-      version = "3.1.2"
+      version = "3.2.0"
     }
     kubectl = {
       source  = "alekc/kubectl"
@@ -343,7 +343,7 @@ terraform {
     random = {
       source  = "hashicorp/random"
       # renovate: datasource=terraform-provider depName=hashicorp/random
-      version = "3.7.2"
+      version = "3.9.0"
     }
   }
 }
@@ -848,7 +848,7 @@ module "aws_lb_controller_pod_identity" {
 
 resource "helm_release" "aws_load_balancer_controller" {
   # renovate: datasource=helm depName=aws-load-balancer-controller registryUrl=https://aws.github.io/eks-charts
-  version          = "3.3.0"
+  version          = "3.4.0"
   name             = "aws-load-balancer-controller"
   repository       = "https://aws.github.io/eks-charts"
   chart            = "aws-load-balancer-controller"
@@ -1199,7 +1199,7 @@ and customize its
 tee "${TMP_DIR}/${CLUSTER_FQDN}/envoy-gateway.tf" << \EOF
 resource "helm_release" "envoy_gateway" {
   # renovate: datasource=docker depName=envoyproxy/gateway-helm registryUrl=https://docker.io
-  version          = "1.8.0"
+  version          = "1.8.1"
   name             = "envoy-gateway"
   repository       = "oci://docker.io/envoyproxy"
   chart            = "gateway-helm"
@@ -1708,7 +1708,7 @@ resource "random_password" "litellm_master_key" {
 
 resource "helm_release" "litellm" {
   # renovate: datasource=docker depName=docker.litellm.ai/berriai/litellm-helm
-  version          = "1.87.0"
+  version          = "1.88.0"
   name             = "litellm"
   chart            = "oci://docker.litellm.ai/berriai/litellm-helm"
   namespace        = "litellm"
