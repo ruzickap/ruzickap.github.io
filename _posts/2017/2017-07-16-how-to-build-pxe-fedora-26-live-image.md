@@ -14,7 +14,7 @@ Sometimes it may be handy to PXE boot live image (running only in memory) over
 the network.
 
 On this
-page [https://lukas.zapletalovi.com/2016/08/hidden-feature-of-fedora-24-live-pxe-boot.html](https://lukas.zapletalovi.com/2016/08/hidden-feature-of-fedora-24-live-pxe-boot.html)
+page [https://lukas.zapletalovi.com/2016/08/hidden-feature-of-fedora-24-live-pxe-boot.html](https://lukas.zapletalovi.com/2016/08/hidden-feature-of-fedora-24-live-pxe-boot.html)
 I found an easy way to boot Fedora Live CD over the network.
 
 In my case I prefer to build my own image to reduce the size, because I do not

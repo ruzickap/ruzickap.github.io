@@ -11,7 +11,7 @@ tags: [kubernetes, istio, harbor, flux, amazon-eks]
 {: .prompt-info }
 
 It's been some time since I posted something. Unfortunately I prefer to write
-some blog posts in [Markdown](https://guides.github.com/features/mastering-markdown/) 
+some blog posts in [Markdown](https://guides.github.com/features/mastering-markdown/)
 instead of writing it here.
 
 Most of them are related to Kubernetes...
@@ -20,10 +20,10 @@ Most of them are related to Kubernetes...
 
 Anyway I put some of my notes / articles here:
 
-- [Kubernetes with Istio demo](https://ruzickap.gitbook.io/k8s-istio-demo/) ([Presentation](https://slides.com/ruzickap/k8s-istio-demo/))
+- [Kubernetes with Istio demo](https://ruzickap.gitbook.io/k8s-istio-demo/) ([Presentation](https://slides.com/ruzickap/k8s-istio-demo/))
 - [Istio workshop](https://ruzickap.github.io/k8s-istio-workshop/)
-- [Istio webinar](https://ruzickap.github.io/k8s-istio-webinar/) ([Presentation](https://slides.com/ruzickap/k8s-istio-webinar/))
-- [Kubernetes + Harbor](https://ruzickap.github.io/k8s-harbor/) ([Presentation](https://ruzickap.github.io/k8s-harbor-presentation/#/))
+- [Istio webinar](https://ruzickap.github.io/k8s-istio-webinar/) ([Presentation](https://slides.com/ruzickap/k8s-istio-webinar/))
+- [Kubernetes + Harbor](https://ruzickap.github.io/k8s-harbor/) ([Presentation](https://ruzickap.github.io/k8s-harbor-presentation/#/))
 - [Kubernetes + PostgreSQL](https://ruzickap.github.io/k8s-postgresql/)
 - [Kubernetes + Flux + Istio + GitLab + Harbor](https://ruzickap.github.io/k8s-flux-istio-gitlab-harbor/)
 - [Kubernetes + Flagger + Flux + Istio](https://ruzickap.github.io/k8s-flagger-istio-flux/)

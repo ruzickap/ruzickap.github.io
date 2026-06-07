@@ -210,16 +210,16 @@ Directory structure after build completed:
 ```text
 .
 ├── ansible
-│   └── win.yml
+│   └── win.yml
 ├── http
-│   └── windows-server-2016
-│   └── Autounattend.xml
+│   └── windows-server-2016
+│   └── Autounattend.xml
 ├── packer_cache
-│   └── 49f719e23c56a779a991c4b4ad1680b8363918cd0bfd9ac6b52697d78a309855.iso
+│   └── 49f719e23c56a779a991c4b4ad1680b8363918cd0bfd9ac6b52697d78a309855.iso
 ├── scripts
-│   └── win-common
-│   ├── fixnetwork.ps1
-│   └── remove_nic.bat
+│   └── win-common
+│   ├── fixnetwork.ps1
+│   └── remove_nic.bat
 ├── Vagrantfile-windows.template
 ├── virtio-win.iso
 ├── windows-server-2016-eval.json

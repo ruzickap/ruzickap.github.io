@@ -23,7 +23,7 @@ likes to see errors like this:
 Now the page is working fine with all external dependencies because I checked it
 properly - but what about in a few months / years / ... ?
 
-Web pages / images  / videos may disappear from the Internet especially when you
+Web pages / images / videos may disappear from the Internet especially when you
 can not control them and then it's handy from time to time to check your web
 pages if all the external links are still alive.
 
@@ -33,7 +33,7 @@ of your web pages instead of manually clicking the links.
 I would like to share how I'm periodically checking my documents / pages
 using the [GitHub Actions](https://github.com/features/actions).
 
-Here is the GitHub Action I wrote for this purpose: 
+Here is the GitHub Action I wrote for this purpose:
 [My Broken Link Checker](https://github.com/ruzickap/action-my-broken-link-checker)
 
 In short you can simply create a git repository in GitHub and store there the
@@ -89,11 +89,11 @@ This is the screencast where you can see it all in action:
 
 {% include embed/youtube.html id='H6H523TMPXk' %}
 
-This URL checker script is based on [muffet](https://github.com/raviqqe/muffet) 
-and you can set its parameters by changing the `INPUT_CMD_PARAMS` variable.
+This URL checker script is based on [muffet](https://github.com/raviqqe/muffet)
+and you can set its parameters by changing the `INPUT_CMD_PARAMS` variable.
 
 Feel free to look at more details
-here: [https://github.com/ruzickap/action-my-broken-link-checker](https://github.com/ruzickap/action-my-broken-link-checker)
+here: [https://github.com/ruzickap/action-my-broken-link-checker](https://github.com/ruzickap/action-my-broken-link-checker)
 
 I hope this may help you to keep the quality of the web pages by finding the
 external link errors quickly.

@@ -23,12 +23,12 @@ Here is the file/directory structure:
 ```text
 .
 ├── group_vars
-│   └── all
+│   └── all
 ├── tasks
-│   ├── create_cf_stack.yml
-│   └── win.yml
+│   ├── create_cf_stack.yml
+│   └── win.yml
 ├── templates
-│   └── aws_cf_stack.yml.j2
+│   └── aws_cf_stack.yml.j2
 ├── run_aws.sh
 └── site_aws.yml
 ```
