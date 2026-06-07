@@ -181,7 +181,7 @@ provider "aws" {
   }
 }
 
-# Cloudflare provider reads CLOUDFLARE_EMAIL and CLOUDFLARE_API_KEY from environment
+# Cloudflare provider reads CLOUDFLARE_API_TOKEN from the environment
 provider "cloudflare" {}
 
 variable "tags" {
@@ -223,7 +223,6 @@ EOF
 
 tofu -chdir="${CLOUDFLARE_TF_DIR}" init
 tofu -chdir="${CLOUDFLARE_TF_DIR}" apply
-rm -rf "${CLOUDFLARE_TF_DIR}"
 ```
 
 The OpenTofu configuration above creates a Route 53 hosted zone for
@@ -231,10 +230,10 @@ The OpenTofu configuration above creates a Route 53 hosted zone for
 that delegate DNS queries for the subdomain to the Route 53 nameservers:
 
 ![CloudFlare mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/cloudflare-mylabs-dev-dns-records.avif)
-_CloudFlare mylabs.dev zone — NS records delegating k8s.mylabs.dev to Route 53_
+_CloudFlare mylabs.dev zone - NS records delegating k8s.mylabs.dev to Route 53_
 
 ![Route53 k8s.mylabs.dev zone](/assets/img/posts/2022/2022-11-27-cheapest-amazon-eks/route53-hostedones-k8s.mylabs.dev-2.avif)
-_Route53 k8s.mylabs.dev zone — hosted zone with NS and SOA records_
+_Route53 k8s.mylabs.dev zone - hosted zone with NS and SOA records_
 
 ### Create S3 bucket for Amazon EKS backups and Tofu state
 
@@ -412,7 +411,7 @@ EOF
 ```
 
 Define the input variables. Values are provided via `TF_VAR_` environment
-variables — no defaults are baked into the configuration:
+variables - no defaults are baked into the configuration:
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/variables.tf" << \EOF
@@ -962,7 +961,7 @@ provider.
   solved via Route 53 (using cert-manager's Pod Identity for AWS API access).
 
 - Wildcard TLS certificate for `*.cluster_fqdn` issued by Let's Encrypt.
-  Only created when no Velero backup exists (count condition) — on subsequent
+  Only created when no Velero backup exists (count condition) - on subsequent
   runs the certificate+secret are restored from the Velero backup instead,
   avoiding unnecessary ACME rate-limit consumption.
   wait_for blocks until cert-manager reports the certificate as Ready so that
@@ -1043,8 +1042,6 @@ Install the `velero`
 [Helm chart](https://artifacthub.io/packages/helm/vmware-tanzu/velero)
 and customize its
 [default values](https://github.com/vmware-tanzu/helm-charts/blob/velero-12.0.2/charts/velero/values.yaml):
-
-##### S3 bucket for Velero backups (if it does not already exist)
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/velero.tf" << \EOF
@@ -1632,9 +1629,9 @@ that supports 100+ LLM providers including
 inline in the Bedrock Converse API call, satisfying the IAM
 `bedrock:GuardrailIdentifier` condition. It uses
 [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
-for authentication — no IAM users or long-term credentials are needed.
+for authentication - no IAM users or long-term credentials are needed.
 A standalone PostgreSQL database is deployed alongside LiteLLM for storing
-usage data and configuration — models are configured via a static YAML file.
+usage data and configuration - models are configured via a static YAML file.
 
 ![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/dc16e47df640b0e66ec91c9c802be3d8b0869cd4/ui/litellm-dashboard/public/assets/logos/litellm.jpg){:width="400"}
 
@@ -1796,6 +1793,9 @@ resource "kubectl_manifest" "litellm_httproute" {
 EOF
 ```
 
+![LiteLLM](/assets/img/posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu/2026-05-26-litellm.avif)
+_LiteLLM_
+
 ### Open WebUI
 
 [Open WebUI](https://openwebui.com/) is a user-friendly web interface for
@@ -1881,6 +1881,9 @@ resource "kubectl_manifest" "openwebui_httproute" {
 EOF
 ```
 
+![Open WebUI](/assets/img/posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu/2026-05-26-openwebui.avif)
+_Open WebUI_
+
 ## OpenTofu Code - apply
 
 Initialise the OpenTofu working directory and apply the entire configuration
@@ -1893,15 +1896,9 @@ if [[ ! ${MY_TASK:-} =~ delete: ]]; then
 fi
 ```
 
-Visit `https://chat.${CLUSTER_FQDN}` — you should be redirected through the
+Visit `https://chat.${CLUSTER_FQDN}` - you should be redirected through the
 Google OIDC flow by Envoy Gateway, and then land in Open WebUI with the
-Bedrock-backed Claude, Llama, and Mistral models available in the model picker:
-
-![LiteLLM](/assets/img/posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu/2026-05-26-litellm.avif)
-_LiteLLM_
-
-![Open WebUI](/assets/img/posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu/2026-05-26-openwebui.avif)
-_Open WebUI_
+Bedrock-backed Claude model.
 
 ## Clean-up
 
@@ -1928,7 +1925,7 @@ aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --ku
 ```
 
 Back up the cert-manager certificate before tearing the cluster down (only if
-it was issued/renewed during this cluster's lifetime — a completed
+it was issued/renewed during this cluster's lifetime - a completed
 CertificateRequest with the `letsencrypt: production` label only exists when
 cert-manager performed the ACME flow, not after a Velero restore):
 
