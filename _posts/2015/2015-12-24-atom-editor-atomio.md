@@ -22,7 +22,7 @@ Maybe you can also use this "Atom Cheatsheet" to help you learn the shortcuts:
 ![Atom editor keyboard shortcuts cheatsheet](https://github.com/ruzickap/cheatsheet-atom/releases/download/v1.1.0/atom_cheatsheet.jpg)
 
 You can download the available formats from
-GitHub: [https://github.com/ruzickap/cheatsheet-atom/releases](https://github.com/ruzickap/cheatsheet-atom/releases)
+GitHub: [https://github.com/ruzickap/cheatsheet-atom/releases](https://github.com/ruzickap/cheatsheet-atom/releases)
 
 - [Atom Cheatsheet - PDF](https://github.com/ruzickap/cheatsheet-atom/releases/download/v1.1.0/atom_cheatsheet.pdf)
 - [Atom Cheatsheet - SVG](https://github.com/ruzickap/cheatsheet-atom/releases/download/v1.1.0/atom_cheatsheet.svg)
