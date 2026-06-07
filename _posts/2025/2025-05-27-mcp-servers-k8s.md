@@ -39,7 +39,7 @@ powered by MCP servers and local LLM inference running on your EKS cluster.
 
 - Amazon EKS Auto Mode cluster (described in
   [Build secure and cheap Amazon EKS Auto Mode]({% post_url /2024/2024-12-14-secure-cheap-amazon-eks-auto %}))
-- [AWS CLI](https://aws.amazon.com/cli/)
+- [AWS CLI](https://builder.aws.com/build/tools)
 - [eksctl](https://eksctl.io/)
 - [Helm](https://helm.sh)
 - [kubectl](https://github.com/kubernetes/kubectl)

@@ -63,7 +63,6 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-production-dns
-  namespace: cert-manager
   labels:
     letsencrypt: production
 spec:

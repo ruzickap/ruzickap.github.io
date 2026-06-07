@@ -41,7 +41,7 @@ and [2]({%post_url /2024/2024-05-09-exploit-vulnerability-wordpress-plugin-kali-
 
 Requirements:
 
-- [AWS CLI](https://aws.amazon.com/cli/)
+- [AWS CLI](https://builder.aws.com/build/tools)
 - [rain](https://github.com/aws-cloudformation/rain)
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)

@@ -21,7 +21,7 @@ them to the new EKS Auto Mode Cluster — effectively making it self-managed.
 ## Requirements
 
 - [AWS account](https://aws.amazon.com/) with appropriate permissions
-- [AWS CLI](https://aws.amazon.com/cli/)
+- [AWS CLI](https://builder.aws.com/build/tools)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/)
 - [Helm](https://helm.sh/)
 - [kind](https://kind.sigs.k8s.io/)
