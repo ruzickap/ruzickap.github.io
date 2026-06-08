@@ -16,10 +16,10 @@ allow others to connect to the Internet for free. I used [Captive
 portal](https://en.wikipedia.org/wiki/Captive_portal) solution based on these
 applications:
 
-- [CoovaChilli](https://coova.org/CoovaChilli)
-- [FreeRadius](https://freeradius.org/)
+- [CoovaChilli](https://coova.github.io/)
+- [FreeRadius](https://www.freeradius.org/)
 - [MySQL](https://www.mysql.com/)
-- [daloRADIUS](https://daloradius.com/)
+- [daloRADIUS](https://www.daloradius.com/)
 
 When somebody wants to connect to the Internet using my wifi, the first page
 they see is the register/login page (whatever page they want to visit).
