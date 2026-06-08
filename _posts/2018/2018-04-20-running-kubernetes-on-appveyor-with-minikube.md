@@ -10,7 +10,7 @@ tags: [kubernetes, automation]
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2018/04/running-kubernetes-on-appveyor-with.html)
 {: .prompt-info }
 
-When I was playing with Kubernetes I made a lot of [notes](https://multinode-kubernetes-cluster.readthedocs.io)
+When I was playing with Kubernetes I made a lot of [notes](https://multinode-kubernetes-cluster.readthedocs.io/en/latest/)
 on how to do things. Then I realized it may be handy to put those notes to
 Github and let them go through some CI to be sure they are correct.
 
