@@ -66,24 +66,24 @@ flowchart TD
 The request flow:
 
 1. A user sends a message in Slack (direct message or `@mention` in a channel).
-2. Slack sends a webhook POST request which passes through WAF v2 — requests
+1. Slack sends a webhook POST request which passes through WAF v2 — requests
    matching AWS Managed Rules (Common Rule Set, Known Bad Inputs) are blocked,
    and IPs exceeding 2000 requests per 5 minutes are rate-limited.
-3. The REST API Gateway routes `POST /slack-events` to the Verification Lambda
+1. The REST API Gateway routes `POST /slack-events` to the Verification Lambda
    via AWS_PROXY integration.
-4. The Verification Lambda retrieves Slack credentials from SSM Parameter Store
+1. The Verification Lambda retrieves Slack credentials from SSM Parameter Store
    and validates the request signature using HMAC-SHA256.
-5. After verification, it async-invokes the Processing Lambda and returns `200`
+1. After verification, it async-invokes the Processing Lambda and returns `200`
    immediately (meeting Slack's 3-second timeout).
-6. The Processing Lambda posts a "Processing your request..." placeholder in
+1. The Processing Lambda posts a "Processing your request..." placeholder in
    the Slack thread.
-7. It invokes the AgentCore Runtime with the user's query and a session ID
+1. It invokes the AgentCore Runtime with the user's query and a session ID
    derived from the thread timestamp.
-8. The Runtime discovers tools from the MCP Gateway (Context7) and runs a
+1. The Runtime discovers tools from the MCP Gateway (Context7) and runs a
    tool-use loop with the Bedrock Converse API.
-9. The Bedrock Guardrail enforces content filtering and PII protection.
-10. The response is converted to Slack's `mrkdwn` format and updates the
-    placeholder message.
+1. The Bedrock Guardrail enforces content filtering and PII protection.
+1. The response is converted to Slack's `mrkdwn` format and updates the
+   placeholder message.
 
 ## Requirements
 
@@ -124,71 +124,127 @@ Before deploying infrastructure, you need to create a Slack app and obtain the
 Bot Token and Signing Secret.
 
 1. Go to [Slack API](https://api.slack.com/apps) and choose **Create New App**.
+  ![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png)
+  _Slack API - Create New App_
+1. Choose **From scratch**.
 
-![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png)
-_Slack API - Create New App_
+   ![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="400"}
+   _Create an app - From scratch_
+1. Enter the **App Name** (`slack-agentcore`) and pick the workspace.
+1. Choose **Create App**.
 
-{:start="2"}
-2. Choose **From scratch**.
-
-![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="400"}
-_Create an app - From scratch_
-
-{:start="3"}
-
-3. Enter the **App Name** (`slack-agentcore`) and pick the workspace.
-4. Choose **Create App**.
-
-![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
-_Name app and choose workspace_
+   ![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
+   _Name app and choose workspace_
 
 ### Configure OAuth & Permissions
 
 1. Navigate to **Features** > **OAuth & Permissions**.
-2. Under **Bot Token Scopes**, add the following scopes:
-   - `app_mentions:read`
-   - `chat:write`
-   - `im:history`
-   - `im:read`
-   - `im:write`
+1. Under **Bot Token Scopes**, add the following scopes:
+   - `app_mentions:read` (receive events when the bot is @mentioned)
+   - `channels:history` (receive thread replies in public channels)
+   - `chat:write` (send messages as the bot)
+   - `groups:history` (receive thread replies in private channels)
+   - `im:history` (view messages in direct message conversations)
+   - `im:read` (view basic information about direct messages)
+   - `im:write` (start direct messages with users)
+  ![Slack Scopes](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/5.AgentCore-Slack-Scopes-comp.gif)
 
-![Slack Scopes](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/5.AgentCore-Slack-Scopes-comp.gif)
-_Adding Bot Token Scopes_
+   _Adding Bot Token Scopes_
+1. Install the app to your workspace.
+  ![Install Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/6.AgentCore-Slack-AgentCoreWeatherAgent-Install-compressed.gif)
+  _Installing the app to the workspace_
+1. Copy the **Bot User OAuth Token** (`xoxb-...`) - you will need this later.
 
-{:start="3"}
-3. Install the app to your workspace.
-
-![Install Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/6.AgentCore-Slack-AgentCoreWeatherAgent-Install-compressed.gif)
-_Installing the app to the workspace_
-
-{:start="4"}
-4. Copy the **Bot User OAuth Token** (`xoxb-...`) - you will need this later.
-
-![Copy OAuth Token](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/7.AgentCore-Slack-Copy-OAuthToken.png)
-_Copy the Bot User OAuth Token_
+   ![Copy OAuth Token](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/7.AgentCore-Slack-Copy-OAuthToken.png)
+   _Copy the Bot User OAuth Token_
 
 ### Get the Signing Secret
 
 1. Navigate to **Settings** > **Basic Information**.
-2. Under **Signing Secret**, choose **Show** and copy the value.
+1. Under **Signing Secret**, choose **Show** and copy the value.
 
-![Signing Secret](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/8.AgentCore-Slack-SigningSecret.png)
-_Copy the Signing Secret_
+   ![Signing Secret](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/8.AgentCore-Slack-SigningSecret.png)
+   _Copy the Signing Secret_
 
 ### Enable Direct Messages
 
 1. Navigate to **Features** > **App Home**.
-2. Enable **Allow users to send Slash commands and messages from the messages
+1. Enable **Allow users to send Slash commands and messages from the messages
    tab**.
 
-![Enable Slash Commands](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/9.AgentCore-Slack-Slack-SlashCommands-compressed.gif)
-_Enable direct messaging_
+   ![Enable Slash Commands](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/9.AgentCore-Slack-Slack-SlashCommands-compressed.gif)
+   _Enable direct messaging_
 
 Set the Slack credentials obtained above as OpenTofu variables:
 
 ```bash
 export TF_VAR_slack_bot_token="${MY_SLACK_BOT_TOKEN}"
 export TF_VAR_slack_signing_secret="${MY_SLACK_BOT_SIGNING_SECRET}"
+```
+
+## Create S3 bucket for Tofu state
+
+Create an S3 bucket to store OpenTofu remote state using CloudFormation. The
+bucket uses KMS encryption, lifecycle policies, and blocks all public access:
+
+```bash
+if ! aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
+  tee "${TMP_DIR}/${PROJECT_NAME}/s3.yaml" << \EOF
+AWSTemplateFormatVersion: "2010-09-09"
+Description: S3 bucket for OpenTofu state files
+Parameters:
+  Name:
+    Description: Name of the S3 bucket
+    Type: String
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref Name
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      LifecycleConfiguration:
+        Rules:
+          - Id: MultipartUploadLifecycleRule
+            Status: Enabled
+            AbortIncompleteMultipartUpload:
+              DaysAfterInitiation: 1
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: aws:kms
+              KMSMasterKeyID: alias/aws/s3
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Sid: ForceSSLOnlyAccess
+            Effect: Deny
+            Principal: "*"
+            Action: s3:*
+            Resource:
+              - !GetAtt S3Bucket.Arn
+              - !Sub ${S3Bucket.Arn}/*
+            Condition:
+              Bool:
+                aws:SecureTransport: "false"
+Outputs:
+  S3Bucket:
+    Value: !Ref S3Bucket
+EOF
+
+  aws cloudformation deploy --region "${AWS_REGION}" \
+    --stack-name "${PROJECT_NAME}-s3" \
+    --tags "Owner=${MY_EMAIL:-petr.ruzicka@gmail.com}" "Environment=dev" \
+    --parameter-overrides "Name=${PROJECT_NAME}" \
+    --template-file "${TMP_DIR}/${PROJECT_NAME}/s3.yaml"
+fi
 ```
 
 ## Deploy the infrastructure with OpenTofu
@@ -215,9 +271,15 @@ Write the main OpenTofu configuration with provider setup, locals, and data
 sources:
 
 ```terraform
-tee "${TMP_DIR}/${PROJECT_NAME}/main.tf" << \EOF
+tee "${TMP_DIR}/${PROJECT_NAME}/main.tf" << EOF
 terraform {
   required_version = ">= 1.14"
+
+  backend "s3" {
+    bucket       = "${PROJECT_NAME}"
+    key          = "terraform.tfstate"
+    use_lockfile = true
+  }
 
   required_providers {
     aws = {
@@ -435,12 +497,20 @@ module "lambda_processing" {
 # -----------------------------------------------------------------------------
 
 module "api_gateway_account_settings" {
+  depends_on = [aws_cloudwatch_log_group.api_gateway_welcome]
+
   source  = "cloudposse/api-gateway/aws//modules/account-settings"
   # renovate: datasource=terraform-module depName=cloudposse/api-gateway/aws
   version = "0.9.0"
 
   name      = "${var.project_name}-apigw"
   namespace = ""
+}
+
+# Pre-create the log group AWS auto-generates when account logging is enabled
+resource "aws_cloudwatch_log_group" "api_gateway_welcome" {
+  name              = "/aws/apigateway/welcome"
+  retention_in_days = 1
 }
 
 # -----------------------------------------------------------------------------
@@ -482,6 +552,15 @@ module "api_gateway" {
       }
     }
   }
+}
+
+# Pre-create the API Gateway execution log group to control retention + KMS.
+# On first apply, import it: tofu import aws_cloudwatch_log_group.api_gateway \
+#   "API-Gateway-Execution-Logs_<rest-api-id>/v1"
+resource "aws_cloudwatch_log_group" "api_gateway" {
+  name              = "API-Gateway-Execution-Logs_${module.api_gateway.id}/v1"
+  retention_in_days = 1
+  kms_key_id        = module.kms.key_arn
 }
 
 # -----------------------------------------------------------------------------
@@ -905,9 +984,9 @@ const ssm = new SSMClient();
 const lambda = new LambdaClient();
 const LOG_LEVEL = process.env.LOG_LEVEL || "INFO";
 const log = {
-  debug: (msg) => LOG_LEVEL === "DEBUG" && console.log("[DEBUG]", msg),
-  info: (msg) => ["DEBUG", "INFO"].includes(LOG_LEVEL) && console.log("[INFO]", msg),
-  error: (msg) => console.error("[ERROR]", msg),
+  debug: (msg) => LOG_LEVEL === "DEBUG" && console.log("🔍 [DEBUG]", msg),
+  info: (msg) => ["DEBUG", "INFO"].includes(LOG_LEVEL) && console.log("ℹ️ [INFO]", msg),
+  error: (msg) => console.error("❌ [ERROR]", msg),
 };
 
 // Cache SSM parameters across warm invocations
@@ -915,7 +994,7 @@ let cached = null;
 
 async function getCredentials() {
   if (!cached) {
-    log.info("Fetching credentials from SSM Parameter Store");
+    log.info("🔑 Fetching credentials from SSM Parameter Store");
     const [token, secret] = await Promise.all([
       ssm.send(new GetParameterCommand({ Name: process.env.SLACK_BOT_TOKEN_PARAM, WithDecryption: true })),
       ssm.send(new GetParameterCommand({ Name: process.env.SLACK_SIGNING_SECRET_PARAM, WithDecryption: true })),
@@ -940,7 +1019,7 @@ export async function handler(event) {
 
     // Slack URL verification challenge
     if (parsed.type === "url_verification") {
-      log.info("URL verification challenge");
+      log.info("🤝 URL verification challenge");
       return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ challenge: parsed.challenge }) };
     }
 
@@ -955,12 +1034,12 @@ export async function handler(event) {
     const creds = await getCredentials();
     const rawBody = typeof body === "string" ? body : JSON.stringify(body);
     if (!verifySignature(rawBody, ts, sig, creds.signingSecret)) {
-      log.info("Signature verification failed");
+      log.info("🚫 Signature verification failed");
       return { statusCode: 403, body: '{"error":"Invalid signature"}' };
     }
 
     // Async invoke processing Lambda
-    log.info("Signature verified, invoking processing Lambda");
+    log.info("✅ Signature verified, invoking processing Lambda");
     await lambda.send(new InvokeCommand({
       FunctionName: process.env.PROCESSING_FUNCTION,
       InvocationType: "Event",
@@ -969,7 +1048,7 @@ export async function handler(event) {
 
     return { statusCode: 200, body: '{"message":"OK"}' };
   } catch (error) {
-    log.error(`Error: ${error.message}`);
+    log.error(`💥 Error: ${error.message}`);
     return { statusCode: error.message.includes("signature") ? 403 : 500, body: JSON.stringify({ error: error.message }) };
   }
 }
@@ -1008,9 +1087,9 @@ import { markdownToSlack, splitForSlack } from "markdown-to-slack-mrkdwn";
 const client = new BedrockAgentCoreClient();
 const LOG_LEVEL = process.env.LOG_LEVEL || "INFO";
 const log = {
-  debug: (msg) => LOG_LEVEL === "DEBUG" && console.log("[DEBUG]", msg),
-  info: (msg) => ["DEBUG", "INFO"].includes(LOG_LEVEL) && console.log("[INFO]", msg),
-  error: (msg) => console.error("[ERROR]", msg),
+  debug: (msg) => LOG_LEVEL === "DEBUG" && console.log("🔍 [DEBUG]", msg),
+  info: (msg) => ["DEBUG", "INFO"].includes(LOG_LEVEL) && console.log("ℹ️ [INFO]", msg),
+  error: (msg) => console.error("❌ [ERROR]", msg),
 };
 
 function callSlack(url, token, data) {
@@ -1075,10 +1154,14 @@ export async function handler(event) {
 
     // Filter: ignore bots, non-user, non-relevant events
     if (e.bot_id || e.subtype === "bot_message" || e.subtype === "message_changed") {
-      log.info("Ignoring bot message");
+      log.info("🤖 Ignoring bot message");
       return { statusCode: 200, body: '{"message":"ignored"}' };
     }
-    if (!(e.type === "app_mention" || (e.type === "message" && e.channel_type === "im"))) {
+    // Accept: @mentions, DMs, or thread replies (so the bot responds in threads it started)
+    const isRelevant = e.type === "app_mention"
+      || (e.type === "message" && e.channel_type === "im")
+      || (e.type === "message" && e.thread_ts);
+    if (!isRelevant) {
       return { statusCode: 200, body: '{"message":"OK"}' };
     }
     if (!e.user) return { statusCode: 200, body: '{"message":"no user"}' };
@@ -1087,12 +1170,12 @@ export async function handler(event) {
     const threadTs = e.thread_ts || e.ts;
 
     // Post "Processing..." placeholder
-    log.info("Processing event, posting processing message to Slack");
+    log.info("⏳ Processing event, posting processing message to Slack");
     const posted = await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
-      channel: e.channel, text: "Processing your request...", thread_ts: threadTs,
+      channel: e.channel, text: "💡 Processing your request...", thread_ts: threadTs,
     });
     if (!posted.ok || !posted.ts) {
-      log.error(`Slack postMessage failed: ${posted.error}`);
+      log.error(`💬 Slack postMessage failed: ${posted.error}`);
       return { statusCode: 500, body: '{"error":"slack post failed"}' };
     }
 
@@ -1102,32 +1185,32 @@ export async function handler(event) {
 
     if (!userMessage) {
       await callSlack("https://slack.com/api/chat.update", slackBotToken, {
-        channel: e.channel, ts: posted.ts, text: "I received an empty message. Please try again.",
+        channel: e.channel, ts: posted.ts, text: "🤷 I received an empty message. Please try again.",
       });
       return { statusCode: 200, body: '{"message":"empty"}' };
     }
 
     // Invoke AgentCore and get response
-    log.info(`Invoking AgentCore for session: ${sessionId}`);
+    log.info(`🚀 Invoking AgentCore for session: ${sessionId}`);
     let completion;
     try {
       completion = await invokeAgentCore(process.env.AGENT_CORE_RUNTIME_ARN, userMessage, sessionId);
     } catch (err) {
-      log.error(`AgentCore error: ${err.name} ${err.message}`);
-      completion = "I'm experiencing technical difficulties. Please try again later.";
+      log.error(`🔥 AgentCore error: ${err.name} ${err.message}`);
+      completion = "⚠️ I'm experiencing technical difficulties. Please try again later.";
     }
 
     // Strip model thinking tags and convert to Slack format
     completion = completion
       .replace(/<thinking>[\s\S]*?<\/thinking>/gi, "")
       .replace(/<response>([\s\S]*?)<\/response>/gi, "$1")
-      .trim() || "I received your message but got an empty response.";
+      .trim() || "🫥 I received your message but got an empty response.";
 
     const slackText = markdownToSlack(completion);
 
     // Update the processing message with the first chunk
     const chunks = splitForSlack(slackText, 3500);
-    log.info(`Updating message ts: ${posted.ts}`);
+    log.info(`✏️ Updating message ts: ${posted.ts}`);
     await callSlack("https://slack.com/api/chat.update", slackBotToken, {
       channel: e.channel, ts: posted.ts, text: chunks[0],
     });
@@ -1141,7 +1224,7 @@ export async function handler(event) {
 
     return { statusCode: 200, body: '{"message":"OK"}' };
   } catch (error) {
-    log.error(`Processing error: ${error.message}`);
+    log.error(`💥 Processing error: ${error.message}`);
     throw error;
   }
 }
@@ -1389,7 +1472,7 @@ tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" apply -auto-approve
 After a successful deployment, OpenTofu outputs the webhook URL:
 
 ```bash
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" output -raw webhook_url
+tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" output
 ```
 
 ## Configure Slack Event Subscriptions
@@ -1398,32 +1481,26 @@ After obtaining the webhook URL from the OpenTofu output, complete the Slack
 app configuration.
 
 1. Return to [Slack API](https://api.slack.com/apps) and select your app.
-
-![Select Your Apps](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/10.AgentCore-Slack-Slack-Select-YourApps.png)
-_Select your Slack app_
-
-{:start="2"}
-
-2. Navigate to **Features** > **Event Subscriptions**.
-3. Toggle **Enable Events** to **On**.
-4. Paste the webhook URL in the **Request URL** field.
-5. After the URL is verified (green checkmark), under **Subscribe to bot
+   ![Select Your Apps](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/10.AgentCore-Slack-Slack-Select-YourApps.png)
+   _Select your Slack app_
+1. Navigate to **Features** > **Event Subscriptions**.
+1. Toggle **Enable Events** to **On**.
+1. Paste the webhook URL in the **Request URL** field.
+1. After the URL is verified (green checkmark), under **Subscribe to bot
    events** add:
+   - `app_mention` (triggered when the bot is @mentioned in a channel)
+   - `message.channels` (thread replies in public channels)
+   - `message.groups` (thread replies in private channels)
+   - `message.im` (direct messages sent to the bot)
+1. Choose **Save Changes**.
 
-- `app_mention`
-- `message.im`
-
-6. Choose **Save Changes**.
-
-![Event Subscriptions](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/11.AgentCore-Slack-EventSubscriptions-Comp.gif)
-_Configure Event Subscriptions with the webhook URL_
-
-{:start="7"}
-7. Navigate to **Settings** > **Install App** and choose **Reinstall** to apply
+   ![Event Subscriptions](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/11.AgentCore-Slack-EventSubscriptions-Comp.gif)
+   _Configure Event Subscriptions with the webhook URL_
+1. Navigate to **Settings** > **Install App** and choose **Reinstall** to apply
    the new event subscriptions.
 
-![Reinstall Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/12.AgentCore-Slack-ReinstallSlackApp-compressed.gif)
-_Reinstall the app to activate event subscriptions_
+   ![Reinstall Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/12.AgentCore-Slack-ReinstallSlackApp-compressed.gif)
+   _Reinstall the app to activate event subscriptions_
 
 ## Test the integration
 
@@ -1465,7 +1542,7 @@ two Lambda functions:
 
 1. **Verification Lambda** - validates the Slack signature and returns HTTP 200
    immediately
-2. **Processing Lambda** - posts a placeholder message, invokes AgentCore,
+1. **Processing Lambda** - posts a placeholder message, invokes AgentCore,
    and updates the message with the response
 
 ### Security
@@ -1509,5 +1586,7 @@ export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 
 ```sh
 tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve
+aws s3 rm "s3://${PROJECT_NAME}/terraform.tfstate" --recursive
+aws cloudformation delete-stack --stack-name "${PROJECT_NAME}-s3"
 rm -rf "${TMP_DIR:?}/${PROJECT_NAME:?}"
 ```
