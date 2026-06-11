@@ -184,7 +184,7 @@ export TF_VAR_slack_signing_secret="${SLACK_SIGNING_SECRET}"
 
 ## Deploy the infrastructure with OpenTofu
 
-![OpenTofu](https://raw.githubusercontent.com/opentofu/brand-artifacts/af744ad2e454fc47cc7d3c6399aaac15c5c0eeac/full/transparent/SVG/on-dark.svg){:width="400"}
+![OpenTofu](https://raw.githubusercontent.com/opentofu/brand-artifacts/af744ad2e454fc47cc7d3c6399aaac15c5c0eeac/full/transparent/SVG/on-dark.svg){:width="300"}
 
 The OpenTofu configuration deploys the following components:
 
@@ -203,7 +203,7 @@ The OpenTofu configuration deploys the following components:
 Write the main OpenTofu configuration with provider setup, locals, and data
 sources:
 
-```terraform
+```hcl
 tee "${TMP_DIR}/${PROJECT_NAME}/main.tf" << \EOF
 terraform {
   required_version = ">= 1.14"
@@ -255,7 +255,7 @@ EOF
 Write the infrastructure resources (KMS, SSM, Lambda, API Gateway, S3,
 AgentCore):
 
-```terraform
+```hcl
 tee "${TMP_DIR}/${PROJECT_NAME}/infrastructure.tf" << \EOF
 # -----------------------------------------------------------------------------
 # KMS CMK - encrypts SSM SecureString parameters and CloudWatch log groups
@@ -762,7 +762,7 @@ EOF
 
 Write the OpenTofu variables file:
 
-```terraform
+```hcl
 tee "${TMP_DIR}/${PROJECT_NAME}/variables.tf" << \EOF
 variable "aws_region" {
   description = "AWS region for deployment"
@@ -803,7 +803,7 @@ EOF
 
 ### OpenTofu outputs
 
-```terraform
+```hcl
 tee "${TMP_DIR}/${PROJECT_NAME}/outputs.tf" << \EOF
 output "webhook_url" {
   description = "Slack webhook URL to configure in Event Subscriptions"
@@ -906,7 +906,7 @@ The Processing Lambda filters bot messages, posts a "Processing..." placeholder
 in the Slack thread, invokes the AgentCore Runtime, and converts the markdown
 response to Slack's `mrkdwn` format:
 
-```json
+```bash
 mkdir -p "${TMP_DIR}/${PROJECT_NAME}/lambda/processing"
 tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/package.json" << \EOF
 {
@@ -1323,7 +1323,7 @@ app configuration.
 
 1. Return to [Slack API](https://api.slack.com/apps) and select your app.
 
-![Select Your Apps](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/10.AgentCore-Slack-Slack-Select-YourApps.png){:width="800"}
+![Select Your Apps](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/10.AgentCore-Slack-Slack-Select-YourApps.png)
 _Select your Slack app_
 
 {:start="2"}
@@ -1339,14 +1339,14 @@ _Select your Slack app_
 
 6. Choose **Save Changes**.
 
-![Event Subscriptions](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/11.AgentCore-Slack-EventSubscriptions-Comp.gif){:width="800"}
+![Event Subscriptions](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/11.AgentCore-Slack-EventSubscriptions-Comp.gif)
 _Configure Event Subscriptions with the webhook URL_
 
 {:start="7"}
 7. Navigate to **Settings** > **Install App** and choose **Reinstall** to apply
    the new event subscriptions.
 
-![Reinstall Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/12.AgentCore-Slack-ReinstallSlackApp-compressed.gif){:width="800"}
+![Reinstall Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/12.AgentCore-Slack-ReinstallSlackApp-compressed.gif)
 _Reinstall the app to activate event subscriptions_
 
 ## Test the integration
@@ -1354,20 +1354,20 @@ _Reinstall the app to activate event subscriptions_
 Locate the app in the **Apps** section of Slack. You can invite it to a channel
 with `/invite @slack-agentcore`, or message it directly.
 
-![Add Agent App in Slack](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/13.AgentCore-Slack-AddAgent-App-in-Slack-compressed.gif){:width="800"}
+![Add Agent App in Slack](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/13.AgentCore-Slack-AddAgent-App-in-Slack-compressed.gif)
 _Adding the bot to a Slack channel_
 
 **Direct messaging**: Go to the app in the Apps section and chat one-on-one.
 The bot posts "Processing your request..." as an initial response, then
 replaces it with the actual answer from AgentCore.
 
-![Slack Conversation](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/14.AgentCore-Slack-AgentCore-Slack-Conversation-compressed.gif){:width="800"}
+![Slack Conversation](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/14.AgentCore-Slack-AgentCore-Slack-Conversation-compressed.gif)
 _Direct conversation with the AgentCore bot_
 
 **Channel integration**: Mention `@slack-agentcore` in any channel where the
 bot is installed.
 
-![Channel Integration](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/15.AgentCore-Slack-Channel-Integration.png){:width="800"}
+![Channel Integration](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/15.AgentCore-Slack-Channel-Integration.png)
 _Channel integration - mentioning the bot_
 
 ## Architecture details
@@ -1414,7 +1414,7 @@ for documentation and code example lookups.
 
 Destroy all resources created by OpenTofu:
 
-![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="150"}
+![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="100"}
 
 ```sh
 tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve
