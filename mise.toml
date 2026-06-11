@@ -64,7 +64,7 @@ quiet = true
 env.EKS_POST_FILE = "./_posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu.md"
 run = '''
 cat <<EOF
-$(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first()' "${EKS_POST_FILE}")
+$(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
 
 export KUBECONFIG="/tmp/kubeconfig-\${CLUSTER_NAME}-\$\$.conf"
 aws eks update-kubeconfig --name "\${CLUSTER_NAME}" --kubeconfig "\${KUBECONFIG}"

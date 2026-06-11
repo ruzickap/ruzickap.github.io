@@ -45,7 +45,6 @@ case "${1%:*}" in
     ;;
 esac
 
-
 chmod a+x "${RUN_FILE}"
 echo "⏰ *** $(date)"
 # shellcheck source=/dev/null
