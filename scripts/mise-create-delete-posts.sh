@@ -31,13 +31,13 @@ case "${1%:*}" in
     for ((idx = ${#POSTS[@]} - 1; idx >= 0; idx--)); do
       POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POSTS[idx]}*.md")")
     done
-    mq 'select(.code.lang == "bash" || .code.lang == "terraform" || .code.lang == "javascript" || .code.lang == "json" || .code.lang == "python")' "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
+    mq 'select(.code.lang == "bash" || .code.lang == "terraform" || .code.lang == "javascript" || .code.lang == "json" || .code.lang == "python") | to_text()' "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
     ;;
   delete)
     for POST_FILE in "${POSTS[@]}"; do
       POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POST_FILE}*.md")")
     done
-    mq 'select(.code.lang != "sh")' "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
+    mq 'select(.code.lang != "sh") | to_text()' "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
     ;;
   *)
     echo "Unknown action: ${1%:*}. Expected 'create' or 'delete'."
