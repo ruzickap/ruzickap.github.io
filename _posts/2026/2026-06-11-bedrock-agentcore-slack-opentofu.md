@@ -141,9 +141,7 @@ Bot Token and Signing Secret.
 1. Navigate to **Features** > **OAuth & Permissions**.
 1. Under **Bot Token Scopes**, add the following scopes:
    - `app_mentions:read` (receive events when the bot is @mentioned)
-   - `channels:history` (receive thread replies in public channels)
    - `chat:write` (send messages as the bot)
-   - `groups:history` (receive thread replies in private channels)
    - `im:history` (view messages in direct message conversations)
    - `im:read` (view basic information about direct messages)
    - `im:write` (start direct messages with users)
@@ -628,7 +626,7 @@ module "s3_agent_code" {
   # renovate: datasource=terraform-module depName=terraform-aws-modules/s3-bucket/aws
   version = "5.14.0"
 
-  bucket_prefix = "${var.project_name}-agent-code-"
+  bucket = "${var.project_name}-agent-code"
   force_destroy = true
 
   versioning = {
@@ -1157,11 +1155,7 @@ export async function handler(event) {
       log.info("🤖 Ignoring bot message");
       return { statusCode: 200, body: '{"message":"ignored"}' };
     }
-    // Accept: @mentions, DMs, or thread replies (so the bot responds in threads it started)
-    const isRelevant = e.type === "app_mention"
-      || (e.type === "message" && e.channel_type === "im")
-      || (e.type === "message" && e.thread_ts);
-    if (!isRelevant) {
+    if (!(e.type === "app_mention" || (e.type === "message" && e.channel_type === "im"))) {
       return { statusCode: 200, body: '{"message":"OK"}' };
     }
     if (!e.user) return { statusCode: 200, body: '{"message":"no user"}' };
@@ -1489,8 +1483,6 @@ app configuration.
 1. After the URL is verified (green checkmark), under **Subscribe to bot
    events** add:
    - `app_mention` (triggered when the bot is @mentioned in a channel)
-   - `message.channels` (thread replies in public channels)
-   - `message.groups` (thread replies in private channels)
    - `message.im` (direct messages sent to the bot)
 1. Choose **Save Changes**.
 
@@ -1585,8 +1577,9 @@ export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 ```
 
 ```sh
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve
-aws s3 rm "s3://${PROJECT_NAME}/terraform.tfstate" --recursive
-aws cloudformation delete-stack --stack-name "${PROJECT_NAME}-s3"
-rm -rf "${TMP_DIR:?}/${PROJECT_NAME:?}"
+aws s3 rb "s3://${PROJECT_NAME}-agent-code" --force || true
+tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve && \
+  aws s3 rm "s3://${PROJECT_NAME}" --recursive || true
+aws cloudformation delete-stack --stack-name "${PROJECT_NAME}-s3" || true
+rm -rf "${TMP_DIR:?}/${PROJECT_NAME:?}" agent-runtime.zip || true
 ```
