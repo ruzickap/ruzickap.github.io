@@ -1483,12 +1483,10 @@ app configuration.
    - `app_mention` (triggered when the bot is @mentioned in a channel)
    - `message.im` (direct messages sent to the bot)
 1. Choose **Save Changes**.
-
    ![Event Subscriptions](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/11.AgentCore-Slack-EventSubscriptions-Comp.gif)
    _Configure Event Subscriptions with the webhook URL_
 1. Navigate to **Settings** > **Install App** and choose **Reinstall** to apply
    the new event subscriptions.
-
    ![Reinstall Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/12.AgentCore-Slack-ReinstallSlackApp-compressed.gif)
    _Reinstall the app to activate event subscriptions_
 
