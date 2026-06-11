@@ -6,7 +6,7 @@ description: Deploy a Slack bot powered by Amazon Bedrock AgentCore with Context
 categories: [AI, Cloud, Serverless]
 tags: [amazon-bedrock, agentcore, slack, opentofu, lambda, api-gateway, mcp]
 mermaid: true
-image: https://raw.githubusercontent.com/redis-developer/Reeko-Slack-Bot/5856a9f1550fc6b70bff7bf8879f524e42c9cb1a/photos/slack/Slack_Technologies_Logo.svg
+image: https://user-images.githubusercontent.com/819186/51553744-4130b580-1e7c-11e9-889e-486937b69475.png
 ---
 
 > This post was inspired by [Integrating Amazon Bedrock AgentCore with Slack](https://github.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack)
@@ -116,13 +116,13 @@ Bot Token and Signing Secret.
 
 1. Go to [Slack API](https://api.slack.com/apps) and choose **Create New App**.
 
-![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png){:width="800"}
+![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png)
 _Slack API - Create New App_
 
 {:start="2"}
 2. Choose **From scratch**.
 
-![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="500"}
+![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="400"}
 _Create an app - From scratch_
 
 {:start="3"}
@@ -130,7 +130,7 @@ _Create an app - From scratch_
 3. Enter the **App Name** (`slack-agentcore`) and pick the workspace.
 4. Choose **Create App**.
 
-![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="500"}
+![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
 _Name app and choose workspace_
 
 ### Configure OAuth & Permissions
@@ -143,19 +143,19 @@ _Name app and choose workspace_
    - `im:read`
    - `im:write`
 
-![Slack Scopes](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/5.AgentCore-Slack-Scopes-comp.gif){:width="800"}
+![Slack Scopes](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/5.AgentCore-Slack-Scopes-comp.gif)
 _Adding Bot Token Scopes_
 
 {:start="3"}
 3. Install the app to your workspace.
 
-![Install Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/6.AgentCore-Slack-AgentCoreWeatherAgent-Install-compressed.gif){:width="800"}
+![Install Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/6.AgentCore-Slack-AgentCoreWeatherAgent-Install-compressed.gif)
 _Installing the app to the workspace_
 
 {:start="4"}
 4. Copy the **Bot User OAuth Token** (`xoxb-...`) - you will need this later.
 
-![Copy OAuth Token](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/7.AgentCore-Slack-Copy-OAuthToken.png){:width="800"}
+![Copy OAuth Token](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/7.AgentCore-Slack-Copy-OAuthToken.png)
 _Copy the Bot User OAuth Token_
 
 ### Get the Signing Secret
@@ -163,7 +163,7 @@ _Copy the Bot User OAuth Token_
 1. Navigate to **Settings** > **Basic Information**.
 2. Under **Signing Secret**, choose **Show** and copy the value.
 
-![Signing Secret](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/8.AgentCore-Slack-SigningSecret.png){:width="800"}
+![Signing Secret](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/8.AgentCore-Slack-SigningSecret.png)
 _Copy the Signing Secret_
 
 ### Enable Direct Messages
@@ -172,14 +172,8 @@ _Copy the Signing Secret_
 2. Enable **Allow users to send Slash commands and messages from the messages
    tab**.
 
-![Enable Slash Commands](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/9.AgentCore-Slack-Slack-SlashCommands-compressed.gif){:width="800"}
+![Enable Slash Commands](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/9.AgentCore-Slack-Slack-SlashCommands-compressed.gif)
 _Enable direct messaging_
-
-<!-- prettier-ignore-start -->
-> Save the **Bot User OAuth Token** and **Signing Secret** - you will use them
-> as OpenTofu variables in the next step.
-{: .prompt-info }
-<!-- prettier-ignore-end -->
 
 Set the Slack credentials obtained above as OpenTofu variables:
 
@@ -188,7 +182,9 @@ export TF_VAR_slack_bot_token="${SLACK_BOT_TOKEN}"
 export TF_VAR_slack_signing_secret="${SLACK_SIGNING_SECRET}"
 ```
 
-## Deploy the infrastructure
+## Deploy the infrastructure with OpenTofu
+
+![OpenTofu](https://raw.githubusercontent.com/opentofu/brand-artifacts/af744ad2e454fc47cc7d3c6399aaac15c5c0eeac/full/transparent/SVG/on-dark.svg){:width="400"}
 
 The OpenTofu configuration deploys the following components:
 
@@ -202,555 +198,12 @@ The OpenTofu configuration deploys the following components:
 - **Bedrock Guardrail** - content filtering + PII protection
 - **Bedrock AgentCore Runtime** - Python runtime with tool-use loop
 
-### OpenTofu variables
-
-Write the OpenTofu variables file:
-
-```bash
-tee "${TMP_DIR}/${PROJECT_NAME}/variables.tf" << \EOF
-variable "aws_region" {
-  description = "AWS region for deployment"
-  type        = string
-  default     = "us-east-1"
-}
-
-variable "project_name" {
-  description = "Project name used for resource naming"
-  type        = string
-  default     = "slack-agentcore"
-}
-
-variable "slack_bot_token" {
-  description = "Slack Bot User OAuth Token (xoxb-...)"
-  type        = string
-  sensitive   = true
-}
-
-variable "slack_signing_secret" {
-  description = "Slack app signing secret for webhook verification"
-  type        = string
-  sensitive   = true
-}
-
-variable "foundation_model" {
-  description = "Bedrock foundation model ID for the agent"
-  type        = string
-  default     = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
-}
-
-variable "tags" {
-  description = "Tags applied to all AWS resources"
-  type        = map(string)
-}
-EOF
-```
-
-### OpenTofu outputs
-
-```bash
-tee "${TMP_DIR}/${PROJECT_NAME}/outputs.tf" << \EOF
-output "webhook_url" {
-  description = "Slack webhook URL to configure in Event Subscriptions"
-  value       = "${module.api_gateway.api_endpoint}/slack-events"
-}
-EOF
-```
-
-### Lambda - Verification function
-
-The Verification Lambda handles Slack URL verification challenges, validates
-webhook signatures using HMAC-SHA256 with timing-safe comparison, and
-async-invokes the Processing Lambda to meet Slack's 3-second response timeout:
-
-```bash
-mkdir -p "${TMP_DIR}/${PROJECT_NAME}/lambda/verification"
-tee "${TMP_DIR}/${PROJECT_NAME}/lambda/verification/index.mjs" << \EOF
-import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
-import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
-import { createHmac, timingSafeEqual } from "crypto";
-
-const ssm = new SSMClient();
-const lambda = new LambdaClient();
-const LOG_LEVEL = process.env.LOG_LEVEL || "INFO";
-const log = {
-  debug: (msg) => LOG_LEVEL === "DEBUG" && console.log("[DEBUG]", msg),
-  info: (msg) => ["DEBUG", "INFO"].includes(LOG_LEVEL) && console.log("[INFO]", msg),
-  error: (msg) => console.error("[ERROR]", msg),
-};
-
-// Cache SSM parameters across warm invocations
-let cached = null;
-
-async function getCredentials() {
-  if (!cached) {
-    log.info("Fetching credentials from SSM Parameter Store");
-    const [token, secret] = await Promise.all([
-      ssm.send(new GetParameterCommand({ Name: process.env.SLACK_BOT_TOKEN_PARAM, WithDecryption: true })),
-      ssm.send(new GetParameterCommand({ Name: process.env.SLACK_SIGNING_SECRET_PARAM, WithDecryption: true })),
-    ]);
-    cached = { token: token.Parameter.Value, signingSecret: secret.Parameter.Value };
-  }
-  return cached;
-}
-
-function verifySignature(body, timestamp, signature, secret) {
-  const computed = `v0=${createHmac("sha256", secret).update(`v0:${timestamp}:${body}`).digest("hex")}`;
-  return timingSafeEqual(Buffer.from(signature), Buffer.from(computed));
-}
-
-export async function handler(event) {
-  log.debug(`Event: ${JSON.stringify(event)}`);
-
-  try {
-    const headers = event.headers || {};
-    const body = event.body;
-    const parsed = typeof body === "string" ? JSON.parse(body) : body;
-
-    // Slack URL verification challenge
-    if (parsed.type === "url_verification") {
-      log.info("URL verification challenge");
-      return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ challenge: parsed.challenge }) };
-    }
-
-    // Validate signature headers
-    const sig = headers["X-Slack-Signature"] || headers["x-slack-signature"];
-    const ts = headers["X-Slack-Request-Timestamp"] || headers["x-slack-request-timestamp"];
-    if (!sig || !ts || Math.abs(Date.now() / 1000 - parseInt(ts)) > 300) {
-      return { statusCode: 403, body: '{"error":"Invalid request"}' };
-    }
-
-    // Verify Slack signature
-    const creds = await getCredentials();
-    const rawBody = typeof body === "string" ? body : JSON.stringify(body);
-    if (!verifySignature(rawBody, ts, sig, creds.signingSecret)) {
-      log.info("Signature verification failed");
-      return { statusCode: 403, body: '{"error":"Invalid signature"}' };
-    }
-
-    // Async invoke processing Lambda
-    log.info("Signature verified, invoking processing Lambda");
-    await lambda.send(new InvokeCommand({
-      FunctionName: process.env.PROCESSING_FUNCTION,
-      InvocationType: "Event",
-      Payload: JSON.stringify({ ...event, slackBotToken: creds.token }),
-    }));
-
-    return { statusCode: 200, body: '{"message":"OK"}' };
-  } catch (error) {
-    log.error(`Error: ${error.message}`);
-    return { statusCode: error.message.includes("signature") ? 403 : 500, body: JSON.stringify({ error: error.message }) };
-  }
-}
-EOF
-```
-
-### Lambda - Processing function
-
-The Processing Lambda filters bot messages, posts a "Processing..." placeholder
-in the Slack thread, invokes the AgentCore Runtime, and converts the markdown
-response to Slack's `mrkdwn` format:
-
-```bash
-mkdir -p "${TMP_DIR}/${PROJECT_NAME}/lambda/processing"
-tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/package.json" << \EOF
-{
-  "name": "processing",
-  "version": "1.0.0",
-  "type": "commonjs",
-  "dependencies": {
-    "markdown-to-slack-mrkdwn": "^1.1.2"
-  }
-}
-EOF
-```
-
-```bash
-tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/index.mjs" << \EOF
-import {
-  BedrockAgentCoreClient,
-  InvokeAgentRuntimeCommand,
-} from "@aws-sdk/client-bedrock-agentcore";
-import https from "https";
-import { markdownToSlack, splitForSlack } from "markdown-to-slack-mrkdwn";
-
-const client = new BedrockAgentCoreClient();
-const LOG_LEVEL = process.env.LOG_LEVEL || "INFO";
-const log = {
-  debug: (msg) => LOG_LEVEL === "DEBUG" && console.log("[DEBUG]", msg),
-  info: (msg) => ["DEBUG", "INFO"].includes(LOG_LEVEL) && console.log("[INFO]", msg),
-  error: (msg) => console.error("[ERROR]", msg),
-};
-
-function callSlack(url, token, data) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(url, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-    }, (res) => {
-      let d = "";
-      res.on("data", (c) => (d += c));
-      res.on("end", () => { try { resolve(JSON.parse(d)); } catch { resolve(d); } });
-    });
-    req.on("error", reject);
-    req.write(JSON.stringify(data));
-    req.end();
-  });
-}
-
-async function invokeAgentCore(runtimeArn, prompt, sessionId) {
-  const payload = JSON.stringify({ prompt, sessionId, userId: sessionId });
-  const cmd = new InvokeAgentRuntimeCommand({
-    agentRuntimeArn: runtimeArn,
-    runtimeSessionId: sessionId,
-    accept: "application/json, text/event-stream",
-    contentType: "application/json",
-    payload: Buffer.from(payload),
-  });
-
-  const response = await client.send(cmd);
-  const chunks = [];
-  for await (const chunk of response.response) chunks.push(chunk);
-  const raw = Buffer.concat(chunks).toString("utf-8");
-
-  log.debug(`Raw response: ${raw.substring(0, 500)}`);
-
-  // Parse based on content type
-  if (response.contentType === "application/json") {
-    const data = JSON.parse(raw);
-    if (data.response) return data.response;
-    if (data.message?.content) return data.message.content.filter((i) => i.text).map((i) => i.text).join("\n");
-    return data.message || JSON.stringify(data);
-  }
-
-  // SSE or plain text
-  if (raw.includes("data: ")) {
-    return raw.split("\n").filter((l) => l.startsWith("data: ")).map((l) => l.slice(6).trim()).join("");
-  }
-  return raw;
-}
-
-export async function handler(event) {
-  log.debug(`Event: ${JSON.stringify(event)}`);
-
-  try {
-    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
-
-    if (body.type !== "event_callback" || !body.event) {
-      return { statusCode: 200, body: '{"message":"OK"}' };
-    }
-
-    const e = body.event;
-
-    // Filter: ignore bots, non-user, non-relevant events
-    if (e.bot_id || e.subtype === "bot_message" || e.subtype === "message_changed") {
-      log.info("Ignoring bot message");
-      return { statusCode: 200, body: '{"message":"ignored"}' };
-    }
-    if (!(e.type === "app_mention" || (e.type === "message" && e.channel_type === "im"))) {
-      return { statusCode: 200, body: '{"message":"OK"}' };
-    }
-    if (!e.user) return { statusCode: 200, body: '{"message":"no user"}' };
-
-    const slackBotToken = event.slackBotToken;
-    const threadTs = e.thread_ts || e.ts;
-
-    // Post "Processing..." placeholder
-    log.info("Processing event, posting processing message to Slack");
-    const posted = await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
-      channel: e.channel, text: "Processing your request...", thread_ts: threadTs,
-    });
-    if (!posted.ok || !posted.ts) {
-      log.error(`Slack postMessage failed: ${posted.error}`);
-      return { statusCode: 500, body: '{"error":"slack post failed"}' };
-    }
-
-    // Build session ID from thread timestamp
-    const sessionId = `slack-thread-${threadTs}`.replace(/\./g, "_").padEnd(33, "0");
-    const userMessage = (e.text || "").replace(/<@[A-Z0-9]+>/g, "").trim();
-
-    if (!userMessage) {
-      await callSlack("https://slack.com/api/chat.update", slackBotToken, {
-        channel: e.channel, ts: posted.ts, text: "I received an empty message. Please try again.",
-      });
-      return { statusCode: 200, body: '{"message":"empty"}' };
-    }
-
-    // Invoke AgentCore and get response
-    log.info(`Invoking AgentCore for session: ${sessionId}`);
-    let completion;
-    try {
-      completion = await invokeAgentCore(process.env.AGENT_CORE_RUNTIME_ARN, userMessage, sessionId);
-    } catch (err) {
-      log.error(`AgentCore error: ${err.name} ${err.message}`);
-      completion = "I'm experiencing technical difficulties. Please try again later.";
-    }
-
-    // Strip model thinking tags and convert to Slack format
-    completion = completion
-      .replace(/<thinking>[\s\S]*?<\/thinking>/gi, "")
-      .replace(/<response>([\s\S]*?)<\/response>/gi, "$1")
-      .trim() || "I received your message but got an empty response.";
-
-    const slackText = markdownToSlack(completion);
-
-    // Update the processing message with the first chunk
-    const chunks = splitForSlack(slackText, 3500);
-    log.info(`Updating message ts: ${posted.ts}`);
-    await callSlack("https://slack.com/api/chat.update", slackBotToken, {
-      channel: e.channel, ts: posted.ts, text: chunks[0],
-    });
-
-    // Send remaining chunks as thread replies
-    for (let i = 1; i < chunks.length; i++) {
-      await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
-        channel: e.channel, text: chunks[i], thread_ts: threadTs,
-      });
-    }
-
-    return { statusCode: 200, body: '{"message":"OK"}' };
-  } catch (error) {
-    log.error(`Processing error: ${error.message}`);
-    throw error;
-  }
-}
-EOF
-```
-
-### Agent Runtime (Python)
-
-The AgentCore Runtime is a Python application that runs on Bedrock AgentCore.
-It uses SigV4-signed requests to communicate with the MCP Gateway, discovers
-tools, and runs a tool-use loop with the Bedrock Converse API:
-
-```bash
-mkdir -p "${TMP_DIR}/${PROJECT_NAME}/agent-runtime"
-tee "${TMP_DIR}/${PROJECT_NAME}/agent-runtime/requirements.txt" << \EOF
-boto3==1.43.27
-bedrock-agentcore>=1.0.0
-urllib3>=2.0.0
-EOF
-```
-
-```bash
-tee "${TMP_DIR}/${PROJECT_NAME}/agent-runtime/agent_runtime.py" << \EOF
-"""
-Agent Runtime for Slack integration with Bedrock AgentCore.
-
-Uses BedrockAgentCoreApp runtime from bedrock-agentcore SDK:
-1. Receives prompts via /invocations (handled by @app.entrypoint)
-2. Calls AgentCore Gateway (Context7 MCP) for tool discovery and execution
-3. Uses Bedrock Converse API with tool-use loop for multi-step reasoning
-4. Returns final response
-"""
-
-import json
-import logging
-import os
-
-import boto3
-from botocore.auth import SigV4Auth
-from botocore.awsrequest import AWSRequest
-import urllib3
-
-from bedrock_agentcore.runtime import BedrockAgentCoreApp
-
-# Configuration
-GATEWAY_ARN = os.environ.get("GATEWAY_ARN", "")
-MODEL_ID = os.environ.get("MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
-AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
-GUARDRAIL_ID = os.environ.get("GUARDRAIL_ID", "")
-GUARDRAIL_VERSION = os.environ.get("GUARDRAIL_VERSION", "DRAFT")
-LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
-
-logging.basicConfig(level=getattr(logging, LOG_LEVEL))
-logger = logging.getLogger(__name__)
-
-gateway_id = GATEWAY_ARN.split("/")[-1] if "/" in GATEWAY_ARN else ""
-GATEWAY_URL = f"https://{gateway_id}.gateway.bedrock-agentcore.{AWS_REGION}.amazonaws.com/mcp"
-
-SYSTEM_PROMPT = """You are a helpful AI assistant integrated with Slack.
-You have access to Context7 documentation and code example tools through your MCP gateway.
-Use these tools to provide accurate, up-to-date information about programming libraries,
-frameworks, and their documentation.
-
-When answering questions:
-- Use the available tools to look up current documentation and code examples
-- Provide accurate, well-formatted responses suitable for Slack
-- Include code examples when relevant
-- Be concise but thorough
-- If you cannot find information, say so clearly rather than guessing
-"""
-
-bedrock_client = boto3.client("bedrock-runtime", region_name=AWS_REGION)
-http = urllib3.PoolManager()
-
-app = BedrockAgentCoreApp()
-
-
-# ---------------------------------------------------------------------------
-# MCP Gateway Client (SigV4-signed JSON-RPC)
-# ---------------------------------------------------------------------------
-
-def _mcp_request(method_name, params=None):
-    """Send a JSON-RPC request to the MCP Gateway."""
-    payload = {"jsonrpc": "2.0", "id": 1, "method": method_name}
-    if params:
-        payload["params"] = params
-
-    body = json.dumps(payload).encode()
-    headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
-
-    session = boto3.Session()
-    creds = session.get_credentials().get_frozen_credentials()
-    aws_req = AWSRequest(method="POST", url=GATEWAY_URL, data=body, headers=headers)
-    SigV4Auth(creds, "bedrock-agentcore", AWS_REGION).add_auth(aws_req)
-    signed = dict(aws_req.headers)
-    signed["Content-Type"] = "application/json"
-    signed["Accept"] = "application/json, text/event-stream"
-
-    resp = http.request("POST", GATEWAY_URL, body=body, headers=signed, timeout=30.0)
-    if resp.status != 200:
-        logger.error("MCP request failed: %d %s", resp.status, resp.data.decode())
-        return None
-
-    data = resp.data.decode()
-    if data.startswith("data:"):
-        for line in data.split("\n"):
-            if line.startswith("data:"):
-                json_str = line[5:].strip()
-                if json_str:
-                    return json.loads(json_str)
-    else:
-        return json.loads(data)
-    return None
-
-
-def get_mcp_tools():
-    """Fetch available tools from the MCP Gateway."""
-    _mcp_request("initialize", {
-        "protocolVersion": "2025-03-26",
-        "capabilities": {},
-        "clientInfo": {"name": "agentcore-runtime", "version": "1.0.0"},
-    })
-    _mcp_request("notifications/initialized")
-    result = _mcp_request("tools/list")
-    if not result or "result" not in result:
-        return []
-    tools = result["result"].get("tools", [])
-    logger.info("Discovered %d MCP tools", len(tools))
-    return tools
-
-
-def call_mcp_tool(tool_name, arguments):
-    """Call a tool via the MCP Gateway."""
-    result = _mcp_request("tools/call", {"name": tool_name, "arguments": arguments})
-    if not result or "result" not in result:
-        return {"error": f"Tool call failed: {result}"}
-    content = result["result"].get("content", [])
-    texts = [c.get("text", "") for c in content if c.get("type") == "text"]
-    return {"result": "\n".join(texts)} if texts else {"result": json.dumps(content)}
-
-
-# ---------------------------------------------------------------------------
-# Bedrock Converse with Tool-Use Loop
-# ---------------------------------------------------------------------------
-
-def invoke_with_tools(prompt, mcp_tools, max_iterations=5):
-    """Run the Bedrock Converse tool-use loop."""
-    messages = [{"role": "user", "content": [{"text": prompt}]}]
-
-    tool_config = None
-    if mcp_tools:
-        tool_configs = [{
-            "toolSpec": {
-                "name": t["name"],
-                "description": t.get("description", ""),
-                "inputSchema": {"json": t.get("inputSchema", {"type": "object", "properties": {}})},
-            }
-        } for t in mcp_tools]
-        tool_config = {"tools": tool_configs}
-
-    for _ in range(max_iterations):
-        kwargs = {"modelId": MODEL_ID, "messages": messages, "system": [{"text": SYSTEM_PROMPT}]}
-        if tool_config:
-            kwargs["toolConfig"] = tool_config
-        if GUARDRAIL_ID:
-            kwargs["guardrailConfig"] = {"guardrailIdentifier": GUARDRAIL_ID, "guardrailVersion": GUARDRAIL_VERSION}
-
-        response = bedrock_client.converse(**kwargs)
-        message = response["output"]["message"]
-        stop_reason = response.get("stopReason", "")
-        messages.append(message)
-
-        if stop_reason == "tool_use":
-            tool_results = []
-            for block in message.get("content", []):
-                if "toolUse" in block:
-                    tu = block["toolUse"]
-                    logger.info("Calling tool: %s", tu["name"])
-                    result = call_mcp_tool(tu["name"], tu.get("input", {}))
-                    tool_results.append({
-                        "toolResult": {
-                            "toolUseId": tu["toolUseId"],
-                            "content": [{"text": result.get("result", json.dumps(result))}],
-                        }
-                    })
-            messages.append({"role": "user", "content": tool_results})
-            continue
-
-        texts = [b.get("text", "") for b in message.get("content", []) if "text" in b]
-        return "\n".join(texts) if texts else "I processed your request but got an empty response."
-
-    return "I reached the maximum number of tool-use iterations. Here's what I have so far."
-
-
-# ---------------------------------------------------------------------------
-# AgentCore Runtime Entrypoint
-# ---------------------------------------------------------------------------
-
-@app.entrypoint
-def invoke(payload):
-    """Main agent entrypoint - handles /invocations."""
-    prompt = payload.get("prompt", "")
-    logger.info("Invocation - prompt: %s", prompt[:80])
-
-    # Debug mode
-    if prompt.strip().lower().startswith("debug:"):
-        debug_info = {"gateway_url": GATEWAY_URL, "gateway_arn": GATEWAY_ARN}
-        try:
-            debug_info["initialize_result"] = _mcp_request("initialize", {
-                "protocolVersion": "2025-03-26", "capabilities": {},
-                "clientInfo": {"name": "agentcore-runtime", "version": "1.0.0"},
-            })
-            debug_info["tools_list_result"] = _mcp_request("tools/list")
-        except Exception as e:
-            debug_info["error"] = str(e)
-        return {"response": json.dumps(debug_info, indent=2)}
-
-    # Fetch MCP tools and run tool-use loop
-    mcp_tools = []
-    if GATEWAY_ARN:
-        try:
-            mcp_tools = get_mcp_tools()
-        except Exception as e:
-            logger.warning("Failed to fetch MCP tools: %s", e)
-
-    result = invoke_with_tools(prompt, mcp_tools)
-
-    return {"response": result}
-
-
-if __name__ == "__main__":
-    app.run()
-EOF
-```
-
 ### Main OpenTofu configuration
 
-Write the main OpenTofu configuration that deploys all infrastructure
-components:
+Write the main OpenTofu configuration with provider setup, locals, and data
+sources:
 
-```bash
+```terraform
 tee "${TMP_DIR}/${PROJECT_NAME}/main.tf" << \EOF
 terraform {
   required_version = ">= 1.14"
@@ -794,7 +247,16 @@ locals {
 
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
+EOF
+```
 
+### Infrastructure resources
+
+Write the infrastructure resources (KMS, SSM, Lambda, API Gateway, S3,
+AgentCore):
+
+```terraform
+tee "${TMP_DIR}/${PROJECT_NAME}/infrastructure.tf" << \EOF
 # -----------------------------------------------------------------------------
 # KMS CMK - encrypts SSM SecureString parameters and CloudWatch log groups
 # -----------------------------------------------------------------------------
@@ -1293,6 +755,549 @@ resource "aws_bedrockagentcore_agent_runtime" "main" {
     GUARDRAIL_VERSION = "DRAFT"
   }
 }
+EOF
+```
+
+### OpenTofu variables
+
+Write the OpenTofu variables file:
+
+```terraform
+tee "${TMP_DIR}/${PROJECT_NAME}/variables.tf" << \EOF
+variable "aws_region" {
+  description = "AWS region for deployment"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "project_name" {
+  description = "Project name used for resource naming"
+  type        = string
+  default     = "slack-agentcore"
+}
+
+variable "slack_bot_token" {
+  description = "Slack Bot User OAuth Token (xoxb-...)"
+  type        = string
+  sensitive   = true
+}
+
+variable "slack_signing_secret" {
+  description = "Slack app signing secret for webhook verification"
+  type        = string
+  sensitive   = true
+}
+
+variable "foundation_model" {
+  description = "Bedrock foundation model ID for the agent"
+  type        = string
+  default     = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+}
+
+variable "tags" {
+  description = "Tags applied to all AWS resources"
+  type        = map(string)
+}
+EOF
+```
+
+### OpenTofu outputs
+
+```terraform
+tee "${TMP_DIR}/${PROJECT_NAME}/outputs.tf" << \EOF
+output "webhook_url" {
+  description = "Slack webhook URL to configure in Event Subscriptions"
+  value       = "${module.api_gateway.api_endpoint}/slack-events"
+}
+EOF
+```
+
+### Lambda - Verification function
+
+The Verification Lambda handles Slack URL verification challenges, validates
+webhook signatures using HMAC-SHA256 with timing-safe comparison, and
+async-invokes the Processing Lambda to meet Slack's 3-second response timeout:
+
+```javascript
+mkdir -p "${TMP_DIR}/${PROJECT_NAME}/lambda/verification"
+tee "${TMP_DIR}/${PROJECT_NAME}/lambda/verification/index.mjs" << \EOF
+import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
+import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
+import { createHmac, timingSafeEqual } from "crypto";
+
+const ssm = new SSMClient();
+const lambda = new LambdaClient();
+const LOG_LEVEL = process.env.LOG_LEVEL || "INFO";
+const log = {
+  debug: (msg) => LOG_LEVEL === "DEBUG" && console.log("[DEBUG]", msg),
+  info: (msg) => ["DEBUG", "INFO"].includes(LOG_LEVEL) && console.log("[INFO]", msg),
+  error: (msg) => console.error("[ERROR]", msg),
+};
+
+// Cache SSM parameters across warm invocations
+let cached = null;
+
+async function getCredentials() {
+  if (!cached) {
+    log.info("Fetching credentials from SSM Parameter Store");
+    const [token, secret] = await Promise.all([
+      ssm.send(new GetParameterCommand({ Name: process.env.SLACK_BOT_TOKEN_PARAM, WithDecryption: true })),
+      ssm.send(new GetParameterCommand({ Name: process.env.SLACK_SIGNING_SECRET_PARAM, WithDecryption: true })),
+    ]);
+    cached = { token: token.Parameter.Value, signingSecret: secret.Parameter.Value };
+  }
+  return cached;
+}
+
+function verifySignature(body, timestamp, signature, secret) {
+  const computed = `v0=${createHmac("sha256", secret).update(`v0:${timestamp}:${body}`).digest("hex")}`;
+  return timingSafeEqual(Buffer.from(signature), Buffer.from(computed));
+}
+
+export async function handler(event) {
+  log.debug(`Event: ${JSON.stringify(event)}`);
+
+  try {
+    const headers = event.headers || {};
+    const body = event.body;
+    const parsed = typeof body === "string" ? JSON.parse(body) : body;
+
+    // Slack URL verification challenge
+    if (parsed.type === "url_verification") {
+      log.info("URL verification challenge");
+      return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ challenge: parsed.challenge }) };
+    }
+
+    // Validate signature headers
+    const sig = headers["X-Slack-Signature"] || headers["x-slack-signature"];
+    const ts = headers["X-Slack-Request-Timestamp"] || headers["x-slack-request-timestamp"];
+    if (!sig || !ts || Math.abs(Date.now() / 1000 - parseInt(ts)) > 300) {
+      return { statusCode: 403, body: '{"error":"Invalid request"}' };
+    }
+
+    // Verify Slack signature
+    const creds = await getCredentials();
+    const rawBody = typeof body === "string" ? body : JSON.stringify(body);
+    if (!verifySignature(rawBody, ts, sig, creds.signingSecret)) {
+      log.info("Signature verification failed");
+      return { statusCode: 403, body: '{"error":"Invalid signature"}' };
+    }
+
+    // Async invoke processing Lambda
+    log.info("Signature verified, invoking processing Lambda");
+    await lambda.send(new InvokeCommand({
+      FunctionName: process.env.PROCESSING_FUNCTION,
+      InvocationType: "Event",
+      Payload: JSON.stringify({ ...event, slackBotToken: creds.token }),
+    }));
+
+    return { statusCode: 200, body: '{"message":"OK"}' };
+  } catch (error) {
+    log.error(`Error: ${error.message}`);
+    return { statusCode: error.message.includes("signature") ? 403 : 500, body: JSON.stringify({ error: error.message }) };
+  }
+}
+EOF
+```
+
+### Lambda - Processing function
+
+The Processing Lambda filters bot messages, posts a "Processing..." placeholder
+in the Slack thread, invokes the AgentCore Runtime, and converts the markdown
+response to Slack's `mrkdwn` format:
+
+```json
+mkdir -p "${TMP_DIR}/${PROJECT_NAME}/lambda/processing"
+tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/package.json" << \EOF
+{
+  "name": "processing",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "dependencies": {
+    "markdown-to-slack-mrkdwn": "^1.1.2"
+  }
+}
+EOF
+```
+
+```javascript
+tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/index.mjs" << \EOF
+import {
+  BedrockAgentCoreClient,
+  InvokeAgentRuntimeCommand,
+} from "@aws-sdk/client-bedrock-agentcore";
+import https from "https";
+import { markdownToSlack, splitForSlack } from "markdown-to-slack-mrkdwn";
+
+const client = new BedrockAgentCoreClient();
+const LOG_LEVEL = process.env.LOG_LEVEL || "INFO";
+const log = {
+  debug: (msg) => LOG_LEVEL === "DEBUG" && console.log("[DEBUG]", msg),
+  info: (msg) => ["DEBUG", "INFO"].includes(LOG_LEVEL) && console.log("[INFO]", msg),
+  error: (msg) => console.error("[ERROR]", msg),
+};
+
+function callSlack(url, token, data) {
+  return new Promise((resolve, reject) => {
+    const req = https.request(url, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    }, (res) => {
+      let d = "";
+      res.on("data", (c) => (d += c));
+      res.on("end", () => { try { resolve(JSON.parse(d)); } catch { resolve(d); } });
+    });
+    req.on("error", reject);
+    req.write(JSON.stringify(data));
+    req.end();
+  });
+}
+
+async function invokeAgentCore(runtimeArn, prompt, sessionId) {
+  const payload = JSON.stringify({ prompt, sessionId, userId: sessionId });
+  const cmd = new InvokeAgentRuntimeCommand({
+    agentRuntimeArn: runtimeArn,
+    runtimeSessionId: sessionId,
+    accept: "application/json, text/event-stream",
+    contentType: "application/json",
+    payload: Buffer.from(payload),
+  });
+
+  const response = await client.send(cmd);
+  const chunks = [];
+  for await (const chunk of response.response) chunks.push(chunk);
+  const raw = Buffer.concat(chunks).toString("utf-8");
+
+  log.debug(`Raw response: ${raw.substring(0, 500)}`);
+
+  // Parse based on content type
+  if (response.contentType === "application/json") {
+    const data = JSON.parse(raw);
+    if (data.response) return data.response;
+    if (data.message?.content) return data.message.content.filter((i) => i.text).map((i) => i.text).join("\n");
+    return data.message || JSON.stringify(data);
+  }
+
+  // SSE or plain text
+  if (raw.includes("data: ")) {
+    return raw.split("\n").filter((l) => l.startsWith("data: ")).map((l) => l.slice(6).trim()).join("");
+  }
+  return raw;
+}
+
+export async function handler(event) {
+  log.debug(`Event: ${JSON.stringify(event)}`);
+
+  try {
+    const body = typeof event.body === "string" ? JSON.parse(event.body) : event.body;
+
+    if (body.type !== "event_callback" || !body.event) {
+      return { statusCode: 200, body: '{"message":"OK"}' };
+    }
+
+    const e = body.event;
+
+    // Filter: ignore bots, non-user, non-relevant events
+    if (e.bot_id || e.subtype === "bot_message" || e.subtype === "message_changed") {
+      log.info("Ignoring bot message");
+      return { statusCode: 200, body: '{"message":"ignored"}' };
+    }
+    if (!(e.type === "app_mention" || (e.type === "message" && e.channel_type === "im"))) {
+      return { statusCode: 200, body: '{"message":"OK"}' };
+    }
+    if (!e.user) return { statusCode: 200, body: '{"message":"no user"}' };
+
+    const slackBotToken = event.slackBotToken;
+    const threadTs = e.thread_ts || e.ts;
+
+    // Post "Processing..." placeholder
+    log.info("Processing event, posting processing message to Slack");
+    const posted = await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
+      channel: e.channel, text: "Processing your request...", thread_ts: threadTs,
+    });
+    if (!posted.ok || !posted.ts) {
+      log.error(`Slack postMessage failed: ${posted.error}`);
+      return { statusCode: 500, body: '{"error":"slack post failed"}' };
+    }
+
+    // Build session ID from thread timestamp
+    const sessionId = `slack-thread-${threadTs}`.replace(/\./g, "_").padEnd(33, "0");
+    const userMessage = (e.text || "").replace(/<@[A-Z0-9]+>/g, "").trim();
+
+    if (!userMessage) {
+      await callSlack("https://slack.com/api/chat.update", slackBotToken, {
+        channel: e.channel, ts: posted.ts, text: "I received an empty message. Please try again.",
+      });
+      return { statusCode: 200, body: '{"message":"empty"}' };
+    }
+
+    // Invoke AgentCore and get response
+    log.info(`Invoking AgentCore for session: ${sessionId}`);
+    let completion;
+    try {
+      completion = await invokeAgentCore(process.env.AGENT_CORE_RUNTIME_ARN, userMessage, sessionId);
+    } catch (err) {
+      log.error(`AgentCore error: ${err.name} ${err.message}`);
+      completion = "I'm experiencing technical difficulties. Please try again later.";
+    }
+
+    // Strip model thinking tags and convert to Slack format
+    completion = completion
+      .replace(/<thinking>[\s\S]*?<\/thinking>/gi, "")
+      .replace(/<response>([\s\S]*?)<\/response>/gi, "$1")
+      .trim() || "I received your message but got an empty response.";
+
+    const slackText = markdownToSlack(completion);
+
+    // Update the processing message with the first chunk
+    const chunks = splitForSlack(slackText, 3500);
+    log.info(`Updating message ts: ${posted.ts}`);
+    await callSlack("https://slack.com/api/chat.update", slackBotToken, {
+      channel: e.channel, ts: posted.ts, text: chunks[0],
+    });
+
+    // Send remaining chunks as thread replies
+    for (let i = 1; i < chunks.length; i++) {
+      await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
+        channel: e.channel, text: chunks[i], thread_ts: threadTs,
+      });
+    }
+
+    return { statusCode: 200, body: '{"message":"OK"}' };
+  } catch (error) {
+    log.error(`Processing error: ${error.message}`);
+    throw error;
+  }
+}
+EOF
+```
+
+### Agent Runtime (Python)
+
+The AgentCore Runtime is a Python application that runs on Bedrock AgentCore.
+It uses SigV4-signed requests to communicate with the MCP Gateway, discovers
+tools, and runs a tool-use loop with the Bedrock Converse API:
+
+```bash
+mkdir -p "${TMP_DIR}/${PROJECT_NAME}/agent-runtime"
+tee "${TMP_DIR}/${PROJECT_NAME}/agent-runtime/requirements.txt" << \EOF
+boto3==1.43.27
+bedrock-agentcore>=1.0.0
+urllib3>=2.0.0
+EOF
+```
+
+```python
+tee "${TMP_DIR}/${PROJECT_NAME}/agent-runtime/agent_runtime.py" << \EOF
+"""
+Agent Runtime for Slack integration with Bedrock AgentCore.
+
+Uses BedrockAgentCoreApp runtime from bedrock-agentcore SDK:
+1. Receives prompts via /invocations (handled by @app.entrypoint)
+2. Calls AgentCore Gateway (Context7 MCP) for tool discovery and execution
+3. Uses Bedrock Converse API with tool-use loop for multi-step reasoning
+4. Returns final response
+"""
+
+import json
+import logging
+import os
+
+import boto3
+from botocore.auth import SigV4Auth
+from botocore.awsrequest import AWSRequest
+import urllib3
+
+from bedrock_agentcore.runtime import BedrockAgentCoreApp
+
+# Configuration
+GATEWAY_ARN = os.environ.get("GATEWAY_ARN", "")
+MODEL_ID = os.environ.get("MODEL_ID", "us.anthropic.claude-haiku-4-5-20251001-v1:0")
+AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
+GUARDRAIL_ID = os.environ.get("GUARDRAIL_ID", "")
+GUARDRAIL_VERSION = os.environ.get("GUARDRAIL_VERSION", "DRAFT")
+LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO")
+
+logging.basicConfig(level=getattr(logging, LOG_LEVEL))
+logger = logging.getLogger(__name__)
+
+gateway_id = GATEWAY_ARN.split("/")[-1] if "/" in GATEWAY_ARN else ""
+GATEWAY_URL = f"https://{gateway_id}.gateway.bedrock-agentcore.{AWS_REGION}.amazonaws.com/mcp"
+
+SYSTEM_PROMPT = """You are a helpful AI assistant integrated with Slack.
+You have access to Context7 documentation and code example tools through your MCP gateway.
+Use these tools to provide accurate, up-to-date information about programming libraries,
+frameworks, and their documentation.
+
+When answering questions:
+- Use the available tools to look up current documentation and code examples
+- Provide accurate, well-formatted responses suitable for Slack
+- Include code examples when relevant
+- Be concise but thorough
+- If you cannot find information, say so clearly rather than guessing
+"""
+
+bedrock_client = boto3.client("bedrock-runtime", region_name=AWS_REGION)
+http = urllib3.PoolManager()
+
+app = BedrockAgentCoreApp()
+
+
+# ---------------------------------------------------------------------------
+# MCP Gateway Client (SigV4-signed JSON-RPC)
+# ---------------------------------------------------------------------------
+
+def _mcp_request(method_name, params=None):
+    """Send a JSON-RPC request to the MCP Gateway."""
+    payload = {"jsonrpc": "2.0", "id": 1, "method": method_name}
+    if params:
+        payload["params"] = params
+
+    body = json.dumps(payload).encode()
+    headers = {"Content-Type": "application/json", "Accept": "application/json, text/event-stream"}
+
+    session = boto3.Session()
+    creds = session.get_credentials().get_frozen_credentials()
+    aws_req = AWSRequest(method="POST", url=GATEWAY_URL, data=body, headers=headers)
+    SigV4Auth(creds, "bedrock-agentcore", AWS_REGION).add_auth(aws_req)
+    signed = dict(aws_req.headers)
+    signed["Content-Type"] = "application/json"
+    signed["Accept"] = "application/json, text/event-stream"
+
+    resp = http.request("POST", GATEWAY_URL, body=body, headers=signed, timeout=30.0)
+    if resp.status != 200:
+        logger.error("MCP request failed: %d %s", resp.status, resp.data.decode())
+        return None
+
+    data = resp.data.decode()
+    if data.startswith("data:"):
+        for line in data.split("\n"):
+            if line.startswith("data:"):
+                json_str = line[5:].strip()
+                if json_str:
+                    return json.loads(json_str)
+    else:
+        return json.loads(data)
+    return None
+
+
+def get_mcp_tools():
+    """Fetch available tools from the MCP Gateway."""
+    _mcp_request("initialize", {
+        "protocolVersion": "2025-03-26",
+        "capabilities": {},
+        "clientInfo": {"name": "agentcore-runtime", "version": "1.0.0"},
+    })
+    _mcp_request("notifications/initialized")
+    result = _mcp_request("tools/list")
+    if not result or "result" not in result:
+        return []
+    tools = result["result"].get("tools", [])
+    logger.info("Discovered %d MCP tools", len(tools))
+    return tools
+
+
+def call_mcp_tool(tool_name, arguments):
+    """Call a tool via the MCP Gateway."""
+    result = _mcp_request("tools/call", {"name": tool_name, "arguments": arguments})
+    if not result or "result" not in result:
+        return {"error": f"Tool call failed: {result}"}
+    content = result["result"].get("content", [])
+    texts = [c.get("text", "") for c in content if c.get("type") == "text"]
+    return {"result": "\n".join(texts)} if texts else {"result": json.dumps(content)}
+
+
+# ---------------------------------------------------------------------------
+# Bedrock Converse with Tool-Use Loop
+# ---------------------------------------------------------------------------
+
+def invoke_with_tools(prompt, mcp_tools, max_iterations=5):
+    """Run the Bedrock Converse tool-use loop."""
+    messages = [{"role": "user", "content": [{"text": prompt}]}]
+
+    tool_config = None
+    if mcp_tools:
+        tool_configs = [{
+            "toolSpec": {
+                "name": t["name"],
+                "description": t.get("description", ""),
+                "inputSchema": {"json": t.get("inputSchema", {"type": "object", "properties": {}})},
+            }
+        } for t in mcp_tools]
+        tool_config = {"tools": tool_configs}
+
+    for _ in range(max_iterations):
+        kwargs = {"modelId": MODEL_ID, "messages": messages, "system": [{"text": SYSTEM_PROMPT}]}
+        if tool_config:
+            kwargs["toolConfig"] = tool_config
+        if GUARDRAIL_ID:
+            kwargs["guardrailConfig"] = {"guardrailIdentifier": GUARDRAIL_ID, "guardrailVersion": GUARDRAIL_VERSION}
+
+        response = bedrock_client.converse(**kwargs)
+        message = response["output"]["message"]
+        stop_reason = response.get("stopReason", "")
+        messages.append(message)
+
+        if stop_reason == "tool_use":
+            tool_results = []
+            for block in message.get("content", []):
+                if "toolUse" in block:
+                    tu = block["toolUse"]
+                    logger.info("Calling tool: %s", tu["name"])
+                    result = call_mcp_tool(tu["name"], tu.get("input", {}))
+                    tool_results.append({
+                        "toolResult": {
+                            "toolUseId": tu["toolUseId"],
+                            "content": [{"text": result.get("result", json.dumps(result))}],
+                        }
+                    })
+            messages.append({"role": "user", "content": tool_results})
+            continue
+
+        texts = [b.get("text", "") for b in message.get("content", []) if "text" in b]
+        return "\n".join(texts) if texts else "I processed your request but got an empty response."
+
+    return "I reached the maximum number of tool-use iterations. Here's what I have so far."
+
+
+# ---------------------------------------------------------------------------
+# AgentCore Runtime Entrypoint
+# ---------------------------------------------------------------------------
+
+@app.entrypoint
+def invoke(payload):
+    """Main agent entrypoint - handles /invocations."""
+    prompt = payload.get("prompt", "")
+    logger.info("Invocation - prompt: %s", prompt[:80])
+
+    # Debug mode
+    if prompt.strip().lower().startswith("debug:"):
+        debug_info = {"gateway_url": GATEWAY_URL, "gateway_arn": GATEWAY_ARN}
+        try:
+            debug_info["initialize_result"] = _mcp_request("initialize", {
+                "protocolVersion": "2025-03-26", "capabilities": {},
+                "clientInfo": {"name": "agentcore-runtime", "version": "1.0.0"},
+            })
+            debug_info["tools_list_result"] = _mcp_request("tools/list")
+        except Exception as e:
+            debug_info["error"] = str(e)
+        return {"response": json.dumps(debug_info, indent=2)}
+
+    # Fetch MCP tools and run tool-use loop
+    mcp_tools = []
+    if GATEWAY_ARN:
+        try:
+            mcp_tools = get_mcp_tools()
+        except Exception as e:
+            logger.warning("Failed to fetch MCP tools: %s", e)
+
+    result = invoke_with_tools(prompt, mcp_tools)
+
+    return {"response": result}
+
+
+if __name__ == "__main__":
+    app.run()
 EOF
 ```
 

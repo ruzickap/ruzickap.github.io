@@ -44,7 +44,7 @@ jobs:
           brew install mq
           echo '#!/usr/bin/env bash' > bash_commands_from_md.sh
           read -ra FILES <<< "${ALL_CHANGED_FILES}"
-          mq 'select(.code.lang == "bash" || .code.lang == "shell" || .code.lang == "sh") | to_text()' "${FILES[@]}" >> bash_commands_from_md.sh
+          mq 'select(.code.lang == "bash" || .code.lang == "shell" || .code.lang == "sh")' "${FILES[@]}" >> bash_commands_from_md.sh
           chmod a+x bash_commands_from_md.sh
 
       - name: Restore lychee cache
