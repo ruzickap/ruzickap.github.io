@@ -20,16 +20,17 @@ team to query programming libraries directly from Slack.
 The architecture uses a fully serverless approach: API Gateway receives Slack
 webhooks, Lambda functions handle verification and processing, and the
 AgentCore Runtime runs the AI agent with [Claude Haiku 4.5](https://docs.anthropic.com/en/docs/about-claude/models)
-as the foundation model. Security is handled via KMS encryption, Bedrock
-Guardrails (PII filtering + content moderation), and Slack signature
-verification.
+as the foundation model. Security is handled via WAF v2 (AWS Managed Rules +
+rate limiting), KMS encryption, Bedrock Guardrails (PII filtering + content
+moderation), and Slack signature verification.
 
 ```mermaid
 flowchart TD
   User(["👤 Slack User"])
 
   User -- "message / @mention" --> Slack
-  Slack -- "POST webhook" --> APIGW
+  Slack -- "POST webhook" --> WAF
+  WAF --> APIGW
   APIGW --> LV
   LV -- "async invoke" --> LP
   LP -- "invoke runtime" --> RT
@@ -39,6 +40,7 @@ flowchart TD
   BR --> Guard
 
   subgraph AWS["☁️ AWS us-east-1"]
+    WAF["🛡️ WAF v2"]
     APIGW["🌐 API Gateway"]
     subgraph Lambda["⚡ Lambda"]
       LV["🛡️ Verification"]
@@ -61,7 +63,8 @@ flowchart TD
 The request flow:
 
 1. A user sends a message in Slack (direct message or `@mention` in a channel).
-2. Slack sends a webhook POST request to API Gateway.
+2. Slack sends a webhook POST request which is inspected by WAF v2 (AWS Managed
+   Rules + rate limiting) before reaching API Gateway.
 3. The Verification Lambda retrieves Slack credentials from SSM Parameter Store
    and validates the request signature using HMAC-SHA256.
 4. After verification, it async-invokes the Processing Lambda and returns `200`
@@ -193,6 +196,7 @@ The OpenTofu configuration deploys the following components:
 - **Lambda (Verification)** - verifies Slack webhook signatures
 - **Lambda (Processing)** - invokes AgentCore and updates Slack messages
 - **API Gateway (HTTP API v2)** - single `POST /slack-events` route
+- **WAF v2** - protects API Gateway with AWS Managed Rules + rate limiting
 - **S3 Bucket** - stores the agent runtime zip (KMS-encrypted, versioned)
 - **Bedrock AgentCore Gateway** - MCP protocol gateway connecting to Context7
 - **Bedrock Guardrail** - content filtering + PII protection
@@ -212,7 +216,7 @@ terraform {
     aws = {
       source  = "hashicorp/aws"
       # renovate: datasource=terraform-provider depName=hashicorp/aws
-      version = "~> 6.0"
+      version = "6.49.0"
     }
   }
 }
@@ -252,10 +256,10 @@ EOF
 
 ### Infrastructure resources
 
-Write the infrastructure resources (KMS, SSM, Lambda, API Gateway, S3,
+Write the infrastructure resources (KMS, SSM, Lambda, API Gateway, WAF, S3,
 AgentCore):
 
-```hcl
+```bash
 tee "${TMP_DIR}/${PROJECT_NAME}/infrastructure.tf" << \EOF
 # -----------------------------------------------------------------------------
 # KMS CMK - encrypts SSM SecureString parameters and CloudWatch log groups
@@ -461,6 +465,60 @@ module "api_gateway" {
       protocol       = "$context.protocol"
       responseLength = "$context.responseLength"
     })
+  }
+}
+
+# -----------------------------------------------------------------------------
+# WAF v2 - Protects API Gateway with AWS Managed Rules + rate limiting
+# -----------------------------------------------------------------------------
+
+module "wafv2" {
+  source  = "terraform-aws-modules/wafv2/aws"
+  # renovate: datasource=terraform-module depName=terraform-aws-modules/wafv2/aws
+  version = "2.1.0"
+
+  name        = "${var.project_name}-waf"
+  description = "WAF Web ACL protecting Slack webhook API Gateway"
+
+  association_resource_arns = {
+    api_gateway = module.api_gateway.stage_arn
+  }
+
+  rules = {
+    aws-managed-common = {
+      priority        = 1
+      override_action = "none"
+
+      statement = {
+        managed_rule_group_statement = {
+          name        = "AWSManagedRulesCommonRuleSet"
+          vendor_name = "AWS"
+        }
+      }
+    }
+
+    aws-managed-known-bad-inputs = {
+      priority        = 2
+      override_action = "none"
+
+      statement = {
+        managed_rule_group_statement = {
+          name        = "AWSManagedRulesKnownBadInputsRuleSet"
+          vendor_name = "AWS"
+        }
+      }
+    }
+
+    rate-limit = {
+      priority = 3
+      action   = "block"
+
+      statement = {
+        rate_based_statement = {
+          limit = 2000
+        }
+      }
+    }
   }
 }
 
