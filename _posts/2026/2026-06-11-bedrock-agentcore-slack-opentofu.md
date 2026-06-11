@@ -37,30 +37,33 @@ flowchart TD
   SSM -. "decrypt" .-> KMS
   LV -- "async invoke" --> LP
   LP -- "invoke runtime" --> RT
-  RT -- "MCP tools/list + tools/call" --> GW
-  GW --> C7
   RT -- "Converse API" --> BR
   BR --> Guard
+  RT -- "MCP tools/list + tools/call" --> GW
+  GW -- "tools" --> C7
 
   subgraph AWS["AWS us-east-1"]
-    WAF["WAF v2\nCommonRuleSet\nKnownBadInputs\nRate Limit: 2000/5min"]
+    WAF["WAF v2"]
     KMS["KMS CMK"]
-    APIGW["API Gateway\nREST API v1"]
+    APIGW["API Gateway (REST API)"]
     SSM["SSM Parameter Store\n(Slack credentials)"]
     subgraph Lambda["Lambda"]
-      LV["Verification\n(signature check)"]
-      LP["Processing\n(async)"]
+      LV["Verification"]
+      LP["Processing"]
     end
     subgraph AgentCore["Bedrock AgentCore"]
-      RT["Runtime\n(Python)"]
-      GW["Gateway\n(MCP)"]
+      RT["Runtime"]
+      GW["Gateway"]
     end
-    BR["Bedrock\nClaude Haiku 4.5"]
+    BR["Bedrock\n(Claude Haiku 4.5)"]
     Guard["Guardrail\n(PII + content)"]
   end
 
   Slack["Slack"]
   C7["Context7\nMCP Server"]
+
+  style Lambda fill:#b45f06,stroke:#ed7100
+  style AgentCore fill:#0b5394,stroke:#8c4fff
 ```
 
 The request flow:
@@ -127,12 +130,10 @@ Bot Token and Signing Secret.
   ![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png)
   _Slack API - Create New App_
 1. Choose **From scratch**.
-
    ![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="400"}
    _Create an app - From scratch_
 1. Enter the **App Name** (`slack-agentcore`) and pick the workspace.
 1. Choose **Create App**.
-
    ![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
    _Name app and choose workspace_
 
@@ -152,7 +153,6 @@ Bot Token and Signing Secret.
   ![Install Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/6.AgentCore-Slack-AgentCoreWeatherAgent-Install-compressed.gif)
   _Installing the app to the workspace_
 1. Copy the **Bot User OAuth Token** (`xoxb-...`) - you will need this later.
-
    ![Copy OAuth Token](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/7.AgentCore-Slack-Copy-OAuthToken.png)
    _Copy the Bot User OAuth Token_
 
@@ -160,7 +160,6 @@ Bot Token and Signing Secret.
 
 1. Navigate to **Settings** > **Basic Information**.
 1. Under **Signing Secret**, choose **Show** and copy the value.
-
    ![Signing Secret](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/8.AgentCore-Slack-SigningSecret.png)
    _Copy the Signing Secret_
 
@@ -169,7 +168,6 @@ Bot Token and Signing Secret.
 1. Navigate to **Features** > **App Home**.
 1. Enable **Allow users to send Slash commands and messages from the messages
    tab**.
-
    ![Enable Slash Commands](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/9.AgentCore-Slack-Slack-SlashCommands-compressed.gif)
    _Enable direct messaging_
 
@@ -1578,7 +1576,7 @@ export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 
 ```sh
 aws s3 rb "s3://${PROJECT_NAME}-agent-code" --force || true
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve && \
+tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve &&
   aws s3 rm "s3://${PROJECT_NAME}" --recursive || true
 aws cloudformation delete-stack --stack-name "${PROJECT_NAME}-s3" || true
 rm -rf "${TMP_DIR:?}/${PROJECT_NAME:?}" agent-runtime.zip || true
