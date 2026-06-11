@@ -116,13 +116,13 @@ Bot Token and Signing Secret.
 
 1. Go to [Slack API](https://api.slack.com/apps) and choose **Create New App**.
 
-![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png)
+![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png)
 _Slack API - Create New App_
 
 {:start="2"}
 2. Choose **From scratch**.
 
-![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="400"}
+![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="400"}
 _Create an app - From scratch_
 
 {:start="3"}
@@ -130,7 +130,7 @@ _Create an app - From scratch_
 3. Enter the **App Name** (`slack-agentcore`) and pick the workspace.
 4. Choose **Create App**.
 
-![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
+![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
 _Name app and choose workspace_
 
 ### Configure OAuth & Permissions
@@ -143,19 +143,19 @@ _Name app and choose workspace_
    - `im:read`
    - `im:write`
 
-![Slack Scopes](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/5.AgentCore-Slack-Scopes-comp.gif)
+![Slack Scopes](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/5.AgentCore-Slack-Scopes-comp.gif)
 _Adding Bot Token Scopes_
 
 {:start="3"}
 3. Install the app to your workspace.
 
-![Install Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/6.AgentCore-Slack-AgentCoreWeatherAgent-Install-compressed.gif)
+![Install Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/6.AgentCore-Slack-AgentCoreWeatherAgent-Install-compressed.gif)
 _Installing the app to the workspace_
 
 {:start="4"}
 4. Copy the **Bot User OAuth Token** (`xoxb-...`) - you will need this later.
 
-![Copy OAuth Token](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/7.AgentCore-Slack-Copy-OAuthToken.png)
+![Copy OAuth Token](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/7.AgentCore-Slack-Copy-OAuthToken.png)
 _Copy the Bot User OAuth Token_
 
 ### Get the Signing Secret
@@ -163,7 +163,7 @@ _Copy the Bot User OAuth Token_
 1. Navigate to **Settings** > **Basic Information**.
 2. Under **Signing Secret**, choose **Show** and copy the value.
 
-![Signing Secret](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/8.AgentCore-Slack-SigningSecret.png)
+![Signing Secret](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/8.AgentCore-Slack-SigningSecret.png)
 _Copy the Signing Secret_
 
 ### Enable Direct Messages
@@ -172,7 +172,7 @@ _Copy the Signing Secret_
 2. Enable **Allow users to send Slash commands and messages from the messages
    tab**.
 
-![Enable Slash Commands](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/9.AgentCore-Slack-Slack-SlashCommands-compressed.gif)
+![Enable Slash Commands](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/9.AgentCore-Slack-Slack-SlashCommands-compressed.gif)
 _Enable direct messaging_
 
 Set the Slack credentials obtained above as OpenTofu variables:
@@ -1323,7 +1323,7 @@ app configuration.
 
 1. Return to [Slack API](https://api.slack.com/apps) and select your app.
 
-![Select Your Apps](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/10.AgentCore-Slack-Slack-Select-YourApps.png)
+![Select Your Apps](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/10.AgentCore-Slack-Slack-Select-YourApps.png)
 _Select your Slack app_
 
 {:start="2"}
@@ -1339,14 +1339,14 @@ _Select your Slack app_
 
 6. Choose **Save Changes**.
 
-![Event Subscriptions](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/11.AgentCore-Slack-EventSubscriptions-Comp.gif)
+![Event Subscriptions](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/11.AgentCore-Slack-EventSubscriptions-Comp.gif)
 _Configure Event Subscriptions with the webhook URL_
 
 {:start="7"}
 7. Navigate to **Settings** > **Install App** and choose **Reinstall** to apply
    the new event subscriptions.
 
-![Reinstall Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/12.AgentCore-Slack-ReinstallSlackApp-compressed.gif)
+![Reinstall Slack App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/12.AgentCore-Slack-ReinstallSlackApp-compressed.gif)
 _Reinstall the app to activate event subscriptions_
 
 ## Test the integration
@@ -1354,20 +1354,20 @@ _Reinstall the app to activate event subscriptions_
 Locate the app in the **Apps** section of Slack. You can invite it to a channel
 with `/invite @slack-agentcore`, or message it directly.
 
-![Add Agent App in Slack](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/13.AgentCore-Slack-AddAgent-App-in-Slack-compressed.gif)
+![Add Agent App in Slack](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/13.AgentCore-Slack-AddAgent-App-in-Slack-compressed.gif)
 _Adding the bot to a Slack channel_
 
 **Direct messaging**: Go to the app in the Apps section and chat one-on-one.
 The bot posts "Processing your request..." as an initial response, then
 replaces it with the actual answer from AgentCore.
 
-![Slack Conversation](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/14.AgentCore-Slack-AgentCore-Slack-Conversation-compressed.gif)
+![Slack Conversation](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/14.AgentCore-Slack-AgentCore-Slack-Conversation-compressed.gif)
 _Direct conversation with the AgentCore bot_
 
 **Channel integration**: Mention `@slack-agentcore` in any channel where the
 bot is installed.
 
-![Channel Integration](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/main/Images/15.AgentCore-Slack-Channel-Integration.png)
+![Channel Integration](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/15.AgentCore-Slack-Channel-Integration.png)
 _Channel integration - mentioning the bot_
 
 ## Architecture details
