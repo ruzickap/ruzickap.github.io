@@ -10,6 +10,7 @@ image: https://user-images.githubusercontent.com/819186/51553744-4130b580-1e7c-1
 ---
 
 > This post was inspired by [Integrating Amazon Bedrock AgentCore with Slack](https://github.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack)
+> and many screenshots are reused from that repository.
 
 It walks through deploying a [Slack](https://slack.com/) bot powered by
 [Amazon Bedrock AgentCore](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/agentcore-get-started-toolkit.html)
@@ -17,21 +18,23 @@ using [OpenTofu](https://opentofu.org/). The bot integrates [Context7](https://c
 MCP tools for real-time documentation and code example lookups, enabling your
 team to query programming libraries directly from Slack.
 
-The architecture uses a fully serverless approach: API Gateway receives Slack
-webhooks, Lambda functions handle verification and processing, and the
-AgentCore Runtime runs the AI agent with [Claude Haiku 4.5](https://docs.anthropic.com/en/docs/about-claude/models)
-as the foundation model. Security is handled via WAF v2 (AWS Managed Rules +
-rate limiting), KMS encryption, Bedrock Guardrails (PII filtering + content
-moderation), and Slack signature verification.
+The architecture uses a fully serverless approach: API Gateway (REST API)
+receives Slack webhooks, Lambda functions handle verification and processing,
+and the AgentCore Runtime runs the AI agent with [Claude Haiku 4.5](https://docs.anthropic.com/en/docs/about-claude/models)
+as the foundation model. Security is handled via WAF v2 (AWS Managed Rules
+Common + Known Bad Inputs + rate limiting), KMS encryption, Bedrock Guardrails
+(PII filtering + content moderation), and Slack signature verification.
 
 ```mermaid
 flowchart TD
-  User(["👤 Slack User"])
+  User(["Slack User"])
 
   User -- "message / @mention" --> Slack
   Slack -- "POST webhook" --> WAF
-  WAF --> APIGW
-  APIGW --> LV
+  WAF -- "allowed" --> APIGW
+  APIGW -- "POST /slack-events" --> LV
+  LV -- "get credentials" --> SSM
+  SSM -. "decrypt" .-> KMS
   LV -- "async invoke" --> LP
   LP -- "invoke runtime" --> RT
   RT -- "MCP tools/list + tools/call" --> GW
@@ -39,45 +42,48 @@ flowchart TD
   RT -- "Converse API" --> BR
   BR --> Guard
 
-  subgraph AWS["☁️ AWS us-east-1"]
-    WAF["🛡️ WAF v2"]
-    APIGW["🌐 API Gateway"]
-    subgraph Lambda["⚡ Lambda"]
-      LV["🛡️ Verification"]
-      LP["⚙️ Processing"]
+  subgraph AWS["AWS us-east-1"]
+    WAF["WAF v2\nCommonRuleSet\nKnownBadInputs\nRate Limit: 2000/5min"]
+    KMS["KMS CMK"]
+    APIGW["API Gateway\nREST API v1"]
+    SSM["SSM Parameter Store\n(Slack credentials)"]
+    subgraph Lambda["Lambda"]
+      LV["Verification\n(signature check)"]
+      LP["Processing\n(async)"]
     end
-    subgraph AgentCore["🧠 Bedrock AgentCore"]
-      RT["🤖 Runtime\n(Python)"]
-      GW["🔌 Gateway\n(MCP)"]
+    subgraph AgentCore["Bedrock AgentCore"]
+      RT["Runtime\n(Python)"]
+      GW["Gateway\n(MCP)"]
     end
-    BR["🧠 Bedrock\nClaude Haiku 4.5"]
-    Guard["🔒 Guardrail"]
+    BR["Bedrock\nClaude Haiku 4.5"]
+    Guard["Guardrail\n(PII + content)"]
   end
 
-  subgraph External["🌐 External"]
-    Slack["💬 Slack"]
-    C7["📚 Context7\nMCP Server"]
-  end
+  Slack["Slack"]
+  C7["Context7\nMCP Server"]
 ```
 
 The request flow:
 
 1. A user sends a message in Slack (direct message or `@mention` in a channel).
-2. Slack sends a webhook POST request which is inspected by WAF v2 (AWS Managed
-   Rules + rate limiting) before reaching API Gateway.
-3. The Verification Lambda retrieves Slack credentials from SSM Parameter Store
+2. Slack sends a webhook POST request which passes through WAF v2 — requests
+   matching AWS Managed Rules (Common Rule Set, Known Bad Inputs) are blocked,
+   and IPs exceeding 2000 requests per 5 minutes are rate-limited.
+3. The REST API Gateway routes `POST /slack-events` to the Verification Lambda
+   via AWS_PROXY integration.
+4. The Verification Lambda retrieves Slack credentials from SSM Parameter Store
    and validates the request signature using HMAC-SHA256.
-4. After verification, it async-invokes the Processing Lambda and returns `200`
+5. After verification, it async-invokes the Processing Lambda and returns `200`
    immediately (meeting Slack's 3-second timeout).
-5. The Processing Lambda posts a "Processing your request..." placeholder in
+6. The Processing Lambda posts a "Processing your request..." placeholder in
    the Slack thread.
-6. It invokes the AgentCore Runtime with the user's query and a session ID
+7. It invokes the AgentCore Runtime with the user's query and a session ID
    derived from the thread timestamp.
-7. The Runtime discovers tools from the MCP Gateway (Context7) and runs a
+8. The Runtime discovers tools from the MCP Gateway (Context7) and runs a
    tool-use loop with the Bedrock Converse API.
-8. The Bedrock Guardrail enforces content filtering and PII protection.
-9. The response is converted to Slack's `mrkdwn` format and updates the
-   placeholder message.
+9. The Bedrock Guardrail enforces content filtering and PII protection.
+10. The response is converted to Slack's `mrkdwn` format and updates the
+    placeholder message.
 
 ## Requirements
 
@@ -181,8 +187,8 @@ _Enable direct messaging_
 Set the Slack credentials obtained above as OpenTofu variables:
 
 ```bash
-export TF_VAR_slack_bot_token="${SLACK_BOT_TOKEN}"
-export TF_VAR_slack_signing_secret="${SLACK_SIGNING_SECRET}"
+export TF_VAR_slack_bot_token="${MY_SLACK_BOT_TOKEN}"
+export TF_VAR_slack_signing_secret="${MY_SLACK_BOT_SIGNING_SECRET}"
 ```
 
 ## Deploy the infrastructure with OpenTofu
@@ -195,7 +201,8 @@ The OpenTofu configuration deploys the following components:
 - **SSM Parameter Store** - stores Slack credentials as SecureString
 - **Lambda (Verification)** - verifies Slack webhook signatures
 - **Lambda (Processing)** - invokes AgentCore and updates Slack messages
-- **API Gateway (HTTP API v2)** - single `POST /slack-events` route
+- **API Gateway (REST API)** - single `POST /slack-events` route with Lambda
+  proxy integration
 - **WAF v2** - protects API Gateway with AWS Managed Rules + rate limiting
 - **S3 Bucket** - stores the agent runtime zip (KMS-encrypted, versioned)
 - **Bedrock AgentCore Gateway** - MCP protocol gateway connecting to Context7
@@ -207,7 +214,7 @@ The OpenTofu configuration deploys the following components:
 Write the main OpenTofu configuration with provider setup, locals, and data
 sources:
 
-```hcl
+```terraform
 tee "${TMP_DIR}/${PROJECT_NAME}/main.tf" << \EOF
 terraform {
   required_version = ">= 1.14"
@@ -368,7 +375,7 @@ module "lambda_verification" {
   allowed_triggers = {
     api_gateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
+      source_arn = "${module.api_gateway.execution_arn}/*/*"
     }
   }
 }
@@ -424,47 +431,56 @@ module "lambda_processing" {
 }
 
 # -----------------------------------------------------------------------------
-# API Gateway (HTTP API v2)
+# API Gateway Account Settings (required for REST API CloudWatch logging)
+# -----------------------------------------------------------------------------
+
+module "api_gateway_account_settings" {
+  source  = "cloudposse/api-gateway/aws//modules/account-settings"
+  # renovate: datasource=terraform-module depName=cloudposse/api-gateway/aws
+  version = "0.9.0"
+
+  name      = "${var.project_name}-apigw"
+  namespace = ""
+}
+
+# -----------------------------------------------------------------------------
+# API Gateway (REST API v1) - uses cloudposse module with OpenAPI spec
 # -----------------------------------------------------------------------------
 
 module "api_gateway" {
-  source  = "terraform-aws-modules/apigateway-v2/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/apigateway-v2/aws
-  version = "6.1.0"
+  depends_on = [module.api_gateway_account_settings]
 
-  name          = "${var.project_name}-api"
-  description   = "Slack webhook endpoint for Bedrock AgentCore integration"
-  protocol_type = "HTTP"
+  source  = "cloudposse/api-gateway/aws"
+  # renovate: datasource=terraform-module depName=cloudposse/api-gateway/aws
+  version = "0.9.0"
 
-  create_domain_name    = false
-  create_domain_records = false
-  create_certificate    = false
+  name      = var.project_name
+  namespace = ""
 
-  disable_execute_api_endpoint = false
+  endpoint_type        = "REGIONAL"
+  stage_name           = "v1"
+  logging_level        = "INFO"
+  metrics_enabled      = true
+  xray_tracing_enabled = false
 
-  routes = {
-    "POST /slack-events" = {
-      integration = {
-        uri                    = module.lambda_verification.lambda_function_arn
-        payload_format_version = "2.0"
-        timeout_milliseconds   = 10000
+  openapi_config = {
+    openapi = "3.0.1"
+    info = {
+      title   = "${var.project_name}-api"
+      version = "1.0"
+    }
+    paths = {
+      "/slack-events" = {
+        post = {
+          x-amazon-apigateway-integration = {
+            httpMethod           = "POST"
+            type                 = "AWS_PROXY"
+            uri                  = "arn:aws:apigateway:${data.aws_region.current.region}:lambda:path/2015-03-31/functions/${module.lambda_verification.lambda_function_arn}/invocations"
+            payloadFormatVersion = "1.0"
+          }
+        }
       }
     }
-  }
-
-  stage_access_log_settings = {
-    create_log_group            = true
-    log_group_retention_in_days = 1
-    format = jsonencode({
-      requestId      = "$context.requestId"
-      ip             = "$context.identity.sourceIp"
-      requestTime    = "$context.requestTime"
-      httpMethod     = "$context.httpMethod"
-      routeKey       = "$context.routeKey"
-      status         = "$context.status"
-      protocol       = "$context.protocol"
-      responseLength = "$context.responseLength"
-    })
   }
 }
 
@@ -509,6 +525,8 @@ module "wafv2" {
       }
     }
 
+    # Block any single IP exceeding 2000 requests in a 5-minute window
+    # (2000 is the minimum allowed value for rate_based_statement limit)
     rate-limit = {
       priority = 3
       action   = "block"
@@ -820,7 +838,7 @@ EOF
 
 Write the OpenTofu variables file:
 
-```hcl
+```terraform
 tee "${TMP_DIR}/${PROJECT_NAME}/variables.tf" << \EOF
 variable "aws_region" {
   description = "AWS region for deployment"
@@ -861,11 +879,11 @@ EOF
 
 ### OpenTofu outputs
 
-```hcl
+```terraform
 tee "${TMP_DIR}/${PROJECT_NAME}/outputs.tf" << \EOF
 output "webhook_url" {
   description = "Slack webhook URL to configure in Event Subscriptions"
-  value       = "${module.api_gateway.api_endpoint}/slack-events"
+  value       = "${module.api_gateway.invoke_url}/slack-events"
 }
 EOF
 ```
@@ -1473,6 +1491,21 @@ for documentation and code example lookups.
 Destroy all resources created by OpenTofu:
 
 ![Clean-up](https://raw.githubusercontent.com/cubanpit/cleanupdate/7aaccaa36ab4888a0847b267ed24d079dfed7863/icons/cleanupdate.svg){:width="100"}
+
+Set environment variables:
+
+```sh
+# AWS Region
+export AWS_REGION="${AWS_REGION:-us-east-1}"
+# Project name used for resource naming
+export PROJECT_NAME="${PROJECT_NAME:-slack-agentcore}"
+# OpenTofu variables
+export TF_VAR_tags="{\"Owner\":\"${MY_EMAIL:-petr.ruzicka@gmail.com}\",\"Environment\":\"dev\",\"Managed-by\":\"opentofu\"}"
+export TF_VAR_slack_bot_token="anything"
+export TF_VAR_slack_signing_secret="anything"
+# Working directory
+export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
+```
 
 ```sh
 tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve
