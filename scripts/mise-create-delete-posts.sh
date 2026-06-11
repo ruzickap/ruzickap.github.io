@@ -28,24 +28,22 @@ echo "set -euxo pipefail" > "${RUN_FILE}"
 
 case "${1%:*}" in
   create)
-    MQ_CODE_BLOCK="bash"
     for ((idx = ${#POSTS[@]} - 1; idx >= 0; idx--)); do
-      POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POSTS[idx]}*.md")")
+      POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POSTS[idx]}*.md")")
     done
+    mq 'select(.code.lang == "bash" || .code.lang == "terraform" || .code.lang == "javascript" || .code.lang == "json" || .code.lang == "python") | to_text()' "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
     ;;
   delete)
-    MQ_CODE_BLOCK="sh"
     for POST_FILE in "${POSTS[@]}"; do
-      POST_FILES_ARRAY+=("$(find "${PWD}/_posts" -type f -name "*${POST_FILE}*.md")")
+      POST_FILES_ARRAY+=("$(find _posts -type f -name "*${POST_FILE}*.md")")
     done
+    mq 'select(.code.lang == "sh") | to_text()' "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
     ;;
   *)
     echo "Unknown action: ${1%:*}. Expected 'create' or 'delete'."
     exit 1
     ;;
 esac
-
-mq "select(.code.lang == \"${MQ_CODE_BLOCK}\") | to_text()" "${POST_FILES_ARRAY[@]}" >> "${RUN_FILE}"
 
 chmod a+x "${RUN_FILE}"
 echo "⏰ *** $(date)"

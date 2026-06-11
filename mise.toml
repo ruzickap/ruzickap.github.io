@@ -294,6 +294,17 @@ description = 'Delete: Amazon EKS with Open WebUI and AWS Bedrock managed by Ope
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
+# Amazon Bedrock AgentCore Slack Bot deployed with OpenTofu
+#------------------------------------------------------------------------------
+[tasks."create:2026-06-11-bedrock-agentcore-slack-opentofu"]
+description = 'Create: Amazon Bedrock AgentCore Slack Bot deployed with OpenTofu'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2026-06-11-bedrock-agentcore-slack-opentofu"]
+description = 'Delete: Amazon Bedrock AgentCore Slack Bot deployed with OpenTofu'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
 # Create and delete all posts
 #------------------------------------------------------------------------------
 [tasks."create-delete:posts:all"]
