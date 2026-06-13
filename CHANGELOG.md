@@ -1,5 +1,63 @@
 # Changelog
 
+## 1.0.0 (2026-06-13)
+
+
+### Features
+
+* add .lycheeignore and update exclusions in lychee.toml ([#384](https://github.com/ruzickap/ruzickap.github.io/issues/384)) ([2360dd7](https://github.com/ruzickap/ruzickap.github.io/commit/2360dd78b35ac420f882064ebd9ab2bf077b1e71))
+* add amazon eks envoy gateway argocd blog post ([#509](https://github.com/ruzickap/ruzickap.github.io/issues/509)) ([488baa0](https://github.com/ruzickap/ruzickap.github.io/commit/488baa0459b39f9c0f3f0736d61e1db5f3211a08))
+* add amazon-eks-grafana-stack post ([#457](https://github.com/ruzickap/ruzickap.github.io/issues/457)) ([dd1734e](https://github.com/ruzickap/ruzickap.github.io/commit/dd1734eb754399da97ef3debace91830f3043efb))
+* add commit-check and remove semantic-pull-request ([#415](https://github.com/ruzickap/ruzickap.github.io/issues/415)) ([9914938](https://github.com/ruzickap/ruzickap.github.io/commit/99149380039f1a29ff3ad69c327558929fa474c4))
+* add default github repo files ([#381](https://github.com/ruzickap/ruzickap.github.io/issues/381)) ([9b7799c](https://github.com/ruzickap/ruzickap.github.io/commit/9b7799cffe58c4b5c41660c7c007588f77c5fef3))
+* add default github repo files ([#399](https://github.com/ruzickap/ruzickap.github.io/issues/399)) ([269f5f3](https://github.com/ruzickap/ruzickap.github.io/commit/269f5f3471ade5ab7e6eb2cf846ad85e4afbbf93))
+* add eks auto mode bootstrap with ack and kro blog post ([#505](https://github.com/ruzickap/ruzickap.github.io/issues/505)) ([27cf8b8](https://github.com/ruzickap/ruzickap.github.io/commit/27cf8b87800c8db0a28af6e0e3fc4b7aea864b0e))
+* add Mastodon ([fe8b047](https://github.com/ruzickap/ruzickap.github.io/commit/fe8b04741bf005ac5917926c9b1d28582e92f3b4))
+* add mcp-servers-k8s ([#392](https://github.com/ruzickap/ruzickap.github.io/issues/392)) ([16ceb77](https://github.com/ruzickap/ruzickap.github.io/commit/16ceb77c14835ce56b28d811cd37575306eca61f))
+* add mise, refactor cleanup sections ([#370](https://github.com/ruzickap/ruzickap.github.io/issues/370)) ([db32565](https://github.com/ruzickap/ruzickap.github.io/commit/db3256526b7b6877fcf1412da8588f26afbdc759))
+* add old posts form my linux-old blog ([#492](https://github.com/ruzickap/ruzickap.github.io/issues/492)) ([c979076](https://github.com/ruzickap/ruzickap.github.io/commit/c979076b679bf712417b55595c960b697352193d))
+* add ollama-k8s-exploitation post ([#393](https://github.com/ruzickap/ruzickap.github.io/issues/393)) ([edf784e](https://github.com/ruzickap/ruzickap.github.io/commit/edf784ea035802f1999a865677e8a6e16433e442))
+* add posts from linux.xvx.cz ([#494](https://github.com/ruzickap/ruzickap.github.io/issues/494)) ([6fb9a4a](https://github.com/ruzickap/ruzickap.github.io/commit/6fb9a4a327d3ac89c8b82d02076720560a5a0505))
+* add pre-build script to fetch and inject VS Code settings ([#382](https://github.com/ruzickap/ruzickap.github.io/issues/382)) ([e97f2e4](https://github.com/ruzickap/ruzickap.github.io/commit/e97f2e4eb3f85be2a437151392ffd65d002252ba))
+* add/update default repository files ([#400](https://github.com/ruzickap/ruzickap.github.io/issues/400)) ([d022f0f](https://github.com/ruzickap/ruzickap.github.io/commit/d022f0fc667a20b5d47cd2083cec05792c5c7b7a))
+* deploy Open WebUI on EKS with LiteLLM and OpenTofu ([#528](https://github.com/ruzickap/ruzickap.github.io/issues/528)) ([a1130c3](https://github.com/ruzickap/ruzickap.github.io/commit/a1130c3125ff86c2adbfff0922d525d5f5782c23))
+* Enhance command extraction in post_tests.yml using mdq ([#354](https://github.com/ruzickap/ruzickap.github.io/issues/354)) ([d322b2d](https://github.com/ruzickap/ruzickap.github.io/commit/d322b2db2391a5f466fd0eb333a42b289cd64272))
+* **gh:** add default github repo files ([#374](https://github.com/ruzickap/ruzickap.github.io/issues/374)) ([5e49c3a](https://github.com/ruzickap/ruzickap.github.io/commit/5e49c3a8c5a9ba26500a3ac40d6bd270bff1f38f))
+* show archived label for archived repositories in projects ([#524](https://github.com/ruzickap/ruzickap.github.io/issues/524)) ([5d138ac](https://github.com/ruzickap/ruzickap.github.io/commit/5d138acf60fa0e6443a1aba53dfc1d421e09d184))
+* update blog posts with new categories and tags ([#495](https://github.com/ruzickap/ruzickap.github.io/issues/495)) ([7e7c485](https://github.com/ruzickap/ruzickap.github.io/commit/7e7c485642d668ec61d460b790d9ee37b49e8481))
+* update helm chart versions for mcp-servers-k8s ([#397](https://github.com/ruzickap/ruzickap.github.io/issues/397)) ([cbaf906](https://github.com/ruzickap/ruzickap.github.io/commit/cbaf9063ddb9a56da4ae3d01b4334dea23574ee7))
+
+
+### Bug Fixes
+
+* add bundle install step before jekyll build ([#523](https://github.com/ruzickap/ruzickap.github.io/issues/523)) ([f0dc1b2](https://github.com/ruzickap/ruzickap.github.io/commit/f0dc1b234dca1a6a30b9016a0371cfec8c732e33))
+* add sleep before disassociating AWS Route 53 Resolver query log config for stability ([#398](https://github.com/ruzickap/ruzickap.github.io/issues/398)) ([43a10be](https://github.com/ruzickap/ruzickap.github.io/commit/43a10be54b861c6e011dfa29a0550d39f358dfab))
+* correct hostname retrieval in assume-role command ([#389](https://github.com/ruzickap/ruzickap.github.io/issues/389)) ([0623ed4](https://github.com/ruzickap/ruzickap.github.io/commit/0623ed46193aa26aa4d81ae161dbf57bf1501807))
+* exclude LinkedIn from lychee link checker ([#519](https://github.com/ruzickap/ruzickap.github.io/issues/519)) ([414ee84](https://github.com/ruzickap/ruzickap.github.io/commit/414ee840c5b1cb7f3499c9f8bfa2e5fd955d3efd))
+* fix separator in docs-confluence-sync ([#441](https://github.com/ruzickap/ruzickap.github.io/issues/441)) ([ad7767d](https://github.com/ruzickap/ruzickap.github.io/commit/ad7767d170b78d3a5dab691003e975407c219fa9))
+* fix velero backups ([#442](https://github.com/ruzickap/ruzickap.github.io/issues/442)) ([38d641f](https://github.com/ruzickap/ruzickap.github.io/commit/38d641fa8eb16e2445ca71c7255cfcd772d07f3c))
+* ignore copilot agent workflows in projects generator ([#518](https://github.com/ruzickap/ruzickap.github.io/issues/518)) ([eef1532](https://github.com/ruzickap/ruzickap.github.io/commit/eef153226f345036814afd33435944cee7e02afd))
+* improve logging format in post_tests.yml for build and destroy actions ([#365](https://github.com/ruzickap/ruzickap.github.io/issues/365)) ([e316517](https://github.com/ruzickap/ruzickap.github.io/commit/e31651777c4e98be3bb5fab496619ef2a8f16e29))
+* pin base image digest in OCI base.name label ([#537](https://github.com/ruzickap/ruzickap.github.io/issues/537)) ([9773524](https://github.com/ruzickap/ruzickap.github.io/commit/9773524d45a04818b093197ea198cca93d23faa7))
+* remove hidden Unicode characters (non-breaking spaces) from posts ([#532](https://github.com/ruzickap/ruzickap.github.io/issues/532)) ([e776c0a](https://github.com/ruzickap/ruzickap.github.io/commit/e776c0a53ad290e82aef2cfc098b8e98883f831a))
+* remove image tag from mcp-servers-k8s configuration ([#394](https://github.com/ruzickap/ruzickap.github.io/issues/394)) ([dc88521](https://github.com/ruzickap/ruzickap.github.io/commit/dc885218b46ebbf6f525a705e2f398209263cd39))
+* rename AWS_REGION to AWS_DEFAULT_REGION across blog posts ([#498](https://github.com/ruzickap/ruzickap.github.io/issues/498)) ([498c0bc](https://github.com/ruzickap/ruzickap.github.io/commit/498c0bcbfa06bff414b2b0173dc6b8f0d2bed5a8))
+* replace dots with dashes in generated labels for tags ([#501](https://github.com/ruzickap/ruzickap.github.io/issues/501)) ([0fa50c8](https://github.com/ruzickap/ruzickap.github.io/commit/0fa50c88979ca6e1d0acdee9bae055eca712ef20))
+* restrict unknown actions to only allow 'build' ([#378](https://github.com/ruzickap/ruzickap.github.io/issues/378)) ([30b3993](https://github.com/ruzickap/ruzickap.github.io/commit/30b3993c8ee7c88fe82fef29f9925e83c0a22ce0))
+* set default TMP_DIR to a subdirectory under PWD ([#506](https://github.com/ruzickap/ruzickap.github.io/issues/506)) ([2d98667](https://github.com/ruzickap/ruzickap.github.io/commit/2d9866728394d179510e8208de3bb5c1572cb946))
+* source generated script and move env vars to post ([#527](https://github.com/ruzickap/ruzickap.github.io/issues/527)) ([aa18376](https://github.com/ruzickap/ruzickap.github.io/commit/aa183766416456e77987c6c9a2daa72b8627aa90))
+* streamline command execution in post_tests.yml ([#355](https://github.com/ruzickap/ruzickap.github.io/issues/355)) ([56b9806](https://github.com/ruzickap/ruzickap.github.io/commit/56b9806429bbc1a462ea4784ac9e2a8e6290fbb6))
+* update AWS CLI URL and remove namespace from ClusterIssuer ([#530](https://github.com/ruzickap/ruzickap.github.io/issues/530)) ([2e3693c](https://github.com/ruzickap/ruzickap.github.io/commit/2e3693c9b919c5110985c6b041cc132455665869))
+* update ingress-nginx Helm chart version to 4.12.3 ([#386](https://github.com/ruzickap/ruzickap.github.io/issues/386)) ([0c0646a](https://github.com/ruzickap/ruzickap.github.io/commit/0c0646a3e1c358b6c246d52ef73921a7365edacf))
+* update ingress-nginx Helm chart version to 4.12.3 ([#387](https://github.com/ruzickap/ruzickap.github.io/issues/387)) ([7f53d8e](https://github.com/ruzickap/ruzickap.github.io/commit/7f53d8e59532d41d42186e0deb98cd28e7e44931))
+* update kubeconfig command to check for cluster existence before deletion ([#395](https://github.com/ruzickap/ruzickap.github.io/issues/395)) ([57545e2](https://github.com/ruzickap/ruzickap.github.io/commit/57545e2f72fee6e9efbd3d3274d14da189e3ea8f))
+* update Mastodon URL in contact.yml ([0778a2d](https://github.com/ruzickap/ruzickap.github.io/commit/0778a2d845197170faff66e51312892972233b63))
+
+
+### Reverts
+
+* undo aws-samples digest updates ([#534](https://github.com/ruzickap/ruzickap.github.io/issues/534)) ([7d23c58](https://github.com/ruzickap/ruzickap.github.io/commit/7d23c58426c9359d5b0c06ce695c4c00ed96ec36))
+
 ## 1.0.0 (2023-11-16)
 
 ## What's Changed
