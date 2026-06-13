@@ -78,15 +78,13 @@ The request flow:
    and validates the request signature using HMAC-SHA256.
 1. After verification, it async-invokes the Processing Lambda and returns `200`
    immediately (meeting Slack's 3-second timeout).
-1. The Processing Lambda posts a "Processing your request..." placeholder in
-   the Slack thread.
-1. It invokes the AgentCore Runtime with the user's query and a session ID
-   derived from the thread timestamp.
+1. The Processing Lambda invokes the AgentCore Runtime with the user's query and
+   a session ID derived from the thread timestamp.
 1. The Runtime discovers tools from the MCP Gateway (Context7) and runs a
    tool-use loop with the Bedrock Converse API.
 1. The Bedrock Guardrail enforces content filtering and PII protection.
-1. The response is converted to Slack's `mrkdwn` format and updates the
-   placeholder message.
+1. The response is converted to Slack's `mrkdwn` format and posted to the
+   thread.
 
 ## Requirements
 
@@ -256,7 +254,7 @@ The OpenTofu configuration deploys the following components:
 - **API Gateway (REST API)** - single `POST /slack-events` route with Lambda
   proxy integration
 - **WAF v2** - protects API Gateway with AWS Managed Rules + rate limiting
-- **S3 Bucket** - stores the agent runtime zip (KMS-encrypted, versioned)
+- **S3 Bucket** - reuses the state bucket for the agent runtime zip
 - **Bedrock AgentCore Gateway** - MCP protocol gateway connecting to Context7
 - **Bedrock Guardrail** - content filtering + PII protection
 - **Bedrock AgentCore Runtime** - Python runtime with tool-use loop
@@ -316,6 +314,49 @@ locals {
 
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
+EOF
+```
+
+### OpenTofu variables
+
+Write the OpenTofu variables file:
+
+```terraform
+tee "${TMP_DIR}/${PROJECT_NAME}/variables.tf" << \EOF
+variable "aws_region" {
+  description = "AWS region for deployment"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "project_name" {
+  description = "Project name used for resource naming"
+  type        = string
+  default     = "slack-agentcore"
+}
+
+variable "slack_bot_token" {
+  description = "Slack Bot User OAuth Token (xoxb-...)"
+  type        = string
+  sensitive   = true
+}
+
+variable "slack_signing_secret" {
+  description = "Slack app signing secret for webhook verification"
+  type        = string
+  sensitive   = true
+}
+
+variable "foundation_model" {
+  description = "Bedrock foundation model ID for the agent"
+  type        = string
+  default     = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+}
+
+variable "tags" {
+  description = "Tags applied to all AWS resources"
+  type        = map(string)
+}
 EOF
 ```
 
@@ -439,7 +480,7 @@ module "lambda_verification" {
 }
 
 # -----------------------------------------------------------------------------
-# Lambda - Processing (posts "Processing...", invokes AgentCore, updates Slack)
+# Lambda - Processing (invokes AgentCore, posts answer to Slack)
 # -----------------------------------------------------------------------------
 
 module "lambda_processing" {
@@ -489,24 +530,41 @@ module "lambda_processing" {
 }
 
 # -----------------------------------------------------------------------------
-# API Gateway Account Settings (required for REST API CloudWatch logging)
+# CloudWatch Log Groups + API Gateway Account Settings
 # -----------------------------------------------------------------------------
 
+# Pre-create log groups to control retention and encryption
+locals {
+  cloudwatch_log_groups = {
+    api_gateway_welcome = {
+      name       = "/aws/apigateway/welcome"
+      kms_key_id = module.kms.key_arn
+    }
+    agentcore_runtime = {
+      name       = "/aws/bedrock-agentcore/runtimes/${var.project_name}"
+      kms_key_id = module.kms.key_arn
+    }
+    waf = {
+      name       = "aws-waf-logs-${var.project_name}"
+      kms_key_id = module.kms.key_arn
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "this" {
+  for_each          = local.cloudwatch_log_groups
+  name              = each.value.name
+  retention_in_days = 1
+  kms_key_id        = each.value.kms_key_id
+}
+
 module "api_gateway_account_settings" {
-  depends_on = [aws_cloudwatch_log_group.api_gateway_welcome]
+  depends_on = [aws_cloudwatch_log_group.this["api_gateway_welcome"]]
 
   source  = "cloudposse/api-gateway/aws//modules/account-settings"
   # renovate: datasource=terraform-module depName=cloudposse/api-gateway/aws
   version = "0.9.0"
-
   name      = "${var.project_name}-apigw"
-  namespace = ""
-}
-
-# Pre-create the log group AWS auto-generates when account logging is enabled
-resource "aws_cloudwatch_log_group" "api_gateway_welcome" {
-  name              = "/aws/apigateway/welcome"
-  retention_in_days = 1
 }
 
 # -----------------------------------------------------------------------------
@@ -519,15 +577,8 @@ module "api_gateway" {
   source  = "cloudposse/api-gateway/aws"
   # renovate: datasource=terraform-module depName=cloudposse/api-gateway/aws
   version = "0.9.0"
-
-  name      = var.project_name
-  namespace = ""
-
-  endpoint_type        = "REGIONAL"
-  stage_name           = "v1"
-  logging_level        = "INFO"
-  metrics_enabled      = true
-  xray_tracing_enabled = false
+  name       = var.project_name
+  stage_name = "v1"
 
   openapi_config = {
     openapi = "3.0.1"
@@ -550,9 +601,7 @@ module "api_gateway" {
   }
 }
 
-# Pre-create the API Gateway execution log group to control retention + KMS.
-# On first apply, import it: tofu import aws_cloudwatch_log_group.api_gateway \
-#   "API-Gateway-Execution-Logs_<rest-api-id>/v1"
+# Kept separate: name depends on module.api_gateway.id (would cause cycle in for_each)
 resource "aws_cloudwatch_log_group" "api_gateway" {
   name              = "API-Gateway-Execution-Logs_${module.api_gateway.id}/v1"
   retention_in_days = 1
@@ -567,13 +616,15 @@ module "wafv2" {
   source  = "terraform-aws-modules/wafv2/aws"
   # renovate: datasource=terraform-module depName=terraform-aws-modules/wafv2/aws
   version = "2.1.0"
-
   name        = "${var.project_name}-waf"
   description = "WAF Web ACL protecting Slack webhook API Gateway"
 
   association_resource_arns = {
     api_gateway = module.api_gateway.stage_arn
   }
+
+  create_logging_configuration    = true
+  logging_log_destination_configs = [aws_cloudwatch_log_group.this["waf"].arn]
 
   rules = {
     aws-managed-common = {
@@ -616,33 +667,11 @@ module "wafv2" {
 }
 
 # -----------------------------------------------------------------------------
-# S3 Bucket for Agent Runtime code
+# S3 - Build the Agent Runtime package and upload it to the state bucket
 # -----------------------------------------------------------------------------
 
-module "s3_agent_code" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  # renovate: datasource=terraform-module depName=terraform-aws-modules/s3-bucket/aws
-  version = "5.14.0"
-
-  bucket = "${var.project_name}-agent-code"
-  force_destroy = true
-
-  versioning = {
-    enabled = true
-  }
-
-  server_side_encryption_configuration = {
-    rule = {
-      apply_server_side_encryption_by_default = {
-        sse_algorithm     = "aws:kms"
-        kms_master_key_id = module.kms.key_arn
-      }
-      bucket_key_enabled = true
-    }
-  }
-
-  attach_deny_insecure_transport_policy = true
-  attach_require_latest_tls_policy      = true
+data "aws_s3_bucket" "main" {
+  bucket = var.project_name
 }
 
 resource "terraform_data" "agent_runtime_build" {
@@ -672,8 +701,8 @@ resource "terraform_data" "agent_runtime_build" {
 resource "aws_s3_object" "agent_runtime_code" {
   depends_on = [terraform_data.agent_runtime_build]
 
-  bucket      = module.s3_agent_code.s3_bucket_id
-  key         = "agent-runtime.zip"
+  bucket      = data.aws_s3_bucket.main.id
+  key         = "agent-runtime/agent-runtime.zip"
   source      = "${path.module}/.build/agent-runtime.zip"
   source_hash = sha256("${filesha256("${path.module}/agent-runtime/agent_runtime.py")}${filesha256("${path.module}/agent-runtime/requirements.txt")}")
 }
@@ -849,14 +878,14 @@ data "aws_iam_policy_document" "agentcore_runtime" {
       "s3:GetObject",
       "s3:GetObjectVersion",
     ]
-    resources = ["${module.s3_agent_code.s3_bucket_arn}/*"]
+    resources = ["${data.aws_s3_bucket.main.arn}/*"]
   }
 
   statement {
     sid       = "S3ListAgentCodeBucket"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [module.s3_agent_code.s3_bucket_arn]
+    resources = [data.aws_s3_bucket.main.arn]
   }
 }
 
@@ -883,7 +912,7 @@ resource "aws_bedrockagentcore_agent_runtime" "main" {
 
       code {
         s3 {
-          bucket = module.s3_agent_code.s3_bucket_id
+          bucket = data.aws_s3_bucket.main.id
           prefix = aws_s3_object.agent_runtime_code.key
         }
       }
@@ -905,49 +934,6 @@ resource "aws_bedrockagentcore_agent_runtime" "main" {
     GUARDRAIL_ID      = aws_bedrock_guardrail.main.guardrail_arn
     GUARDRAIL_VERSION = "DRAFT"
   }
-}
-EOF
-```
-
-### OpenTofu variables
-
-Write the OpenTofu variables file:
-
-```terraform
-tee "${TMP_DIR}/${PROJECT_NAME}/variables.tf" << \EOF
-variable "aws_region" {
-  description = "AWS region for deployment"
-  type        = string
-  default     = "us-east-1"
-}
-
-variable "project_name" {
-  description = "Project name used for resource naming"
-  type        = string
-  default     = "slack-agentcore"
-}
-
-variable "slack_bot_token" {
-  description = "Slack Bot User OAuth Token (xoxb-...)"
-  type        = string
-  sensitive   = true
-}
-
-variable "slack_signing_secret" {
-  description = "Slack app signing secret for webhook verification"
-  type        = string
-  sensitive   = true
-}
-
-variable "foundation_model" {
-  description = "Bedrock foundation model ID for the agent"
-  type        = string
-  default     = "us.anthropic.claude-haiku-4-5-20251001-v1:0"
-}
-
-variable "tags" {
-  description = "Tags applied to all AWS resources"
-  type        = map(string)
 }
 EOF
 ```
@@ -1053,9 +1039,9 @@ EOF
 
 ### Lambda - Processing function
 
-The Processing Lambda filters bot messages, posts a "Processing..." placeholder
-in the Slack thread, invokes the AgentCore Runtime, and converts the markdown
-response to Slack's `mrkdwn` format:
+The Processing Lambda filters bot messages, invokes the AgentCore Runtime, and
+converts the markdown response to Slack's `mrkdwn` format before posting it to
+the thread:
 
 ```bash
 mkdir -p "${TMP_DIR}/${PROJECT_NAME}/lambda/processing"
@@ -1070,6 +1056,8 @@ tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/package.json" << \EOF
 }
 EOF
 ```
+
+Then write the handler that drives the AgentCore Runtime and updates Slack:
 
 ```javascript
 tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/index.mjs" << \EOF
@@ -1161,23 +1149,13 @@ export async function handler(event) {
     const slackBotToken = event.slackBotToken;
     const threadTs = e.thread_ts || e.ts;
 
-    // Post "Processing..." placeholder
-    log.info("⏳ Processing event, posting processing message to Slack");
-    const posted = await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
-      channel: e.channel, text: "💡 Processing your request...", thread_ts: threadTs,
-    });
-    if (!posted.ok || !posted.ts) {
-      log.error(`💬 Slack postMessage failed: ${posted.error}`);
-      return { statusCode: 500, body: '{"error":"slack post failed"}' };
-    }
-
     // Build session ID from thread timestamp
     const sessionId = `slack-thread-${threadTs}`.replace(/\./g, "_").padEnd(33, "0");
     const userMessage = (e.text || "").replace(/<@[A-Z0-9]+>/g, "").trim();
 
     if (!userMessage) {
-      await callSlack("https://slack.com/api/chat.update", slackBotToken, {
-        channel: e.channel, ts: posted.ts, text: "🤷 I received an empty message. Please try again.",
+      await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
+        channel: e.channel, text: "🤷 I received an empty message. Please try again.", thread_ts: threadTs,
       });
       return { statusCode: 200, body: '{"message":"empty"}' };
     }
@@ -1200,17 +1178,12 @@ export async function handler(event) {
 
     const slackText = markdownToSlack(completion);
 
-    // Update the processing message with the first chunk
+    // Post the answer as a single message (split into thread replies if long)
     const chunks = splitForSlack(slackText, 3500);
-    log.info(`✏️ Updating message ts: ${posted.ts}`);
-    await callSlack("https://slack.com/api/chat.update", slackBotToken, {
-      channel: e.channel, ts: posted.ts, text: chunks[0],
-    });
-
-    // Send remaining chunks as thread replies
-    for (let i = 1; i < chunks.length; i++) {
+    log.info(`✏️ Posting answer (${chunks.length} chunk(s))`);
+    for (const chunk of chunks) {
       await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
-        channel: e.channel, text: chunks[i], thread_ts: threadTs,
+        channel: e.channel, text: chunk, thread_ts: threadTs,
       });
     }
 
@@ -1499,8 +1472,8 @@ with `/invite @slack-agentcore`, or message it directly.
 _Adding the bot to a Slack channel_
 
 **Direct messaging**: Go to the app in the Apps section and chat one-on-one.
-The bot posts "Processing your request..." as an initial response, then
-replaces it with the actual answer from AgentCore.
+The bot replies in the thread with the answer from AgentCore once it finishes
+processing.
 
 ![Slack Conversation](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/14.AgentCore-Slack-AgentCore-Slack-Conversation-compressed.gif)
 _Direct conversation with the AgentCore bot_
@@ -1530,8 +1503,8 @@ two Lambda functions:
 
 1. **Verification Lambda** - validates the Slack signature and returns HTTP 200
    immediately
-1. **Processing Lambda** - posts a placeholder message, invokes AgentCore,
-   and updates the message with the response
+1. **Processing Lambda** - invokes AgentCore and posts the response to the
+   thread
 
 ### Security
 
@@ -1573,7 +1546,6 @@ export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 ```
 
 ```sh
-aws s3 rb "s3://${PROJECT_NAME}-agent-code" --force || true
 tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve &&
   aws s3 rm "s3://${PROJECT_NAME}" --recursive || true
 aws cloudformation delete-stack --stack-name "${PROJECT_NAME}-s3" || true
