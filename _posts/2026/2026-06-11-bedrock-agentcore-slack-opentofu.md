@@ -692,7 +692,7 @@ resource "terraform_data" "agent_runtime_build" {
         --only-binary=:all: \
         -r agent-runtime/requirements.txt
       cp agent-runtime/agent_runtime.py .build/agent-runtime-package/
-      cd .build/agent-runtime-package && zip -rq ../agent-runtime.zip . -x "*.pyc" -x "*__pycache__*"
+      cd .build/agent-runtime-package && zip -rq ../agent-runtime.zip . -x "*.pyc" -x "*__pycache__*" -x "*/sboms/*"
     EOT
     working_dir = path.module
   }
@@ -832,11 +832,13 @@ data "aws_iam_policy_document" "agentcore_runtime" {
     effect = "Allow"
     actions = [
       "bedrock:InvokeModel",
+      "bedrock:InvokeModelWithResponseStream",
       "bedrock:Converse",
       "bedrock:ConverseStream",
     ]
+    # Cross-region inference profiles dispatch to bare-id foundation-model ARNs, so allow both shapes
     resources = [
-      "arn:aws:bedrock:*::foundation-model/${var.foundation_model}",
+      "arn:aws:bedrock:*::foundation-model/${replace(var.foundation_model, "/^(us|eu|apac)\\./", "")}",
       "arn:aws:bedrock:*:${data.aws_caller_identity.current.account_id}:inference-profile/${var.foundation_model}",
     ]
     condition {
@@ -887,17 +889,26 @@ data "aws_iam_policy_document" "agentcore_runtime" {
     actions   = ["s3:ListBucket"]
     resources = [data.aws_s3_bucket.main.arn]
   }
+
+  # Workload identity tokens scoped to this runtime; GetWorkloadAccessTokenForUserId omitted (unverified caller-supplied user IDs)
+  statement {
+    sid    = "AgentCoreWorkloadIdentity"
+    effect = "Allow"
+    actions = [
+      "bedrock-agentcore:GetWorkloadAccessToken",
+      "bedrock-agentcore:GetWorkloadAccessTokenForJWT",
+    ]
+    resources = [
+      "arn:aws:bedrock-agentcore:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:workload-identity-directory/default",
+      "arn:aws:bedrock-agentcore:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:workload-identity-directory/default/workload-identity/${replace("${var.project_name}_runtime", "-", "_")}-*",
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "agentcore_runtime" {
   name   = "agentcore-runtime-policy"
   role   = aws_iam_role.agentcore_runtime.id
   policy = data.aws_iam_policy_document.agentcore_runtime.json
-}
-
-resource "aws_iam_role_policy_attachment" "agentcore_runtime" {
-  role       = aws_iam_role.agentcore_runtime.name
-  policy_arn = "arn:aws:iam::aws:policy/BedrockAgentCoreFullAccess"
 }
 
 resource "aws_bedrockagentcore_agent_runtime" "main" {
