@@ -119,6 +119,10 @@ Install the required tools:
 - [uv](https://docs.astral.sh/uv/)
 - [Node.js](https://nodejs.org/)
 
+```bash
+mise install opentofu@1.12.1 aws@2.35.2 uv@0.11.21 node@24.11.1
+```
+
 ## Create a Slack App
 
 Before deploying infrastructure, you need to create a Slack app and obtain the
