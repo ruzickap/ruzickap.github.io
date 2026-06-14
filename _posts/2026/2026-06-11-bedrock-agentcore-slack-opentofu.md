@@ -267,7 +267,7 @@ sources:
 ```terraform
 tee "${TMP_DIR}/${PROJECT_NAME}/main.tf" << EOF
 terraform {
-  required_version = ">= 1.14"
+  required_version = ">= 1.12"
 
   backend "s3" {
     bucket       = "${PROJECT_NAME}"
@@ -1045,8 +1045,10 @@ export async function handler(event) {
 
     return { statusCode: 200, body: '{"message":"OK"}' };
   } catch (error) {
-    log.error(`💥 Error: ${error.message}`);
-    return { statusCode: error.message.includes("signature") ? 403 : 500, body: JSON.stringify({ error: error.message }) };
+    log.error(`💥 Error: ${error?.message || error}`);
+    // Log details above but return a generic body - never echo internal error text (AWS SDK/SSM/KMS) back to the webhook caller.
+    const statusCode = `${error?.message || ""}`.includes("signature") ? 403 : 500;
+    return { statusCode, body: statusCode === 403 ? '{"error":"Invalid signature"}' : '{"error":"Internal server error"}' };
   }
 }
 EOF
