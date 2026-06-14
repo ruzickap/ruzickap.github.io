@@ -590,10 +590,9 @@ module "api_gateway" {
       "/slack-events" = {
         post = {
           x-amazon-apigateway-integration = {
-            httpMethod           = "POST"
-            type                 = "AWS_PROXY"
-            uri                  = "arn:aws:apigateway:${data.aws_region.current.region}:lambda:path/2015-03-31/functions/${module.lambda_verification.lambda_function_arn}/invocations"
-            payloadFormatVersion = "1.0"
+            httpMethod = "POST"
+            type       = "AWS_PROXY"
+            uri        = "arn:aws:apigateway:${data.aws_region.current.region}:lambda:path/2015-03-31/functions/${module.lambda_verification.lambda_function_arn}/invocations"
           }
         }
       }
@@ -999,7 +998,10 @@ async function getCredentials() {
 
 function verifySignature(body, timestamp, signature, secret) {
   const computed = `v0=${createHmac("sha256", secret).update(`v0:${timestamp}:${body}`).digest("hex")}`;
-  return timingSafeEqual(Buffer.from(signature), Buffer.from(computed));
+  const a = Buffer.from(signature);
+  const b = Buffer.from(computed);
+  // timingSafeEqual throws on length mismatch - guard so a forged signature returns 403, not 500
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 export async function handler(event) {
@@ -1060,8 +1062,9 @@ tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/package.json" << \EOF
 {
   "name": "processing",
   "version": "1.0.0",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
+    "@aws-sdk/client-bedrock-agentcore": "^3.901.0",
     "markdown-to-slack-mrkdwn": "^1.1.2"
   }
 }
@@ -1190,7 +1193,7 @@ export async function handler(event) {
     const slackText = markdownToSlack(completion);
 
     // Post the answer as a single message (split into thread replies if long)
-    const chunks = splitForSlack(slackText, 3500);
+    const chunks = splitForSlack(slackText, { maxLength: 3500 });
     log.info(`✏️ Posting answer (${chunks.length} chunk(s))`);
     for (const chunk of chunks) {
       await callSlack("https://slack.com/api/chat.postMessage", slackBotToken, {
