@@ -1010,27 +1010,29 @@ export async function handler(event) {
   try {
     const headers = event.headers || {};
     const body = event.body;
-    const parsed = typeof body === "string" ? JSON.parse(body) : body;
+    const rawBody = typeof body === "string" ? body : JSON.stringify(body);
 
-    // Slack URL verification challenge
-    if (parsed.type === "url_verification") {
-      log.info("🤝 URL verification challenge");
-      return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ challenge: parsed.challenge }) };
-    }
-
-    // Validate signature headers
+    // Validate signature headers (reject stale requests to block replays)
     const sig = headers["X-Slack-Signature"] || headers["x-slack-signature"];
     const ts = headers["X-Slack-Request-Timestamp"] || headers["x-slack-request-timestamp"];
     if (!sig || !ts || Math.abs(Date.now() / 1000 - parseInt(ts)) > 300) {
       return { statusCode: 403, body: '{"error":"Invalid request"}' };
     }
 
-    // Verify Slack signature
+    // Verify Slack signature before acting on the payload - Slack signs the
+    // url_verification handshake too, so authenticate first, then respond.
     const creds = await getCredentials();
-    const rawBody = typeof body === "string" ? body : JSON.stringify(body);
     if (!verifySignature(rawBody, ts, sig, creds.signingSecret)) {
       log.info("🚫 Signature verification failed");
       return { statusCode: 403, body: '{"error":"Invalid signature"}' };
+    }
+
+    const parsed = typeof body === "string" ? JSON.parse(body) : body;
+
+    // Slack URL verification challenge
+    if (parsed.type === "url_verification") {
+      log.info("🤝 URL verification challenge");
+      return { statusCode: 200, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ challenge: parsed.challenge }) };
     }
 
     // Async invoke processing Lambda
