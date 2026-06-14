@@ -46,9 +46,11 @@ on:
 
 env:
   AWS_REGION: us-east-1
+  CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-  CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
+  MY_SLACK_BOT_SIGNING_SECRET: ${{ secrets.MY_SLACK_BOT_SIGNING_SECRET }}
+  MY_SLACK_BOT_TOKEN: ${{ secrets.MY_SLACK_BOT_TOKEN }}
 
 permissions: read-all
 
