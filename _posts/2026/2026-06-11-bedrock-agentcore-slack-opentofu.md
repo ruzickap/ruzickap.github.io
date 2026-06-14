@@ -1449,13 +1449,10 @@ Initialize and apply the OpenTofu configuration:
 
 ```bash
 tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" init
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" apply -auto-approve
-```
-
-After a successful deployment, OpenTofu outputs the webhook URL:
-
-```bash
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" output
+if [[ ! ${MY_TASK:-} =~ delete: ]]; then
+  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" apply -auto-approve
+  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" output
+fi
 ```
 
 ## Configure Slack Event Subscriptions
@@ -1561,6 +1558,13 @@ export TF_VAR_slack_bot_token="anything"
 export TF_VAR_slack_signing_secret="anything"
 # Working directory
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
+```
+
+Recreate the OpenTofu code files:
+
+```sh
+export MY_TASK="${MISE_TASK_NAME}"
+mise run "create:${MISE_TASK_NAME##*:}"
 ```
 
 ```sh
