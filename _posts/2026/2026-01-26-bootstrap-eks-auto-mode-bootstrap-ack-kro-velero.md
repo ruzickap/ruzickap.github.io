@@ -1751,6 +1751,7 @@ export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}" "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup"
+mise use kubectl@1.36.1 helm@4.2.0 kind@0.32.0
 ```
 
 Create the Kind cluster:

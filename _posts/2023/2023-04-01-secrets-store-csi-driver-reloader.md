@@ -525,6 +525,7 @@ To clean up the environment, delete the IRSA, remove the CloudFormation stack,
 and delete the namespace:
 
 ```sh
+mise use aws@2.35.2 eksctl@0.227.0
 if eksctl get iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard; then
   eksctl delete iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard
 fi

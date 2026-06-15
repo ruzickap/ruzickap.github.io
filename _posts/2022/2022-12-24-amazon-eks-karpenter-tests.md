@@ -534,6 +534,7 @@ kubectl view-allocations --utilization
 Uninstall [Podinfo](https://github.com/stefanprodan/podinfo):
 
 ```sh
+mise use kubectl@1.36.1
 kubectl delete namespace podinfo || true
 ```
 
