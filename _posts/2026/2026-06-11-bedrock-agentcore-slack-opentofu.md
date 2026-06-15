@@ -1512,24 +1512,13 @@ _Reinstall the app to activate event subscriptions_
 
 ## Test the integration
 
-Locate the app in the **Apps** section of Slack. You can invite it to a channel
-with `/invite @slack-agentcore`, or message it directly.
+You can invite the app to a channel with `/invite @slack-agentcore`, or message
+it directly.
 
-![Add Agent App in Slack](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/13.AgentCore-Slack-AddAgent-App-in-Slack-compressed.gif)
-_Adding the bot to a Slack channel_
+Mention `@slack-agentcore` in any channel where the bot is installed.
 
-**Direct messaging**: Go to the app in the Apps section and chat one-on-one.
-The bot replies in the thread with the answer from AgentCore once it finishes
-processing.
-
-![Slack Conversation](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/14.AgentCore-Slack-AgentCore-Slack-Conversation-compressed.gif)
-_Direct conversation with the AgentCore bot_
-
-**Channel integration**: Mention `@slack-agentcore` in any channel where the
-bot is installed.
-
-![Channel Integration](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/15.AgentCore-Slack-Channel-Integration.png)
-_Channel integration - mentioning the bot_
+![SlackBot](/assets/img/posts/2026/2026-06-11-bedrock-agentcore-slack-opentofu/2026-06-15-slackbot-test.avif)
+_SlackBot Chat test_
 
 ## Architecture details
 
