@@ -1491,7 +1491,8 @@ _Select your Slack app_
 
 1. Navigate to **Features** > **Event Subscriptions**.
 1. Toggle **Enable Events** to **On**.
-1. Paste the webhook URL in the **Request URL** field.
+1. Paste the webhook URL from the OpenTofu `webhook_url` output into the
+   **Request URL** field.
 1. After the URL is verified (green checkmark), under **Subscribe to bot
    events** add:
    - `app_mention` (triggered when the bot is @mentioned in a channel)
