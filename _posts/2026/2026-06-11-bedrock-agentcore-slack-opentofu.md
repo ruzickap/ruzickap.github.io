@@ -129,15 +129,18 @@ Before deploying infrastructure, you need to create a Slack app and obtain the
 Bot Token and Signing Secret.
 
 1. Go to [Slack API](https://api.slack.com/apps) and choose **Create New App**.
-  ![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png)
-  _Slack API - Create New App_
-1. Choose **From scratch**.
-   ![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="400"}
-   _Create an app - From scratch_
-1. Enter the **App Name** (`slack-agentcore`) and pick the workspace.
-1. Choose **Create App**.
-   ![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
-   _Name app and choose workspace_
+![Slack API - Create New App](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/2.AgentCore-Slack-SlackAPI-Create-New-App.png)
+_Slack API - Create New App_
+
+2. Choose **From scratch**.
+![Create an app from scratch](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/3.AgentCore-Slack-Create-an-app-from-scratch.png){:width="400"}
+_Create an app - From scratch_
+
+3. Enter the **App Name** (`slack-agentcore`) and pick the workspace.
+
+4. Choose **Create App**.
+![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
+_Name app and choose workspace_
 
 ### Configure OAuth & Permissions
 
