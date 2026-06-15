@@ -114,10 +114,10 @@ mkdir -pv "${TMP_DIR}/${PROJECT_NAME}"
 
 Install the required tools:
 
-- [OpenTofu](https://opentofu.org/)
 - [AWS CLI](https://builder.aws.com/build/tools)
-- [uv](https://docs.astral.sh/uv/)
 - [Node.js](https://nodejs.org/)
+- [OpenTofu](https://opentofu.org/)
+- [uv](https://docs.astral.sh/uv/)
 
 ```bash
 mise use opentofu@1.12.1 aws@2.35.2 uv@0.11.21 node@24.11.1
