@@ -6,12 +6,6 @@
 ##############################################################################
 [tools]
 # keep-sorted start
-aws = { version = "2.35.2", symlink_bins = "true" }
-eksctl = "0.227.0"
-fnox = "latest"
-helm = "4.2.0"
-kubectl = "1.36.1"
-velero = "1.18.1"
 yq = "4.53.3"
 # keep-sorted end
 
@@ -301,12 +295,22 @@ run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 #------------------------------------------------------------------------------
 # Create and delete 2026 posts
 #------------------------------------------------------------------------------
-[tasks."create-delete:posts:2026"]
-description = 'Create and delete all 2026 posts'
+[tasks."create:posts:2026"]
+description = 'Create all 2026 posts'
 run = '''
   #!/usr/bin/env bash
   set -euxo pipefail
   while read -r TASK; do
     mise run "${TASK}"
-  done < <(sed -n 's/^\[tasks."\(\(delete\):2026.*\)"]/\1/p' mise.toml)
+  done < <(sed -n 's/^\[tasks."\(create:2026.*\)"]/\1/p' mise.toml)
+'''
+
+[tasks."delete:posts:2026"]
+description = 'Delete all 2026 posts'
+run = '''
+  #!/usr/bin/env bash
+  set -euxo pipefail
+  while read -r TASK; do
+    mise run "${TASK}"
+  done < <(sed -n 's/^\[tasks."\(delete:2026.*\)"]/\1/p' mise.toml)
 '''
