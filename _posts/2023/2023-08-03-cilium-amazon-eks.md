@@ -99,6 +99,10 @@ Install the necessary tools:
 - [cilium](https://github.com/cilium/cilium-cli)
 - [helm](https://github.com/helm/helm)
 
+```bash
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 github:cilium/cilium-cli@0.19.4 helm@4.2.0
+```
+
 ## Configure AWS Route 53 Domain delegation
 
 <!-- prettier-ignore-start -->

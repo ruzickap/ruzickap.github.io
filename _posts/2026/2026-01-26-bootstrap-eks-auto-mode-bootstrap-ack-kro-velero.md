@@ -27,6 +27,10 @@ them to the new EKS Auto Mode Cluster — effectively making it self-managed.
 - [kind](https://kind.sigs.k8s.io/)
 - [Velero CLI](https://velero.io/docs/main/basic-install/#install-the-cli)
 
+```bash
+mise use aws@2.35.2 kubectl@1.36.1 helm@4.2.0 kind@0.32.0 velero@1.18.1
+```
+
 ## Architecture Overview
 
 The bootstrap process follows these steps:

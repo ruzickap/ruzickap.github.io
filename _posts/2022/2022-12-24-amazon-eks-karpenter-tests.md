@@ -25,6 +25,10 @@ real-world examples.
   "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %})"
 - [Helm](https://helm.sh)
 
+```bash
+mise use kubectl@1.36.1 helm@4.2.0
+```
+
 The following variables are used in the subsequent steps:
 
 ```bash

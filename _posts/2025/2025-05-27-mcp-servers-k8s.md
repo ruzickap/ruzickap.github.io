@@ -46,6 +46,10 @@ powered by MCP servers and local LLM inference running on your EKS cluster.
 
 <!-- rumdl-enable MD013 -->
 
+```bash
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0
+```
+
 You will need the following environment variables. Replace the placeholder
 values with your actual credentials:
 

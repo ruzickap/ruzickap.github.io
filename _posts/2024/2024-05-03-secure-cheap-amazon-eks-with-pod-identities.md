@@ -91,6 +91,10 @@ Install the required tools:
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
 
+```bash
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0
+```
+
 ## Configure AWS Route 53 Domain delegation
 
 <!-- prettier-ignore-start -->

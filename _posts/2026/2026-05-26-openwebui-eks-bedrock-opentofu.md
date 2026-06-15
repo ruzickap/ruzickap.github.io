@@ -127,6 +127,10 @@ Install the required tools:
 - [AWS CLI](https://builder.aws.com/build/tools)
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 
+```bash
+mise use opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1 helm@4.2.0
+```
+
 ### Configure AWS Route 53 Domain delegation
 
 <!-- prettier-ignore-start -->

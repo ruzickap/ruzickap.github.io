@@ -150,13 +150,14 @@ mega-linter-runner --remove-container \
 
 ```bash
 docker run --rm -it -v "${PWD}:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock" -v "${HOME}/.aws:/root/.aws" \
-  --env GOOGLE_CLIENT_ID --env GOOGLE_CLIENT_SECRET --env FORCE_COLOR=1 --env USER \
-  --workdir /mnt \
-  ubuntu bash -c 'set -euo pipefail && \
+  --env FORCE_COLOR=1 --env USER --workdir /mnt \
+  ubuntu bash -i  -c 'set -euo pipefail && \
     apt update -qq && apt install -qqy bsdextrautils curl docker.io jq unzip wget && \
     curl -sL https://mise.run -o - | bash && \
+    ~/.local/bin/mise trust --all && \
     eval "$(~/.local/bin/mise activate bash)" && \
-    mise run "create-delete:posts:all" \
+    mise plugins install fnox-env https://github.com/jdx/mise-env-fnox && mise use fnox && \
+    mise run "create-delete:posts:2026"
   '
 ```
 

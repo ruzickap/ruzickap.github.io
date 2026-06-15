@@ -25,6 +25,10 @@ Links:
   "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))"
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 
+```bash
+mise use kubectl@1.36.1
+```
+
 ## Install krew
 
 Install Krew, the plugin manager for the kubectl command-line tool:
