@@ -142,7 +142,7 @@ _Create an app - From scratch_
 
 {:start="3"}
 
-1. Enter the **App Name** (`slack-agentcore`) and pick the workspace.
+1. Enter the **App Name** (`Slack Bot`) and pick the workspace.
 1. Choose **Create App**.
 
 ![Name app and choose workspace](https://raw.githubusercontent.com/aws-samples/sample-Integrating-Amazon-Bedrock-AgentCore-with-Slack/62c940dc3243fc935205ddda1df40d621ee1ecd9/Images/4.AgentCore-Slack-Name-app-and-choose-workspace.png){:width="400"}
@@ -1512,13 +1512,10 @@ _Reinstall the app to activate event subscriptions_
 
 ## Test the integration
 
-You can invite the app to a channel with `/invite @slack-agentcore`, or message
-it directly.
+Invite the `@Slack Bot` to a channel and ask it a question:
 
-Mention `@slack-agentcore` in any channel where the bot is installed.
-
-![SlackBot](/assets/img/posts/2026/2026-06-11-bedrock-agentcore-slack-opentofu/2026-06-15-slackbot-test.avif)
-_SlackBot Chat test_
+![Slack Bot](/assets/img/posts/2026/2026-06-11-bedrock-agentcore-slack-opentofu/2026-06-15-slackbot-test.avif)
+_Slack Bot Chat test_
 
 ## Architecture details
 
