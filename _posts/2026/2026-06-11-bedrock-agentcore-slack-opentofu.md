@@ -187,7 +187,7 @@ bucket uses KMS encryption, lifecycle policies, and blocks all public access:
 
 ```bash
 if ! aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
-  tee "${TMP_DIR}/${PROJECT_NAME}/s3.yaml" << \EOF
+  cat > "${TMP_DIR}/${PROJECT_NAME}/s3.yaml" << \EOF
 AWSTemplateFormatVersion: "2010-09-09"
 Description: S3 bucket for OpenTofu state files
 Parameters:
@@ -269,7 +269,7 @@ Write the main OpenTofu configuration with provider setup, locals, and data
 sources:
 
 ```terraform
-tee "${TMP_DIR}/${PROJECT_NAME}/main.tf" << EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/main.tf" << EOF
 terraform {
   required_version = ">= 1.12"
 
@@ -326,7 +326,7 @@ EOF
 Write the OpenTofu variables file:
 
 ```terraform
-tee "${TMP_DIR}/${PROJECT_NAME}/variables.tf" << \EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/variables.tf" << \EOF
 variable "aws_region" {
   description = "AWS region for deployment"
   type        = string
@@ -370,7 +370,7 @@ Write the infrastructure resources (KMS, SSM, Lambda, API Gateway, WAF, S3,
 AgentCore):
 
 ```bash
-tee "${TMP_DIR}/${PROJECT_NAME}/infrastructure.tf" << \EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/infrastructure.tf" << \EOF
 # -----------------------------------------------------------------------------
 # KMS CMK - encrypts SSM SecureString parameters and CloudWatch log groups
 # -----------------------------------------------------------------------------
@@ -955,7 +955,7 @@ EOF
 ### OpenTofu outputs
 
 ```terraform
-tee "${TMP_DIR}/${PROJECT_NAME}/outputs.tf" << \EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/outputs.tf" << \EOF
 output "webhook_url" {
   description = "Slack webhook URL to configure in Event Subscriptions"
   value       = "${module.api_gateway.invoke_url}/slack-events"
@@ -971,7 +971,7 @@ async-invokes the Processing Lambda to meet Slack's 3-second response timeout:
 
 ```javascript
 mkdir -p "${TMP_DIR}/${PROJECT_NAME}/lambda/verification"
-tee "${TMP_DIR}/${PROJECT_NAME}/lambda/verification/index.mjs" << \EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/lambda/verification/index.mjs" << \EOF
 import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
 import { LambdaClient, InvokeCommand } from "@aws-sdk/client-lambda";
 import { createHmac, timingSafeEqual } from "crypto";
@@ -1066,7 +1066,7 @@ the thread:
 
 ```bash
 mkdir -p "${TMP_DIR}/${PROJECT_NAME}/lambda/processing"
-tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/package.json" << \EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/package.json" << \EOF
 {
   "name": "processing",
   "version": "1.0.0",
@@ -1082,7 +1082,7 @@ EOF
 Then write the handler that drives the AgentCore Runtime and updates Slack:
 
 ```javascript
-tee "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/index.mjs" << \EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/lambda/processing/index.mjs" << \EOF
 import {
   BedrockAgentCoreClient,
   InvokeAgentRuntimeCommand,
@@ -1226,7 +1226,7 @@ tools, and runs a tool-use loop with the Bedrock Converse API:
 
 ```bash
 mkdir -p "${TMP_DIR}/${PROJECT_NAME}/agent-runtime"
-tee "${TMP_DIR}/${PROJECT_NAME}/agent-runtime/requirements.txt" << \EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/agent-runtime/requirements.txt" << \EOF
 boto3==1.43.27
 bedrock-agentcore>=1.0.0
 urllib3>=2.0.0
@@ -1234,7 +1234,7 @@ EOF
 ```
 
 ```python
-tee "${TMP_DIR}/${PROJECT_NAME}/agent-runtime/agent_runtime.py" << \EOF
+cat > "${TMP_DIR}/${PROJECT_NAME}/agent-runtime/agent_runtime.py" << \EOF
 """
 Agent Runtime for Slack integration with Bedrock AgentCore.
 
@@ -1455,7 +1455,6 @@ Initialize and apply the OpenTofu configuration:
 tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" init
 if [[ ! ${MY_TASK:-} =~ delete: ]]; then
   tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" apply -auto-approve
-  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" output
 fi
 ```
 
