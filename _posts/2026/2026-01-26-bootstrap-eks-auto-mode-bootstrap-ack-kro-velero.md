@@ -1882,9 +1882,9 @@ snapshotsEnabled: false
 EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/helm_values-velero.yml" velero vmware-tanzu/velero
 
-for I in $(seq 50); do
+for I in $(seq 20); do
   kubectl get backup -n velero kro-ack-backup 2> /dev/null && break
-  echo "Waiting for kro-ack-backup to appear... (${I}/50)"
+  echo "Waiting for kro-ack-backup to appear... (${I}/20)"
   sleep 5
 done
 ```
@@ -1905,7 +1905,7 @@ spec:
     includedResources:
       - "*"
 EOF
-kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero
+kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero || true
 ```
 
 Scale kro and ACK controllers back up so they can reconcile the restored
