@@ -890,7 +890,7 @@ Back up the certificate before deleting the cluster (in case it was renewed):
 {% raw %}
 
 ```sh
-if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]] && [[ -n "$(velero get backups -o json | jq -e --arg today "$(date +%Y-%m-%d)" '.items[] | select(.status.startTimestamp | startswith($today))')" ]]; then
+if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}' | grep -q "True"; then
   velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
 fi
 ```

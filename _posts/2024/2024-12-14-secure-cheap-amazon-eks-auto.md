@@ -1177,11 +1177,12 @@ aws route53resolver list-resolver-query-log-configs --query "ResolverQueryLogCon
   done
 ```
 
-Stop Karpenter from launching additional nodes and delete all Ingress
-resources to release the AWS Load Balancer before removing the cluster:
+Stop Karpenter from launching additional nodes by deleting the NodePool, and
+delete all Ingress resources to release the AWS Load Balancer before removing
+the cluster:
 
 ```sh
-helm uninstall -n karpenter karpenter || true
+kubectl delete nodepool my-default || true
 kubectl delete ingress --all-namespaces --all || true
 ```
 

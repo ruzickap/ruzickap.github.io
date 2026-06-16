@@ -1350,11 +1350,12 @@ mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
-Stop Karpenter from launching additional nodes and delete all Ingress
-resources to release the AWS Load Balancer before removing the cluster:
+Stop Karpenter from launching additional nodes by deleting the Provisioner, and
+delete all Ingress resources to release the AWS Load Balancer before removing
+the cluster:
 
 ```sh
-helm uninstall -n karpenter karpenter || true
+kubectl delete provisioner default || true
 kubectl delete ingress --all-namespaces --all || true
 ```
 

@@ -205,7 +205,7 @@ Create an S3 bucket to store OpenTofu remote state using CloudFormation. The
 bucket uses KMS encryption, lifecycle policies, and blocks all public access:
 
 ```bash
-if ! aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
+if [[ ! ${MY_TASK:-} =~ delete: ]] && ! aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
   cat > "${TMP_DIR}/${PROJECT_NAME}/s3.yaml" << \EOF
 AWSTemplateFormatVersion: "2010-09-09"
 Description: S3 bucket for OpenTofu state files

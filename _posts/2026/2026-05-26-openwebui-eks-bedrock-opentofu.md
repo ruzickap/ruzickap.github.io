@@ -246,7 +246,7 @@ using CloudFormation. The bucket uses KMS encryption, lifecycle policies, and
 blocks all public access:
 
 ```bash
-if ! aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
+if [[ ! ${MY_TASK:-} =~ delete: ]] && ! aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
   tee "${TMP_DIR}/${CLUSTER_FQDN}/s3.yaml" << \EOF
 AWSTemplateFormatVersion: "2010-09-09"
 Description: S3 bucket for Amazon EKS backups and OpenTofu state files
