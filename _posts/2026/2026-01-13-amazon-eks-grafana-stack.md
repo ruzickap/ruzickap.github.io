@@ -697,12 +697,12 @@ flexibility, performance, and simplicity.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
 
 Install the `karpenter` [Helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
-and customize its [default values](https://github.com/aws/karpenter-provider-aws/blob/v1.8.2/charts/karpenter/values.yaml)
+and customize its [default values](https://github.com/aws/karpenter-provider-aws/blob/v1.12.1/charts/karpenter/values.yaml)
 to fit your environment and storage backend:
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
-KARPENTER_HELM_CHART_VERSION="1.8.4"
+KARPENTER_HELM_CHART_VERSION="1.12.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 serviceMonitor:
@@ -917,22 +917,6 @@ serviceAccount:
     name: velero
 credentials:
   useSecret: false
-# Create scheduled backup to periodically backup the let's encrypt production resources in the "cert-manager" namespace:
-schedules:
-  monthly-backup-cert-manager-production:
-    labels:
-      letsencrypt: production
-    schedule: "@monthly"
-    template:
-      ttl: 2160h
-      includedNamespaces:
-        - cert-manager
-      includedResources:
-        - certificates.cert-manager.io
-        - secrets
-      labelSelector:
-        matchLabels:
-          letsencrypt: production
 EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" velero vmware-tanzu/velero
 ```
@@ -944,11 +928,14 @@ helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace vele
 The following steps will guide you through restoring a Let's Encrypt production
 certificate, previously backed up by Velero to S3, onto a new cluster.
 
-Initiate the restore process for the cert-manager objects.
+Initiate the restore process for the cert-manager objects if the backup exists
+in the S3 bucket:
 
 ```bash
 while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
-velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
+if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q cert-manager-production; then
+  velero restore create restore-cert-manager-production --from-backup cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
+fi
 ```
 
 View details about the restore process:
@@ -958,7 +945,7 @@ velero restore describe --selector letsencrypt=production --details
 ```
 
 ```console
-Name:         velero-monthly-backup-cert-manager-production-20251030075321
+Name:         restore-cert-manager-production
 Namespace:    velero
 Labels:       letsencrypt=production
 Annotations:  <none>
@@ -970,7 +957,7 @@ Items restored:              3
 Started:    2025-10-30 07:53:22 +0100 CET
 Completed:  2025-10-30 07:53:24 +0100 CET
 
-Backup:  velero-monthly-backup-cert-manager-production-20250921155028
+Backup:  cert-manager-production
 
 Namespaces:
   Included:  all namespaces found in the backup
@@ -1020,8 +1007,8 @@ kubectl describe certificates -n cert-manager ingress-cert-production
 Name:         ingress-cert-production
 Namespace:    cert-manager
 Labels:       letsencrypt=production
-              velero.io/backup-name=velero-monthly-backup-cert-manager-production-20250921155028
-              velero.io/restore-name=velero-monthly-backup-cert-manager-production-20251030075321
+              velero.io/backup-name=cert-manager-production
+              velero.io/restore-name=restore-cert-manager-production
 Annotations:  <none>
 API Version:  cert-manager.io/v1
 Kind:         Certificate
@@ -2238,7 +2225,23 @@ Back up the certificate before deleting the cluster (in case it was renewed):
 
 ```sh
 if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}' | grep -q "True"; then
-  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
+  kubectl apply -f - << EOF
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: cert-manager-production
+  namespace: velero
+spec:
+  ttl: 2160h
+  includedNamespaces:
+    - cert-manager
+  includedResources:
+    - certificates.cert-manager.io
+    - secrets
+  labelSelector:
+    matchLabels:
+      letsencrypt: production
+EOF
 fi
 ```
 
