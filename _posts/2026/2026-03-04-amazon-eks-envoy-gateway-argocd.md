@@ -803,7 +803,7 @@ kubectl label secret --namespace cert-manager letsencrypt-production-dns letsenc
 Create a new certificate and have it signed by Let's Encrypt for validation:
 
 ```bash
-if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q cert-manager-production; then
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" > /dev/null 2>&1; then
   tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
   apiVersion: cert-manager.io/v1
   kind: Certificate
@@ -1036,7 +1036,7 @@ Initiate the restore process for the cert-manager objects if the backup exists
 in the S3 bucket:
 
 ```bash
-if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q cert-manager-production; then
+if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" > /dev/null 2>&1; then
   velero restore create restore-cert-manager-production --from-backup cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 fi
 ```

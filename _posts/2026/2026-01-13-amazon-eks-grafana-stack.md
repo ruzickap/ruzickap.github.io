@@ -962,7 +962,7 @@ new certificate and have it signed by Let's Encrypt:
 
 ```bash
 while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
-if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q cert-manager-production; then
+if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" > /dev/null 2>&1; then
   velero restore create restore-cert-manager-production --from-backup cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 else
   tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
@@ -2410,7 +2410,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,k8s-monitoring,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,pyroscope,tempo,velero},k8s-{karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,k8s-monitoring,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,pyroscope,tempo,velero},k8s-{cert-manager-certificate-production,cert-manager-clusterissuer-production,karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else
