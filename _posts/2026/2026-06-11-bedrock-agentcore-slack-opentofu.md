@@ -1471,9 +1471,11 @@ EOF
 Initialize and apply the OpenTofu configuration:
 
 ```bash
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" init
-if [[ ! ${MY_TASK:-} =~ delete: ]]; then
-  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" apply -auto-approve
+if aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
+  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" init
+  if [[ ! ${MY_TASK:-} =~ delete: ]]; then
+    tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" apply -auto-approve
+  fi
 fi
 ```
 

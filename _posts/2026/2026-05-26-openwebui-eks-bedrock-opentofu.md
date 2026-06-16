@@ -1894,9 +1894,11 @@ Initialise the OpenTofu working directory and apply the entire configuration
 in a single run:
 
 ```bash
-tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
-if [[ ! ${MY_TASK:-} =~ delete: ]]; then
-  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
+if aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
+  if [[ ! ${MY_TASK:-} =~ delete: ]]; then
+    tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
+  fi
 fi
 ```
 
