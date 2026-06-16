@@ -928,13 +928,66 @@ helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace vele
 The following steps will guide you through restoring a Let's Encrypt production
 certificate, previously backed up by Velero to S3, onto a new cluster.
 
-Initiate the restore process for the cert-manager objects if the backup exists
-in the S3 bucket:
+Create a Let's Encrypt production `ClusterIssuer`:
+
+```bash
+kubectl wait --namespace cert-manager --for=condition=Available deployment/cert-manager-webhook --timeout=300s
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-production.yml" << EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production-dns
+  labels:
+    letsencrypt: production
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: ${MY_EMAIL}
+    privateKeySecretRef:
+      name: letsencrypt-production-dns
+    solvers:
+      - selector:
+          dnsZones:
+            - ${CLUSTER_FQDN}
+        dns01:
+          route53: {}
+EOF
+kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
+kubectl label secret --namespace cert-manager letsencrypt-production-dns letsencrypt=production
+```
+
+Wait for the Velero `BackupStorageLocation` to sync, then restore the
+cert-manager objects if the backup exists in the S3 bucket. Otherwise, request a
+new certificate and have it signed by Let's Encrypt:
 
 ```bash
 while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
 if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q cert-manager-production; then
   velero restore create restore-cert-manager-production --from-backup cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
+else
+  tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-production
+  namespace: cert-manager
+  labels:
+    letsencrypt: production
+spec:
+  secretName: cert-production
+  secretTemplate:
+    labels:
+      letsencrypt: production
+  issuerRef:
+    name: letsencrypt-production-dns
+    kind: ClusterIssuer
+  commonName: "*.${CLUSTER_FQDN}"
+  dnsNames:
+    - "*.${CLUSTER_FQDN}"
+    - "${CLUSTER_FQDN}"
+EOF
+  kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate cert-production
+  echo "👉 Certificate successfully created and signed by Let's Encrypt."
 fi
 ```
 
@@ -991,20 +1044,20 @@ HooksFailed:      0
 
 Resource List:
   cert-manager.io/v1/Certificate:
-    - cert-manager/ingress-cert-production(created)
+    - cert-manager/cert-production(created)
   v1/Secret:
-    - cert-manager/ingress-cert-production(created)
+    - cert-manager/cert-production(created)
     - cert-manager/letsencrypt-production-dns(created)
 ```
 
 Verify that the certificate was restored properly:
 
 ```bash
-kubectl describe certificates -n cert-manager ingress-cert-production
+kubectl describe certificates -n cert-manager cert-production
 ```
 
 ```console
-Name:         ingress-cert-production
+Name:         cert-production
 Namespace:    cert-manager
 Labels:       letsencrypt=production
               velero.io/backup-name=cert-manager-production
@@ -1026,7 +1079,7 @@ Spec:
     Group:      cert-manager.io
     Kind:       ClusterIssuer
     Name:       letsencrypt-production-dns
-  Secret Name:  ingress-cert-production
+  Secret Name:  cert-production
   Secret Template:
     Labels:
       Letsencrypt:  production
@@ -1097,7 +1150,7 @@ controller:
   ingressClassResource:
     default: true
   extraArgs:
-    default-ssl-certificate: cert-manager/ingress-cert-production
+    default-ssl-certificate: cert-manager/cert-production
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
