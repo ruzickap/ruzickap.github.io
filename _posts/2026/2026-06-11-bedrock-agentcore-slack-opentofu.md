@@ -1586,8 +1586,10 @@ mise run "create:${MISE_TASK_NAME##*:}"
 ```
 
 ```sh
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve &&
-  aws s3 rm "s3://${PROJECT_NAME}" --recursive || true
+if aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
+  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve &&
+    aws s3 rm "s3://${PROJECT_NAME}" --recursive || true
+fi
 aws cloudformation delete-stack --stack-name "${PROJECT_NAME}-s3" || true
 rm -rf "${TMP_DIR:?}/${PROJECT_NAME:?}" agent-runtime.zip || true
 ```

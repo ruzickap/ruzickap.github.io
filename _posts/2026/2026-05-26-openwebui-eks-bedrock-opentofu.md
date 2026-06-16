@@ -1971,7 +1971,9 @@ Remove the Gateway resource so the AWS Load Balancer Controller can properly
 delete the NLB and its security groups while still running:
 
 ```sh
-tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=kubectl_manifest.nodepool_default -target=kubectl_manifest.gateway -auto-approve || true
+if aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=kubectl_manifest.nodepool_default -target=kubectl_manifest.gateway -auto-approve || true
+fi
 ```
 
 Terminate EC2 instances provisioned by Karpenter:
@@ -1986,7 +1988,8 @@ done
 Destroy the remaining infrastructure with OpenTofu:
 
 ```sh
-if tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -auto-approve; then
+if aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null &&
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -auto-approve; then
   aws s3 rm "s3://${CLUSTER_FQDN}/terraform.tfstate" --recursive
   rm -rf "${TMP_DIR:?}/${CLUSTER_FQDN:?}"
 fi
