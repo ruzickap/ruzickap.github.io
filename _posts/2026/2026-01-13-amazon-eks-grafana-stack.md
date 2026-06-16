@@ -47,7 +47,6 @@ and set up other necessary secrets and variables:
 export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AWS_SESSION_TOKEN="xxxxxxxx"
-export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
 export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
 export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```

@@ -90,7 +90,6 @@ and set up other necessary secrets and variables:
 export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AWS_SESSION_TOKEN="xxxxxxxx"
-export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
 ```
 
 If you plan to follow this document and its tasks, you will need to set up a few
@@ -99,6 +98,7 @@ environment variables, such as:
 ```bash
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ROLE_TO_ASSUME=$(aws sts get-caller-identity --query "Arn" --output text) && export AWS_ROLE_TO_ASSUME
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 # Cluster Name: k02

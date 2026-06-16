@@ -47,7 +47,6 @@ on:
 
 env:
   AWS_REGION: us-east-1
-  AWS_ROLE_TO_ASSUME: ${{ secrets.RUZICKA_SBX01_AWS_ROLE_TO_ASSUME }}
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
@@ -70,7 +69,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
         with:
-          role-to-assume: ${{ env.AWS_ROLE_TO_ASSUME }}
+          role-to-assume: ${{ secrets.RUZICKA_SBX01_AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 7200
           role-session-name: ${{ github.event.repository.name }}-${{ github.workflow }}-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
