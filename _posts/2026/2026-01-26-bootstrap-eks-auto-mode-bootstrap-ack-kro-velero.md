@@ -1946,7 +1946,7 @@ cause the delete to hang indefinitely:
 # KRO from removing its own finalizer from the S3Bucket CR. The finalizer is
 # owned by Velero's field manager, so KRO's SSA patch silently fails to remove
 # it, causing deletion to hang indefinitely.
-kubectl patch s3buckets k02-s3 -n kro-system --type=json -p='[{"op": "remove", "path": "/metadata/finalizers/0"}]'
+kubectl patch s3buckets k02-s3 -n kro-system --type=json -p='[{"op": "remove", "path": "/metadata/finalizers/0"}]' || true
 
 kubectl delete eksautomodeclusters.kro.run -n kro-system "${CLUSTER_NAME}" --timeout=10m || true
 ```
