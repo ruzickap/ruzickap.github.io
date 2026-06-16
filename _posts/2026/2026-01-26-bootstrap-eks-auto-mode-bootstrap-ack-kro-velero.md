@@ -1748,6 +1748,7 @@ Define environment variables and workspace paths for cleanup tasks:
 
 ```sh
 export AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ROLE_TO_ASSUME=$(aws sts get-caller-identity --query "Arn" --output text) && export AWS_ROLE_TO_ASSUME
 export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
