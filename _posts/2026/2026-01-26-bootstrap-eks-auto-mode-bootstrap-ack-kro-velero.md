@@ -1634,8 +1634,9 @@ Wait for the `kro-ack-backup` to appear in the Velero backup list (synced from
 the S3 bucket):
 
 ```bash
-while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
-  echo "Waiting for kro-ack-backup to appear..."
+for i in $(seq 10); do
+  kubectl get backup -n velero kro-ack-backup 2> /dev/null && break
+  echo "Waiting for kro-ack-backup to appear... (${i}/10)"
   sleep 5
 done
 ```
@@ -1880,8 +1881,9 @@ snapshotsEnabled: false
 EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/helm_values-velero.yml" velero vmware-tanzu/velero
 
-while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
-  echo "Waiting for kro-ack-backup to appear..."
+for I in $(seq 50); do
+  kubectl get backup -n velero kro-ack-backup 2> /dev/null && break
+  echo "Waiting for kro-ack-backup to appear... (${I}/50)"
   sleep 5
 done
 ```
