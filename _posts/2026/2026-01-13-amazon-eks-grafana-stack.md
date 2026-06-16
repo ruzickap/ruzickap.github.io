@@ -856,6 +856,7 @@ initContainers:
     volumeMounts:
       - mountPath: /target
         name: plugins
+upgradeCRDs: false
 priorityClassName: high-priority
 metrics:
   serviceMonitor:
@@ -2236,19 +2237,20 @@ Back up the certificate before deleting the cluster (in case it was renewed):
 {% raw %}
 
 ```sh
-if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
+if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}' | grep -q "True"; then
   velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
 fi
 ```
 
 {% endraw %}
 
-Stop Karpenter from launching additional nodes and remove ingress-nginx
-to release the AWS Load Balancer:
+Stop Karpenter from launching additional nodes by deleting the NodePool, and
+delete the ingress-nginx controller Service to release the AWS Load Balancer
+(Karpenter and the ingress-nginx release stay installed):
 
 ```sh
-helm uninstall -n karpenter karpenter || true
-helm uninstall -n ingress-nginx ingress-nginx || true
+kubectl delete nodepool default || true
+kubectl delete -n ingress-nginx service ingress-nginx-controller || true
 ```
 
 Remove any remaining EC2 instances provisioned by Karpenter (if they still
