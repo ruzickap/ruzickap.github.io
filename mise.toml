@@ -303,6 +303,7 @@ run = '''
   set -euxo pipefail
   while read -r TASK; do
     mise run "${TASK}"
+    aws sts get-caller-identity
   done < <(sed -n 's/^\[tasks."\(\(create\|delete\):2026.*\)"]/\1/p' mise.toml)
 '''
 
@@ -313,5 +314,6 @@ run = '''
   set -euxo pipefail
   while read -r TASK; do
     mise run "${TASK}"
+    aws sts get-caller-identity
   done < <(sed -n 's/^\[tasks."\(delete:2026.*\)"]/\1/p' mise.toml)
 '''
