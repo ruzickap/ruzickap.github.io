@@ -64,13 +64,13 @@ jobs:
     name: "${{ inputs.action }} | ${{ inputs.posts }}"
     concurrency:
       group: post_tests-${{ inputs.cluster_fqdn }}
-    timeout-minutes: 120 # Same as timeout for the AWS IAM role - AWS_ROLE_TO_ASSUME
+    timeout-minutes: 240 # Same as timeout for the AWS IAM role - AWS_ROLE_TO_ASSUME
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
         with:
           role-to-assume: ${{ secrets.RUZICKA_SBX01_AWS_ROLE_TO_ASSUME }}
-          role-duration-seconds: 7200
+          role-duration-seconds: 14400
           role-session-name: ${{ github.event.repository.name }}-${{ github.workflow }}-${{ github.run_id }}
           aws-region: ${{ env.AWS_REGION }}
           mask-aws-account-id: true
