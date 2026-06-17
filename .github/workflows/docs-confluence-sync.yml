@@ -24,7 +24,7 @@ env:
 
 jobs:
   docs-confluence-sync:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout Code
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
@@ -43,6 +43,13 @@ jobs:
         env:
           CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
+          # Ubuntu 24.04 restricts unprivileged user namespaces via AppArmor,
+          # which breaks the headless Chrome sandbox used by mark to render
+          # Mermaid diagrams (fatal "No usable sandbox" error). Relax the
+          # restriction so Chrome can start.
+          # https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
           eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
           brew install mark
 
