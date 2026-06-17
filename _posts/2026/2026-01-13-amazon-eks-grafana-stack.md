@@ -2417,7 +2417,7 @@ if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
       echo "❌ File not found: ${FILE}"
     fi
   done
-  rmdir "${TMP_DIR}/${CLUSTER_FQDN}" || find "${TMP_DIR}" -ls
+  rmdir "${TMP_DIR}/${CLUSTER_FQDN}"
 fi
 ```
 
