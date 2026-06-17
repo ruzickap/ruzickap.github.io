@@ -962,7 +962,7 @@ new certificate and have it signed by Let's Encrypt:
 
 ```bash
 while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
-if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" > /dev/null 2>&1; then
+if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" 2> /dev/null | grep -q .; then
   velero restore create restore-cert-manager-production --from-backup cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 else
   tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
