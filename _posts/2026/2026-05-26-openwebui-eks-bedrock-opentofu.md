@@ -127,6 +127,10 @@ Install the required tools:
 - [AWS CLI](https://builder.aws.com/build/tools)
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 
+```bash
+mise use opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1 helm@4.2.0
+```
+
 ### Configure AWS Route 53 Domain delegation
 
 <!-- prettier-ignore-start -->
@@ -242,7 +246,7 @@ using CloudFormation. The bucket uses KMS encryption, lifecycle policies, and
 blocks all public access:
 
 ```bash
-if ! aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
+if [[ ! ${MY_TASK:-} =~ delete: ]] && ! aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
   tee "${TMP_DIR}/${CLUSTER_FQDN}/s3.yaml" << \EOF
 AWSTemplateFormatVersion: "2010-09-09"
 Description: S3 bucket for Amazon EKS backups and OpenTofu state files
@@ -1890,9 +1894,11 @@ Initialise the OpenTofu working directory and apply the entire configuration
 in a single run:
 
 ```bash
-tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
-if [[ ! ${MY_TASK:-} =~ delete: ]]; then
-  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
+if aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" init
+  if [[ ! ${MY_TASK:-} =~ delete: ]]; then
+    tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" apply -auto-approve
+  fi
 fi
 ```
 
@@ -1921,6 +1927,7 @@ export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig.conf}"
+mise use opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
@@ -1966,7 +1973,9 @@ Remove the Gateway resource so the AWS Load Balancer Controller can properly
 delete the NLB and its security groups while still running:
 
 ```sh
-tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=kubectl_manifest.nodepool_default -target=kubectl_manifest.gateway -auto-approve || true
+if aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=kubectl_manifest.nodepool_default -target=kubectl_manifest.gateway -auto-approve || true
+fi
 ```
 
 Terminate EC2 instances provisioned by Karpenter:
@@ -1981,7 +1990,8 @@ done
 Destroy the remaining infrastructure with OpenTofu:
 
 ```sh
-if tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -auto-approve; then
+if aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null &&
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -auto-approve; then
   aws s3 rm "s3://${CLUSTER_FQDN}/terraform.tfstate" --recursive
   rm -rf "${TMP_DIR:?}/${CLUSTER_FQDN:?}"
 fi

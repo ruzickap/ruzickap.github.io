@@ -100,6 +100,10 @@ Install the required tools:
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
 
+```bash
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
+```
+
 ### Configure AWS Route 53 Domain delegation
 
 <!-- prettier-ignore-start -->
@@ -379,7 +383,7 @@ Karpenter.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="400"}
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.12/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
+curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.13/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
 eval aws cloudformation deploy --stack-name "${CLUSTER_NAME}-karpenter" \
   --template-file "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml" \
   --capabilities CAPABILITY_NAMED_IAM \
@@ -539,7 +543,7 @@ following concerns:
   AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver create-resolver-query-log-config \
     --name "${CLUSTER_NAME}-vpc-dns-logs" \
     --destination-arn "${AWS_CLUSTER_LOG_GROUP_ARN}" \
-    --creator-request-id "$(uuidgen)" --query 'ResolverQueryLogConfig.Id' --output text)
+    --creator-request-id "$(cat /proc/sys/kernel/random/uuid)" --query 'ResolverQueryLogConfig.Id' --output text)
 
   aws route53resolver associate-resolver-query-log-config \
     --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
@@ -799,7 +803,7 @@ kubectl label secret --namespace cert-manager letsencrypt-production-dns letsenc
 Create a new certificate and have it signed by Let's Encrypt for validation:
 
 ```bash
-if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
+if ! aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" 2> /dev/null | grep -q .; then
   tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
   apiVersion: cert-manager.io/v1
   kind: Certificate
@@ -1008,21 +1012,6 @@ spec:
             name: velero
         credentials:
           useSecret: false
-        schedules:
-          monthly-backup-cert-manager-production:
-            labels:
-              letsencrypt: production
-            schedule: "@monthly"
-            template:
-              ttl: 2160h
-              includedNamespaces:
-                - cert-manager
-              includedResources:
-                - certificates.cert-manager.io
-                - secrets
-              labelSelector:
-                matchLabels:
-                  letsencrypt: production
   syncPolicy:
     automated:
       prune: true
@@ -1047,8 +1036,8 @@ Initiate the restore process for the cert-manager objects if the backup exists
 in the S3 bucket:
 
 ```bash
-if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/" | grep -q velero-monthly-backup-cert-manager-production; then
-  velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
+if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" 2> /dev/null | grep -q .; then
+  velero restore create restore-cert-manager-production --from-backup cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 fi
 ```
 
@@ -2212,6 +2201,7 @@ export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 velero@1.18.1
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
@@ -2228,13 +2218,32 @@ by cert-manager (not merely restored from a previous backup). The presence of
 a `CertificateRequest` resource proves that cert-manager contacted Let's
 Encrypt — Velero does not back up or restore `CertificateRequest` resources:
 
+{% raw %}
+
 ```sh
 if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o name 2> /dev/null | grep -q .; then
-  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production --wait
-  velero backup describe "$(kubectl get backup -n velero -l velero.io/schedule-name=velero-monthly-backup-cert-manager-production --sort-by=.metadata.creationTimestamp -o jsonpath='{.items[-1].metadata.name}')"
+  kubectl apply -f - << EOF
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: cert-manager-production
+  namespace: velero
+spec:
+  ttl: 2160h
+  includedNamespaces:
+    - cert-manager
+  includedResources:
+    - certificates.cert-manager.io
+    - secrets
+  labelSelector:
+    matchLabels:
+      letsencrypt: production
+EOF
   echo "👉 Production cert-manager certificates backed up with Velero"
 fi
 ```
+
+{% endraw %}
 
 Disassociate a Route 53 Resolver query log configuration from an Amazon
 VPC:

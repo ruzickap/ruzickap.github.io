@@ -205,7 +205,7 @@ Create an S3 bucket to store OpenTofu remote state using CloudFormation. The
 bucket uses KMS encryption, lifecycle policies, and blocks all public access:
 
 ```bash
-if ! aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
+if [[ ! ${MY_TASK:-} =~ delete: ]] && ! aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
   cat > "${TMP_DIR}/${PROJECT_NAME}/s3.yaml" << \EOF
 AWSTemplateFormatVersion: "2010-09-09"
 Description: S3 bucket for OpenTofu state files
@@ -1471,9 +1471,11 @@ EOF
 Initialize and apply the OpenTofu configuration:
 
 ```bash
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" init
-if [[ ! ${MY_TASK:-} =~ delete: ]]; then
-  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" apply -auto-approve
+if aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
+  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" init
+  if [[ ! ${MY_TASK:-} =~ delete: ]]; then
+    tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" apply -auto-approve
+  fi
 fi
 ```
 
@@ -1586,8 +1588,10 @@ mise run "create:${MISE_TASK_NAME##*:}"
 ```
 
 ```sh
-tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve &&
-  aws s3 rm "s3://${PROJECT_NAME}" --recursive || true
+if aws s3api head-bucket --bucket "${PROJECT_NAME}" 2> /dev/null; then
+  tofu -chdir="${TMP_DIR}/${PROJECT_NAME}" destroy -auto-approve &&
+    aws s3 rm "s3://${PROJECT_NAME}" --recursive || true
+fi
 aws cloudformation delete-stack --stack-name "${PROJECT_NAME}-s3" || true
 rm -rf "${TMP_DIR:?}/${PROJECT_NAME:?}" agent-runtime.zip || true
 ```

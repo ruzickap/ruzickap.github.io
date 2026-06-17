@@ -31,6 +31,10 @@ Links:
   "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))"
 - [Helm](https://helm.sh)
 
+```bash
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
+```
+
 The following variables are used in the subsequent steps:
 
 ```bash
@@ -798,21 +802,20 @@ I0913 04:53:46.526286       1 acme.go:233] "cert-manager/certificaterequests-iss
 I0913 04:53:46.526563       1 conditions.go:252] Found status change for CertificateRequest "ingress-cert-production-1" condition "Ready": "False" -> "True"; setting lastTransitionTime to 2023-09-13 04:53:46.526554494 +0000 UTC m=+658.570022573
 ```
 
----
+## Clean-up
 
 Back up the certificate before deleting the cluster (in case it was renewed):
 
 {% raw %}
 
 ```sh
-if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
+mise use kubectl@1.36.1 velero@1.18.1
+if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}' | grep -q "True"; then
   velero backup create --labels letsencrypt=production --ttl 2160h0m0s --from-schedule velero-weekly-backup-cert-manager
 fi
 ```
 
 {% endraw %}
-
-## Clean-up
 
 Remove files from the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 

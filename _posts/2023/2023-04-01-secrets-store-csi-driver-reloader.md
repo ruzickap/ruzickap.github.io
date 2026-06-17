@@ -41,6 +41,10 @@ Links:
   "[Cheapest Amazon EKS]({% post_url /2022/2022-11-27-cheapest-amazon-eks %}))"
 - [Helm](https://helm.sh)
 
+```bash
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0
+```
+
 The following variables are used in the subsequent steps:
 
 ```bash
@@ -521,6 +525,7 @@ To clean up the environment, delete the IRSA, remove the CloudFormation stack,
 and delete the namespace:
 
 ```sh
+mise use aws@2.35.2 eksctl@0.227.0
 if eksctl get iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard; then
   eksctl delete iamserviceaccount --cluster="${CLUSTER_NAME}" --name=kuard --namespace=kuard
 fi

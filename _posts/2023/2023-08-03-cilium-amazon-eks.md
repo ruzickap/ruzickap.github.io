@@ -59,7 +59,6 @@ and set up other necessary secrets and variables.
 export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AWS_SESSION_TOKEN="xxxxxxxx"
-export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
 export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
 export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```
@@ -98,6 +97,10 @@ Install the necessary tools:
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [cilium](https://github.com/cilium/cilium-cli)
 - [helm](https://github.com/helm/helm)
+
+```bash
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 github:cilium/cilium-cli@0.19.4 helm@4.2.0
+```
 
 ## Configure AWS Route 53 Domain delegation
 
@@ -2212,14 +2215,16 @@ export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
-Stop Karpenter from launching additional nodes and delete all Ingress
-resources to release the AWS Load Balancer before removing the cluster:
+Stop Karpenter from launching additional nodes by deleting the Provisioner, and
+delete all Ingress resources to release the AWS Load Balancer before removing
+the cluster:
 
 ```sh
-helm uninstall -n karpenter karpenter || true
+kubectl delete provisioner default || true
 kubectl delete ingress --all-namespaces --all || true
 ```
 

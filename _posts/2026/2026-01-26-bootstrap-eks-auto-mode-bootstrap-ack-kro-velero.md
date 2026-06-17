@@ -27,6 +27,10 @@ them to the new EKS Auto Mode Cluster — effectively making it self-managed.
 - [kind](https://kind.sigs.k8s.io/)
 - [Velero CLI](https://velero.io/docs/main/basic-install/#install-the-cli)
 
+```bash
+mise use aws@2.35.2 kubectl@1.36.1 helm@4.2.0 kind@0.32.0 velero@1.18.1
+```
+
 ## Architecture Overview
 
 The bootstrap process follows these steps:
@@ -86,7 +90,6 @@ and set up other necessary secrets and variables:
 export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AWS_SESSION_TOKEN="xxxxxxxx"
-export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
 ```
 
 If you plan to follow this document and its tasks, you will need to set up a few
@@ -95,6 +98,7 @@ environment variables, such as:
 ```bash
 # AWS Region
 export AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ROLE_TO_ASSUME=$(aws sts get-caller-identity --query "Arn" --output text) && export AWS_ROLE_TO_ASSUME
 # Hostname / FQDN definitions
 export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 # Cluster Name: k02
@@ -1630,8 +1634,9 @@ Wait for the `kro-ack-backup` to appear in the Velero backup list (synced from
 the S3 bucket):
 
 ```bash
-while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
-  echo "Waiting for kro-ack-backup to appear..."
+for i in $(seq 10); do
+  kubectl get backup -n velero kro-ack-backup 2> /dev/null && break
+  echo "Waiting for kro-ack-backup to appear... (${i}/10)"
   sleep 5
 done
 ```
@@ -1743,10 +1748,12 @@ Define environment variables and workspace paths for cleanup tasks:
 
 ```sh
 export AWS_REGION="${AWS_REGION:-us-east-1}"
+AWS_ROLE_TO_ASSUME=$(aws sts get-caller-identity --query "Arn" --output text) && export AWS_ROLE_TO_ASSUME
 export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}" "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup"
+mise use kubectl@1.36.1 helm@4.2.0 kind@0.32.0
 ```
 
 Create the Kind cluster:
@@ -1875,8 +1882,9 @@ snapshotsEnabled: false
 EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup/helm_values-velero.yml" velero vmware-tanzu/velero
 
-while ! kubectl get backup -n velero kro-ack-backup 2> /dev/null; do
-  echo "Waiting for kro-ack-backup to appear..."
+for I in $(seq 20); do
+  kubectl get backup -n velero kro-ack-backup 2> /dev/null && break
+  echo "Waiting for kro-ack-backup to appear... (${I}/20)"
   sleep 5
 done
 ```
@@ -1897,7 +1905,7 @@ spec:
     includedResources:
       - "*"
 EOF
-kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero
+kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero || true
 ```
 
 Scale kro and ACK controllers back up so they can reconcile the restored
@@ -1938,7 +1946,7 @@ cause the delete to hang indefinitely:
 # KRO from removing its own finalizer from the S3Bucket CR. The finalizer is
 # owned by Velero's field manager, so KRO's SSA patch silently fails to remove
 # it, causing deletion to hang indefinitely.
-kubectl patch s3buckets k02-s3 -n kro-system --type=json -p='[{"op": "remove", "path": "/metadata/finalizers/0"}]'
+kubectl patch s3buckets k02-s3 -n kro-system --type=json -p='[{"op": "remove", "path": "/metadata/finalizers/0"}]' || true
 
 kubectl delete eksautomodeclusters.kro.run -n kro-system "${CLUSTER_NAME}" --timeout=10m || true
 ```

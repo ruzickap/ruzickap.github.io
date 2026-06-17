@@ -47,7 +47,6 @@ and set up other necessary secrets and variables:
 export AWS_ACCESS_KEY_ID="xxxxxxxxxxxxxxxxxx"
 export AWS_SECRET_ACCESS_KEY="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export AWS_SESSION_TOKEN="xxxxxxxx"
-export AWS_ROLE_TO_ASSUME="arn:aws:iam::7xxxxxxxxxx7:role/Gixxxxxxxxxxxxxxxxxxxxle"
 export GOOGLE_CLIENT_ID="10xxxxxxxxxxxxxxxud.apps.googleusercontent.com"
 export GOOGLE_CLIENT_SECRET="GOxxxxxxxxxxxxxxxtw"
 ```
@@ -86,6 +85,10 @@ Install the required tools:
 - [eksctl](https://eksctl.io/)
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
+
+```bash
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
+```
 
 ### Configure AWS Route 53 Domain delegation
 
@@ -362,7 +365,7 @@ a complete description of what `cloudformation.yaml` does for Karpenter.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="400"}
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.8/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
+curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.13/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
 eval aws cloudformation deploy \
   --stack-name "${CLUSTER_NAME}-karpenter" \
   --template-file "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml" \
@@ -530,7 +533,7 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
   AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver create-resolver-query-log-config \
     --name "${CLUSTER_NAME}-vpc-dns-logs" \
     --destination-arn "${AWS_CLUSTER_LOG_GROUP_ARN}" \
-    --creator-request-id "$(uuidgen)" --query 'ResolverQueryLogConfig.Id' --output text)
+    --creator-request-id "$(cat /proc/sys/kernel/random/uuid)" --query 'ResolverQueryLogConfig.Id' --output text)
 
   aws route53resolver associate-resolver-query-log-config \
     --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
@@ -694,12 +697,12 @@ flexibility, performance, and simplicity.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter-provider-aws/41b115a0b85677641e387635496176c4cc30d4c6/website/static/full_logo.svg){:width="500"}
 
 Install the `karpenter` [Helm chart](https://github.com/aws/karpenter-provider-aws/tree/main/charts/karpenter)
-and customize its [default values](https://github.com/aws/karpenter-provider-aws/blob/v1.8.2/charts/karpenter/values.yaml)
+and customize its [default values](https://github.com/aws/karpenter-provider-aws/blob/v1.12.1/charts/karpenter/values.yaml)
 to fit your environment and storage backend:
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter-provider-aws
-KARPENTER_HELM_CHART_VERSION="1.8.4"
+KARPENTER_HELM_CHART_VERSION="1.12.1"
 
 tee "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-karpenter.yml" << EOF
 serviceMonitor:
@@ -853,6 +856,7 @@ initContainers:
     volumeMounts:
       - mountPath: /target
         name: plugins
+upgradeCRDs: false
 priorityClassName: high-priority
 metrics:
   serviceMonitor:
@@ -913,22 +917,6 @@ serviceAccount:
     name: velero
 credentials:
   useSecret: false
-# Create scheduled backup to periodically backup the let's encrypt production resources in the "cert-manager" namespace:
-schedules:
-  monthly-backup-cert-manager-production:
-    labels:
-      letsencrypt: production
-    schedule: "@monthly"
-    template:
-      ttl: 2160h
-      includedNamespaces:
-        - cert-manager
-      includedResources:
-        - certificates.cert-manager.io
-        - secrets
-      labelSelector:
-        matchLabels:
-          letsencrypt: production
 EOF
 helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace velero --create-namespace --wait --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-velero.yml" velero vmware-tanzu/velero
 ```
@@ -940,11 +928,67 @@ helm upgrade --install --version "${VELERO_HELM_CHART_VERSION}" --namespace vele
 The following steps will guide you through restoring a Let's Encrypt production
 certificate, previously backed up by Velero to S3, onto a new cluster.
 
-Initiate the restore process for the cert-manager objects.
+Create a Let's Encrypt production `ClusterIssuer`:
+
+```bash
+kubectl wait --namespace cert-manager --for=condition=Available deployment/cert-manager-webhook --timeout=300s
+tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-clusterissuer-production.yml" << EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-production-dns
+  labels:
+    letsencrypt: production
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: ${MY_EMAIL}
+    privateKeySecretRef:
+      name: letsencrypt-production-dns
+    solvers:
+      - selector:
+          dnsZones:
+            - ${CLUSTER_FQDN}
+        dns01:
+          route53: {}
+EOF
+kubectl wait --namespace cert-manager --timeout=15m --for=condition=Ready clusterissuer --all
+kubectl label secret --namespace cert-manager letsencrypt-production-dns letsencrypt=production
+```
+
+Wait for the Velero `BackupStorageLocation` to sync, then restore the
+cert-manager objects if the backup exists in the S3 bucket. Otherwise, request a
+new certificate and have it signed by Let's Encrypt:
 
 ```bash
 while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
-velero restore create --from-schedule velero-monthly-backup-cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
+if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" 2> /dev/null | grep -q .; then
+  velero restore create restore-cert-manager-production --from-backup cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
+else
+  tee "${TMP_DIR}/${CLUSTER_FQDN}/k8s-cert-manager-certificate-production.yml" << EOF | kubectl apply -f -
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cert-production
+  namespace: cert-manager
+  labels:
+    letsencrypt: production
+spec:
+  secretName: cert-production
+  secretTemplate:
+    labels:
+      letsencrypt: production
+  issuerRef:
+    name: letsencrypt-production-dns
+    kind: ClusterIssuer
+  commonName: "*.${CLUSTER_FQDN}"
+  dnsNames:
+    - "*.${CLUSTER_FQDN}"
+    - "${CLUSTER_FQDN}"
+EOF
+  kubectl wait --namespace cert-manager --for=condition=Ready --timeout=10m certificate cert-production
+  echo "👉 Certificate successfully created and signed by Let's Encrypt."
+fi
 ```
 
 View details about the restore process:
@@ -954,7 +998,7 @@ velero restore describe --selector letsencrypt=production --details
 ```
 
 ```console
-Name:         velero-monthly-backup-cert-manager-production-20251030075321
+Name:         restore-cert-manager-production
 Namespace:    velero
 Labels:       letsencrypt=production
 Annotations:  <none>
@@ -966,7 +1010,7 @@ Items restored:              3
 Started:    2025-10-30 07:53:22 +0100 CET
 Completed:  2025-10-30 07:53:24 +0100 CET
 
-Backup:  velero-monthly-backup-cert-manager-production-20250921155028
+Backup:  cert-manager-production
 
 Namespaces:
   Included:  all namespaces found in the backup
@@ -1000,24 +1044,24 @@ HooksFailed:      0
 
 Resource List:
   cert-manager.io/v1/Certificate:
-    - cert-manager/ingress-cert-production(created)
+    - cert-manager/cert-production(created)
   v1/Secret:
-    - cert-manager/ingress-cert-production(created)
+    - cert-manager/cert-production(created)
     - cert-manager/letsencrypt-production-dns(created)
 ```
 
 Verify that the certificate was restored properly:
 
 ```bash
-kubectl describe certificates -n cert-manager ingress-cert-production
+kubectl describe certificates -n cert-manager cert-production
 ```
 
 ```console
-Name:         ingress-cert-production
+Name:         cert-production
 Namespace:    cert-manager
 Labels:       letsencrypt=production
-              velero.io/backup-name=velero-monthly-backup-cert-manager-production-20250921155028
-              velero.io/restore-name=velero-monthly-backup-cert-manager-production-20251030075321
+              velero.io/backup-name=cert-manager-production
+              velero.io/restore-name=restore-cert-manager-production
 Annotations:  <none>
 API Version:  cert-manager.io/v1
 Kind:         Certificate
@@ -1035,7 +1079,7 @@ Spec:
     Group:      cert-manager.io
     Kind:       ClusterIssuer
     Name:       letsencrypt-production-dns
-  Secret Name:  ingress-cert-production
+  Secret Name:  cert-production
   Secret Template:
     Labels:
       Letsencrypt:  production
@@ -1106,7 +1150,7 @@ controller:
   ingressClassResource:
     default: true
   extraArgs:
-    default-ssl-certificate: cert-manager/ingress-cert-production
+    default-ssl-certificate: cert-manager/cert-production
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -2224,6 +2268,7 @@ export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
@@ -2232,19 +2277,36 @@ Back up the certificate before deleting the cluster (in case it was renewed):
 {% raw %}
 
 ```sh
-if [[ "$(kubectl get --raw /api/v1/namespaces/cert-manager/services/cert-manager:9402/proxy/metrics | awk '/certmanager_http_acme_client_request_count.*acme-v02\.api.*finalize/ { print $2 }')" -gt 0 ]]; then
-  velero backup create --labels letsencrypt=production --ttl 2160h --from-schedule velero-monthly-backup-cert-manager-production
+if kubectl get certificaterequest -n cert-manager -l letsencrypt=production -o jsonpath='{.items[*].status.conditions[?(@.type=="Ready")].status}' | grep -q "True"; then
+  kubectl apply -f - << EOF
+apiVersion: velero.io/v1
+kind: Backup
+metadata:
+  name: cert-manager-production
+  namespace: velero
+spec:
+  ttl: 2160h
+  includedNamespaces:
+    - cert-manager
+  includedResources:
+    - certificates.cert-manager.io
+    - secrets
+  labelSelector:
+    matchLabels:
+      letsencrypt: production
+EOF
 fi
 ```
 
 {% endraw %}
 
-Stop Karpenter from launching additional nodes and remove ingress-nginx
-to release the AWS Load Balancer:
+Stop Karpenter from launching additional nodes by deleting the NodePool, and
+delete the ingress-nginx controller Service to release the AWS Load Balancer
+(Karpenter and the ingress-nginx release stay installed):
 
 ```sh
-helm uninstall -n karpenter karpenter || true
-helm uninstall -n ingress-nginx ingress-nginx || true
+kubectl delete nodepool default || true
+kubectl delete -n ingress-nginx service ingress-nginx-controller || true
 ```
 
 Remove any remaining EC2 instances provisioned by Karpenter (if they still
@@ -2348,7 +2410,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,k8s-monitoring,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,pyroscope,tempo,velero},k8s-{karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,k8s-monitoring,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,pyroscope,tempo,velero},k8s-{cert-manager-certificate-production,cert-manager-clusterissuer-production,karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else
