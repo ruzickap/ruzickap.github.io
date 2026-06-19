@@ -31,7 +31,7 @@ criteria:
 The Amazon EKS setup should also meet the following security requirements:
 
 - The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
-- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
+- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-encryption.html)
 - Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be
   configured
 - [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
@@ -83,7 +83,7 @@ Install the required tools:
 <!-- prettier-ignore-end -->
 
 - [AWS CLI](https://builder.aws.com/build/tools)
-- [eksctl](https://eksctl.io/)
+- [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/what-is-eksctl.html)
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
 
@@ -330,7 +330,7 @@ _KMS key_
 
 ## Create Amazon EKS
 
-I will use [eksctl](https://eksctl.io/) to create the [Amazon EKS](https://aws.amazon.com/eks/)
+I will use [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/what-is-eksctl.html) to create the [Amazon EKS](https://aws.amazon.com/eks/)
 cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
@@ -975,7 +975,7 @@ compute resources to handle your cluster's applications.
 
 Customize the [Karpenter](https://karpenter.sh/) default installation by
 upgrading its [Helm chart](https://artifacthub.io/packages/helm/oci-karpenter/karpenter)
-and modifying the [default values](https://github.com/aws/karpenter/blob/v0.31.4/charts/karpenter/values.yaml):
+and modifying the [default values](https://github.com/aws/karpenter-provider-aws/blob/v0.31.4/charts/karpenter/values.yaml):
 
 ```bash
 # renovate: datasource=github-tags depName=aws/karpenter extractVersion=^(?<version>.*)$
@@ -1156,7 +1156,7 @@ kubectl label namespace external-dns pod-security.kubernetes.io/enforce=baseline
 ### ingress-nginx
 
 [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
-controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
+controller for Kubernetes that uses [nginx](https://nginx.org/) as a
 reverse proxy and load balancer.
 
 Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)

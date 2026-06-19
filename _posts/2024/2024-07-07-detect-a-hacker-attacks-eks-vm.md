@@ -43,7 +43,7 @@ Requirements:
 
 - [AWS CLI](https://builder.aws.com/build/tools)
 - [rain](https://github.com/aws-cloudformation/rain)
-- [eksctl](https://eksctl.io/)
+- [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/what-is-eksctl.html)
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
 
@@ -77,7 +77,7 @@ chmod 600 "${TMP_DIR}/${AWS_EC2_KEY_PAIR_NAME}.pem"
 
 ### Amazon EKS with Wordpress
 
-Install the Amazon EKS cluster using [eksctl](https://eksctl.io/), run the
+Install the Amazon EKS cluster using [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/what-is-eksctl.html), run the
 vulnerable WordPress application, and connect the cluster to Wiz.
 
 ```bash

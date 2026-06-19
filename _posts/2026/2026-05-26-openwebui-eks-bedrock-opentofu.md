@@ -389,17 +389,13 @@ provider "helm" {
 locals {
   cluster_name = split(".", var.cluster_fqdn)[0]
   base_domain  = join(".", slice(split(".", var.cluster_fqdn), 1, length(split(".", var.cluster_fqdn))))
-  pii_block = [
-    "PASSWORD", "CREDIT_DEBIT_CARD_NUMBER", "PIN",
-    "INTERNATIONAL_BANK_ACCOUNT_NUMBER", "SWIFT_CODE",
-    "AWS_ACCESS_KEY", "AWS_SECRET_KEY",
-    "US_SOCIAL_SECURITY_NUMBER", "US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER",
-    "US_BANK_ACCOUNT_NUMBER", "US_BANK_ROUTING_NUMBER",
-    "CA_HEALTH_NUMBER", "CA_SOCIAL_INSURANCE_NUMBER",
-    "UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER", "UK_NATIONAL_INSURANCE_NUMBER",
-    "UK_NATIONAL_HEALTH_SERVICE_NUMBER",
+  pii_anonymize = [
+    "PHONE", "EMAIL", "ADDRESS", "PASSWORD", "DRIVER_ID", "LICENSE_PLATE", "VEHICLE_IDENTIFICATION_NUMBER",
+    "CREDIT_DEBIT_CARD_NUMBER", "PIN", "INTERNATIONAL_BANK_ACCOUNT_NUMBER", "SWIFT_CODE", "MAC_ADDRESS",
+    "AWS_ACCESS_KEY", "AWS_SECRET_KEY", "US_SOCIAL_SECURITY_NUMBER", "US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER",
+    "US_BANK_ACCOUNT_NUMBER", "US_BANK_ROUTING_NUMBER", "CA_HEALTH_NUMBER", "CA_SOCIAL_INSURANCE_NUMBER",
+    "UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER", "UK_NATIONAL_INSURANCE_NUMBER", "UK_NATIONAL_HEALTH_SERVICE_NUMBER",
   ]
-  pii_anonymize = ["PHONE", "EMAIL", "ADDRESS", "DRIVER_ID", "LICENSE_PLATE", "VEHICLE_IDENTIFICATION_NUMBER", "MAC_ADDRESS"]
   # [rule_no, action, from_port, to_port, protocol]
   nacl_ingress = [
     [89, "deny", 22, 22, "tcp"],
@@ -560,33 +556,26 @@ resource "aws_bedrock_guardrail" "ai_safety" {
   blocked_input_messaging   = "Input contains blocked PII"
   blocked_outputs_messaging = "Output contains blocked PII"
 
-  content_policy_config {
-    filters_config {
-      type            = "SEXUAL"
-      input_strength  = "HIGH"
-      output_strength = "HIGH"
-    }
-    filters_config {
-      type            = "PROMPT_ATTACK"
-      input_strength  = "HIGH"
-      output_strength = "NONE"
-    }
-  }
-
   sensitive_information_policy_config {
-    dynamic "pii_entities_config" {
-      for_each = local.pii_block
-      content {
-        type   = pii_entities_config.value
-        action = "BLOCK"
-      }
-    }
     dynamic "pii_entities_config" {
       for_each = local.pii_anonymize
       content {
         type   = pii_entities_config.value
         action = "ANONYMIZE"
       }
+    }
+  }
+
+  content_policy_config {
+    filters_config {
+      type            = "PROMPT_ATTACK"
+      input_strength  = "HIGH"
+      output_strength = "NONE"
+    }
+    filters_config {
+      type            = "SEXUAL"
+      input_strength  = "HIGH"
+      output_strength = "HIGH"
     }
   }
 }
@@ -1750,6 +1739,9 @@ resource "helm_release" "litellm" {
           litellm_params:
             model: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
             aws_region_name: ${data.aws_region.current.region}
+            # Claude on Bedrock rejects temperature+top_p together.
+            # Collmbo sends temperature, so drop top_p.
+            additional_drop_params: ["top_p"]
             guardrailConfig:
               guardrailIdentifier: ${aws_bedrock_guardrail.ai_safety.guardrail_arn}
               guardrailVersion: "DRAFT"
