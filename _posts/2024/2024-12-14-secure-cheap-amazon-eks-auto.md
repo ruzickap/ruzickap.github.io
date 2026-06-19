@@ -33,7 +33,7 @@ The Amazon EKS Auto Mode setup should also meet the following security
 requirements:
 
 - The Amazon EKS Auto Mode control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
-- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
+- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-encryption.html)
 - Cluster logging to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be
   configured
 
@@ -84,7 +84,7 @@ Install the required tools:
 <!-- prettier-ignore-end -->
 
 - [AWS CLI](https://builder.aws.com/build/tools)
-- [eksctl](https://eksctl.io/)
+- [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/what-is-eksctl.html)
 - [kubectl](https://github.com/kubernetes/kubectl)
 - [helm](https://github.com/helm/helm)
 
@@ -332,7 +332,7 @@ _KMS key_
 
 ## Create Amazon EKS Auto Mode
 
-I will use [eksctl](https://eksctl.io/) to create the [Amazon EKS Auto Mode](https://aws.amazon.com/eks/auto-mode/)
+I will use [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/what-is-eksctl.html) to create the [Amazon EKS Auto Mode](https://aws.amazon.com/eks/auto-mode/)
 cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
@@ -927,7 +927,7 @@ helm upgrade --install --version "${EXTERNAL_DNS_HELM_CHART_VERSION}" --namespac
 ### Ingress NGINX Controller
 
 [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) is an Ingress
-controller for Kubernetes that uses [nginx](https://www.nginx.org/) as a
+controller for Kubernetes that uses [nginx](https://nginx.org/) as a
 reverse proxy and load balancer.
 
 Install the `ingress-nginx` [Helm chart](https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx)

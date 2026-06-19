@@ -31,7 +31,7 @@ The Amazon EKS setup should align with the following criteria:
 - [Karpenter](https://karpenter.sh/) to enable automatic node scaling that
   matches the specific resource requirements of pods
 - The Amazon EKS control plane must be [encrypted using KMS](https://docs.aws.amazon.com/eks/latest/userguide/enable-kms.html)
-- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSEncryption.html)
+- Worker node [EBS volumes must be encrypted](https://docs.aws.amazon.com/ebs/latest/userguide/ebs-encryption.html)
 - [EKS cluster logging](https://docs.aws.amazon.com/eks/latest/userguide/control-plane-logs.html)
   to [CloudWatch](https://aws.amazon.com/cloudwatch/) must be configured
 - [EKS Pod Identities](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html)
@@ -97,7 +97,7 @@ Install the required tools:
 <!-- prettier-ignore-end -->
 
 - [AWS CLI](https://builder.aws.com/build/tools)
-- [eksctl](https://eksctl.io/)
+- [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/what-is-eksctl.html)
 - [kubectl](https://github.com/kubernetes/kubectl)
 
 ```bash
@@ -392,7 +392,7 @@ eval aws cloudformation deploy --stack-name "${CLUSTER_NAME}-karpenter" \
 
 ### Create Amazon EKS
 
-I will use [eksctl](https://eksctl.io/) to create the
+I will use [eksctl](https://docs.aws.amazon.com/eks/latest/eksctl/what-is-eksctl.html) to create the
 [Amazon EKS](https://aws.amazon.com/eks/) cluster.
 
 ![eksctl](https://raw.githubusercontent.com/weaveworks/eksctl/2b1ec6223c4e7cb8103c08162e6de8ced47376f9/userdocs/src/img/eksctl.png){:width="700"}
