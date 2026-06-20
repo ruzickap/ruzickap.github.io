@@ -32,6 +32,7 @@ on:
           - 2026-03-04-amazon-eks-envoy-gateway-argocd
           - 2026-05-26-openwebui-eks-bedrock-opentofu
           - 2026-06-11-bedrock-agentcore-slack-opentofu
+          - 2026-06-17-slack-bot-bedrock-confluence|2026-05-26-openwebui-eks-bedrock-opentofu
           - posts:2026
       action:
         type: choice
@@ -50,8 +51,10 @@ env:
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  MY_SLACK_APP_TOKEN: ${{ secrets.MY_SLACK_APP_TOKEN }}
   MY_SLACK_BOT_SIGNING_SECRET: ${{ secrets.MY_SLACK_BOT_SIGNING_SECRET }}
   MY_SLACK_BOT_TOKEN: ${{ secrets.MY_SLACK_BOT_TOKEN }}
+  MY_CONFLUENCE_API_TOKEN: ${{ secrets.MY_CONFLUENCE_API_TOKEN }}
 
 permissions: read-all
 

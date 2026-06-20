@@ -294,6 +294,17 @@ description = 'Delete: Amazon Bedrock AgentCore Slack Bot deployed with OpenTofu
 run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
 
 #------------------------------------------------------------------------------
+# Slack bot answering from Confluence with Amazon Bedrock Knowledge Bases
+#------------------------------------------------------------------------------
+[tasks."create:2026-06-17-slack-bot-bedrock-confluence|2026-05-26-openwebui-eks-bedrock-opentofu"]
+description = 'Create: Slack bot answering from Confluence with Amazon Bedrock Knowledge Bases'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2026-06-17-slack-bot-bedrock-confluence|2026-05-26-openwebui-eks-bedrock-opentofu"]
+description = 'Delete: Slack bot answering from Confluence with Amazon Bedrock Knowledge Bases'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
 # Create and delete 2026 posts
 #------------------------------------------------------------------------------
 [tasks."create:posts:2026"]

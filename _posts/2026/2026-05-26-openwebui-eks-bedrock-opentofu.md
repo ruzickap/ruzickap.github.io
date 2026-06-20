@@ -390,7 +390,7 @@ locals {
   cluster_name = split(".", var.cluster_fqdn)[0]
   base_domain  = join(".", slice(split(".", var.cluster_fqdn), 1, length(split(".", var.cluster_fqdn))))
   pii_block = [
-    "PASSWORD", "CREDIT_DEBIT_CARD_NUMBER", "PIN",
+    "CREDIT_DEBIT_CARD_NUMBER", "PIN",
     "INTERNATIONAL_BANK_ACCOUNT_NUMBER", "SWIFT_CODE",
     "AWS_ACCESS_KEY", "AWS_SECRET_KEY",
     "US_SOCIAL_SECURITY_NUMBER", "US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER",
@@ -399,7 +399,7 @@ locals {
     "UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER", "UK_NATIONAL_INSURANCE_NUMBER",
     "UK_NATIONAL_HEALTH_SERVICE_NUMBER",
   ]
-  pii_anonymize = ["PHONE", "EMAIL", "ADDRESS", "DRIVER_ID", "LICENSE_PLATE", "VEHICLE_IDENTIFICATION_NUMBER", "MAC_ADDRESS"]
+  pii_anonymize = ["PASSWORD", "PHONE", "EMAIL", "ADDRESS", "DRIVER_ID", "LICENSE_PLATE", "VEHICLE_IDENTIFICATION_NUMBER", "MAC_ADDRESS"]
   # [rule_no, action, from_port, to_port, protocol]
   nacl_ingress = [
     [89, "deny", 22, 22, "tcp"],
