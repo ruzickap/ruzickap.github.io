@@ -89,7 +89,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # renovate: datasource=github-releases depName=jdx/mise
-          version: 2026.6.10
+          version: 2026.6.11
 
       - name: "${{ inputs.action }} | ${{ inputs.posts }}"
         env:
