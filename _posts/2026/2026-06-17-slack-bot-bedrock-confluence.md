@@ -149,7 +149,7 @@ the OpenTofu code expects (in CI these come from secrets):
 ```bash
 export TF_VAR_confluence_url="${MY_CONFLUENCE_URL:-https://mylabsdev.atlassian.net}"
 export TF_VAR_confluence_username="${MY_CONFLUENCE_EMAIL:-petr.ruzicka@gmail.com}"
-export TF_VAR_confluence_api_token="${MY_CONFLUENCE_API_TOKEN:-${MY_ATLASSIAN_PERSONAL_TOKEN}}"
+export TF_VAR_confluence_api_token="${MY_CONFLUENCE_API_TOKEN:-${MY_ATLASSIAN_PERSONAL_TOKEN:-confluence-api-token-placeholder}}"
 export TF_VAR_confluence_space_key="${MY_CONFLUENCE_SPACE_KEY:-myspace}"
 ```
 
@@ -199,7 +199,7 @@ exactly the following.
 **Bot token scopes** (`oauth_config.scopes.bot`):
 
 | Scope               | Why Collmbo needs it                                      |
-| ------------------- | ----------------------------------------------------------|
+|---------------------|-----------------------------------------------------------|
 | `channels:history`  | Read messages in public channels it is invited to         |
 | `groups:history`    | Read messages in private channels                         |
 | `im:history`        | Read direct messages                                      |
@@ -663,6 +663,16 @@ data "aws_iam_policy_document" "litellm_kb" {
     resources = [aws_bedrock_guardrail.ai_safety.guardrail_arn]
   }
   statement {
+    sid = "BedrockListAndGet"
+    actions = [
+      "bedrock:ListFoundationModels",
+      "bedrock:GetFoundationModel",
+      "bedrock:ListInferenceProfiles",
+      "bedrock:GetInferenceProfile",
+    ]
+    resources = ["*"]
+  }
+  statement {
     sid       = "BedrockRetrieve"
     actions   = ["bedrock:Retrieve"]
     resources = [aws_bedrockagent_knowledge_base.confluence.arn]
@@ -730,8 +740,8 @@ resource "helm_release" "litellm_kb" {
             model: bedrock/us.anthropic.claude-haiku-4-5-20251001-v1:0
             aws_region_name: ${data.aws_region.current.region}
             vector_store_ids: ["${aws_bedrockagent_knowledge_base.confluence.id}"]
-            # Claude on Bedrock rejects receiving both temperature and top_p;
-            # Collmbo always sends top_p, so drop it server-side.
+            # Claude on Bedrock rejects temperature+top_p together.
+            # Collmbo sends temperature, so drop top_p.
             additional_drop_params: ["top_p"]
             guardrailConfig:
               guardrailIdentifier: ${aws_bedrock_guardrail.ai_safety.guardrail_arn}
@@ -746,6 +756,7 @@ resource "helm_release" "litellm_kb" {
       litellm_settings:
         drop_params: true
       general_settings:
+        store_model_in_db: true
         store_prompts_in_spend_logs: true
     # With a database attached, LiteLLM reads vector stores from the
     # LiteLLM_ManagedVectorStores table, not "vector_store_registry"
