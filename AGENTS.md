@@ -33,6 +33,19 @@ for `shellcheck` syntax validation, so every block must be valid shell.
 - When adding a new tested post, add matching `create:`/`delete:` tasks to
   `mise.toml` **and** an option in `post_tests.yml`.
 
+## Connecting to the EKS / Kubernetes cluster
+
+- To get `kubectl` access to the live EKS cluster, run **`eval "$(mise run a)"`**
+  (`a` is the alias for the `eks-access` task). It sources the base post's env
+  setup (`AWS_REGION`, `CLUSTER_NAME`, …) and runs `aws eks update-kubeconfig`
+  into a throwaway `KUBECONFIG`, so `kubectl` works in the current shell
+  afterwards.
+- This is a **one-time, per-session** action — run it **once** per shell
+  session, then reuse the same session for all `kubectl` commands. Do not
+  re-run it before every command, and do not hand-roll
+  `aws eks update-kubeconfig` yourself.
+- It needs working AWS credentials (`aws sts get-caller-identity` must succeed).
+
 ## Build & lint locally
 
 - Build the site: `bundle exec jekyll build --destination public`
