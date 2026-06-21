@@ -341,6 +341,10 @@ locals {
   aoss_text_field       = "AMAZON_BEDROCK_TEXT_CHUNK"
   aoss_metadata_field   = "AMAZON_BEDROCK_METADATA"
   aoss_vector_dimension = 1024
+  # Convert assumed-role STS ARN to IAM role ARN for the AOSS principal:
+  # arn:aws:sts::<acct>:assumed-role/<role>/<session>
+  # -> arn:aws:iam::<acct>:role/<role>. Roles with paths (for example
+  # AWSReservedSSO_*) may need a manual principal.
   aoss_caller_arn = replace(
     replace(data.aws_caller_identity.current.arn, "/:sts::(\\d+):assumed-role/([^/]+)/.*/", ":iam::$1:role/$2"),
     "/^(arn:aws:iam::\\d+:role/[^/]+)/.*/", "$1"
