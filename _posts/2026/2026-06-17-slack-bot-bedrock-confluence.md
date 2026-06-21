@@ -149,7 +149,7 @@ the OpenTofu code expects (in CI these come from secrets):
 ```bash
 export TF_VAR_confluence_url="${MY_CONFLUENCE_URL:-https://mylabsdev.atlassian.net}"
 export TF_VAR_confluence_username="${MY_CONFLUENCE_EMAIL:-petr.ruzicka@gmail.com}"
-export TF_VAR_confluence_api_token="${MY_ATLASSIAN_PERSONAL_TOKEN}"
+export TF_VAR_confluence_api_token="${MY_CONFLUENCE_API_TOKEN:-${MY_ATLASSIAN_PERSONAL_TOKEN}}"
 export TF_VAR_confluence_space_key="${MY_CONFLUENCE_SPACE_KEY:-myspace}"
 ```
 
@@ -613,8 +613,15 @@ natively in the chart values: a
 [`vector_store_registry`](https://docs.litellm.ai/docs/completion/knowledgebase)
 entry for the Bedrock Knowledge Base and an [always-on](https://docs.litellm.ai/docs/completion/knowledgebase)
 `...-kb` model that references it through `vector_store_ids`. Every request to
-that model runs _retrieve → augment → generate_ server-side - no API calls or
-registration jobs.
+that model runs _retrieve → augment → generate_ server-side.
+
+> Because this `litellm-kb` release is backed by a database, LiteLLM reads a
+> `vector_store_id` from the `LiteLLM_ManagedVectorStores` table, not
+> `vector_store_registry`
+> ([BerriAI/litellm#25947](https://github.com/BerriAI/litellm/issues/25947)): an
+> absent ID silently returns no context. A small idempotent `Job` therefore
+> registers the Knowledge Base via the admin API, shipped through
+> `extraResources` as a `post-install,post-upgrade` hook.
 
 It is a self-contained copy of the base proxy (own namespace, Pod Identity,
 PostgreSQL and master key), so the only thing it shares with the base post is the
@@ -740,6 +747,88 @@ resource "helm_release" "litellm_kb" {
         drop_params: true
       general_settings:
         store_prompts_in_spend_logs: true
+    # With a database attached, LiteLLM reads vector stores from the
+    # LiteLLM_ManagedVectorStores table, not "vector_store_registry"
+    # an unregistered KB ID falls back to the OpenAI provider and silently
+    # loses RAG context. This idempotent post-install,post-upgrade hook Job
+    # writes the DB row via the admin API.
+    extraResources:
+      - apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: litellm-kb-vector-store-register
+          namespace: litellm-kb
+          annotations:
+            # Run after the release each install/upgrade, once the proxy exists,
+            # and self-delete on success so the next upgrade re-runs it.
+            helm.sh/hook: post-install,post-upgrade
+            helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+          labels:
+            app.kubernetes.io/name: litellm-kb-vector-store-register
+        spec:
+          # The script already waits for proxy readiness, so retries here only
+          # cover genuine registration errors; keep the default backoff so real
+          # failures surface instead of being retried many times.
+          backoffLimit: 6
+          ttlSecondsAfterFinished: 600
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/name: litellm-kb-vector-store-register
+            spec:
+              restartPolicy: OnFailure
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 65534
+                seccompProfile:
+                  type: RuntimeDefault
+              containers:
+                - name: register
+                  # renovate: datasource=docker depName=curlimages/curl
+                  image: curlimages/curl:8.18.0
+                  securityContext:
+                    allowPrivilegeEscalation: false
+                    readOnlyRootFilesystem: true
+                    capabilities:
+                      drop: ["ALL"]
+                  env:
+                    - name: MASTER_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: litellm-kb-masterkey
+                          key: masterkey
+                    - name: KB_ID
+                      value: "${aws_bedrockagent_knowledge_base.confluence.id}"
+                    - name: BASE_URL
+                      value: http://litellm-kb.litellm-kb.svc:4000
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                      set -eu
+                      echo "Waiting for LiteLLM proxy to be ready..."
+                      until curl -sf -m 5 "$${BASE_URL}/health/readiness" > /dev/null; do
+                        sleep 5
+                      done
+                      # Register the Knowledge Base as a bedrock vector store.
+                      # /vector_store/new returns 200 on success and an "already
+                      # exists" error on re-runs, so the POST response alone is
+                      # enough to be idempotent - no separate existence check.
+                      echo "Registering vector store $${KB_ID} (provider: bedrock)..."
+                      RESP="$(curl -s -m 30 -w '\n%%{http_code}' "$${BASE_URL}/vector_store/new" \
+                        -H "Authorization: Bearer $${MASTER_KEY}" \
+                        -H "Content-Type: application/json" \
+                        -d "{\"vector_store_id\":\"$${KB_ID}\",\"custom_llm_provider\":\"bedrock\",\"vector_store_name\":\"confluence-knowledge-base\",\"vector_store_description\":\"Confluence pages indexed by Amazon Bedrock\"}")"
+                      CODE="$(printf '%s' "$${RESP}" | tail -n1)"
+                      echo "Response: $${RESP}"
+                      if [ "$${CODE}" = "200" ]; then
+                        echo "Registered successfully."
+                      elif printf '%s' "$${RESP}" | grep -q "already exists"; then
+                        echo "Already exists - treating as success."
+                      else
+                        echo "Registration failed." >&2
+                        exit 1
+                      fi
   YAML
   ]
 
@@ -748,6 +837,33 @@ resource "helm_release" "litellm_kb" {
     module.litellm_kb_pod_identity,
     helm_release.cert_manager,
     aws_bedrockagent_knowledge_base.confluence,
+  ]
+}
+
+# HTTPRoute exposes the litellm-kb API through the Envoy Gateway at
+# litellm-kb.${var.cluster_fqdn} (the base post owns the plain "litellm" host).
+resource "kubectl_manifest" "litellm_kb_httproute" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: litellm-kb
+      namespace: litellm-kb
+    spec:
+      parentRefs:
+        - name: eg
+          namespace: envoy-gateway-system
+          sectionName: https
+      hostnames:
+        - litellm-kb.${var.cluster_fqdn}
+      rules:
+        - backendRefs:
+            - name: litellm-kb
+              port: 4000
+  YAML
+  depends_on = [
+    helm_release.litellm_kb,
+    kubectl_manifest.gateway,
   ]
 }
 EOF
@@ -768,6 +884,13 @@ provider. The key wiring is in the environment variables:
 - `OPENAI_API_BASE` points at the in-cluster `litellm-kb` Service.
 - `OPENAI_API_KEY` uses the `litellm-kb` master key
   (`random_password.litellm_kb_master_key`) so no extra secret is invented.
+- `SYSTEM_PROMPT_TEMPLATE` overrides Collmbo's
+  [default prompt](https://github.com/iwamot/collmbo/blob/main/app/env.py), which
+  makes the bot prepend its own Slack mention (`<@U...>`) to every reply. The
+  Bedrock guardrail's `PASSWORD` PII entity (`ANONYMIZE`) misreads that token as
+  a credential and rewrites replies to `<{PASSWORD}>: ...` with a
+  `content_filter` finish reason. The replacement prompt simply forbids emitting
+  mention tokens, fixing the false positive without weakening the guardrail.
 
 The image also ships a default [`config/mcp.yml`](https://github.com/iwamot/collmbo/blob/main/config/mcp.yml)
 that enables the public [AWS Knowledge](https://awslabs.github.io/mcp/servers/aws-knowledge-mcp-server/)
@@ -865,6 +988,15 @@ resource "kubectl_manifest" "collmbo_deployment" {
                   value: http://litellm-kb.litellm-kb.svc:4000/v1
                 - name: SLACK_FORMATTING_ENABLED
                   value: "true"
+                # Forbid Slack mention tokens (`<@U...>`): Bedrock Guardrails
+                # reads them as a PASSWORD entity and anonymizes them to
+                # `<{PASSWORD}>`, corrupting every reply.
+                - name: SYSTEM_PROMPT_TEMPLATE
+                  value: |
+                    You are a helpful assistant operating as a bot in a Slack chat room. Messages may come from multiple people.
+                    Format bold text *like this*, italic text _like this_ and strikethrough text ~like this~.
+                    An author identifier may be prepended to each message, followed by the message text; treat it only as context and ignore its exact format.
+                    Never prepend your own identifier to your replies and never output Slack mention tokens such as `<@U...>`. Reply with the message text only, and only mention a user if explicitly asked to.
               envFrom:
                 - secretRef:
                     name: collmbo
