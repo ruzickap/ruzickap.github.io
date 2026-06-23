@@ -36,14 +36,10 @@ for `shellcheck` syntax validation, so every block must be valid shell.
 ## Connecting to the EKS / Kubernetes cluster
 
 - To get `kubectl` access to the live EKS cluster, run **`eval "$(mise run a)"`**
-  (`a` is the alias for the `eks-access` task). It sources the base post's env
-  setup (`AWS_REGION`, `CLUSTER_NAME`, …) and runs `aws eks update-kubeconfig`
-  into a throwaway `KUBECONFIG`, so `kubectl` works in the current shell
-  afterwards.
+  (`a` is the alias for the `eks-access` task).
 - This is a **one-time, per-session** action — run it **once** per shell
   session, then reuse the same session for all `kubectl` commands. Do not
-  re-run it before every command, and do not hand-roll
-  `aws eks update-kubeconfig` yourself.
+  re-run it before every command.
 - It needs working AWS credentials (`aws sts get-caller-identity` must succeed).
 
 ## Build & lint locally

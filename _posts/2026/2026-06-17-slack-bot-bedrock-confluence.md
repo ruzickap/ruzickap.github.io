@@ -52,7 +52,7 @@ The setup should align with the following criteria:
 - Collmbo talks to a dedicated [LiteLLM](https://github.com/BerriAI/litellm)
   release inside the cluster through the [OpenAI-compatible API](https://docs.litellm.ai/docs/providers/openai_compatible)
   (`http://litellm-kb.litellm-kb.svc:4000/v1`) - no model credentials in the bot
-- Slack connectivity uses [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode),
+- Slack connectivity uses [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode/),
   so the bot needs no public endpoint and no inbound load balancer
 
 ## Architecture
@@ -899,16 +899,12 @@ provider. The key wiring is in the environment variables:
 - `OPENAI_API_BASE` points at the in-cluster `litellm-kb` Service.
 - `OPENAI_API_KEY` uses the `litellm-kb` master key
   (`random_password.litellm_kb_master_key`) so no extra secret is invented.
-- `SYSTEM_PROMPT_TEMPLATE` overrides Collmbo's
-  [default prompt](https://github.com/iwamot/collmbo/blob/main/app/env.py), which
-  makes the bot prepend its own Slack mention (`<@U...>`) to every reply. The
-  Bedrock guardrail's `PASSWORD` PII entity (`ANONYMIZE`) misreads that token as
-  a credential and rewrites replies to `<{PASSWORD}>: ...` with a
-  `content_filter` finish reason. The replacement prompt simply forbids emitting
-  mention tokens, fixing the false positive without weakening the guardrail.
+- `SLACK_FORMATTING_ENABLED` lets Collmbo rewrite the model's inline emphasis
+  into Slack `mrkdwn` (`**bold**` -> `*bold*`, `*italic*` -> `_italic_`) before
+  posting, so replies render with Slack formatting rather than raw Markdown.
 
 The image also ships a default [`config/mcp.yml`](https://github.com/iwamot/collmbo/blob/main/config/mcp.yml)
-that enables the public [AWS Knowledge](https://awslabs.github.io/mcp/servers/aws-knowledge-mcp-server/)
+that enables the public [AWS Knowledge](https://awslabs.github.io/mcp/servers/aws-knowledge-mcp-server)
 MCP server. Collmbo loads those tools at startup and passes them to the model on
 every request, and their AWS-centric descriptions nudge the bot into answering
 as an _AWS assistant_ regardless of the question. A `ConfigMap` with an empty
@@ -1003,15 +999,6 @@ resource "kubectl_manifest" "collmbo_deployment" {
                   value: http://litellm-kb.litellm-kb.svc:4000/v1
                 - name: SLACK_FORMATTING_ENABLED
                   value: "true"
-                # Forbid Slack mention tokens (`<@U...>`): Bedrock Guardrails
-                # reads them as a PASSWORD entity and anonymizes them to
-                # `<{PASSWORD}>`, corrupting every reply.
-                - name: SYSTEM_PROMPT_TEMPLATE
-                  value: |
-                    You are a helpful assistant operating as a bot in a Slack chat room. Messages may come from multiple people.
-                    Format bold text *like this*, italic text _like this_ and strikethrough text ~like this~.
-                    An author identifier may be prepended to each message, followed by the message text; treat it only as context and ignore its exact format.
-                    Never prepend your own identifier to your replies and never output Slack mention tokens such as `<@U...>`. Reply with the message text only, and only mention a user if explicitly asked to.
               envFrom:
                 - secretRef:
                     name: collmbo
