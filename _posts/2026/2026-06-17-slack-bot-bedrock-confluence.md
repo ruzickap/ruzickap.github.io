@@ -6,7 +6,7 @@ description: Slack bot that answers questions from your Confluence wiki using Am
 categories: [Kubernetes, Cloud, AI]
 tags: [amazon-eks, amazon-bedrock, amazon-bedrock-knowledge-base, opensearch-serverless, confluence, rag, collmbo, litellm, slack, opentofu]
 mermaid: true
-image: https://github.com/user-attachments/assets/b13da1c7-5d2f-4ad3-8c5b-9ef4e500deb8
+image: https://raw.githubusercontent.com/tgfjt/asyncy.com/472af583fbb7bae5c724bc9b1fcb44bac2ac9fab/src/assets/img/slack-bot.svg
 ---
 
 <!-- rumdl-disable MD013 -->
@@ -20,8 +20,8 @@ That cluster is the foundation here; this post adds a
 [Retrieval-Augmented Generation (RAG)](https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html)
 pipeline on top of it.
 
-The goal is a [Slack](https://slack.com/) bot that answers **from your own
-[Confluence](https://www.atlassian.com/software/confluence) wiki**. An
+The goal is a [Slack](https://slack.com/) bot that answers from your own
+[Confluence](https://www.atlassian.com/software/confluence) wiki. An
 [Amazon Bedrock Knowledge Base](https://aws.amazon.com/bedrock/knowledge-bases/)
 crawls a single Confluence space, embeds the pages with
 [Amazon Titan](https://docs.aws.amazon.com/bedrock/latest/userguide/titan-embedding-models.html)
@@ -35,15 +35,15 @@ LiteLLM and AWS.
 The setup should align with the following criteria:
 
 - An [Amazon Bedrock Knowledge Base](https://aws.amazon.com/bedrock/knowledge-bases/)
-  indexes **one configurable [Confluence](https://www.atlassian.com/software/confluence)
-  space** (the space key is an OpenTofu variable)
+  indexes one configurable [Confluence](https://www.atlassian.com/software/confluence)
+  space (the space key is an OpenTofu variable)
 - [Confluence](https://www.atlassian.com/software/confluence) credentials are
   rendered by OpenTofu into an [AWS Secrets Manager](https://aws.amazon.com/secrets-manager/)
   secret - the only credential store the Bedrock connector accepts
 - [Amazon OpenSearch Serverless](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless.html)
   is the vector store backing the Knowledge Base (the only store the Confluence
   connector supports)
-- [LiteLLM](https://github.com/BerriAI/litellm) performs RAG **server-side**
+- [LiteLLM](https://github.com/BerriAI/litellm) performs RAG server-side
   through an [always-on vector store](https://docs.litellm.ai/docs/completion/knowledgebase)
   attached to a model - the bot passes no extra parameters
 - [Collmbo](https://github.com/iwamot/collmbo) runs as a single container
@@ -153,13 +153,6 @@ export TF_VAR_confluence_api_token="${MY_CONFLUENCE_API_TOKEN:-${MY_ATLASSIAN_PE
 export TF_VAR_confluence_space_key="${MY_CONFLUENCE_SPACE_KEY:-myspace}"
 ```
 
-<!-- prettier-ignore-start -->
-> Amazon Bedrock only supports Confluence URLs ending in `.atlassian.net`
-> (custom domains are not supported), and basic authentication uses the account
-> email as the username with the API token in place of the password.
-{: .prompt-info }
-<!-- prettier-ignore-end -->
-
 Install the required tools:
 
 - [OpenTofu](https://opentofu.org/)
@@ -172,19 +165,19 @@ mise use opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1
 
 ## Create a Slack App
 
-Creating the app, installing it to a workspace, and copying the **Bot User OAuth
-Token** (`xoxb-...`) are the same steps described in
+Creating the app, installing it to a workspace, and copying the Bot User OAuth
+Token (`xoxb-...`) are the same steps described in
 <!-- rumdl-disable MD013 -->
 [Amazon Bedrock AgentCore Slack Bot deployed with OpenTofu]({% post_url /2026/2026-06-11-bedrock-agentcore-slack-opentofu %})
 <!-- rumdl-enable MD013 -->
 under **Create a Slack App** - follow that section, with two Collmbo-specific
 differences:
 
-- **Use a manifest.** When creating the app, choose **From an app manifest**
+- **Use a manifest** When creating the app, choose **From an app manifest**
   (instead of _From scratch_) and paste Collmbo's
   [`manifest.yml`](https://github.com/iwamot/collmbo/blob/main/manifest.yml). It
   already enables Socket Mode and sets the required bot scopes.
-- **Generate an App-Level Token.** Socket Mode needs an extra token: go to
+- **Generate an App-Level Token** Socket Mode needs an extra token: go to
   **Settings** > **Basic Information** > **App-Level Tokens**, choose **Generate
   Token and Scopes**, add the `connections:write` scope, and copy the
   **App-Level Token** (`xapp-1-...`).
@@ -219,14 +212,6 @@ exactly the following.
 - `message.im`
 - `message.mpim`
 
-<!-- prettier-ignore-start -->
-> Adding scopes or events to an **already-installed** app does nothing until you
-> **reinstall** it to the workspace - the existing `xoxb-...` token keeps its old
-> scopes. Reinstall, copy the new token, and roll the Deployment so the pod picks
-> it up.
-{: .prompt-info }
-<!-- prettier-ignore-end -->
-
 Map secrets to the `TF_VAR_*` names Collmbo's OpenTofu code expects:
 
 ```bash
@@ -242,14 +227,6 @@ providers and can reference its resources directly (the EKS module, the Bedrock
 guardrail `aws_bedrock_guardrail.ai_safety`, and the cluster add-ons).
 
 ![OpenTofu](https://raw.githubusercontent.com/opentofu/brand-artifacts/af744ad2e454fc47cc7d3c6399aaac15c5c0eeac/full/transparent/SVG/on-dark.svg){:width="300"}
-
-<!-- prettier-ignore-start -->
-> **Cost warning.** The Confluence connector requires
-> [Amazon OpenSearch Serverless](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-overview.html),
-> which bills for a minimum capacity (OCUs) even while idle - on the order of
-> hundreds of USD per month.
-{: .prompt-warning }
-<!-- prettier-ignore-end -->
 
 ### Knowledge Base and Collmbo variables
 
@@ -322,9 +299,9 @@ EOF
 
 ### OpenSearch Serverless vector store
 
-The Confluence connector is **only supported with an
+The Confluence connector is only supported with an
 [Amazon OpenSearch Serverless](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-vector-search.html)
-vector store** (S3 Vectors is not accepted for managed connectors), so the
+vector store (S3 Vectors is not accepted for managed connectors), so the
 Knowledge Base stores its embeddings in an OpenSearch Serverless collection of
 type `VECTORSEARCH`. The collection needs three policies before it can be created
 or used: an encryption policy (required before creation), a network policy, and
@@ -455,19 +432,12 @@ resource "terraform_data" "aoss_index" {
 EOF
 ```
 
-<!-- prettier-ignore-start -->
-> Provisioning the OpenSearch Serverless collection takes **~4-5 minutes**
-> (`Still creating...`), and the index/Knowledge Base steps add a couple more.
-> This is expected one-time setup time, not a hang.
-{: .prompt-info }
-<!-- prettier-ignore-end -->
-
 ### Bedrock Knowledge Base and Confluence data source
 
 The Knowledge Base ties everything together: an IAM role Bedrock assumes (with
 permission to read the Secrets Manager secret, embed with Titan, and access the
-OpenSearch collection), the vector configuration, and a **Confluence data
-source** restricted to the single space via a `Space` inclusion filter on the
+OpenSearch collection), the vector configuration, and a Confluence data
+source restricted to the single space via a `Space` inclusion filter on the
 space key:
 
 ```bash
@@ -574,11 +544,8 @@ resource "aws_bedrockagent_data_source" "confluence" {
   }
 }
 
-# Start a Bedrock ingestion job after the data source is created or changed.
-# There is no native Terraform resource for StartIngestionJob, so a terraform_data
-# resource shells out to the AWS CLI. The job runs asynchronously - we just kick
-# it off and do not block the apply. It re-runs whenever the data source ID
-# changes (i.e. when the space filter / data source is replaced).
+# Start a Bedrock ingestion job when the data source is created/replaced.
+# Terraform has no StartIngestionJob resource, so terraform_data runs the AWS CLI.
 resource "terraform_data" "confluence_ingestion" {
   triggers_replace = [aws_bedrockagent_data_source.confluence.data_source_id]
 
@@ -891,17 +858,19 @@ image (there is no Helm chart), so it is deployed with a plain Kubernetes
 `Deployment` through the [`alekc/kubectl`](https://registry.terraform.io/providers/alekc/kubectl/latest/docs)
 provider. The key wiring is in the environment variables:
 
-- `LLM_MODEL` is set to the **knowledge-base-attached** model
+- `LLM_MODEL` is set to the knowledge-base-attached model
   (`openai/us.anthropic.claude-haiku-4-5-...-kb`). The `openai/` prefix routes the
   call through LiteLLM's [OpenAI-compatible](https://docs.litellm.ai/docs/providers/openai_compatible)
   path; the `-kb` suffix selects the model that performs RAG server-side. This
-  single value is the **only** Collmbo-side change needed for Confluence answers.
+  single value is the only Collmbo-side change needed for Confluence answers.
 - `OPENAI_API_BASE` points at the in-cluster `litellm-kb` Service.
 - `OPENAI_API_KEY` uses the `litellm-kb` master key
   (`random_password.litellm_kb_master_key`) so no extra secret is invented.
 - `SLACK_FORMATTING_ENABLED` lets Collmbo rewrite the model's inline emphasis
   into Slack `mrkdwn` (`**bold**` -> `*bold*`, `*italic*` -> `_italic_`) before
   posting, so replies render with Slack formatting rather than raw Markdown.
+
+![Collmbo](https://github.com/user-attachments/assets/b13da1c7-5d2f-4ad3-8c5b-9ef4e500deb8){:width="150"}
 
 The image also ships a default [`config/mcp.yml`](https://github.com/iwamot/collmbo/blob/main/config/mcp.yml)
 that enables the public [AWS Knowledge](https://awslabs.github.io/mcp/servers/aws-knowledge-mcp-server)
@@ -910,8 +879,6 @@ every request, and their AWS-centric descriptions nudge the bot into answering
 as an _AWS assistant_ regardless of the question. A `ConfigMap` with an empty
 `servers: []` list is mounted over that file to disable MCP - this also keeps the
 tool list empty so it never competes with Knowledge Base retrieval.
-
-![Collmbo](https://github.com/user-attachments/assets/b13da1c7-5d2f-4ad3-8c5b-9ef4e500deb8){:width="150"}
 
 ```bash
 tee "${TMP_DIR}/${CLUSTER_FQDN}/collmbo.tf" << \EOF
@@ -1110,7 +1077,7 @@ Base and the Bedrock model answers from them - so the reply reflects your wiki,
 not the model's general knowledge.
 
 <!-- prettier-ignore-start -->
-> The ingestion job is started **asynchronously** by the apply (it is not waited
+> The ingestion job is started asynchronously by the apply (it is not waited
 > on), so give it a few minutes to finish before testing - until the first job
 > reaches `COMPLETE` the Knowledge Base is empty and answers fall back to the
 > model's general knowledge. Track progress with the
