@@ -182,6 +182,8 @@ differences:
   Token and Scopes**, add the `connections:write` scope, and copy the
   **App-Level Token** (`xapp-1-...`).
 
+![Slack App](https://repository-images.githubusercontent.com/358292134/398fbb00-9dbe-11eb-9167-fd67cf034596){:width="300"}
+
 ### Slack permissions and events
 
 The manifest is the source of truth for the bot's permissions, so creating the
@@ -303,7 +305,11 @@ The Confluence connector is only supported with an
 [Amazon OpenSearch Serverless](https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-vector-search.html)
 vector store (S3 Vectors is not accepted for managed connectors), so the
 Knowledge Base stores its embeddings in an OpenSearch Serverless collection of
-type `VECTORSEARCH`. The collection needs three policies before it can be created
+type `VECTORSEARCH`.
+
+![OpenSearch Serverless](https://raw.githubusercontent.com/opensearch-project/.github/16e5a6b2e4ccb6afd3571aff55372ce4c2d28e4d/profile/banner.jpg){:width="300"}
+
+The collection needs three policies before it can be created
 or used: an encryption policy (required before creation), a network policy, and
 a data access policy granting both the OpenTofu caller (to create the index) and
 the Knowledge Base role (to read/write vectors):
@@ -580,11 +586,12 @@ EOF
 The base post owns the `litellm` Helm release and is left untouched. Rather than
 mutating that release at runtime, this post deploys a second, dedicated LiteLLM
 release (`litellm-kb`) whose `proxy_config` declares the Knowledge Base wiring
-natively in the chart values: a
-[`vector_store_registry`](https://docs.litellm.ai/docs/completion/knowledgebase)
+natively in the chart values: a [`vector_store_registry`](https://docs.litellm.ai/docs/completion/knowledgebase)
 entry for the Bedrock Knowledge Base and an [always-on](https://docs.litellm.ai/docs/completion/knowledgebase)
 `...-kb` model that references it through `vector_store_ids`. Every request to
 that model runs _retrieve → augment → generate_ server-side.
+
+![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/dc16e47df640b0e66ec91c9c802be3d8b0869cd4/ui/litellm-dashboard/public/assets/logos/litellm.jpg){:width="400"}
 
 > Because this `litellm-kb` release is backed by a database, LiteLLM reads a
 > `vector_store_id` from the `LiteLLM_ManagedVectorStores` table, not
