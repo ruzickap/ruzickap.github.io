@@ -182,7 +182,7 @@ differences:
   Token and Scopes**, add the `connections:write` scope, and copy the
   **App-Level Token** (`xapp-1-...`).
 
-![Slack App](https://repository-images.githubusercontent.com/358292134/398fbb00-9dbe-11eb-9167-fd67cf034596){:width="300"}
+![Slack App](https://repository-images.githubusercontent.com/358292134/398fbb00-9dbe-11eb-9167-fd67cf034596){:width="500"}
 
 ### Slack permissions and events
 
@@ -307,7 +307,7 @@ vector store (S3 Vectors is not accepted for managed connectors), so the
 Knowledge Base stores its embeddings in an OpenSearch Serverless collection of
 type `VECTORSEARCH`.
 
-![OpenSearch Serverless](https://raw.githubusercontent.com/opensearch-project/.github/16e5a6b2e4ccb6afd3571aff55372ce4c2d28e4d/profile/banner.jpg){:width="300"}
+![OpenSearch Serverless](https://raw.githubusercontent.com/opensearch-project/.github/16e5a6b2e4ccb6afd3571aff55372ce4c2d28e4d/profile/banner.jpg){:width="400"}
 
 The collection needs three policies before it can be created
 or used: an encryption policy (required before creation), a network policy, and
@@ -383,7 +383,11 @@ EOF
 
 Bedrock expects the vector index to already exist in the collection, but
 there is no Terraform, CloudFormation or CDK resource that creates an OpenSearch
-Serverless index - only the AWS CLI can. A [`terraform_data`](https://developer.hashicorp.com/terraform/language/resources/terraform-data)
+Serverless index - only the AWS CLI can.
+
+![OpenSearch Serverless](https://raw.githubusercontent.com/opensearch-project/.github/e611a0db9ce39e4a133569150a12aec2b34c5e18/OpenSearch.svg){:width="400"}
+
+A [`terraform_data`](https://developer.hashicorp.com/terraform/language/resources/terraform-data)
 resource runs `aws opensearchserverless create-index` with the kNN schema and is
 re-run whenever the collection is replaced:
 
