@@ -390,8 +390,8 @@ locals {
   cluster_name = split(".", var.cluster_fqdn)[0]
   base_domain  = join(".", slice(split(".", var.cluster_fqdn), 1, length(split(".", var.cluster_fqdn))))
   pii_anonymize = [
-    "PHONE", "EMAIL", "ADDRESS", "PASSWORD", "DRIVER_ID", "LICENSE_PLATE", "VEHICLE_IDENTIFICATION_NUMBER",
-    "CREDIT_DEBIT_CARD_NUMBER", "PIN", "INTERNATIONAL_BANK_ACCOUNT_NUMBER", "SWIFT_CODE", "MAC_ADDRESS",
+    "DRIVER_ID", "LICENSE_PLATE", "VEHICLE_IDENTIFICATION_NUMBER",
+    "CREDIT_DEBIT_CARD_NUMBER", "INTERNATIONAL_BANK_ACCOUNT_NUMBER", "SWIFT_CODE", "MAC_ADDRESS",
     "AWS_ACCESS_KEY", "AWS_SECRET_KEY", "US_SOCIAL_SECURITY_NUMBER", "US_INDIVIDUAL_TAX_IDENTIFICATION_NUMBER",
     "US_BANK_ACCOUNT_NUMBER", "US_BANK_ROUTING_NUMBER", "CA_HEALTH_NUMBER", "CA_SOCIAL_INSURANCE_NUMBER",
     "UK_UNIQUE_TAXPAYER_REFERENCE_NUMBER", "UK_NATIONAL_INSURANCE_NUMBER", "UK_NATIONAL_HEALTH_SERVICE_NUMBER",
@@ -1966,7 +1966,18 @@ delete the NLB and its security groups while still running:
 
 ```sh
 if aws s3api head-bucket --bucket "${CLUSTER_FQDN}" 2> /dev/null; then
-  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=kubectl_manifest.nodepool_default -target=kubectl_manifest.gateway -auto-approve || true
+  # 1. Delete ONLY the Gateway → triggers NLB + SG deletion by the still-running controller.
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=kubectl_manifest.gateway -auto-approve || true
+  # 2. WAIT for the controller to actually delete its SGs (poll by tag).
+  VPC_ID="$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=${CLUSTER_NAME}" --query 'Vpcs[0].VpcId' --output text)"
+  for _ in $(seq 1 30); do
+    REMAINING="$(aws ec2 describe-security-groups --filters "Name=vpc-id,Values=${VPC_ID}" "Name=tag:elbv2.k8s.aws/cluster,Values=${CLUSTER_NAME}" --query 'SecurityGroups[].GroupId' --output text)"
+    [[ -z "${REMAINING}" ]] && break
+    echo "*** Waiting for AWS LB Controller to delete its SGs: ${REMAINING}"
+    sleep 10
+  done
+  # 3. NOW destroy the nodepool (lets Karpenter remove nodes after SGs are clean).
+  tofu -chdir="${TMP_DIR}/${CLUSTER_FQDN}" destroy -target=kubectl_manifest.nodepool_default -auto-approve || true
 fi
 ```
 

@@ -12,3 +12,6 @@ Gemfile.lock
 
 # tmp files
 tmp/
+
+# fnox local secrets
+fnox.local.toml
