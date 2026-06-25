@@ -1730,9 +1730,15 @@ resource "helm_release" "litellm" {
       auth:
         password: ${random_password.litellm_master_key.result}
         postgres-password: ${random_password.litellm_master_key.result}
-    disableSchemaUpdate: false
+    # The chart's default migration Job (Prisma) OOMKills with the chart's
+    # unset limits; its post-migration sanity check needs ~3Gi to succeed.
     migrationJob:
-      enabled: false
+      resources:
+        requests:
+          cpu: 100m
+          memory: 3Gi
+        limits:
+          memory: 3Gi
     proxy_config:
       model_list:
         - model_name: us.anthropic.claude-haiku-4-5-20251001-v1:0

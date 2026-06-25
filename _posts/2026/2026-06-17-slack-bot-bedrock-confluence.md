@@ -710,9 +710,15 @@ resource "helm_release" "litellm_kb" {
       auth:
         password: ${random_password.litellm_kb_master_key.result}
         postgres-password: ${random_password.litellm_kb_master_key.result}
-    disableSchemaUpdate: false
+    # The chart's default migration Job (Prisma) OOMKills with the chart's
+    # unset limits; its post-migration sanity check needs ~3Gi to succeed.
     migrationJob:
-      enabled: false
+      resources:
+        requests:
+          cpu: 100m
+          memory: 3Gi
+        limits:
+          memory: 3Gi
     proxy_config:
       model_list:
         # Always-on RAG model: every call queries the Bedrock Knowledge Base
