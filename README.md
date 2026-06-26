@@ -151,7 +151,7 @@ mega-linter-runner --remove-container \
 ```bash
 docker run --rm -it -v "${PWD}:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock" -v "${HOME}/.aws:/root/.aws" \
   --env FORCE_COLOR=1 --env USER --workdir /mnt \
-  ubuntu bash -i  -c 'set -euo pipefail && \
+  ubuntu bash -i -c 'set -euo pipefail && \
     apt update -qq && apt install -qqy bsdextrautils curl docker.io jq unzip wget && \
     curl -sL https://mise.run -o - | bash && \
     ~/.local/bin/mise trust --all && \
