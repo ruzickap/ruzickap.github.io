@@ -2,9 +2,9 @@
 title: Slack bot for answering questions from Confluence using Amazon Bedrock
 author: Petr Ruzicka
 date: 2026-06-17
-description: Slack bot that answers questions from your Confluence wiki using Amazon Bedrock Knowledge Base, OpenSearch Serverless, and LiteLLM on Amazon EKS, provisioned with OpenTofu.
+description: Slack bot that answers questions from your Confluence wiki using Amazon Bedrock Knowledge Base, OpenSearch Serverless, and LiteLLM on Amazon EKS, with Arize Phoenix tracing, provisioned with OpenTofu.
 categories: [Kubernetes, Cloud, AI]
-tags: [amazon-eks, amazon-bedrock, amazon-bedrock-knowledge-base, opensearch-serverless, confluence, rag, collmbo, litellm, slack, opentofu]
+tags: [amazon-eks, amazon-bedrock, amazon-bedrock-knowledge-base, opensearch-serverless, confluence, rag, collmbo, litellm, slack, arize-phoenix, observability, opentofu]
 mermaid: true
 image: https://raw.githubusercontent.com/tgfjt/asyncy.com/472af583fbb7bae5c724bc9b1fcb44bac2ac9fab/src/assets/img/slack-bot.svg
 ---
@@ -54,6 +54,8 @@ The setup should align with the following criteria:
   (`http://litellm-kb.litellm-kb.svc:4000/v1`) - no model credentials in the bot
 - Slack connectivity uses [Socket Mode](https://docs.slack.dev/apis/events-api/using-socket-mode/),
   so the bot needs no public endpoint and no inbound load balancer
+- [Arize Phoenix](https://github.com/Arize-ai/phoenix) (OSS) receives
+  OpenTelemetry traces from the `litellm-kb` proxy
 
 ## Architecture
 
@@ -70,6 +72,7 @@ flowchart TD
   KB -- "vectors" --> AOSS
   LL -- "Converse (+context)\nSigV4" --> BR
   BR --> GR
+  LL -. "OTLP traces" .-> PHX
   KB -. "crawl + embed (ingestion job)" .-> Confluence
 
   subgraph AWS["fa:fa-cloud AWS us-east-1"]
@@ -81,6 +84,7 @@ flowchart TD
     subgraph EKS["fa:fa-dharmachakra Amazon EKS"]
       CO["fa:fa-robot Collmbo"]
       LL["fa:fa-server LiteLLM (litellm-kb)"]
+      PHX["fa:fa-chart-line Arize Phoenix"]
     end
   end
 
@@ -585,6 +589,94 @@ output "data_source_id" {
 EOF
 ```
 
+### Arize Phoenix
+
+[Arize Phoenix](https://github.com/Arize-ai/phoenix) is an open-source LLM
+tracing and evaluation platform. It is installed with its [Helm chart](https://arize.com/docs/phoenix/self-hosting/deployment-options/kubernetes-helm)
+and receives [OpenTelemetry](https://opentelemetry.io/) traces from the
+`litellm-kb` proxy, so every retrieval and Bedrock call is captured as a span
+and can be inspected in the UI.
+
+![Arize Phoenix](https://raw.githubusercontent.com/Arize-ai/phoenix/bfa02b4645f3f157c5968e7b44dab11426732e4c/docs/logo/dark.png){:width="400"}
+
+```bash
+tee "${TMP_DIR}/${CLUSTER_FQDN}/phoenix.tf" << \EOF
+resource "helm_release" "phoenix" {
+  # renovate: datasource=docker depName=arizephoenix/phoenix-helm
+  version          = "9.0.10"
+  name             = "phoenix"
+  chart            = "oci://registry-1.docker.io/arizephoenix/phoenix-helm"
+  namespace        = "phoenix"
+  create_namespace = true
+  wait             = true
+
+  values = [<<-YAML
+    # Routing is handled by a Gateway API HTTPRoute, so disable the chart Ingress.
+    ingress:
+      enabled: false
+    # ClusterIP: the Service is only reached in-cluster (LiteLLM exporter) and
+    # via the Envoy Gateway HTTPRoute below.
+    service:
+      type: ClusterIP
+    # Access control is delegated to the Envoy Gateway SSO (see note above), so
+    # Phoenix's own auth stays off - otherwise it rejects LiteLLM's traces with
+    # 401 until an API key is minted by hand, breaking the automated apply.
+    auth:
+      enableAuth: false
+    # Ephemeral in-memory SQLite - no PostgreSQL, no PersistentVolume to clean up.
+    # database.url is required: without it the chart keeps the default Postgres
+    # wiring (persistence.inMemory alone only drops the volume, not the DB URL).
+    postgresql:
+      enabled: false
+    persistence:
+      inMemory: true
+    database:
+      url: "sqlite:///:memory:"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 512Mi
+      limits:
+        memory: 1Gi
+  YAML
+  ]
+
+  depends_on = [
+    kubectl_manifest.nodepool_default,
+    helm_release.cert_manager,
+  ]
+}
+
+# HTTPRoute exposes the Phoenix UI through the Envoy Gateway at
+# phoenix.${var.cluster_fqdn}. The "https" listener's SecurityPolicy (base post)
+# enforces Google OIDC, so the UI is SSO-protected without any extra config.
+resource "kubectl_manifest" "phoenix_httproute" {
+  yaml_body = <<-YAML
+    apiVersion: gateway.networking.k8s.io/v1
+    kind: HTTPRoute
+    metadata:
+      name: phoenix
+      namespace: phoenix
+    spec:
+      parentRefs:
+        - name: eg
+          namespace: envoy-gateway-system
+          sectionName: https
+      hostnames:
+        - phoenix.${var.cluster_fqdn}
+      rules:
+        - backendRefs:
+            - name: phoenix-svc
+              port: 6006
+  YAML
+  depends_on = [
+    helm_release.phoenix,
+    kubectl_manifest.gateway,
+  ]
+}
+EOF
+```
+
 ### Dedicated LiteLLM release for RAG
 
 The base post owns the `litellm` Helm release and is left untouched. Rather than
@@ -593,7 +685,10 @@ release (`litellm-kb`) whose `proxy_config` declares the Knowledge Base wiring
 natively in the chart values: a [`vector_store_registry`](https://docs.litellm.ai/docs/completion/knowledgebase)
 entry for the Bedrock Knowledge Base and an [always-on](https://docs.litellm.ai/docs/completion/knowledgebase)
 `...-kb` model that references it through `vector_store_ids`. Every request to
-that model runs _retrieve → augment → generate_ server-side.
+that model runs _retrieve → augment → generate_ server-side. The same
+`proxy_config` also enables the [`arize_phoenix`](https://docs.litellm.ai/docs/observability/phoenix_integration)
+callback so every call is traced to the in-cluster [Arize Phoenix](https://github.com/Arize-ai/phoenix)
+instance deployed [above](#arize-phoenix).
 
 ![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/dc16e47df640b0e66ec91c9c802be3d8b0869cd4/ui/litellm-dashboard/public/assets/logos/litellm.jpg){:width="400"}
 
@@ -743,6 +838,14 @@ resource "helm_release" "litellm_kb" {
             vector_store_description: Confluence pages indexed by Amazon Bedrock
       litellm_settings:
         drop_params: true
+        # Emit OpenTelemetry traces to the in-cluster Arize Phoenix instance.
+        callbacks: ["arize_phoenix"]
+      # LiteLLM's arize_phoenix callback exports over OTLP/HTTP, so point it at
+      # Phoenix's HTTP collector (port 6006, /v1/traces) - NOT the gRPC port
+      # 4317, which would silently drop spans and need the extra grpcio package.
+      environment_variables:
+        PHOENIX_COLLECTOR_HTTP_ENDPOINT: http://phoenix-svc.phoenix.svc:6006/v1/traces
+        PHOENIX_PROJECT_NAME: litellm-kb
       general_settings:
         store_model_in_db: true
         store_prompts_in_spend_logs: true
@@ -835,6 +938,7 @@ resource "helm_release" "litellm_kb" {
     kubectl_manifest.nodepool_default,
     module.litellm_kb_pod_identity,
     helm_release.cert_manager,
+    helm_release.phoenix,
     aws_bedrockagent_knowledge_base.confluence,
   ]
 }
@@ -1103,11 +1207,21 @@ not the model's general knowledge.
 {: .prompt-info }
 <!-- prettier-ignore-end -->
 
+Then open `https://phoenix.${CLUSTER_FQDN}` in a browser. After the Google OIDC
+flow (the same SSO as the chat UI) you land in [Arize Phoenix](https://github.com/Arize-ai/phoenix);
+under the `litellm-kb` project you will see one trace per question, each with
+spans for the Knowledge Base `Retrieve` step and the Bedrock completion - latency,
+token usage, and the full prompt/response captured by the `arize_phoenix`
+callback.
+
+![Arize Phoenix](/assets/img/posts/2026/2026-06-17-slack-bot-bedrock-confluence/2026-06-26-phoenix.avif)
+_Arize Phoenix_
+
 ## Clean-up
 
-Collmbo, the dedicated `litellm-kb` release, the Knowledge Base, the OpenSearch
-Serverless collection and the Confluence secret all live inside the base
-cluster's OpenTofu state, so the standard clean-up from
+Collmbo, the dedicated `litellm-kb` release, Arize Phoenix, the Knowledge Base,
+the OpenSearch Serverless collection and the Confluence secret all live inside
+the base cluster's OpenTofu state, so the standard clean-up from
 <!-- rumdl-disable MD013 -->
 [Amazon EKS with Open WebUI and AWS Bedrock managed by OpenTofu]({% post_url /2026/2026-05-26-openwebui-eks-bedrock-opentofu %})
 <!-- rumdl-enable MD013 -->
