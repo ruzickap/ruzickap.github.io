@@ -35,7 +35,12 @@
       extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.+)${{/if}}",
 
       // File types to scan for custom dependency patterns
-      fileMatch: ["\\.ya?ml$", "\\.md$", "^Dockerfile$", "^entrypoint\\.sh$"],
+      managerFilePatterns: [
+        "/\\.ya?ml$/",
+        "/\\.md$/",
+        "/^Dockerfile$/",
+        "/^entrypoint\\.sh$/",
+      ],
 
       // Regex pattern to match custom dependency declarations
       // Format: # renovate: datasource=<source> depName=<name> [versioning=<type>] [extractVersion=<regex>] [registryUrl=<url>]
@@ -56,7 +61,7 @@
       datasourceTemplate: "custom.grafana-dashboards",
       customType: "regex",
       // Only scan markdown files for dashboard definitions
-      fileMatch: ["\\.md$"],
+      managerFilePatterns: ["/\\.md$/"],
       // Match renovate comments followed by gnetId and revision fields
       matchStrings: [
         '# renovate: depName="(?<depName>.*)"\\n\\s+gnetId:\\s+(?<packageName>.*?)\\n\\s+revision:\\s+(?<currentValue>.*)',
@@ -75,7 +80,7 @@
       // Construct GitHub repo URL from the extracted dependency name
       packageNameTemplate: "https://github.com/{{depName}}",
       // Only scan markdown files
-      fileMatch: ["\\.md$"],
+      managerFilePatterns: ["/\\.md$/"],
       // Match raw.githubusercontent.com URLs and extract repo and commit digest
       matchStrings: [
         "# renovate:( currentValue=(?<currentValue>.+?))?\\n.*https:\\/\\/raw.githubusercontent.com\\/(?<depName>[^\\/]+\\/[^\\/]+)\\/(?<currentDigest>[^\\/]+)\\/",
