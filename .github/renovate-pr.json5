@@ -115,5 +115,11 @@
   requireConfig: "ignored",
   // Combine major and minor updates into a single PR instead of separate ones
   separateMajorMinor: false,
+  // Disable GitHub Dependabot-based vulnerability alerts: the GITHUB_TOKEN
+  // cannot read the dependabot/alerts API (403 integration-unauthorized), and
+  // this PR-scoped Renovate only updates _posts/** tutorial code
+  vulnerabilityAlerts: {
+    enabled: false,
+  },
   // # keep-sorted end
 }
