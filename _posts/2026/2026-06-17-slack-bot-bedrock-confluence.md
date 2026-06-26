@@ -594,8 +594,8 @@ EOF
 [Arize Phoenix](https://github.com/Arize-ai/phoenix) is an open-source LLM
 tracing and evaluation platform. It is installed with its [Helm chart](https://arize.com/docs/phoenix/self-hosting/deployment-options/kubernetes-helm)
 and receives [OpenTelemetry](https://opentelemetry.io/) traces from the
-`litellm-kb` proxy, so every retrieval and Bedrock call is captured as a span
-and can be inspected in the UI.
+`litellm-kb` proxy, so the retrieval and the Bedrock call are each captured as
+spans that can be inspected in the UI.
 
 ![Arize Phoenix](https://raw.githubusercontent.com/Arize-ai/phoenix/bfa02b4645f3f157c5968e7b44dab11426732e4c/docs/logo/dark.png){:width="400"}
 
@@ -618,7 +618,8 @@ resource "helm_release" "phoenix" {
     # via the Envoy Gateway HTTPRoute below.
     service:
       type: ClusterIP
-    # Access control is delegated to the Envoy Gateway SSO (see note above), so
+    # Access control is delegated to the base post's Google OIDC SecurityPolicy
+    # on the Envoy Gateway "https" listener (see the HTTPRoute below), so
     # Phoenix's own auth stays off - otherwise it rejects LiteLLM's traces with
     # 401 until an API key is minted by hand, breaking the automated apply.
     auth:
