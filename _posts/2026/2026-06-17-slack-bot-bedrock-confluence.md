@@ -618,10 +618,10 @@ resource "helm_release" "phoenix" {
     # via the Envoy Gateway HTTPRoute below.
     service:
       type: ClusterIP
-    # Access control is delegated to the base post's Google OIDC SecurityPolicy
-    # on the Envoy Gateway "https" listener (see the HTTPRoute below), so
-    # Phoenix's own auth stays off - otherwise it rejects LiteLLM's traces with
-    # 401 until an API key is minted by hand, breaking the automated apply.
+    # Access is gated by the base post's Google OIDC SecurityPolicy on the
+    # Envoy Gateway "https" listener (see the HTTPRoute below), so Phoenix's
+    # own auth stays off - otherwise it 401s LiteLLM's traces until an API
+    # key is minted by hand, breaking the automated apply.
     auth:
       enableAuth: false
     # Ephemeral in-memory SQLite - no PostgreSQL, no PersistentVolume to clean up.
