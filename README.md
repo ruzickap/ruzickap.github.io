@@ -3,7 +3,7 @@
 [![GitHub Actions status - Lint Code Base](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/mega-linter.yml)
 [![Build and Deploy](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml/badge.svg?branch=main)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/gh-pages-build.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/ruzickap/ruzickap.github.io/badge)](https://scorecard.dev/viewer/?uri=github.com/ruzickap/ruzickap.github.io)
-[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9800/badge)](https://www.bestpractices.dev/projects/9800)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9800/badge)](https://www.bestpractices.dev/en/projects/9800/passing)
 
 ## Overview
 
@@ -151,7 +151,7 @@ mega-linter-runner --remove-container \
 ```bash
 docker run --rm -it -v "${PWD}:/mnt" -v "/var/run/docker.sock:/var/run/docker.sock" -v "${HOME}/.aws:/root/.aws" \
   --env FORCE_COLOR=1 --env USER --workdir /mnt \
-  ubuntu bash -i  -c 'set -euo pipefail && \
+  ubuntu bash -i -c 'set -euo pipefail && \
     apt update -qq && apt install -qqy bsdextrautils curl docker.io jq unzip wget && \
     curl -sL https://mise.run -o - | bash && \
     ~/.local/bin/mise trust --all && \
