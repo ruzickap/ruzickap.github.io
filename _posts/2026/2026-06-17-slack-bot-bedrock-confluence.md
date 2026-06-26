@@ -777,7 +777,7 @@ module "litellm_kb_pod_identity" {
 
 resource "helm_release" "litellm_kb" {
   # renovate: datasource=docker depName=docker.litellm.ai/berriai/litellm-helm
-  version          = "1.89.2"
+  version          = "1.89.4"
   name             = "litellm-kb"
   chart            = "oci://docker.litellm.ai/berriai/litellm-helm"
   namespace        = "litellm-kb"
@@ -888,7 +888,7 @@ resource "helm_release" "litellm_kb" {
               containers:
                 - name: register
                   # renovate: datasource=docker depName=curlimages/curl
-                  image: curlimages/curl:8.18.0
+                  image: curlimages/curl:8.21.0
                   securityContext:
                     allowPrivilegeEscalation: false
                     readOnlyRootFilesystem: true
@@ -1077,7 +1077,7 @@ resource "kubectl_manifest" "collmbo_deployment" {
           containers:
             - name: collmbo
               # renovate: datasource=docker depName=ghcr.io/iwamot/collmbo
-              image: ghcr.io/iwamot/collmbo:11.0.16
+              image: ghcr.io/iwamot/collmbo:11.1.0
               env:
                 # Route through LiteLLM's OpenAI-compatible endpoint to the
                 # knowledge-base-attached model so every answer is grounded in
