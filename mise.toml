@@ -1,0 +1,129 @@
+# mise.toml - Tool and task management configuration
+# This file manages tool versions, environment variables, and automated tasks for blog post testing
+
+##############################################################################
+# Tool Versions
+##############################################################################
+[tools]
+# keep-sorted start
+fnox = "1.26.0"
+yq = "4.53.3"
+# keep-sorted end
+
+[tools."github:harehare/mq"]
+version = "0.6.1"
+bin = "mq"
+
+[tools."github:harehare/mq".platforms]
+linux-x64 = { asset_pattern = "mq-x86_64-unknown-linux-gnu" }
+linux-arm64 = { asset_pattern = "mq-aarch64-unknown-linux-gnu" }
+macos-arm64 = { asset_pattern = "mq-aarch64-apple-darwin" }
+
+##############################################################################
+# Plugins
+##############################################################################
+[plugins]
+fnox-env = "https://github.com/jdx/mise-env-fnox"
+
+##############################################################################
+# Global Settings
+[settings]
+jobs = 1
+
+##############################################################################
+# Environment Variables
+[env]
+_.fnox-env = { tools = true }
+FORCE_COLOR = 1
+
+##############################################################################
+# Tasks - Blog Post Testing
+# Each task follows the pattern:
+# - create:posts:* - Creates and tests blog post environments
+# - delete:posts:* - Cleans up blog post test environments
+##############################################################################
+
+#------------------------------------------------------------------------------
+# EKS Access
+#------------------------------------------------------------------------------
+[tasks."eks-access"]
+description = 'EKS Access - eval "$(mise run a)"'
+alias = "a"
+quiet = true
+env.EKS_POST_FILE = "./_posts/2026/2026-05-26-openwebui-eks-bedrock-opentofu.md"
+run = '''
+cat <<EOF
+$(mq -A 'filter(fn(n): n | .code.lang == "bash";) | first() | to_text()' "${EKS_POST_FILE}")
+
+export KUBECONFIG="/tmp/kubeconfig-\${CLUSTER_NAME}-\$\$.conf"
+aws eks update-kubeconfig --name "\${CLUSTER_NAME}" --kubeconfig "\${KUBECONFIG}"
+EOF
+'''
+
+#------------------------------------------------------------------------------
+# Amazon EKS and Grafana stack
+#------------------------------------------------------------------------------
+[tasks."create:2026-01-13-amazon-eks-grafana-stack"]
+description = 'Create: Amazon EKS and Grafana stack'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2026-01-13-amazon-eks-grafana-stack"]
+description = 'Delete: Amazon EKS and Grafana stack'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind
+#------------------------------------------------------------------------------
+[tasks."create:2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero"]
+description = 'Create: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2026-01-26-bootstrap-eks-auto-mode-bootstrap-ack-kro-velero"]
+description = 'Delete: Bootstrap EKS Auto Mode Cluster with ACK and kro using Kind'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS with Envoy Gateway deployed using Argo CD
+#------------------------------------------------------------------------------
+[tasks."create:2026-03-04-amazon-eks-envoy-gateway-argocd"]
+description = 'Create: Amazon EKS with Envoy Gateway deployed using Argo CD'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+
+[tasks."delete:2026-03-04-amazon-eks-envoy-gateway-argocd"]
+description = 'Delete: Amazon EKS with Envoy Gateway deployed using Argo CD'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon EKS with Open WebUI and AWS Bedrock managed by OpenTofu
+#------------------------------------------------------------------------------
+[tasks."create:2026-05-26-openwebui-eks-bedrock-opentofu"]
+description = 'Create: Amazon EKS with Open WebUI and AWS Bedrock managed by OpenTofu'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+
+[tasks."delete:2026-05-26-openwebui-eks-bedrock-opentofu"]
+description = 'Delete: Amazon EKS with Open WebUI and AWS Bedrock managed by OpenTofu'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Amazon Bedrock AgentCore Slack Bot deployed with OpenTofu
+#------------------------------------------------------------------------------
+[tasks."create:2026-06-11-bedrock-agentcore-slack-opentofu"]
+description = 'Create: Amazon Bedrock AgentCore Slack Bot deployed with OpenTofu'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2026-06-11-bedrock-agentcore-slack-opentofu"]
+description = 'Delete: Amazon Bedrock AgentCore Slack Bot deployed with OpenTofu'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+#------------------------------------------------------------------------------
+# Slack bot answering from Confluence with Amazon Bedrock Knowledge Bases
+#------------------------------------------------------------------------------
+[tasks."create:2026-06-17-slack-bot-bedrock-confluence|2026-05-26-openwebui-eks-bedrock-opentofu"]
+description = 'Create: Slack bot answering from Confluence with Amazon Bedrock Knowledge Bases'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
+
+[tasks."delete:2026-06-17-slack-bot-bedrock-confluence|2026-05-26-openwebui-eks-bedrock-opentofu"]
+description = 'Delete: Slack bot answering from Confluence with Amazon Bedrock Knowledge Bases'
+run = './scripts/mise-create-delete-posts.sh ${MISE_TASK_NAME}'
