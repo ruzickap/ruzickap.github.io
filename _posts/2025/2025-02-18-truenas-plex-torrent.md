@@ -240,7 +240,7 @@ graph LR
 Test the [OpenSpeedTest](https://openspeedtest.com/) web interface by accessing
 it through the [local instance](http://truenas.local:30116/).
 
-![SpeedTest by OpenSpeedTest](https://github.com/openspeedtest/v2-Test/raw/main/images/10G-S.gif){:width="500"}
+![SpeedTest by OpenSpeedTest](https://raw.githubusercontent.com/openspeedtest/v2-Test/main/images/10G-S.gif){:width="500"}
 
 #### [File Browser](https://filebrowser.org/)
 
@@ -337,9 +337,9 @@ graph LR
     webui --> bypass[Bypass authentication for clients in whitelisted IP subnets: 192.168.1.0/24]
 ```
 
-#### [Plex](https://www.plex.tv/)
+#### [Plex](https://watch.plex.tv/)
 
-Install the [Plex](https://www.plex.tv/) application for media streaming:
+Install the [Plex](https://watch.plex.tv/) application for media streaming:
 
 ![Plex](https://raw.githubusercontent.com/plexinc/pms-docker/8db104bcc92596266bfc37f746b9fb923a890337/img/plex-server.png){:width="100"}
 

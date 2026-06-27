@@ -11,7 +11,7 @@ tags: [kvm, windows, automation]
 {: .prompt-info }
 
 Sometimes I need to test/work with Windows 7 in my
-[libvirt](https://libvirt.org/)/[KVM](https://www.linux-kvm.org/)
+[libvirt](https://libvirt.org/)/[KVM](https://linux-kvm.org/page/Main_Page)
 virtualization. Because the testing can be destructive I decided to automate
 it as much as possible. As a Linux user there are not many options to modify
 an ISO image and create a fully unattended installation, because I need the

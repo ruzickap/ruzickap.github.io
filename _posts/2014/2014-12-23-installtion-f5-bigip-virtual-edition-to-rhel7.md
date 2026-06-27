@@ -19,7 +19,7 @@ and install it as virtual machine.
 That is the way I would like to describe here. I had one spare
 [HP ProLiant DL380p Gen8](https://web.archive.org/web/20150207155049/http://www8.hp.com/us/en/products/proliant-servers/product-detail.html?oid=5177957)
 so [RHEL7](https://en.wikipedia.org/wiki/Red_Hat_Enterprise_Linux#RHEL_7)
-virtualization ([KVM](https://www.linux-kvm.org/)) was the first choice.
+virtualization ([KVM](https://linux-kvm.org/page/Main_Page)) was the first choice.
 
 In short I had to deal with bonding (two cables going to the 2 separate
 switches), trunk containing 3 vlans, bridges and finally with the F5
