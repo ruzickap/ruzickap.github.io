@@ -15,7 +15,7 @@ I decided to change my home network to match the following "network diagram":
 ![OpenWrt multi-SSID network diagram](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt2.svg)
 
 The core part of the design is [TP-Link
-TL-WR1043ND](https://www.tp-link.com/en/products/details/?model=TL-WR1043ND) wifi
+TL-WR1043ND](https://www.tp-link.com/en/home-networking/wifi-router/tl-wr1043nd/) wifi
 router running [OpenWrt](https://openwrt.org/) with a small 16GB USB stick
 `/dev/sda1` containing ext3 partition with OpenWrt configuration + swap.
 
@@ -23,14 +23,14 @@ There is also a 16GB USB stick and 2 thermometers connected using USB Serial
 connector (bought on eBay):
 
 I'm going to use the last stable version of the OpenWrt firmware:
-[openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin](https://downloads.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin)
+[openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin](https://archive.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin)
 
 Upgrade the firmware and remove the old configuration:
 
 ```bash
 rm -r /tmp/opkg-lists/
 sysctl -w vm.drop_caches=1
-sysupgrade -v -n https://downloads.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin
+sysupgrade -v -n https://archive.openwrt.org/attitude_adjustment/12.09/ar71xx/generic/openwrt-ar71xx-generic-tl-wr1043nd-v1-squashfs-sysupgrade.bin
 ```
 
 Here are the notes how way how I configured it.
