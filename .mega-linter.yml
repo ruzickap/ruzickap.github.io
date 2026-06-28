@@ -23,6 +23,7 @@ BASH_SHFMT_ARGUMENTS: --case-indent --indent 2 --space-redirects
 DISABLE_LINTERS:
   - COPYPASTE_JSCPD
   - MARKDOWN_MARKDOWNLINT # Using rumdl instead (faster Rust-based alternative)
+  - REPOSITORY_GITLEAKS # Deprecated in favor of Betterleaks (REPOSITORY_BETTERLEAKS)
   - REPOSITORY_KINGFISHER # Secret detection with too many false positives
   - REPOSITORY_OSV_SCANNER # No package lockfiles in this Jekyll blog repository
   - SPELL_CSPELL # Spell checking disabled - prone to false positives
