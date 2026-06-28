@@ -64,6 +64,10 @@ REPOSITORY_CHECKOV_ARGUMENTS: --quiet
 #   - DS137138: "Insecure URL" (for HTTP links that are intentional)
 REPOSITORY_DEVSKIM_ARGUMENTS: --ignore-globs CHANGELOG.md --ignore-rule-ids DS162092,DS137138
 
+# Gitleaks (secret scanner) - use the Betterleaks config file (.betterleaks.toml)
+# The legacy gitleaks config format is backwards compatible with Betterleaks
+REPOSITORY_GITLEAKS_CONFIG_FILE: .betterleaks.toml
+
 # Trivy (vulnerability scanner) - only check HIGH and CRITICAL severity
 REPOSITORY_TRIVY_ARGUMENTS: --severity HIGH,CRITICAL --ignore-unfixed
 
