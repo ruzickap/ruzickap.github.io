@@ -51,7 +51,7 @@ jobs:
     timeout-minutes: 240 # Same as timeout for the AWS IAM role - AWS_ROLE_TO_ASSUME
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@e7f100cf4c008499ea8adda475de1042d6975c7b # v6.2.0
+        uses: aws-actions/configure-aws-credentials@254c19bd240aabef8777f48595e9d2d7b972184b # v6.2.1
         with:
           role-to-assume: ${{ secrets.RUZICKA_SBX01_AWS_ROLE_TO_ASSUME }}
           role-duration-seconds: 14400

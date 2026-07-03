@@ -57,7 +57,7 @@ jobs:
         # zizmor: ignore[cache-poisoning] -- bundler-cache in a trusted workflow with no untrusted inputs
         uses: ruby/setup-ruby@9eb537ca036ebaed86729dcb9309076e4c5c3b74 # v1.314.0
         with:
-          ruby-version: 3.4.9
+          ruby-version: 3.4.10
           bundler-cache: true
 
       - name: Build site
