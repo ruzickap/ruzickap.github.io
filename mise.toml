@@ -11,7 +11,7 @@ yq = "4.53.3"
 # keep-sorted end
 
 [tools."github:harehare/mq"]
-version = "0.6.3"
+version = "0.6.4"
 bin = "mq"
 
 [tools."github:harehare/mq".platforms]
