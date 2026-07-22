@@ -54,7 +54,6 @@ order: 4
 
 - CI/CD status:
 
-  [![GitHub Actions status - Dependabot Updates](https://github.com/awsugcz/awsug.cz/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/dependabot/dependabot-updates)
   [![GitHub Actions status - hugo-build](https://github.com/awsugcz/awsug.cz/workflows/hugo-build/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/hugo-build.yml)
   [![GitHub Actions status - markdown](https://github.com/awsugcz/awsug.cz/workflows/markdown/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/markdown.yml)
   [![GitHub Actions status - release-please](https://github.com/awsugcz/awsug.cz/workflows/release-please/badge.svg)](https://github.com/awsugcz/awsug.cz/actions/workflows/release-please.yaml)
@@ -96,7 +95,6 @@ order: 4
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/action-my-broken-link-checker/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-broken-link-checker/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/readme-commands-check.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-broken-link-checker/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-broken-link-checker/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/action-my-broken-link-checker/workflows/scorecards/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-broken-link-checker/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-broken-link-checker/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-broken-link-checker/actions/workflows/stale.yml)
@@ -138,7 +136,6 @@ order: 4
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/readme-commands-check.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/scorecards/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-markdown-link-checker/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/actions/workflows/stale.yml)
@@ -179,7 +176,6 @@ order: 4
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/action-my-markdown-linter/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - readme-commands-check](https://github.com/ruzickap/action-my-markdown-linter/workflows/readme-commands-check/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/readme-commands-check.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/action-my-markdown-linter/workflows/release-please/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/action-my-markdown-linter/workflows/renovate/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/action-my-markdown-linter/workflows/scorecards/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/action-my-markdown-linter/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/action-my-markdown-linter/workflows/stale/badge.svg)](https://github.com/ruzickap/action-my-markdown-linter/actions/workflows/stale.yml)
@@ -221,7 +217,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/ansible-my_workstation/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-my_workstation/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-my_workstation/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-my_workstation/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-my_workstation/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-my_workstation/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-my_workstation/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/stale.yml)
@@ -259,7 +254,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/ansible-openwrt/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-openwrt/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-openwrt/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-openwrt/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-openwrt/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-openwrt/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-openwrt/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-openwrt/actions/workflows/stale.yml)
@@ -298,7 +292,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/renovate/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-raspberry-pi-os/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/actions/workflows/stale.yml)
@@ -492,7 +485,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/cheatsheet-atom/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-atom/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/cheatsheet-atom/workflows/release-please/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/cheatsheet-atom/workflows/renovate/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/cheatsheet-atom/workflows/scorecards/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cheatsheet-atom/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/cheatsheet-atom/workflows/stale/badge.svg)](https://github.com/ruzickap/cheatsheet-atom/actions/workflows/stale.yml)
@@ -530,7 +522,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/cheatsheet-macos/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-macos/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/cheatsheet-macos/workflows/release-please/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/cheatsheet-macos/workflows/renovate/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/cheatsheet-macos/workflows/scorecards/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cheatsheet-macos/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/cheatsheet-macos/workflows/stale/badge.svg)](https://github.com/ruzickap/cheatsheet-macos/actions/workflows/stale.yml)
@@ -568,7 +559,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/cheatsheet-systemd/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cheatsheet-systemd/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/cheatsheet-systemd/workflows/release-please/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/cheatsheet-systemd/workflows/renovate/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/cheatsheet-systemd/workflows/scorecards/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cheatsheet-systemd/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/cheatsheet-systemd/workflows/stale/badge.svg)](https://github.com/ruzickap/cheatsheet-systemd/actions/workflows/stale.yml)
@@ -606,7 +596,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/cks-notes/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/cks-notes/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/cks-notes/workflows/release-please/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/cks-notes/workflows/renovate/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/cks-notes/workflows/scorecards/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/cks-notes/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/cks-notes/workflows/stale/badge.svg)](https://github.com/ruzickap/cks-notes/actions/workflows/stale.yml)
@@ -623,6 +612,42 @@ order: 4
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cks-notes/latest)](https://github.com/ruzickap/cks-notes/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes)
+
+### [claude-courses](https://github.com/ruzickap/claude-courses)
+
+- Description: Claude Courses Notes
+- Topics: architect, claude, courses, foundations, notes, public
+
+[![GitHub release](https://img.shields.io/github/v/release/ruzickap/claude-courses.svg)](https://github.com/ruzickap/claude-courses/releases/latest)
+[![GitHub license](https://img.shields.io/github/license/ruzickap/claude-courses.svg)](https://github.com/ruzickap/claude-courses/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/ruzickap/claude-courses.svg?style=social)](https://github.com/ruzickap/claude-courses/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/ruzickap/claude-courses.svg?style=social)](https://github.com/ruzickap/claude-courses/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/ruzickap/claude-courses.svg?style=social)](https://github.com/ruzickap/claude-courses)
+
+- CI/CD status:
+
+  [![GitHub Actions status - codeql](https://github.com/ruzickap/claude-courses/workflows/codeql/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/codeql.yml)
+  [![GitHub Actions status - commit-check](https://github.com/ruzickap/claude-courses/workflows/commit-check/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/commit-check.yml)
+  [![GitHub Actions status - mega-linter](https://github.com/ruzickap/claude-courses/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/mega-linter.yml)
+  [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/claude-courses/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/pr-size-labeler.yml)
+  [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/claude-courses/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/pr-slack-notification.yml)
+  [![GitHub Actions status - release-please](https://github.com/ruzickap/claude-courses/workflows/release-please/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/release-please.yml)
+  [![GitHub Actions status - scorecards](https://github.com/ruzickap/claude-courses/workflows/scorecards/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/scorecards.yml)
+  [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/claude-courses/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/semantic-pull-request.yml)
+  [![GitHub Actions status - stale](https://github.com/ruzickap/claude-courses/workflows/stale/badge.svg)](https://github.com/ruzickap/claude-courses/actions/workflows/stale.yml)
+
+- Issue tracking:
+
+  [![GitHub issues](https://img.shields.io/github/issues/ruzickap/claude-courses.svg)](https://github.com/ruzickap/claude-courses/issues)
+  [![GitHub pull requests](https://img.shields.io/github/issues-pr/ruzickap/claude-courses.svg)](https://github.com/ruzickap/claude-courses/pulls)
+
+- Repository:
+
+  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/claude-courses.svg)](https://github.com/ruzickap/claude-courses/releases)
+  [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/claude-courses.svg)](https://github.com/ruzickap/claude-courses/commits/)
+  [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/claude-courses/latest)](https://github.com/ruzickap/claude-courses/commits/)
+  [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/claude-courses.svg)](https://github.com/ruzickap/claude-courses/commits/)
+  [![GitHub repo size](https://img.shields.io/github/repo-size/ruzickap/claude-courses.svg)](https://github.com/ruzickap/claude-courses)
 
 ### [container-image-scans](https://github.com/ruzickap/container-image-scans)
 
@@ -646,7 +671,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/container-image-scans/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/container-image-scans/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/container-image-scans/workflows/release-please/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/container-image-scans/workflows/renovate/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/container-image-scans/workflows/scorecards/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/container-image-scans/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/container-image-scans/workflows/stale/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/stale.yml)
@@ -1097,7 +1121,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/malware-cryptominer-container/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/malware-cryptominer-container/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/malware-cryptominer-container/workflows/release-please/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/malware-cryptominer-container/workflows/renovate/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/malware-cryptominer-container/workflows/scorecards/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/malware-cryptominer-container/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/malware-cryptominer-container/workflows/stale/badge.svg)](https://github.com/ruzickap/malware-cryptominer-container/actions/workflows/stale.yml)
@@ -1211,7 +1234,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/petr.ruzicka.dev/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/petr.ruzicka.dev/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/petr.ruzicka.dev/workflows/release-please/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/petr.ruzicka.dev/workflows/renovate/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/petr.ruzicka.dev/workflows/scorecards/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/petr.ruzicka.dev/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/petr.ruzicka.dev/workflows/stale/badge.svg)](https://github.com/ruzickap/petr.ruzicka.dev/actions/workflows/stale.yml)
@@ -1257,7 +1279,6 @@ order: 4
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/ruzickap.github.io/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ruzickap.github.io/workflows/release-please/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/release-please.yml)
   [![GitHub Actions status - renovate-pr](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate-pr/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate-pr.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/ruzickap.github.io/workflows/renovate/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/ruzickap.github.io/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/ruzickap.github.io/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ruzickap.github.io/workflows/stale/badge.svg)](https://github.com/ruzickap/ruzickap.github.io/actions/workflows/stale.yml)
@@ -1297,7 +1318,6 @@ order: 4
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/xvx.cz/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/xvx.cz/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/xvx.cz/workflows/release-please/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/release-please.yml)
-  [![GitHub Actions status - renovate](https://github.com/ruzickap/xvx.cz/workflows/renovate/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/renovate.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/xvx.cz/workflows/scorecards/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/scorecards.yml)
   [![GitHub Actions status - semantic-pull-request](https://github.com/ruzickap/xvx.cz/workflows/semantic-pull-request/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/semantic-pull-request.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/xvx.cz/workflows/stale/badge.svg)](https://github.com/ruzickap/xvx.cz/actions/workflows/stale.yml)
