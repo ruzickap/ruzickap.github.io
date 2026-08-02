@@ -55,7 +55,7 @@ jobs:
 
       - name: 💡 Self-hosted Renovate
         if: steps.changed-files.outputs.any_changed == 'true'
-        uses: renovatebot/github-action@22e0a16091fc706b04affe6ae53d5e3358ac4023 # v46.1.19
+        uses: renovatebot/github-action@973d3e5a68e735a444e8c03432b66eedb343c302 # v46.2.0
         env:
           RENOVATE_INCLUDE_PATHS: ${{ steps.changed-files.outputs.all_changed_files }}
         with:
