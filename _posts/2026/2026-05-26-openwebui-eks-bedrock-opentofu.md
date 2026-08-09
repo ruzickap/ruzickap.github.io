@@ -1629,9 +1629,9 @@ usage data and configuration - models are configured via a static YAML file.
 ![LiteLLM](https://raw.githubusercontent.com/BerriAI/litellm/dc16e47df640b0e66ec91c9c802be3d8b0869cd4/ui/litellm-dashboard/public/assets/logos/litellm.jpg){:width="400"}
 
 Install `litellm` using
-[Helm](https://github.com/BerriAI/litellm/tree/main/deploy/charts/litellm-helm)
+[Helm](https://github.com/BerriAI/litellm/tree/7c667b8797a03a9aecc3592c7ed33af1e46c5aac/deploy/charts/litellm-helm)
 and customize its
-[default values](https://github.com/BerriAI/litellm/blob/main/deploy/charts/litellm-helm/values.yaml).
+[default values](https://github.com/BerriAI/litellm/blob/7c667b8797a03a9aecc3592c7ed33af1e46c5aac/deploy/charts/litellm-helm/values.yaml).
 Create a dedicated IAM role granting the LiteLLM pod permission to call the
 Bedrock Converse/InvokeModel APIs with guardrail enforcement, and associate it
 with the `litellm` ServiceAccount through EKS Pod Identity:

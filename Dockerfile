@@ -38,7 +38,7 @@ RUN printf '%s\n' > /etc/nginx/conf.d/health.conf \
     '    }' \
     '}'
 
-USER nginx
+USER 101
 
 # Healthcheck to make sure container is ready
-HEALTHCHECK --interval=5m --timeout=3s CMD curl --fail http://localhost:8081 || exit 1
+HEALTHCHECK --interval=5m --timeout=3s CMD ["curl", "--fail", "http://localhost:8081"]

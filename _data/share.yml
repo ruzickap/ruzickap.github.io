@@ -42,7 +42,7 @@ platforms:
   #
   # - type: Mastodon
   #   icon: "fa-brands fa-mastodon"
-  #   # See: https://github.com/justinribeiro/share-to-mastodon#properties
+  #   # See: https://web.archive.org/web/20241117082311/https://github.com/justinribeiro/share-to-mastodon#properties
   #   instances:
   #     - label: mastodon.social
   #       link: "https://mastodon.social/"
