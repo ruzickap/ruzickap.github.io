@@ -65,6 +65,10 @@ REPOSITORY_CHECKOV_ARGUMENTS: --quiet
 #   - DS137138: "Insecure URL" (for HTTP links that are intentional)
 REPOSITORY_DEVSKIM_ARGUMENTS: --ignore-globs CHANGELOG.md --ignore-rule-ids DS162092,DS137138
 
+# Disable automatic forwarding of EXCLUDED_DIRECTORIES to DevSkim
+# (conflicts with --ignore-globs in REPOSITORY_DEVSKIM_ARGUMENTS)
+REPOSITORY_DEVSKIM_FORWARD_EXCLUDED_DIRECTORIES: false
+
 # Trivy (vulnerability scanner) - only check HIGH and CRITICAL severity
 REPOSITORY_TRIVY_ARGUMENTS: --severity HIGH,CRITICAL --ignore-unfixed
 
