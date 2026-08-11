@@ -26,7 +26,9 @@ I found a solution in KDE:
 
 1. Install Firefox add-on called Abduction! It will allow you to save pages or
    part of the page as image (File -> Save Page As Image...)
+
 2. Run Firefox and choose your place in the map.
+
 3. Press ALT + F3 -> Advanced -> Special Windows Settings...
 
    ![Advanced Windows Settings - KDE](/assets/img/posts/2009/2009-03-17-how-to-store-google-maps-or-any-other-page-as-jpg-or-png/advanced_settings.avif)

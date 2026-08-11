@@ -14,9 +14,9 @@ I decided to change my home network to match the following "network diagram":
 
 ![OpenWrt multi-SSID network diagram](https://raw.githubusercontent.com/ruzickap/linux.xvx.cz/refs/heads/gh-pages/pics/openwrt/wifi_openwrt2.svg)
 
-The core part of the design is [TP-Link
-TL-WR1043ND](https://www.tp-link.com/en/home-networking/wifi-router/tl-wr1043nd/) wifi
-router running [OpenWrt](https://openwrt.org/) with a small 16GB USB stick
+The core part of the design is
+[TP-Link TL-WR1043ND](https://www.tp-link.com/en/home-networking/wifi-router/tl-wr1043nd/)
+wifi router running [OpenWrt](https://openwrt.org/) with a small 16GB USB stick
 `/dev/sda1` containing ext3 partition with OpenWrt configuration + swap.
 
 There is also a 16GB USB stick and 2 thermometers connected using USB Serial

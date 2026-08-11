@@ -71,6 +71,9 @@ REPOSITORY_KINGFISHER_ARGUMENTS: --exclude .git
 # Trivy (vulnerability scanner) - only check HIGH and CRITICAL severity
 REPOSITORY_TRIVY_ARGUMENTS: --severity HIGH,CRITICAL --ignore-unfixed
 
+# Lychee arguments: set workspace root for root-relative links
+SPELL_LYCHEE_ARGUMENTS: --root-dir /github/workspace
+
 # Lychee (link checker) - exclude projects tab from link validation
 SPELL_LYCHEE_FILTER_REGEX_EXCLUDE: _tabs/projects.md
 

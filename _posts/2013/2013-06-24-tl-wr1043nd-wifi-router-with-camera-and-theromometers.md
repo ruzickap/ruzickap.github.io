@@ -10,9 +10,9 @@ tags: [tp-link, router, monitoring]
 > Original post from [linux.xvx.cz](https://linux.xvx.cz/2013/06/tl-wr1043nd-wifi-router-with-camera-and.html)
 {: .prompt-info }
 
-Here are a few photos of my 2-year-old [TP-Link
-TL-WR1043ND](https://www.tp-link.com/en/home-networking/wifi-router/tl-wr1043nd/) wifi
-router. It was getting some pictures from camera using
+Here are a few photos of my 2-year-old
+[TP-Link TL-WR1043ND](https://www.tp-link.com/en/home-networking/wifi-router/tl-wr1043nd/)
+wifi router. It was getting some pictures from camera using
 [fswebcam](https://web.archive.org/web/20130621044049/http://www.firestorm.cx/fswebcam/) and measuring internal/external
 temperature using [digitemp](https://www.digitemp.com/).
 
