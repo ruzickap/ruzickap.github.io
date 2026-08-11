@@ -14,11 +14,10 @@ I would like to describe another [OpenWrt](https://openwrt.org/) configuration.
 It's going to be just a few examples on how to configure the latest available
 OpenWrt firmware [Backfire 10.03.1](https://archive.openwrt.org/backfire/10.03.1/).
 
-I'm going to use [TP-Link
-TL-WR1043ND](https://www.tp-link.com/en/home-networking/wifi-router/tl-wr1043nd/) wifi
-router with a small 64MB USB stick `/dev/sda1` containing an ext2 partition. I
-plan
-to have some stats on the USB stick and simple html pages as well.
+I'm going to use
+[TP-Link TL-WR1043ND](https://www.tp-link.com/en/home-networking/wifi-router/tl-wr1043nd/)
+wifi router with a small 64MB USB stick `/dev/sda1` containing an ext2 partition.
+I plan to have some stats on the USB stick and simple html pages as well.
 
 <!-- rumdl-disable MD013 -->
 After flashing the original firmware with [openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin](https://archive.openwrt.org/backfire/10.03.1/ar71xx/openwrt-ar71xx-tl-wr1043nd-v1-squashfs-factory.bin)

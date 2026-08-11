@@ -25,6 +25,7 @@ Here are the steps to configure your Raspberry Pi to use Grafana Cloud:
 
 - Go to [Grafana Cloud](https://grafana.com/products/cloud/) and create a new
   account.
+
 - Select your "Team URL" and region:
 
   ![Grafana Cloud Team URL](/assets/img/posts/2022/2022-01-06-monitor-your-raspberry-pi-using-grafana-cloud/grafana-cloud-team-url.avif)
@@ -35,6 +36,7 @@ Here are the steps to configure your Raspberry Pi to use Grafana Cloud:
 
 - I left the "Debian - based" as a default and changed the "Architecture" to
   "Armv7"
+
 - Copy the content from the Grafana Agent field and paste it to your shell
   connected to RPi
 
