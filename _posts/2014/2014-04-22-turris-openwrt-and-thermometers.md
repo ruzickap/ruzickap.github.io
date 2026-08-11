@@ -136,12 +136,12 @@ values, so you need to read them a few times.
 ```bash
 mkdir -p /data/mydigitemp /www3/mydigitemp
 #The graphs can be accessed: http://192.168.1.1/myadmin/mydigitemp
-ln -s /www3/mydigitemp  /www3/myadmin/mydigitemp
+ln -s /www3/mydigitemp /www3/myadmin/mydigitemp
 
 #Create RRDtool database to store the values every 10 minutes (600 seconds) for 10 years (525600 * 600 seconds)
 rrdtool create /data/mydigitemp/mydigitemp.rrd --step 600 \
-DS:temp0:GAUGE:1000:-273:5000 DS:temp1:GAUGE:1000:-273:5000 RRA:AVERAGE:0.5:1:525600 \
-RRA:MIN:0.5:1:525600 RRA:MAX:0.5:1:525600
+  DS:temp0:GAUGE:1000:-273:5000 DS:temp1:GAUGE:1000:-273:5000 RRA:AVERAGE:0.5:1:525600 \
+  RRA:MIN:0.5:1:525600 RRA:MAX:0.5:1:525600
 
 #Script getting the data from thermometers
 cat > /data/mydigitemp/mydigitemp.sh << \EOF
