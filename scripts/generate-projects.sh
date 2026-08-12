@@ -94,4 +94,4 @@ ${GITHUB_REPOSITORY_CI_CD_STATUS}
 EOF
 done <<< "$(gh repo list --visibility public --json defaultBranchRef,description,homepageUrl,isArchived,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' awsugcz | jq -c && gh repo list --visibility public --topic public --limit 100 --json defaultBranchRef,description,homepageUrl,isArchived,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' ruzickap | jq -c)"
 
-npx prettier -w --parser markdown --prose-wrap always --print-width 80 "${DESTINATION_FILE}"
+bunx prettier -w --parser markdown --prose-wrap always --print-width 80 "${DESTINATION_FILE}"
