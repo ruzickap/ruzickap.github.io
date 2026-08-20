@@ -21,10 +21,10 @@ RUN bundle exec jekyll build
 
 ################################################################################
 
-FROM nginxinc/nginx-unprivileged:1.31.3-alpine-slim@sha256:d61d7ef52430df468e74ed6ee6e914429b80e20ba988e3176278a73165f876cf
+FROM nginxinc/nginx-unprivileged:1.31.4-alpine-slim@sha256:f08c8378b2ac3a544e3e9ee664c3efb733b5aa53c774ca4ec8d5d0cc641d9e88
 
 # renovate: datasource=docker depName=nginxinc/nginx-unprivileged versioning=docker
-LABEL org.opencontainers.image.base.name="nginxinc/nginx-unprivileged:1.31.3-alpine-slim@sha256:d61d7ef52430df468e74ed6ee6e914429b80e20ba988e3176278a73165f876cf"
+LABEL org.opencontainers.image.base.name="nginxinc/nginx-unprivileged:1.31.4-alpine-slim@sha256:f08c8378b2ac3a544e3e9ee664c3efb733b5aa53c774ca4ec8d5d0cc641d9e88"
 
 COPY --from=build /usr/src/app/_site /usr/share/nginx/html/
 
