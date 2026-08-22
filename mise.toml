@@ -7,11 +7,11 @@
 [tools]
 # keep-sorted start
 fnox = "1.33.1"
-yq = "4.53.3"
+yq = "4.53.4"
 # keep-sorted end
 
 [tools."github:harehare/mq"]
-version = "0.8.2"
+version = "0.8.3"
 bin = "mq"
 
 [tools."github:harehare/mq".platforms]
