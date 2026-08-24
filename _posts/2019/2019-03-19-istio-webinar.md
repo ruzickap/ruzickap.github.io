@@ -11,6 +11,8 @@ image: https://opengraph.githubassets.com/1f5dd74ac457248216a53a592cc6b772683731
 This webinar introduces [Istio](https://istio.io/) service-mesh capabilities on
 [Amazon EKS](https://aws.amazon.com/eks/).
 
+![Istio logo](https://ruzickap.github.io/k8s-istio-webinar/assets/img/istio.a24267ed.svg)
+
 - Creates an EKS cluster and installs [Istio](https://istio.io/) with
   [Helm](https://helm.sh/)
 - Deploys the [Bookinfo](https://istio.io/latest/docs/examples/bookinfo/)
