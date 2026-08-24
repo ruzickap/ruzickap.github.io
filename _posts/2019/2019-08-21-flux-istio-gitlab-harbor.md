@@ -12,8 +12,6 @@ This guide documents a [kops](https://kops.sigs.k8s.io/)
 [Kubernetes](https://kubernetes.io/) cluster on AWS with a GitOps platform
 stack.
 
-![Flux logo](https://raw.githubusercontent.com/fluxcd/flux/18e5174581f44ed8c9a881dd5071179eed1ebf4d/docs/_files/flux-logo-vertical.svg?sanitize=true)
-
 - Creates the cluster and installs [Helm](https://helm.sh/) and
   [Flux](https://fluxcd.io/)
 - Deploys [cert-manager](https://cert-manager.io/),
