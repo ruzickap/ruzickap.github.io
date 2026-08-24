@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2019-09-25
 description: Guide for deploying Sock Shop to Azure Kubernetes Service with Flux and Flagger
 categories: [Kubernetes, Cloud, DevOps]
-tags: [azure-aks, kubernetes, flux, flagger, istio, sock-shop, gitops, terraform]
+tags: [azure-aks, kubernetes, flux, flagger, sock-shop, gitops, terraform, kubectl]
 image: https://opengraph.githubassets.com/f046993ddf1105ab54489a944e2c04a055cc0d3b/ruzickap/k8s-sockshop
 ---
 

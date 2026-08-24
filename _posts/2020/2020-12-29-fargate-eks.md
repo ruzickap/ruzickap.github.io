@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2020-12-29
 description: Guide for running Kubernetes workloads on AWS Fargate with Amazon EKS
 categories: [Kubernetes, Cloud]
-tags: [amazon-eks, kubernetes, fargate, eksctl, helm, aws]
+tags: [amazon-eks, kubernetes, fargate, eksctl, helm, kubectl]
 image: https://opengraph.githubassets.com/b7f005263139c73ed5dd6806a150c5def9ea8bae/ruzickap/k8s-fargate-eks
 ---
 

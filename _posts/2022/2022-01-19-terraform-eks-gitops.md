@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2022-01-19
 description: Guide for a multitenant, multicluster Amazon EKS platform managed with Terraform and GitOps
 categories: [Kubernetes, Cloud, DevOps]
-tags: [amazon-eks, kubernetes, terraform, gitops, flux, argocd, multicluster, multitenant, cilium, prometheus, grafana]
+tags: [amazon-eks, kubernetes, terraform, github-actions, gitops, flux, argocd, multicluster, multitenant, cilium, prometheus, grafana, rancher, renovate, sops, cert-manager, external-dns, ingress-nginx]
 image: https://opengraph.githubassets.com/db2ec04ad980eb4b833f883296334260e9699225/ruzickap/k8s-tf-eks-gitops
 ---
 

@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2019-10-15
 description: Guide for installing Jenkins X and deploying Sock Shop on Kubernetes in AWS
 categories: [Kubernetes, Cloud, DevOps]
-tags: [kubernetes, aws, kops, jenkins-x, jenkins, cicd, sock-shop]
+tags: [kubernetes, aws, kops, jenkins-x, jenkins, cicd, sock-shop, kubectl]
 image: https://opengraph.githubassets.com/e2ea69f58d55bb84ab7b28d2111722586fb47dba/ruzickap/k8s-jenkins-x
 ---
 

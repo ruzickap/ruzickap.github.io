@@ -21,11 +21,12 @@ Personal blog and website built with Jekyll using the Chirpy theme.
 
 Post sources:
 
-| Source                       | Posts | Years     | Categories | Tags |
-|------------------------------|------:|-----------|:----------:|-----:|
-| <https://ruzickap.github.io> |    24 | 2019-2026 |     10     |   35 |
-| <https://linux.xvx.cz>       |    30 | 2013-2022 |     11     |   40 |
-| <https://linux-old.xvx.cz>   |    24 | 2009-2013 |     9      |   22 |
+| Source                              | Posts | Years     | Categories | Tags |
+|-------------------------------------|------:|-----------|:----------:|-----:|
+| <https://ruzickap.github.io>        |    24 | 2019-2026 |     10     |   35 |
+| k8s-* GitHub Pages                  |    14 | 2019-2022 |      5     |   52 |
+| <https://linux.xvx.cz>              |    30 | 2013-2022 |     11     |   40 |
+| <https://linux-old.xvx.cz>          |    24 | 2009-2013 |     9      |   22 |
 
 ### Categories (14)
 

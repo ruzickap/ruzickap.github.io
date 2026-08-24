@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2019-02-18
 description: Hands-on workshop for building and operating an Istio service mesh
 categories: [Kubernetes, DevOps]
-tags: [kubernetes, istio, service-mesh, workshop, canary-deployment, observability]
+tags: [kubernetes, istio, service-mesh, workshop]
 image: https://opengraph.githubassets.com/e521749d59cb46b0904161cb1e2e1c4c36ffe188/ruzickap/k8s-istio-workshop
 ---
 

@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2019-08-21
 description: Guide for a kops Kubernetes cluster with GitOps, service mesh, and registry services
 categories: [Kubernetes, Cloud, DevOps]
-tags: [kubernetes, kops, aws, flux, gitops, istio, gitlab, harbor, cert-manager, helm]
+tags: [kubernetes, aws, kops, flux, gitops, istio, gitlab, harbor, cert-manager, kubed, helm]
 image: https://opengraph.githubassets.com/a85ea78b88494b393a4aba484ffc386dbd1ac581/ruzickap/k8s-flux-istio-gitlab-harbor
 ---
 

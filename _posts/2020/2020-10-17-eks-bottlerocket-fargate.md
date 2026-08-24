@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2020-10-17
 description: Guide for building Amazon EKS with Bottlerocket and AWS Fargate
 categories: [Kubernetes, Cloud]
-tags: [amazon-eks, kubernetes, bottlerocket, fargate, eksctl, helm, gitops, harbor, velero]
+tags: [amazon-eks, kubernetes, bottlerocket, fargate, eksctl, helm, gitops, harbor, velero, drupal, monitoring, logging]
 image: https://opengraph.githubassets.com/917f7c6e6def2aea61e230cc152f60359147dff3/ruzickap/k8s-eks-bottlerocket-fargate
 ---
 
