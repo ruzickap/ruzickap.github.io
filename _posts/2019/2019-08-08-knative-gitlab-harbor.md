@@ -12,8 +12,6 @@ This guide builds a [kops](https://kops.sigs.k8s.io/)
 [Kubernetes](https://kubernetes.io/) platform on AWS for cloud-native
 application delivery.
 
-![Amazon EKS services animation](https://raw.githubusercontent.com/aws-samples/eks-workshop/65b766c494a5b4f5420b2912d8373c4957163541/static/images/3-service-animated.gif){:width="500"}
-
 - Installs [Istio](https://istio.io/), [cert-manager](https://cert-manager.io/),
   [Harbor](https://goharbor.io/), [GitLab](https://about.gitlab.com/), and
   [Knative](https://knative.dev/)
