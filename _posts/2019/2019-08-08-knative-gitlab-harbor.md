@@ -3,8 +3,8 @@ title: Kubernetes with Knative, GitLab, and Harbor
 author: Petr Ruzicka
 date: 2019-08-08
 description: Guide for building and deploying container images with Knative and Tekton
-categories: [Kubernetes, Cloud, DevOps]
-tags: [kubernetes, aws, kops, knative, tekton, gitlab, harbor, istio, cert-manager, kaniko]
+categories: [Cloud, DevOps, Kubernetes]
+tags: [aws, cert-manager, gitlab, harbor, istio, kaniko, knative, kops, kubed, kubernetes, tekton]
 image: https://opengraph.githubassets.com/ec2a45f6584cea1cbd22d105f58a481d1e7dc8e7/ruzickap/k8s-knative-gitlab-harbor
 ---
 
