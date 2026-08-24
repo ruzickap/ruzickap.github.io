@@ -12,6 +12,8 @@ This guide explores [Amazon EKS](https://aws.amazon.com/eks/) with
 [Bottlerocket](https://bottlerocket.dev/) worker nodes and
 [AWS Fargate](https://aws.amazon.com/fargate/).
 
+![Amazon EKS logo](https://raw.githubusercontent.com/cncf/landscape/7f5b02ecba914a32912e77fc78e1c54d1c2f98ec/hosted_logos/amazon-eks.svg?sanitize=true)
+
 - Creates the EKS cluster and supporting AWS resources
 - Configures monitoring, logging, DNS, ingress, certificates, and authentication
 - Deploys workloads, [Drupal](https://www.drupal.org/),
