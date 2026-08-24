@@ -11,6 +11,8 @@ image: https://opengraph.githubassets.com/f9caf0b921824c0281f01f7f1772c914440696
 This guide deploys the [Harbor](https://goharbor.io/) cloud-native container
 registry on [Amazon EKS](https://aws.amazon.com/eks/).
 
+![Harbor logo](https://ruzickap.github.io/k8s-harbor/assets/img/harbor-horizontal-color.ef644877.svg)
+
 - Creates an EKS cluster and installs [Helm](https://helm.sh/)
 - Configures [ingress-nginx](https://kubernetes.github.io/ingress-nginx/) and
   [cert-manager](https://cert-manager.io/)
