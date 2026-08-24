@@ -3,8 +3,8 @@ title: Harbor on Kubernetes
 author: Petr Ruzicka
 date: 2019-04-12
 description: Guide for installing and operating the Harbor container registry on Amazon EKS
-categories: [Kubernetes, Cloud, Security]
-tags: [amazon-eks, kubernetes, harbor, container-registry, vulnerability-scanning, helm, cert-manager, ingress-nginx, eksctl]
+categories: [Cloud, Kubernetes, Security]
+tags: [amazon-eks, cert-manager, container-registry, eksctl, harbor, helm, ingress-nginx, kubernetes, vulnerability-scanning]
 image: https://opengraph.githubassets.com/f9caf0b921824c0281f01f7f1772c91444069644/ruzickap/k8s-harbor
 ---
 

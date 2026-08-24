@@ -3,7 +3,7 @@ title: Amazon EKS with Rancher
 author: Petr Ruzicka
 date: 2022-05-12
 description: Guide for building an Amazon EKS cluster managed by Rancher
-categories: [Kubernetes, Cloud]
+categories: [Cloud, Kubernetes]
 tags: [amazon-eks, kubernetes, rancher]
 image: https://opengraph.githubassets.com/b340d63cda05b1338034c14ebb1b47fbe189b85e/ruzickap/k8s-eks-rancher
 ---
