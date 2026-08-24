@@ -5,7 +5,7 @@ date: 2019-09-13
 description: Guide for GitOps-driven canary deployments on Azure Kubernetes Service
 categories: [Kubernetes, Cloud, DevOps]
 tags: [azure-aks, kubernetes, flux, flagger, istio, tekton, canary-deployment, gitops, terraform]
-image: https://raw.githubusercontent.com/ruzickap/k8s-flagger-istio-flux/20487f7178d1b43eaafb7c66c4160ef985884299/docs/part-05/grafana-canary-completed.png
+image: https://opengraph.githubassets.com/20487f7178d1b43eaafb7c66c4160ef985884299/ruzickap/k8s-flagger-istio-flux
 ---
 
 This guide builds an [Azure Kubernetes Service](https://azure.microsoft.com/products/kubernetes-service/)

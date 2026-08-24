@@ -5,7 +5,7 @@ date: 2019-03-19
 description: Webinar guide for installing and operating Istio on Amazon EKS
 categories: [Kubernetes, Cloud, Security]
 tags: [amazon-eks, kubernetes, istio, service-mesh, canary-deployment, observability, helm]
-image: https://raw.githubusercontent.com/ruzickap/k8s-istio-webinar/1f5dd74ac457248216a53a592cc6b772683731f1/docs/part-04/kiali.png
+image: https://opengraph.githubassets.com/1f5dd74ac457248216a53a592cc6b772683731f1/ruzickap/k8s-istio-webinar
 ---
 
 This webinar introduces [Istio](https://istio.io/) service-mesh capabilities on

@@ -5,7 +5,7 @@ date: 2019-06-10
 description: Presentation introducing the Harbor cloud-native container registry
 categories: [Kubernetes, DevOps]
 tags: [kubernetes, harbor, container-registry, presentation, security]
-image: https://raw.githubusercontent.com/ruzickap/k8s-harbor-presentation/93c6b40ae5d0a96971efde40db7f4dc60bf1231b/images/harbor_architecture.png
+image: https://opengraph.githubassets.com/93c6b40ae5d0a96971efde40db7f4dc60bf1231b/ruzickap/k8s-harbor-presentation
 ---
 
 This presentation introduces [Harbor](https://goharbor.io/) as a cloud-native
