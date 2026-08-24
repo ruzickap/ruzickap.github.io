@@ -89,6 +89,19 @@ flowchart TD
   end
 
   KB -. "reads creds" .-> SM
+
+  style User fill:whitesmoke,stroke:dimgray,color:black
+  style Slack fill:rebeccapurple,stroke:deepskyblue,color:white
+  style Confluence fill:royalblue,stroke:turquoise,color:white
+  style BR fill:orange,stroke:white,color:darkslategray
+  style GR fill:orange,stroke:white,color:darkslategray
+  style KB fill:orange,stroke:white,color:darkslategray
+  style AOSS fill:orange,stroke:white,color:darkslategray
+  style SM fill:orange,stroke:white,color:darkslategray
+  style EKS fill:royalblue,stroke:white,color:white
+  style CO fill:royalblue,stroke:white,color:white
+  style LL fill:royalblue,stroke:white,color:white
+  style PHX fill:indigo,stroke:white,color:white
 ```
 
 The request flow:
