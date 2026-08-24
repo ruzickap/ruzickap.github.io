@@ -17,5 +17,3 @@ environment for [GitOps](https://opengitops.dev/) and progressive delivery.
 - Demonstrates a [Flagger](https://flagger.app/)-managed canary deployment
 
 Read the complete guide at [AKS with Flagger, Flux, and Istio](https://ruzickap.github.io/k8s-flagger-istio-flux/).
-
-View the source at [ruzickap/k8s-flagger-istio-flux](https://github.com/ruzickap/k8s-flagger-istio-flux).

@@ -18,5 +18,3 @@ This guide demonstrates [Jenkins X](https://jenkins-x.io/) on a
 - Covers [Jenkins X](https://jenkins-x.io/) operational tasks and cleanup
 
 Read the complete guide at [Kubernetes with Jenkins X and Sock Shop](https://ruzickap.github.io/k8s-jenkins-x/).
-
-View the source at [ruzickap/k8s-jenkins-x](https://github.com/ruzickap/k8s-jenkins-x).

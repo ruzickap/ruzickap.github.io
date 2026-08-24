@@ -17,5 +17,3 @@ on [Kubernetes](https://kubernetes.io/).
   and [Crunchy Data PostgreSQL Operator](https://github.com/CrunchyData/postgres-operator)
 
 Read the complete guide at [PostgreSQL on Kubernetes](https://ruzickap.github.io/k8s-postgresql/).
-
-View the source at [ruzickap/k8s-postgresql](https://github.com/ruzickap/k8s-postgresql).

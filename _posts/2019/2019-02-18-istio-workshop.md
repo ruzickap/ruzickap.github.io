@@ -18,5 +18,3 @@ This workshop provides hands-on material for creating a
 - Includes a complete recorded terminal demonstration
 
 Read the complete guide at [Kubernetes with Istio Workshop](https://ruzickap.github.io/k8s-istio-workshop/).
-
-View the source at [ruzickap/k8s-istio-workshop](https://github.com/ruzickap/k8s-istio-workshop).

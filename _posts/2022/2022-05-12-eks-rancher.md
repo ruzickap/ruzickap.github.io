@@ -17,5 +17,3 @@ This guide covers an [Amazon EKS](https://aws.amazon.com/eks/) deployment with
   [Kubernetes](https://kubernetes.io/) cluster components
 
 Read the complete guide at [Amazon EKS with Rancher](https://ruzickap.github.io/k8s-eks-rancher/).
-
-View the source at [ruzickap/k8s-eks-rancher](https://github.com/ruzickap/k8s-eks-rancher).

@@ -18,5 +18,3 @@ This guide demonstrates [Amazon EKS](https://aws.amazon.com/eks/) with
 - Deploys a sample workload and removes the environment
 
 Read the complete guide at [AWS Fargate with Amazon EKS](https://ruzickap.github.io/k8s-fargate-eks/).
-
-View the source at [ruzickap/k8s-fargate-eks](https://github.com/ruzickap/k8s-fargate-eks).

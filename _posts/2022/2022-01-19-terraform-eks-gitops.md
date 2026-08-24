@@ -21,5 +21,3 @@ This guide describes a multitenant, multicluster
   secret encryption, and SSO
 
 Read the complete guide at [Amazon EKS with Terraform and GitOps](https://ruzickap.github.io/k8s-tf-eks-gitops/).
-
-View the source at [ruzickap/k8s-tf-eks-gitops](https://github.com/ruzickap/k8s-tf-eks-gitops).

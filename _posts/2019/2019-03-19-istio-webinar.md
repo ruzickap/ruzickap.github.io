@@ -20,5 +20,3 @@ This webinar introduces [Istio](https://istio.io/) service-mesh capabilities on
 - Covers routing, fault injection, traffic splitting, observability, and security
 
 Read the complete guide at [Istio Service Mesh Webinar](https://ruzickap.github.io/k8s-istio-webinar/).
-
-View the source at [ruzickap/k8s-istio-webinar](https://github.com/ruzickap/k8s-istio-webinar).

@@ -18,5 +18,3 @@ using [GitOps](https://opengitops.dev/) tooling.
   [Istio](https://istio.io/)
 
 Read the complete guide at [AKS with Flagger, Flux, and Sock Shop](https://ruzickap.github.io/k8s-sockshop/).
-
-View the source at [ruzickap/k8s-sockshop](https://github.com/ruzickap/k8s-sockshop).

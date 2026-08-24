@@ -21,5 +21,3 @@ stack.
   workflows
 
 Read the complete guide at [Kubernetes with Flux, Istio, GitLab, and Harbor](https://ruzickap.github.io/k8s-flux-istio-gitlab-harbor/).
-
-View the source at [ruzickap/k8s-flux-istio-gitlab-harbor](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor).

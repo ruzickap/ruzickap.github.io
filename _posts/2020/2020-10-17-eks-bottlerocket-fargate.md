@@ -20,5 +20,3 @@ This guide explores [Amazon EKS](https://aws.amazon.com/eks/) with
   [Harbor](https://goharbor.io/), [Velero](https://velero.io/), and GitOps tools
 
 Read the complete guide at [Amazon EKS with Bottlerocket and Fargate](https://ruzickap.github.io/k8s-eks-bottlerocket-fargate/).
-
-View the source at [ruzickap/k8s-eks-bottlerocket-fargate](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate).

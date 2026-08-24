@@ -23,5 +23,3 @@ application delivery.
   operations
 
 Read the complete guide at [Kubernetes with Knative, GitLab, and Harbor](https://ruzickap.github.io/k8s-knative-gitlab-harbor/).
-
-View the source at [ruzickap/k8s-knative-gitlab-harbor](https://github.com/ruzickap/k8s-knative-gitlab-harbor).
