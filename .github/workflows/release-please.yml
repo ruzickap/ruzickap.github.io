@@ -15,7 +15,9 @@ permissions: read-all
 jobs:
   release-please:
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 5
+    # Bumped from 5: the one-time bootstrap-sha backfill pages through
+    # ~1500 commits. Can go back to 5 once bootstrap-sha is removed.
+    timeout-minutes: 20
     permissions:
       contents: write
       issues: write
