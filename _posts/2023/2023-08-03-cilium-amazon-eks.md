@@ -745,7 +745,7 @@ Then, you will need some basic tools and integrations, such as
 
 MailHog will be used to receive email alerts from Prometheus.
 
-![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png){:width="200"}
+![MailHog](https://raw.githubusercontent.com/sj26/mailcatcher/6ee124aa9ca70d3b592a971884cf0c266a2f85d8/public/assets/logo_large.png){:width="200"}
 
 Install the `mailhog` [Helm chart](https://artifacthub.io/packages/helm/codecentric/mailhog)
 and modify its [default values](https://github.com/codecentric/helm-charts/blob/mailhog-5.2.3/charts/mailhog/values.yaml):
@@ -763,7 +763,7 @@ ingress:
   enabled: true
   annotations:
     forecastle.stakater.com/expose: "true"
-    forecastle.stakater.com/icon: https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
+    forecastle.stakater.com/icon: https://raw.githubusercontent.com/sj26/mailcatcher/6ee124aa9ca70d3b592a971884cf0c266a2f85d8/public/assets/logo_large.png
     forecastle.stakater.com/appName: Mailhog
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
