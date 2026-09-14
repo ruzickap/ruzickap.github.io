@@ -650,7 +650,7 @@ kubectl delete storageclass gp2 || true
 
 Mailpit will be used to receive email alerts from the Prometheus.
 
-![mailpit](https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png){:width="200"}
+![mailpit](https://raw.githubusercontent.com/sj26/mailcatcher/6ee124aa9ca70d3b592a971884cf0c266a2f85d8/public/assets/logo_large.png){:width="200"}
 
 Install `mailpit` [helm chart](https://artifacthub.io/packages/helm/jouve/mailpit)
 and modify the [default values](https://github.com/jouve/charts/blob/mailpit-0.14.0/charts/mailpit/values.yaml):
@@ -665,7 +665,7 @@ ingress:
   enabled: true
   annotations:
     forecastle.stakater.com/expose: "true"
-    forecastle.stakater.com/icon: https://raw.githubusercontent.com/sj26/mailcatcher/main/assets/images/logo_large.png
+    forecastle.stakater.com/icon: https://raw.githubusercontent.com/sj26/mailcatcher/6ee124aa9ca70d3b592a971884cf0c266a2f85d8/public/assets/logo_large.png
     forecastle.stakater.com/appName: Mailpit
     nginx.ingress.kubernetes.io/auth-url: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/auth
     nginx.ingress.kubernetes.io/auth-signin: https://oauth2-proxy.${CLUSTER_FQDN}/oauth2/start?rd=\$scheme://\$host\$request_uri
