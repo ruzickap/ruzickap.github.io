@@ -80,6 +80,17 @@ flowchart TD
       LL["fa:fa-robot LiteLLM"]
     end
   end
+
+  style User fill:whitesmoke,stroke:dimgray,color:black
+  style Google fill:royalblue,stroke:turquoise,color:white
+  style R53 fill:orange,stroke:white,color:darkslategray
+  style NLB fill:orange,stroke:white,color:darkslategray
+  style BR fill:orange,stroke:white,color:darkslategray
+  style GR fill:orange,stroke:white,color:darkslategray
+  style EKS fill:royalblue,stroke:white,color:white
+  style EG fill:royalblue,stroke:white,color:white
+  style OW fill:royalblue,stroke:white,color:white
+  style LL fill:royalblue,stroke:white,color:white
 ```
 
 ## Build Amazon EKS
@@ -150,6 +161,12 @@ flowchart LR
   R53B -- "NS delegation" --> R53C
   ED -- "manages records" --> R53C
   R53C -- "*.k01.k8s.mylabs.dev" --> NLB
+
+  style CF fill:darkorange,stroke:white,color:white
+  style R53B fill:orange,stroke:white,color:darkslategray
+  style R53C fill:orange,stroke:white,color:darkslategray
+  style NLB fill:orange,stroke:white,color:darkslategray
+  style ED fill:royalblue,stroke:white,color:white
 ```
 
 Create a Route 53 DNS zone for the EKS clusters and delegate it from
