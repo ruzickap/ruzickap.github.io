@@ -55,7 +55,7 @@ jobs:
 
       - name: Setup Ruby
         # zizmor: ignore[cache-poisoning] -- bundler-cache in a trusted workflow with no untrusted inputs
-        uses: ruby/setup-ruby@a0102e0972be65f351c307e2d64b9314a57c8073 # v1.324.0
+        uses: ruby/setup-ruby@762794c140bbeda0f1224786aa33b4b46783a6c1 # v1.326.0
         with:
           ruby-version: 3.4.11
           bundler-cache: true
@@ -86,7 +86,7 @@ jobs:
           force_orphan: true
 
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
+        uses: cloudflare/wrangler-action@4e88846969242f7752bcfdaf5511bfbb3985ca47 # v4.1.1
         if: ${{ github.ref != 'refs/heads/main' && github.ref != 'refs/heads/gh-pages' }}
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
