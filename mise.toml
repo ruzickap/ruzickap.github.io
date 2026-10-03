@@ -6,8 +6,8 @@
 ##############################################################################
 [tools]
 # keep-sorted start
-fnox = "1.35.3"
-yq = "4.53.6"
+fnox = "1.36.0"
+yq = "4.54.1"
 # keep-sorted end
 
 [tools."github:harehare/mq"]
