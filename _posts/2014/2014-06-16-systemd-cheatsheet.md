@@ -25,7 +25,7 @@ See the example:
 All source files can be found here: [GitHub - cheatsheet-systemd](https://github.com/ruzickap/cheatsheet-systemd)
 
 I used the following sources:
-[Arch Linux Wiki - systemd](https://wiki.archlinux.org/index.php/systemd),
+[Arch Linux Wiki - systemd](https://web.archive.org/web/20140527172252/https://wiki.archlinux.org/index.php/systemd),
 [SysVinit_to_Systemd_Cheatsheet](https://fedoraproject.org/wiki/SysVinit_to_Systemd_Cheatsheet),
 [RHEL7 - System_Administrators_Guide](https://access.redhat.com/site/documentation/en-US/Red_Hat_Enterprise_Linux/7/html/System_Administrators_Guide/index.html).
 

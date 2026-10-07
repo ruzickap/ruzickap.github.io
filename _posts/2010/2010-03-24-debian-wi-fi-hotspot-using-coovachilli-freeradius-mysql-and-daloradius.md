@@ -207,6 +207,6 @@ you to tweak it yourself.
 
 You can find additional info on this web page:
 
-[https://help.ubuntu.com/community/WifiDocs/CoovaChilli](https://help.ubuntu.com/community/WifiDocs/CoovaChilli)
+[https://help.ubuntu.com/community/WifiDocs/CoovaChilli](https://web.archive.org/web/20251124172227/https://help.ubuntu.com/community/WifiDocs/CoovaChilli)
 
 Enjoy... ;-)
