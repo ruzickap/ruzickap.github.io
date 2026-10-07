@@ -70,7 +70,6 @@ while read -r GITHUB_REPOSITORY_TITLE_TMP; do
 - Topics: ${GITHUB_REPOSITORY_TOPICS}
 
 [![GitHub release](https://img.shields.io/github/v/release/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/releases/latest)
-[![GitHub release date](https://img.shields.io/github/release-date/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/releases)
 [![GitHub license](https://img.shields.io/github/license/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/blob/${GITHUB_REPOSITORY_DEFAULT_BRANCH}/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/${GITHUB_REPOSITORY_NAME}.svg?style=social)](https://github.com/${GITHUB_REPOSITORY_NAME}/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/${GITHUB_REPOSITORY_NAME}.svg?style=social)](https://github.com/${GITHUB_REPOSITORY_NAME}/network/members)
@@ -87,6 +86,7 @@ ${GITHUB_REPOSITORY_CI_CD_STATUS}
 
 - Repository:
 
+  [![GitHub release date](https://img.shields.io/github/release-date/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/${GITHUB_REPOSITORY_NAME}/latest)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
