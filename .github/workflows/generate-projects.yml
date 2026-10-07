@@ -20,8 +20,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+      - name: Install rumdl
+        uses: rvben/rumdl@9c4cc2a2ebe176de68e1788106e25af8a9bd3899 # v0.2.78
+        with:
+          install-only: true
+          # renovate: datasource=github-releases depName=rvben/rumdl
+          version: 0.2.78
 
       - name: Generate _tabs/projects.md
         env:
