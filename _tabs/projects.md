@@ -21,20 +21,20 @@ order: 4
 ## Websites
 
 - [awsug.cz](https://awsug.cz/) - Prague AWS User Group community website
-- [linux-old.xvx.cz](https://linux-old.xvx.cz/) - Old WordPress-based personal
-  blog about Linux
-- [linux.xvx.cz](https://linux.xvx.cz/) - Old Blogger-based personal blog about
-  Linux
+- [linux-old.xvx.cz](https://linux-old.xvx.cz/) - Old WordPress-based
+  personal blog about Linux
+- [linux.xvx.cz](https://linux.xvx.cz/) - Old Blogger-based personal blog
+  about Linux
 - [petr.ruzicka.dev](https://petr.ruzicka.dev/) - Personal homepage
-- [ruzickap.github.io](https://ruzickap.github.io/) - Personal blog about Linux,
-  CNCF and cloud technologies
-- [xvx.cz](https://xvx.cz/) - Personal domain landing page with links to all
-  sites
+- [ruzickap.github.io](https://ruzickap.github.io/) - Personal blog about
+  Linux, CNCF and cloud technologies
+- [xvx.cz](https://xvx.cz/) - Personal domain landing page with links to
+  all sites
 
 ## Vibe Coding Projects
 
-- [brewwatch](https://brewwatch.lovable.app/) - A modern web app to discover and
-  track newly added Homebrew packages and casks
+- [brewwatch](https://brewwatch.lovable.app/) - A modern web app to discover
+  and track newly added Homebrew packages and casks
 
 ## [GitHub Projects](https://github.com/ruzickap/)
 
@@ -216,6 +216,9 @@ order: 4
   [![GitHub Actions status - release-please](https://github.com/ruzickap/ansible-my_workstation/workflows/release-please/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/release-please.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/ansible-my_workstation/workflows/scorecards/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/scorecards.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/ansible-my_workstation/workflows/stale/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/stale.yml)
+  [![GitHub Actions status - terraform-tests](https://github.com/ruzickap/ansible-my_workstation/workflows/terraform-tests/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/terraform-tests.yml)
+  [![GitHub Actions status - terraform](https://github.com/ruzickap/ansible-my_workstation/workflows/terraform/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/terraform.yml)
+  [![GitHub Actions status - tofu-tests](https://github.com/ruzickap/ansible-my_workstation/workflows/tofu-tests/badge.svg)](https://github.com/ruzickap/ansible-my_workstation/actions/workflows/tofu-tests.yml)
 
 - Issue tracking:
 
