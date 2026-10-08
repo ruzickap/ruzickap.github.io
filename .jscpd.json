@@ -1,0 +1,18 @@
+{
+  "threshold": 0,
+  "ignore": [
+    "**/.git/**",
+    "**/*cache*/**",
+    "**/megalinter-reports/**",
+    "**/node_modules/**",
+    "**/report/**",
+    "**/*.html",
+    "**/*.json",
+    "**/*.md",
+    "**/*.png",
+    "**/*.svg",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/bash_commands_from_md.sh"
+  ]
+}
