@@ -1,0 +1,4 @@
+{
+  "threshold": 0,
+  "ignore": ["**/*.md", "**/*.yml", "**/bash_commands_from_md.sh"]
+}
