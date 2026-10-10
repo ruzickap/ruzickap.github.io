@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/ruzickap/ruzickap.github.io/compare/v1.1.0...v1.2.0) (2026-10-10)
+
+
+### Features
+
+* show release date badge and format projects with rumdl ([#568](https://github.com/ruzickap/ruzickap.github.io/issues/568)) ([5d423df](https://github.com/ruzickap/ruzickap.github.io/commit/5d423dfdb238f429ecf69e2ca415ea0a0e52b094))
+
+
+### Bug Fixes
+
+* move release date badge back to repository section ([#571](https://github.com/ruzickap/ruzickap.github.io/issues/571)) ([706ff41](https://github.com/ruzickap/ruzickap.github.io/commit/706ff41af4daf4b053d88d6581c98f9be76abea1))
+
 ## [1.1.0](https://github.com/ruzickap/ruzickap.github.io/compare/v1.0.0...v1.1.0) (2026-09-14)
 
 
