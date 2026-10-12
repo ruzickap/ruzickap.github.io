@@ -65,8 +65,10 @@ for `shellcheck` syntax validation, so every block must be valid shell.
   etc. are injected at deploy time by `gh-pages-build.yml`. Don't "fill them in".
 - Tooling is pinned in `mise.toml` (aws, eksctl, kubectl, opentofu, helm, ...);
   prefer `mise`-provided versions over system installs.
-- `fnox.toml` resolves AWS-stored secrets locally via mise; CI deletes it and
-  uses GitHub secrets instead (see `post_tests.yml`).
+- `fnox.toml` resolves AWS-stored secrets locally; the `create:*`/`delete:*`
+  mise tasks wrap the script in `fnox exec --`. CI sets
+  `FNOX_IF_MISSING=ignore` and uses GitHub secrets instead (see
+  `post_tests.yml`).
 
 ## Git / PR workflow
 

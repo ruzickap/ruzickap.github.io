@@ -157,7 +157,6 @@ docker run --rm -it -v "${PWD}:/mnt" -v "/var/run/docker.sock:/var/run/docker.so
     curl -sL https://mise.run -o - | bash && \
     ~/.local/bin/mise trust --all && \
     eval "$(~/.local/bin/mise activate bash)" && \
-    mise plugins install fnox-env https://github.com/jdx/mise-env-fnox && mise use fnox && \
     mise run "create:posts:2026"
   '
 ```

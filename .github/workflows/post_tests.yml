@@ -64,9 +64,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Remove fnox.toml to skip fnox-env secret resolution in CI
-        run: rm -f fnox.toml
-
       - name: Install mise and dependencies
         uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         env:
@@ -79,6 +76,8 @@ jobs:
         env:
           ACTION: ${{ inputs.action }}
           POSTS: ${{ inputs.posts }}
+          # fnox.toml uses the local "my-aws" AWS profile - skip it and use GitHub secrets
+          FNOX_IF_MISSING: ignore
         run: |
           set -euxo pipefail
           mise run "${ACTION}:${POSTS}"
