@@ -25,7 +25,7 @@ jobs:
         with:
           install-only: true
           # renovate: datasource=github-releases depName=rvben/rumdl
-          version: 0.2.79
+          version: 0.3.0
 
       - name: Generate _tabs/projects.md
         env:
