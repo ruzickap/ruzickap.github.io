@@ -1,4 +1,4 @@
-FROM ruby:4-slim@sha256:bfee2958067e42c7a27e17b204fa23d08637869ed2722ecb3aad19c2510f4a3e AS build
+FROM ruby:4-slim@sha256:3251898a6b7ff1275a0dc279d401889c6c743c1fb3292fa3ce1a2e12fc2cd31d AS build
 
 SHELL ["/bin/bash", "-euxo", "pipefail", "-c"]
 
