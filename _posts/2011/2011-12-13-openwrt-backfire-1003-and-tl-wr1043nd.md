@@ -30,7 +30,7 @@ to use a web camera, USB hub, external USB storage and later a few thermometers.
 
 I decided to compile it from scratch (using Fedora 13), because squashfs can't
 work with block-extroot without building an image (see
-[https://forum.openwrt.org/viewtopic.php?pid=108642](https://forum.openwrt.org/viewtopic.php?pid=108642)).
+[https://forum.openwrt.org/viewtopic.php?pid=108642](https://web.archive.org/web/20150321034932/https://forum.openwrt.org/viewtopic.php?pid=108642)).
 I prefer to use [squashfs](https://squashfs.sourceforge.net/), because some
 people say it's better than jffs2.
 
@@ -457,4 +457,4 @@ Serial Port Temperature Sensors:
 [https://martybugs.net/electronics/tempsensor/hardware.cgi](https://martybugs.net/electronics/tempsensor/hardware.cgi)
 
 Serial cable:
-[https://halfface.se/wiki/index.php/Openwrt](https://halfface.se/wiki/index.php/Openwrt)
+[https://halfface.se/wiki/index.php/Openwrt](https://web.archive.org/web/20190826072653/https://halfface.se/wiki/index.php/Openwrt)
