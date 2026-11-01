@@ -18,7 +18,7 @@ In this example I'm going to use a movie from
 [Big Buck Bunny](https://www.bigbuckbunny.org/) which is licensed under the
 [Creative Commons Attribution 3.0](https://creativecommons.org/licenses/by/3.0/)
 license. But you can probably use it generally for any movie which can be
-played in [mplayer](https://mplayerhq.hu/).
+played in [mplayer](https://web.archive.org/web/20261019001342/https://mplayerhq.hu/).
 
 First download the movie:
 
