@@ -28,7 +28,7 @@ permissions: read-all
 
 jobs:
   renovate-pr:
-    runs-on: ubuntu-24.04-arm
+    runs-on: ubuntu-26.04-arm
     if: ${{ contains(github.event.pull_request.labels.*.name, 'renovate-pr') }}
     permissions:
       contents: write
