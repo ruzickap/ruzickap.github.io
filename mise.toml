@@ -7,7 +7,7 @@
 [tools]
 # keep-sorted start
 fnox = "1.47.0"
-yq = "4.54.2"
+yq = "4.54.3"
 # keep-sorted end
 
 [tools."github:harehare/mq"]
