@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
 
       - name: Install rumdl
-        uses: rvben/rumdl@1e0f1d13c87418c31e0d59dacddd98f27a02efcc # v0.3.2
+        uses: rvben/rumdl@dac508e6b2f52c1d869811d138ffc1ff2b9f6e71 # v0.3.3
         with:
           install-only: true
           # renovate: datasource=github-releases depName=rvben/rumdl
@@ -34,7 +34,7 @@ jobs:
           scripts/generate-projects.sh _tabs/projects.md
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.1.3
         with:
           add-paths: _tabs/projects.md
           branch: chore/generate-projects
