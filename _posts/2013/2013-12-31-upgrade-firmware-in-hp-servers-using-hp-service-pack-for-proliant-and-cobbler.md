@@ -45,7 +45,7 @@ echo "/data/hp/HPSPP.iso /data/hp/HP_Service_Pack_for_Proliant iso9660 ro,loop,a
 mount /data/hp/HP_Service_Pack_for_Proliant
 ```
 
-Now install and configure [Cobbler](https://www.cobblerd.org/) to boot the
+Now install and configure [Cobbler](https://cobbler.github.io/) to boot the
 HP SPP using PXE:
 
 ```bash
