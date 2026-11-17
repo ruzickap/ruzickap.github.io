@@ -62,7 +62,7 @@ sed 's@/mnt/main/scripts/includes@/TOOLKIT/includes@;s@cp -a \${RAM_TOOLKIT_DIR}
 chmod a+x /data/hp/ss-scripting-toolkit-linux/scripts/systemreset.sh
 ```
 
-Now install and configure [Cobbler](https://www.cobblerd.org/):
+Now install and configure [Cobbler](https://cobbler.github.io/):
 
 ```bash
 # Install EPEL
