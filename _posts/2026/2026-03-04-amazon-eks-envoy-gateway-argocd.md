@@ -1029,7 +1029,7 @@ Wait for Velero to sync with the S3 bucket and be ready for backup and restore
 operations:
 
 ```bash
-while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
+kubectl wait --namespace velero --for=jsonpath='{.status.lastSyncedTime}' backupstoragelocations/default --timeout=5m
 ```
 
 Initiate the restore process for the cert-manager objects if the backup exists
