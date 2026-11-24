@@ -1,7 +1,6 @@
 name: post_tests
 
 on:
-  # checkov:skip=CKV_GHA_7:The build output cannot be affected by user parameters other than the build entry point and the top-level source location. GitHub Actions workflow_dispatch inputs MUST be empty.
   workflow_dispatch:
     inputs:
       posts:
@@ -32,10 +31,10 @@ env:
   CLUSTER_FQDN: ${{ inputs.cluster_fqdn }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
   GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+  MY_ATLASSIAN_PERSONAL_TOKEN: ${{ secrets.MY_ATLASSIAN_PERSONAL_TOKEN }}
   MY_SLACK_APP_TOKEN: ${{ secrets.MY_SLACK_APP_TOKEN }}
   MY_SLACK_BOT_SIGNING_SECRET: ${{ secrets.MY_SLACK_BOT_SIGNING_SECRET }}
   MY_SLACK_BOT_TOKEN: ${{ secrets.MY_SLACK_BOT_TOKEN }}
-  MY_CONFLUENCE_API_TOKEN: ${{ secrets.MY_CONFLUENCE_API_TOKEN }}
 
 permissions: read-all
 

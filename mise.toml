@@ -32,8 +32,8 @@ FORCE_COLOR = 1
 ##############################################################################
 # Tasks - Blog Post Testing
 # Each task follows the pattern:
-# - create:posts:* - Creates and tests blog post environments
-# - delete:posts:* - Cleans up blog post test environments
+# - create:<post> - Creates and tests blog post environments
+# - delete:<post> - Cleans up blog post test environments
 ##############################################################################
 
 #------------------------------------------------------------------------------

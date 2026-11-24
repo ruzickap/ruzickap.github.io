@@ -4,6 +4,8 @@ set -euo pipefail
 
 DESTINATION_FILE="${1:-projects.md}"
 GITHUB_TOKEN="${GITHUB_TOKEN:-$(gh auth token)}"
+# Fetch the lists before writing anything: a failed "gh" call here stops the script (set -e)
+GITHUB_REPOSITORIES=$(gh repo list --visibility public --json defaultBranchRef,description,homepageUrl,isArchived,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' awsugcz | jq -c && gh repo list --visibility public --topic public --limit 100 --json defaultBranchRef,description,homepageUrl,isArchived,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' ruzickap | jq -c)
 
 cat > "${DESTINATION_FILE}" << 'EOF'
 ---
@@ -96,6 +98,6 @@ ${GITHUB_REPOSITORY_CI_CD_STATUS}
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME}/commits/)
   [![GitHub repo size](https://img.shields.io/github/repo-size/${GITHUB_REPOSITORY_NAME}.svg)](https://github.com/${GITHUB_REPOSITORY_NAME})
 EOF
-done <<< "$(gh repo list --visibility public --json defaultBranchRef,description,homepageUrl,isArchived,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' awsugcz | jq -c && gh repo list --visibility public --topic public --limit 100 --json defaultBranchRef,description,homepageUrl,isArchived,nameWithOwner,repositoryTopics,url --jq 'sort_by(.nameWithOwner).[]' ruzickap | jq -c)"
+done <<< "${GITHUB_REPOSITORIES}"
 
 rumdl fmt --config 'MD013.reflow = true' "${DESTINATION_FILE}"

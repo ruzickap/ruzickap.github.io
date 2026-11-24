@@ -3,7 +3,10 @@
 set -euo pipefail
 
 # Save all output (stdout + stderr) to a log file while still displaying on terminal
-exec > >(tee "/tmp/${MISE_TASK_NAME//[:|]/_}.log") 2>&1
+# mktemp creates a new file readable only by you - "set -x" below prints secret values
+LOG_FILE=$(mktemp "/tmp/${MISE_TASK_NAME//[:|]/_}.XXXXXX")
+exec > >(tee "${LOG_FILE}") 2>&1
+echo "📝 *** Log: ${LOG_FILE}"
 
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 

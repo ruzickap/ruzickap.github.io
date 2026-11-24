@@ -16,6 +16,7 @@ permissions:
   contents: read
 
 env:
+  BLOG_URL: https://ruzickap.github.io
   CONFLUENCE_BASE_URL: https://mylabsdev.atlassian.net/wiki/
   CONFLUENCE_PARENTS: "Petr's Blog"
   CONFLUENCE_PASSWORD: "${{ secrets.MY_ATLASSIAN_PERSONAL_TOKEN }}"
@@ -29,19 +30,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Get changed files
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        id: changed-files
-        with:
-          files: |
-            _posts/**/*.md
-
       - name: Sync docs to Confluence
-        if: github.event_name == 'workflow_dispatch' || steps.changed-files.outputs.any_changed == 'true'
         env:
-          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          BEFORE: ${{ github.event.before }}
         run: |
           # Ubuntu 24.04 restricts unprivileged user namespaces via AppArmor,
           # which breaks the headless Chrome sandbox used by mark to render
@@ -50,16 +44,17 @@ jobs:
           # https://chromium.googlesource.com/chromium/src/+/main/docs/security/apparmor-userns-restrictions.md
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          brew install mark
+          # renovate: datasource=github-releases depName=kovetskiy/mark
+          MARK_VERSION="17.3.1"
+          curl -fsSL "https://github.com/kovetskiy/mark/releases/download/v${MARK_VERSION}/mark_Linux_x86_64.tar.gz" | tar -xz -C "${RUNNER_TEMP}" mark
 
           # Determine which files to process
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
             # For workflow_dispatch, process all markdown files
             FILES_TO_PROCESS=$(find _posts -type f -name '*.md' | sort)
           else
-            # For push events, process only changed files
-            FILES_TO_PROCESS="${CHANGED_FILES}"
+            # For push events, process only added or changed files
+            FILES_TO_PROCESS=$(git diff --name-only --diff-filter=ACMR "${BEFORE}" "${GITHUB_SHA}" -- '_posts/*.md')
           fi
 
           # Process markdown files
@@ -80,11 +75,12 @@ jobs:
                   echo "<!-- Label: ${TAG//./-} -->"
                 done
               perl -0777 -pe 's/^---\n.*?\n---\n//s' "${FILE}"
-            } | sed -e 's@/assets/img/posts/@../..&@' -e 's|{%[[:space:]]*post_url[^%]*%}|https://ruzickap.github.io|g' -e 's/{:[^}]*}//' -e 's/{%[^%]*%}//' > "${FILE}-2"
+            } | sed -E "s#\{%[[:space:]]*post_url[[:space:]]*/?([0-9]{4}/)?[0-9]{4}-[0-9]{2}-[0-9]{2}-([^ %]+)[[:space:]]*%\}#${BLOG_URL}/posts/\2/#g" |
+              sed -e 's@/assets/img/posts/@../..&@' -e 's/{:[^}]*}//' -e 's/{%[^%]*%}//' > "${FILE}-2"
 
             mv "${FILE}-2" "${FILE}"
 
-            mark -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
+            "${RUNNER_TEMP}/mark" publish -f "${FILE}" --space="${CONFLUENCE_SPACE}" --parents "${CONFLUENCE_PARENTS}" \
               --changes-only --title-from-filename \
               --base-url "${CONFLUENCE_BASE_URL}" \
               --username "${CONFLUENCE_USERNAME}" \

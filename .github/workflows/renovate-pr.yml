@@ -47,16 +47,18 @@ jobs:
 
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        with:
-          files: "_posts/**"
-          # Use comma separator for Renovate's RENOVATE_INCLUDE_PATHS (expects comma-separated or JSON array)
-          separator: ","
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          # Comma separated for Renovate's RENOVATE_INCLUDE_PATHS
+          FILES=$(gh pr view "${PR_NUMBER}" --json files --jq '[.files[].path | select(startswith("_posts/"))] | join(",")')
+          echo "files=${FILES}" | tee -a "${GITHUB_OUTPUT}"
 
       - name: 💡 Self-hosted Renovate
-        if: steps.changed-files.outputs.any_changed == 'true'
+        if: steps.changed-files.outputs.files != ''
         uses: renovatebot/github-action@266fef21329c44765ad42f9dea1f01f5d2d91084 # v46.3.13
         env:
-          RENOVATE_INCLUDE_PATHS: ${{ steps.changed-files.outputs.all_changed_files }}
+          RENOVATE_INCLUDE_PATHS: ${{ steps.changed-files.outputs.files }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -23,10 +23,6 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup Pages
-        id: pages
-        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-
       - name: Restore lychee cache
         id: restore-cache
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -47,7 +43,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          args: --include-verbatim --no-progress ${{ steps.pages.outputs.base_url }}
+          # lychee does not crawl a site, so check the source files (same as MegaLinter)
+          args: --no-progress --root-dir ${{ github.workspace }} --exclude-path _tabs/projects.md .
 
       - name: Save lychee cache
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0

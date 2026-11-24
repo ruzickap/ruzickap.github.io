@@ -1,5 +1,5 @@
 ---
-# GitHub Actions workflow for Hugo static site building and deployment
+# GitHub Actions workflow for Jekyll static site building and deployment
 # Builds Jekyll site and deploys to GitHub Pages
 name: gh-pages-build
 
@@ -32,7 +32,6 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-          submodules: true
           persist-credentials: false
 
       - name: Set Variables
