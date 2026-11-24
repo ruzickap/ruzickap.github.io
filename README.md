@@ -190,9 +190,9 @@ docker run --rm -it -v "${PWD}:/mnt" -v "/var/run/docker.sock:/var/run/docker.so
   ```
   ````
 
-- ` ```terraform `, ` ```javascript ` and ` ```python ` blocks also run during
-  the "create" execution: use them only for the body of a heredoc opened by
-  the ` ```bash ` block before them.
+- ` ```terraform `, ` ```javascript `, ` ```json ` and ` ```python ` blocks also
+  run during the "create" execution: use them only for the body of a heredoc
+  opened by the ` ```bash ` block before them.
 
 ## Star History
 

@@ -12,9 +12,9 @@ change it casually, and pick the right one when adding blocks (`scripts/mise-cre
 `.github/workflows/mega-linter.yml`):
 
 - ` ```bash ` — extracted and **run on `create`** (cluster setup steps).
-- ` ```terraform ` / ` ```javascript ` / ` ```python ` — also **run on `create`**:
-  only use them for the body of a heredoc opened by the ` ```bash ` block
-  before them (see `2026-06-11-bedrock-agentcore-slack-opentofu.md`).
+- ` ```terraform ` / ` ```javascript ` / ` ```json ` / ` ```python ` — also
+  **run on `create`**: only use them for the body of a heredoc opened by the
+  ` ```bash ` block before them (see `2026-06-11-bedrock-agentcore-slack-opentofu.md`).
 - ` ```sh ` — extracted and **run on `delete`** (cleanup/teardown steps).
 - ` ```shell ` — **display-only**, never executed (creds, illustrative output).
   Use this for anything that must not run, e.g. example `export AWS_ACCESS_KEY_ID=...`.
