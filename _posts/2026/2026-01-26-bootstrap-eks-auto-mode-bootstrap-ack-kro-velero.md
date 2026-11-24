@@ -1905,7 +1905,7 @@ spec:
     includedResources:
       - "*"
 EOF
-kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero --timeout=5m
+kubectl wait --for=jsonpath='{.status.phase}'=Completed restore/kro-ack-restore -n velero || true
 ```
 
 Scale kro and ACK controllers back up so they can reconcile the restored
@@ -1948,7 +1948,7 @@ cause the delete to hang indefinitely:
 # it, causing deletion to hang indefinitely.
 kubectl patch s3buckets k02-s3 -n kro-system --type=json -p='[{"op": "remove", "path": "/metadata/finalizers/0"}]' || true
 
-kubectl delete eksautomodeclusters.kro.run -n kro-system "${CLUSTER_NAME}" --timeout=30m
+kubectl delete eksautomodeclusters.kro.run -n kro-system "${CLUSTER_NAME}" --timeout=10m || true
 ```
 
 Delete all the kind clusters:
