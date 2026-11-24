@@ -177,7 +177,7 @@ Install the required tools:
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 
 ```bash
-mise use opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1
+mise use --env local opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1
 ```
 
 ## Create a Slack App

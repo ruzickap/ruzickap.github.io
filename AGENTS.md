@@ -63,8 +63,10 @@ for `shellcheck` syntax validation, so every block must be valid shell.
   (scheduled `generate-projects.yml`) — edit the script, not the file.
 - `_config.yml` placeholders are intentional: `url`, cloudflare analytics `id`,
   etc. are injected at deploy time by `gh-pages-build.yml`. Don't "fill them in".
-- Tooling is pinned in `mise.toml` (aws, eksctl, kubectl, opentofu, helm, ...);
-  prefer `mise`-provided versions over system installs.
+- Repo tools (fnox, yq, mq) are pinned in `mise.toml`; each tested post pins
+  its own tools (aws, eksctl, kubectl, opentofu, helm, ...) with
+  `mise use --env local …`, which writes the gitignored `mise.local.toml`.
+  Prefer `mise`-provided versions over system installs.
 - `fnox.toml` resolves AWS-stored secrets locally; the `create:*`/`delete:*`
   mise tasks wrap the script in `fnox exec --`. CI sets
   `FNOX_IF_MISSING=ignore` and uses GitHub secrets instead (see

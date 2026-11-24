@@ -15,3 +15,6 @@ tmp/
 
 # fnox local secrets
 fnox.local.toml
+
+# mise tools installed by the posts ("mise use --env local")
+mise.local.toml
