@@ -51,6 +51,7 @@ order: 4
 - Topics: aws, community, meetup, user-group, aws-user-group
 
 [![GitHub release](https://img.shields.io/github/v/release/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/releases)
 [![GitHub license](https://img.shields.io/github/license/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/awsugcz/awsug.cz.svg?style=social)](https://github.com/awsugcz/awsug.cz/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/awsugcz/awsug.cz.svg?style=social)](https://github.com/awsugcz/awsug.cz/network/members)
@@ -70,7 +71,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/awsugcz/awsug.cz/latest)](https://github.com/awsugcz/awsug.cz/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/awsugcz/awsug.cz.svg)](https://github.com/awsugcz/awsug.cz/commits/)
@@ -83,6 +83,7 @@ order: 4
   checker, links, link-checker, url-checker, link-checking, public, url-checking
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/action-my-broken-link-checker.svg?style=social)](https://github.com/ruzickap/action-my-broken-link-checker/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/action-my-broken-link-checker.svg?style=social)](https://github.com/ruzickap/action-my-broken-link-checker/network/members)
@@ -110,7 +111,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/action-my-broken-link-checker/latest)](https://github.com/ruzickap/action-my-broken-link-checker/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-broken-link-checker.svg)](https://github.com/ruzickap/action-my-broken-link-checker/commits/)
@@ -124,6 +124,7 @@ order: 4
   url-checking
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/action-my-markdown-link-checker.svg?style=social)](https://github.com/ruzickap/action-my-markdown-link-checker/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/action-my-markdown-link-checker.svg?style=social)](https://github.com/ruzickap/action-my-markdown-link-checker/network/members)
@@ -150,7 +151,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/action-my-markdown-link-checker/latest)](https://github.com/ruzickap/action-my-markdown-link-checker/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-markdown-link-checker.svg)](https://github.com/ruzickap/action-my-markdown-link-checker/commits/)
@@ -163,6 +163,7 @@ order: 4
   linting, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/action-my-markdown-linter.svg?style=social)](https://github.com/ruzickap/action-my-markdown-linter/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/action-my-markdown-linter.svg?style=social)](https://github.com/ruzickap/action-my-markdown-linter/network/members)
@@ -189,7 +190,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/action-my-markdown-linter/latest)](https://github.com/ruzickap/action-my-markdown-linter/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/action-my-markdown-linter.svg)](https://github.com/ruzickap/action-my-markdown-linter/commits/)
@@ -203,6 +203,7 @@ order: 4
   workstation
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-my_workstation.svg?style=social)](https://github.com/ruzickap/ansible-my_workstation/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-my_workstation.svg?style=social)](https://github.com/ruzickap/ansible-my_workstation/network/members)
@@ -231,7 +232,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-my_workstation/latest)](https://github.com/ruzickap/ansible-my_workstation/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-my_workstation.svg)](https://github.com/ruzickap/ansible-my_workstation/commits/)
@@ -243,6 +243,7 @@ order: 4
 - Topics: ansible, openwrt, wifi, router, ansible-playbook, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-openwrt.svg?style=social)](https://github.com/ruzickap/ansible-openwrt/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-openwrt.svg?style=social)](https://github.com/ruzickap/ansible-openwrt/network/members)
@@ -267,7 +268,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-openwrt/latest)](https://github.com/ruzickap/ansible-openwrt/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-openwrt.svg)](https://github.com/ruzickap/ansible-openwrt/commits/)
@@ -280,6 +280,7 @@ order: 4
   raspberry-pi, raspberry-pi-os
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-raspberry-pi-os.svg?style=social)](https://github.com/ruzickap/ansible-raspberry-pi-os/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-raspberry-pi-os.svg?style=social)](https://github.com/ruzickap/ansible-raspberry-pi-os/network/members)
@@ -304,7 +305,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-raspberry-pi-os/latest)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-raspberry-pi-os.svg)](https://github.com/ruzickap/ansible-raspberry-pi-os/commits/)
@@ -317,6 +317,7 @@ order: 4
 - Topics: ansible-role, ubuntu, centos, windows, ansible, debian, public, redhat
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-role-my_common_defaults.svg?style=social)](https://github.com/ruzickap/ansible-role-my_common_defaults/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-role-my_common_defaults.svg?style=social)](https://github.com/ruzickap/ansible-role-my_common_defaults/network/members)
@@ -342,7 +343,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-role-my_common_defaults/latest)](https://github.com/ruzickap/ansible-role-my_common_defaults/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-my_common_defaults.svg)](https://github.com/ruzickap/ansible-role-my_common_defaults/commits/)
@@ -357,6 +357,7 @@ order: 4
   ubuntu
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-role-proxy_settings.svg?style=social)](https://github.com/ruzickap/ansible-role-proxy_settings/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-role-proxy_settings.svg?style=social)](https://github.com/ruzickap/ansible-role-proxy_settings/network/members)
@@ -383,7 +384,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-role-proxy_settings/latest)](https://github.com/ruzickap/ansible-role-proxy_settings/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-proxy_settings.svg)](https://github.com/ruzickap/ansible-role-proxy_settings/commits/)
@@ -397,6 +397,7 @@ order: 4
   windows
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-role-virtio-win.svg?style=social)](https://github.com/ruzickap/ansible-role-virtio-win/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-role-virtio-win.svg?style=social)](https://github.com/ruzickap/ansible-role-virtio-win/network/members)
@@ -423,7 +424,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-role-virtio-win/latest)](https://github.com/ruzickap/ansible-role-virtio-win/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-virtio-win.svg)](https://github.com/ruzickap/ansible-role-virtio-win/commits/)
@@ -437,6 +437,7 @@ order: 4
   public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/ansible-role-vmwaretools.svg?style=social)](https://github.com/ruzickap/ansible-role-vmwaretools/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/ansible-role-vmwaretools.svg?style=social)](https://github.com/ruzickap/ansible-role-vmwaretools/network/members)
@@ -460,7 +461,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ansible-role-vmwaretools/latest)](https://github.com/ruzickap/ansible-role-vmwaretools/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ansible-role-vmwaretools.svg)](https://github.com/ruzickap/ansible-role-vmwaretools/commits/)
@@ -472,6 +472,7 @@ order: 4
 - Topics: latex, cheatsheet, atom, public, cheatsheet-atom
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/cheatsheet-atom.svg?style=social)](https://github.com/ruzickap/cheatsheet-atom/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/cheatsheet-atom.svg?style=social)](https://github.com/ruzickap/cheatsheet-atom/network/members)
@@ -496,7 +497,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-atom/latest)](https://github.com/ruzickap/cheatsheet-atom/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-atom.svg)](https://github.com/ruzickap/cheatsheet-atom/commits/)
@@ -508,6 +508,7 @@ order: 4
 - Topics: cheatsheet, latex, macos, public, cheatsheet-mscos
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/cheatsheet-macos.svg?style=social)](https://github.com/ruzickap/cheatsheet-macos/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/cheatsheet-macos.svg?style=social)](https://github.com/ruzickap/cheatsheet-macos/network/members)
@@ -532,7 +533,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-macos/latest)](https://github.com/ruzickap/cheatsheet-macos/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-macos.svg)](https://github.com/ruzickap/cheatsheet-macos/commits/)
@@ -544,6 +544,7 @@ order: 4
 - Topics: latex, systemd, cheatsheet-systemd, cheatsheet, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/cheatsheet-systemd.svg?style=social)](https://github.com/ruzickap/cheatsheet-systemd/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/cheatsheet-systemd.svg?style=social)](https://github.com/ruzickap/cheatsheet-systemd/network/members)
@@ -568,7 +569,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cheatsheet-systemd/latest)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cheatsheet-systemd.svg)](https://github.com/ruzickap/cheatsheet-systemd/commits/)
@@ -581,6 +581,7 @@ order: 4
   kubernetes, public, notes
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/cks-notes.svg?style=social)](https://github.com/ruzickap/cks-notes/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/cks-notes.svg?style=social)](https://github.com/ruzickap/cks-notes/network/members)
@@ -604,7 +605,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/cks-notes/latest)](https://github.com/ruzickap/cks-notes/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/cks-notes.svg)](https://github.com/ruzickap/cks-notes/commits/)
@@ -613,10 +613,12 @@ order: 4
 ### [container-image-scans](https://github.com/ruzickap/container-image-scans)
 
 - Description: Container image scans
+- Website: <https://ruzickap.github.io/container-image-scans/>
 - Topics: container, container-image, container-security, cve, image, public,
   security, vulnerability
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/container-image-scans.svg?style=social)](https://github.com/ruzickap/container-image-scans/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/container-image-scans.svg?style=social)](https://github.com/ruzickap/container-image-scans/network/members)
@@ -624,16 +626,18 @@ order: 4
 
 - CI/CD status:
 
-  [![GitHub Actions status - apply-schema](https://github.com/ruzickap/container-image-scans/workflows/apply-schema/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/apply-schema.yml)
   [![GitHub Actions status - codeql](https://github.com/ruzickap/container-image-scans/workflows/codeql/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/codeql.yml)
   [![GitHub Actions status - commit-check](https://github.com/ruzickap/container-image-scans/workflows/commit-check/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/commit-check.yml)
+  [![GitHub Actions status - deploy-web](https://github.com/ruzickap/container-image-scans/workflows/deploy-web/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/deploy-web.yml)
   [![GitHub Actions status - mega-linter](https://github.com/ruzickap/container-image-scans/workflows/mega-linter/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/mega-linter.yml)
   [![GitHub Actions status - nightly-scans](https://github.com/ruzickap/container-image-scans/workflows/nightly-scans/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/nightly-scans.yml)
   [![GitHub Actions status - pr-size-labeler](https://github.com/ruzickap/container-image-scans/workflows/pr-size-labeler/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/pr-size-labeler.yml)
   [![GitHub Actions status - pr-slack-notification](https://github.com/ruzickap/container-image-scans/workflows/pr-slack-notification/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/pr-slack-notification.yml)
   [![GitHub Actions status - release-please](https://github.com/ruzickap/container-image-scans/workflows/release-please/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/release-please.yml)
+  [![GitHub Actions status - scanner-tests](https://github.com/ruzickap/container-image-scans/workflows/scanner-tests/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/scanner-tests.yml)
   [![GitHub Actions status - scorecards](https://github.com/ruzickap/container-image-scans/workflows/scorecards/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/scorecards.yml)
   [![GitHub Actions status - stale](https://github.com/ruzickap/container-image-scans/workflows/stale/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/stale.yml)
+  [![GitHub Actions status - web-tests](https://github.com/ruzickap/container-image-scans/workflows/web-tests/badge.svg)](https://github.com/ruzickap/container-image-scans/actions/workflows/web-tests.yml)
 
 - Issue tracking:
 
@@ -642,7 +646,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/container-image-scans/latest)](https://github.com/ruzickap/container-image-scans/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/container-image-scans.svg)](https://github.com/ruzickap/container-image-scans/commits/)
@@ -655,6 +658,7 @@ order: 4
 - Topics: eks, fargate, bottlerocket, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-eks-bottlerocket-fargate.svg?style=social)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-eks-bottlerocket-fargate.svg?style=social)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/network/members)
@@ -680,7 +684,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-eks-bottlerocket-fargate/latest)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-bottlerocket-fargate.svg)](https://github.com/ruzickap/k8s-eks-bottlerocket-fargate/commits/)
@@ -693,6 +696,7 @@ order: 4
 - Topics: public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-eks-flux.svg?style=social)](https://github.com/ruzickap/k8s-eks-flux/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-eks-flux.svg?style=social)](https://github.com/ruzickap/k8s-eks-flux/network/members)
@@ -717,7 +721,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-eks-flux/latest)](https://github.com/ruzickap/k8s-eks-flux/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-eks-flux.svg)](https://github.com/ruzickap/k8s-eks-flux/commits/)
@@ -731,6 +734,7 @@ order: 4
   aks, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-flagger-istio-flux.svg?style=social)](https://github.com/ruzickap/k8s-flagger-istio-flux/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-flagger-istio-flux.svg?style=social)](https://github.com/ruzickap/k8s-flagger-istio-flux/network/members)
@@ -755,7 +759,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-flagger-istio-flux/latest)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flagger-istio-flux.svg)](https://github.com/ruzickap/k8s-flagger-istio-flux/commits/)
@@ -770,6 +773,7 @@ order: 4
   cert-manager, helm, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-flux-istio-gitlab-harbor.svg?style=social)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-flux-istio-gitlab-harbor.svg?style=social)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/network/members)
@@ -793,7 +797,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-flux-istio-gitlab-harbor/latest)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-flux-istio-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-flux-istio-gitlab-harbor/commits/)
@@ -807,6 +810,7 @@ order: 4
   kubernetes
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-harbor.svg?style=social)](https://github.com/ruzickap/k8s-harbor/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-harbor.svg?style=social)](https://github.com/ruzickap/k8s-harbor/network/members)
@@ -830,7 +834,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-harbor/latest)](https://github.com/ruzickap/k8s-harbor/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor.svg)](https://github.com/ruzickap/k8s-harbor/commits/)
@@ -843,6 +846,7 @@ order: 4
 - Topics: harbor, presentation, demo, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-harbor-presentation.svg?style=social)](https://github.com/ruzickap/k8s-harbor-presentation/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-harbor-presentation.svg?style=social)](https://github.com/ruzickap/k8s-harbor-presentation/network/members)
@@ -864,7 +868,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-harbor-presentation/latest)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-harbor-presentation.svg)](https://github.com/ruzickap/k8s-harbor-presentation/commits/)
@@ -878,6 +881,7 @@ order: 4
   canary-deployment, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-istio-webinar.svg?style=social)](https://github.com/ruzickap/k8s-istio-webinar/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-istio-webinar.svg?style=social)](https://github.com/ruzickap/k8s-istio-webinar/network/members)
@@ -901,7 +905,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-istio-webinar/latest)](https://github.com/ruzickap/k8s-istio-webinar/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-istio-webinar.svg)](https://github.com/ruzickap/k8s-istio-webinar/commits/)
@@ -914,6 +917,7 @@ order: 4
 - Topics: kubernetes, jenkins, sockshop, aws, kops, jenkins-ci, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-jenkins-x.svg?style=social)](https://github.com/ruzickap/k8s-jenkins-x/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-jenkins-x.svg?style=social)](https://github.com/ruzickap/k8s-jenkins-x/network/members)
@@ -937,7 +941,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-jenkins-x/latest)](https://github.com/ruzickap/k8s-jenkins-x/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-jenkins-x.svg)](https://github.com/ruzickap/k8s-jenkins-x/commits/)
@@ -952,6 +955,7 @@ order: 4
   cert-manager, tekton, tekton-pipelines, kops, pipelines, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-knative-gitlab-harbor.svg?style=social)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-knative-gitlab-harbor.svg?style=social)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/network/members)
@@ -975,7 +979,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-knative-gitlab-harbor/latest)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-knative-gitlab-harbor.svg)](https://github.com/ruzickap/k8s-knative-gitlab-harbor/commits/)
@@ -988,6 +991,7 @@ order: 4
 - Topics: kubernetes, patroni, helm, pgadmin, harbor, postgresql, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-postgresql.svg?style=social)](https://github.com/ruzickap/k8s-postgresql/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-postgresql.svg?style=social)](https://github.com/ruzickap/k8s-postgresql/network/members)
@@ -1012,7 +1016,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-postgresql/latest)](https://github.com/ruzickap/k8s-postgresql/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-postgresql.svg)](https://github.com/ruzickap/k8s-postgresql/commits/)
@@ -1025,6 +1028,7 @@ order: 4
 - Topics: kubernetes, flux, terraform, aks, azure, sockshop, istio, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/k8s-sockshop.svg?style=social)](https://github.com/ruzickap/k8s-sockshop/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/k8s-sockshop.svg?style=social)](https://github.com/ruzickap/k8s-sockshop/network/members)
@@ -1049,7 +1053,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/k8s-sockshop/latest)](https://github.com/ruzickap/k8s-sockshop/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/k8s-sockshop.svg)](https://github.com/ruzickap/k8s-sockshop/commits/)
@@ -1065,6 +1068,7 @@ order: 4
   test, xmrig, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/malware-cryptominer-container.svg?style=social)](https://github.com/ruzickap/malware-cryptominer-container/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/malware-cryptominer-container.svg?style=social)](https://github.com/ruzickap/malware-cryptominer-container/network/members)
@@ -1091,7 +1095,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/malware-cryptominer-container/latest)](https://github.com/ruzickap/malware-cryptominer-container/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/malware-cryptominer-container.svg)](https://github.com/ruzickap/malware-cryptominer-container/commits/)
@@ -1105,6 +1108,7 @@ order: 4
   virtio, driver, public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/packer-templates.svg?style=social)](https://github.com/ruzickap/packer-templates/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/packer-templates.svg?style=social)](https://github.com/ruzickap/packer-templates/network/members)
@@ -1132,7 +1136,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/packer-templates/latest)](https://github.com/ruzickap/packer-templates/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/packer-templates.svg)](https://github.com/ruzickap/packer-templates/commits/)
@@ -1145,6 +1148,7 @@ order: 4
 - Topics: public
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/packer-virt-sysprep.svg?style=social)](https://github.com/ruzickap/packer-virt-sysprep/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/packer-virt-sysprep.svg?style=social)](https://github.com/ruzickap/packer-virt-sysprep/network/members)
@@ -1165,7 +1169,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/packer-virt-sysprep/latest)](https://github.com/ruzickap/packer-virt-sysprep/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/packer-virt-sysprep.svg)](https://github.com/ruzickap/packer-virt-sysprep/commits/)
@@ -1178,6 +1181,7 @@ order: 4
 - Topics: personal-website, web, personal, public, website
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/petr.ruzicka.dev.svg?style=social)](https://github.com/ruzickap/petr.ruzicka.dev/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/petr.ruzicka.dev.svg?style=social)](https://github.com/ruzickap/petr.ruzicka.dev/network/members)
@@ -1203,7 +1207,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/petr.ruzicka.dev/latest)](https://github.com/ruzickap/petr.ruzicka.dev/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/petr.ruzicka.dev.svg)](https://github.com/ruzickap/petr.ruzicka.dev/commits/)
@@ -1217,6 +1220,7 @@ order: 4
   public, blog, web
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/ruzickap.github.io.svg?style=social)](https://github.com/ruzickap/ruzickap.github.io/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/ruzickap.github.io.svg?style=social)](https://github.com/ruzickap/ruzickap.github.io/network/members)
@@ -1247,7 +1251,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/ruzickap.github.io/latest)](https://github.com/ruzickap/ruzickap.github.io/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/ruzickap.github.io.svg)](https://github.com/ruzickap/ruzickap.github.io/commits/)
@@ -1260,6 +1263,7 @@ order: 4
 - Topics: personal-website, public, website, xvx, xvx-cz, personal, web
 
 [![GitHub release](https://img.shields.io/github/v/release/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/releases/latest)
+[![GitHub release date](https://img.shields.io/github/release-date/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/releases)
 [![GitHub license](https://img.shields.io/github/license/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/ruzickap/xvx.cz.svg?style=social)](https://github.com/ruzickap/xvx.cz/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/ruzickap/xvx.cz.svg?style=social)](https://github.com/ruzickap/xvx.cz/network/members)
@@ -1285,7 +1289,6 @@ order: 4
 
 - Repository:
 
-  [![GitHub release date](https://img.shields.io/github/release-date/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/releases)
   [![GitHub last commit](https://img.shields.io/github/last-commit/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/commits/)
   [![GitHub commits since latest release](https://img.shields.io/github/commits-since/ruzickap/xvx.cz/latest)](https://github.com/ruzickap/xvx.cz/commits/)
   [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ruzickap/xvx.cz.svg)](https://github.com/ruzickap/xvx.cz/commits/)
