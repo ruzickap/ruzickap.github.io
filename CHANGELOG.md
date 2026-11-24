@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.2.0](https://github.com/ruzickap/ruzickap.github.io/compare/v1.1.0...v1.2.0) (2026-11-24)
+
+
+### Features
+
+* show release date badge and format projects with rumdl ([#568](https://github.com/ruzickap/ruzickap.github.io/issues/568)) ([5d423df](https://github.com/ruzickap/ruzickap.github.io/commit/5d423dfdb238f429ecf69e2ca415ea0a0e52b094))
+* show release date badge next to release version ([#578](https://github.com/ruzickap/ruzickap.github.io/issues/578)) ([2c47721](https://github.com/ruzickap/ruzickap.github.io/commit/2c4772150fd176d97c97dcf6ef0f2de017cce43c))
+
+
+### Bug Fixes
+
+* address repo audit findings ([#580](https://github.com/ruzickap/ruzickap.github.io/issues/580)) ([85bd03b](https://github.com/ruzickap/ruzickap.github.io/commit/85bd03b892a361d0ceaf18af56c488efaaca607d))
+* correct post categories, tags and readme stats ([#581](https://github.com/ruzickap/ruzickap.github.io/issues/581)) ([07478f5](https://github.com/ruzickap/ruzickap.github.io/commit/07478f5680d88f29c4e4488ea56aa930885b6a61))
+* move release date badge back to repository section ([#571](https://github.com/ruzickap/ruzickap.github.io/issues/571)) ([706ff41](https://github.com/ruzickap/ruzickap.github.io/commit/706ff41af4daf4b053d88d6581c98f9be76abea1))
+
 ## [1.1.0](https://github.com/ruzickap/ruzickap.github.io/compare/v1.0.0...v1.1.0) (2026-09-14)
 
 
