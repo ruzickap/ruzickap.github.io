@@ -157,7 +157,7 @@ docker run --rm -it -v "${PWD}:/mnt" -v "/var/run/docker.sock:/var/run/docker.so
     curl -sL https://mise.run -o - | bash && \
     ~/.local/bin/mise trust --all && \
     eval "$(~/.local/bin/mise activate bash)" && \
-    mise run "create:posts:2026"
+    mise run "create:2026-05-26-openwebui-eks-bedrock-opentofu"
   '
 ```
 
@@ -189,6 +189,10 @@ docker run --rm -it -v "${PWD}:/mnt" -v "/var/run/docker.sock:/var/run/docker.so
   ### <some clean-up/destroy commands...>
   ```
   ````
+
+- ` ```terraform `, ` ```javascript ` and ` ```python ` blocks also run during
+  the "create" execution: use them only for the body of a heredoc opened by
+  the ` ```bash ` block before them.
 
 ## Star History
 

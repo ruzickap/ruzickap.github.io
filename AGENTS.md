@@ -12,6 +12,9 @@ change it casually, and pick the right one when adding blocks (`scripts/mise-cre
 `.github/workflows/mega-linter.yml`):
 
 - ` ```bash ` — extracted and **run on `create`** (cluster setup steps).
+- ` ```terraform ` / ` ```javascript ` / ` ```python ` — also **run on `create`**:
+  only use them for the body of a heredoc opened by the ` ```bash ` block
+  before them (see `2026-06-11-bedrock-agentcore-slack-opentofu.md`).
 - ` ```sh ` — extracted and **run on `delete`** (cleanup/teardown steps).
 - ` ```shell ` — **display-only**, never executed (creds, illustrative output).
   Use this for anything that must not run, e.g. example `export AWS_ACCESS_KEY_ID=...`.
@@ -23,12 +26,11 @@ for `shellcheck` syntax validation, so every block must be valid shell.
 
 - Tasks are defined in `mise.toml` as `create:<post>` / `delete:<post>`. Post
   names with `|` are dependency chains, e.g.
-  `create:2025-02-01-eks-auto-cert-manager-velero|2024-12-14-secure-cheap-amazon-eks-auto`
+  `create:2026-06-17-slack-bot-bedrock-confluence|2026-05-26-openwebui-eks-bedrock-opentofu`
   layers that post on top of the base cluster post.
 - `mq` (a Markdown query tool) extracts the fenced blocks; `mise run <task>`
   executes them via `scripts/mise-create-delete-posts.sh`. Requires real AWS
   credentials — the script aborts if `aws sts get-caller-identity` fails.
-- Run everything (expensive, real infra): `mise run "create-delete:posts:all"`.
 - CI entry point is the manual `post_tests.yml` workflow (workflow_dispatch only).
 - When adding a new tested post, add matching `create:`/`delete:` tasks to
   `mise.toml` **and** an option in `post_tests.yml`.
