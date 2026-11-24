@@ -29,19 +29,12 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          fetch-depth: 0
           persist-credentials: false
 
-      - name: Get changed files
-        uses: tj-actions/changed-files@9426d40962ed5378910ee2e21d5f8c6fcbf2dd96 # v47.0.6
-        id: changed-files
-        with:
-          files: |
-            _posts/**/*.md
-
       - name: Sync docs to Confluence
-        if: github.event_name == 'workflow_dispatch' || steps.changed-files.outputs.any_changed == 'true'
         env:
-          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          BEFORE: ${{ github.event.before }}
         run: |
           # Ubuntu 24.04 restricts unprivileged user namespaces via AppArmor,
           # which breaks the headless Chrome sandbox used by mark to render
@@ -59,8 +52,8 @@ jobs:
             # For workflow_dispatch, process all markdown files
             FILES_TO_PROCESS=$(find _posts -type f -name '*.md' | sort)
           else
-            # For push events, process only changed files
-            FILES_TO_PROCESS="${CHANGED_FILES}"
+            # For push events, process only added or changed files
+            FILES_TO_PROCESS=$(git diff --name-only --diff-filter=ACMR "${BEFORE}" "${GITHUB_SHA}" -- '_posts/*.md')
           fi
 
           # Process markdown files
