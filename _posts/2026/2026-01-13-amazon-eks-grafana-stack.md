@@ -879,6 +879,7 @@ Resources:
                 StorageClass: STANDARD_IA
           - Id: DeleteOldObjects
             Status: Enabled
+            Prefix: velero/
             ExpirationInDays: 120
       BucketEncryption:
         ServerSideEncryptionConfiguration:
