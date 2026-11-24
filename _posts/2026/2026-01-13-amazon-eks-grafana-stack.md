@@ -365,7 +365,10 @@ a complete description of what `cloudformation.yaml` does for Karpenter.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="400"}
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.13/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
+# renovate: datasource=github-tags depName=aws/karpenter-provider-aws
+KARPENTER_HELM_CHART_VERSION="1.12.1"
+
+curl -fsSL "https://raw.githubusercontent.com/aws/karpenter-provider-aws/v${KARPENTER_HELM_CHART_VERSION}/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml" > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
 eval aws cloudformation deploy \
   --stack-name "${CLUSTER_NAME}-karpenter" \
   --template-file "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml" \
