@@ -120,7 +120,7 @@ Install the required tools:
 - [uv](https://docs.astral.sh/uv/)
 
 ```bash
-mise use --env local opentofu@1.12.1 aws@2.35.2 uv@0.11.21 node@24.11.1
+mise use opentofu@1.12.1 aws@2.35.2 uv@0.11.21 node@24.11.1
 ```
 
 ## Create a Slack App

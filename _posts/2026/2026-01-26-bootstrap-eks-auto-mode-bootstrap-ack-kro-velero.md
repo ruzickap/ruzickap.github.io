@@ -28,7 +28,7 @@ them to the new EKS Auto Mode Cluster — effectively making it self-managed.
 - [Velero CLI](https://velero.io/docs/main/basic-install/#install-the-cli)
 
 ```bash
-mise use --env local aws@2.35.2 kubectl@1.36.1 helm@4.2.0 kind@0.32.0 velero@1.18.1
+mise use aws@2.35.2 kubectl@1.36.1 helm@4.2.0 kind@0.32.0 velero@1.18.1
 ```
 
 ## Architecture Overview
@@ -1425,7 +1425,7 @@ spec:
   name: ${CLUSTER_NAME}
   region: ${AWS_REGION}
   accountId: "${AWS_ACCOUNT_ID}"
-  adminRoleARN: "arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin"
+  adminRoleARN: "${AWS_ROLE_TO_ASSUME%/*}/admin"
   s3BucketName: ${CLUSTER_FQDN}
   tags:
     owner: ${MY_EMAIL}
@@ -1753,7 +1753,7 @@ export CLUSTER_FQDN="k02.k8s.mylabs.dev"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 mkdir -pv "${TMP_DIR}/${CLUSTER_FQDN}" "${TMP_DIR}/kind-${CLUSTER_NAME}-cleanup"
-mise use --env local kubectl@1.36.1 helm@4.2.0 kind@0.32.0
+mise use kubectl@1.36.1 helm@4.2.0 kind@0.32.0
 ```
 
 Create the Kind cluster:

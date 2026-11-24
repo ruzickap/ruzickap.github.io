@@ -87,7 +87,7 @@ Install the required tools:
 - [helm](https://github.com/helm/helm)
 
 ```bash
-mise use --env local aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
 ```
 
 ### Configure AWS Route 53 Domain delegation
@@ -365,7 +365,7 @@ a complete description of what `cloudformation.yaml` does for Karpenter.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="400"}
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/v1.12.1/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
+curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.13/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
 eval aws cloudformation deploy \
   --stack-name "${CLUSTER_NAME}-karpenter" \
   --template-file "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml" \
@@ -422,11 +422,7 @@ iam:
       serviceAccountName: karpenter
       roleName: eksctl-${CLUSTER_NAME}-karpenter
       permissionPolicyARNs:
-        - arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerNodeLifecyclePolicy-${CLUSTER_NAME}
-        - arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerIAMIntegrationPolicy-${CLUSTER_NAME}
-        - arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerEKSIntegrationPolicy-${CLUSTER_NAME}
-        - arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerInterruptionPolicy-${CLUSTER_NAME}
-        - arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerResourceDiscoveryPolicy-${CLUSTER_NAME}
+        - arn:${AWS_PARTITION}:iam::${AWS_ACCOUNT_ID}:policy/KarpenterControllerPolicy-${CLUSTER_NAME}
     - namespace: loki
       serviceAccountName: loki
       roleName: eksctl-${CLUSTER_NAME}-loki
@@ -537,7 +533,7 @@ AWS_NACL_ID=$(aws ec2 describe-network-acls --filters "Name=vpc-id,Values=${AWS_
   AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver create-resolver-query-log-config \
     --name "${CLUSTER_NAME}-vpc-dns-logs" \
     --destination-arn "${AWS_CLUSTER_LOG_GROUP_ARN}" \
-    --creator-request-id "${CLUSTER_NAME}-$(date +%s)" --query 'ResolverQueryLogConfig.Id' --output text)
+    --creator-request-id "$(cat /proc/sys/kernel/random/uuid)" --query 'ResolverQueryLogConfig.Id' --output text)
 
   aws route53resolver associate-resolver-query-log-config \
     --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
@@ -833,122 +829,6 @@ EOF
 helm upgrade --install --version "${CERT_MANAGER_HELM_CHART_VERSION}" --namespace cert-manager --create-namespace --values "${TMP_DIR}/${CLUSTER_FQDN}/helm_values-cert-manager.yml" cert-manager jetstack/cert-manager
 ```
 
-### Create S3 bucket
-
-<!-- prettier-ignore-start -->
-> The following step needs to be performed only once.
-{: .prompt-info }
-<!-- prettier-ignore-end -->
-
-Use CloudFormation to create an S3 bucket that will be used for storing Velero
-backups and the Mimir, Loki and Tempo data.
-
-```bash
-if ! aws s3 ls "s3://${CLUSTER_FQDN}"; then
-  cat > "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" << \EOF
-AWSTemplateFormatVersion: 2010-09-09
-
-Parameters:
-  S3BucketName:
-    Description: Name of the S3 bucket
-    Type: String
-  EmailToSubscribe:
-    Description: Confirm subscription over email to receive a copy of S3 events
-    Type: String
-
-Resources:
-  S3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Ref S3BucketName
-      PublicAccessBlockConfiguration:
-        BlockPublicAcls: true
-        BlockPublicPolicy: true
-        IgnorePublicAcls: true
-        RestrictPublicBuckets: true
-      LifecycleConfiguration:
-        Rules:
-          # Transitions objects to the ONEZONE_IA storage class after 30 days
-          - Id: TransitionToOneZoneIA
-            Status: Enabled
-            Transitions:
-              - TransitionInDays: 30
-                StorageClass: STANDARD_IA
-          - Id: DeleteOldObjects
-            Status: Enabled
-            Prefix: velero/
-            ExpirationInDays: 120
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
-              SSEAlgorithm: aws:kms
-              KMSMasterKeyID: alias/aws/s3
-  S3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3Bucket
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          # S3 Bucket policy force HTTPs requests
-          - Sid: ForceSSLOnlyAccess
-            Effect: Deny
-            Principal: "*"
-            Action: s3:*
-            Resource:
-              - !GetAtt S3Bucket.Arn
-              - !Sub ${S3Bucket.Arn}/*
-            Condition:
-              Bool:
-                aws:SecureTransport: "false"
-  S3Policy:
-    Type: AWS::IAM::ManagedPolicy
-    Properties:
-      ManagedPolicyName: !Sub "${S3BucketName}-s3"
-      Description: !Sub "Policy required by Velero to write to S3 bucket ${S3BucketName}"
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-        - Effect: Allow
-          Action:
-          - s3:ListBucket
-          - s3:GetBucketLocation
-          - s3:ListBucketMultipartUploads
-          Resource: !GetAtt S3Bucket.Arn
-        - Effect: Allow
-          Action:
-          - s3:PutObject
-          - s3:GetObject
-          - s3:DeleteObject
-          - s3:ListMultipartUploadParts
-          - s3:AbortMultipartUpload
-          Resource: !Sub "arn:aws:s3:::${S3BucketName}/*"
-        # S3 Bucket policy does not deny HTTP requests
-        - Sid: ForceSSLOnlyAccess
-          Effect: Deny
-          Action: "s3:*"
-          Resource:
-            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}"
-            - !Sub "arn:${AWS::Partition}:s3:::${S3Bucket}/*"
-          Condition:
-            Bool:
-              aws:SecureTransport: "false"
-Outputs:
-  S3PolicyArn:
-    Description: The ARN of the created Amazon S3 policy
-    Value: !Ref S3Policy
-  S3Bucket:
-    Description: The name of the created Amazon S3 bucket
-    Value: !Ref S3Bucket
-EOF
-
-  eval aws cloudformation deploy --capabilities CAPABILITY_NAMED_IAM \
-    --parameter-overrides S3BucketName="${CLUSTER_FQDN}" EmailToSubscribe="${MY_EMAIL}" \
-    --stack-name "${CLUSTER_NAME}-s3" --template-file "${TMP_DIR}/${CLUSTER_FQDN}/aws-s3.yml" --tags "${TAGS//,/ }"
-  echo "👉 S3 bucket successfully created."
-fi
-```
-
 ### Velero
 
 Velero is an open-source tool for backing up and restoring Kubernetes cluster
@@ -1081,7 +961,7 @@ cert-manager objects if the backup exists in the S3 bucket. Otherwise, request a
 new certificate and have it signed by Let's Encrypt:
 
 ```bash
-kubectl wait --namespace velero --for=jsonpath='{.status.lastSyncedTime}' backupstoragelocations/default --timeout=5m
+while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
 if aws s3 ls "s3://${CLUSTER_FQDN}/velero/backups/cert-manager-production/" 2> /dev/null | grep -q .; then
   velero restore create restore-cert-manager-production --from-backup cert-manager-production --labels letsencrypt=production --wait --existing-resource-policy=update
 else
@@ -2388,7 +2268,7 @@ export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
-mise use --env local aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
@@ -2530,7 +2410,7 @@ Remove the `${TMP_DIR}/${CLUSTER_FQDN}` directory:
 
 ```sh
 if [[ -d "${TMP_DIR}/${CLUSTER_FQDN}" ]]; then
-  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,aws-s3,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,k8s-monitoring,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,pyroscope,tempo,velero},k8s-{cert-manager-certificate-production,cert-manager-clusterissuer-production,karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
+  for FILE in "${TMP_DIR}/${CLUSTER_FQDN}"/{kubeconfig-${CLUSTER_NAME}.conf,{aws-cf-route53-kms,cloudformation-karpenter,eksctl-${CLUSTER_NAME},helm_values-{aws-load-balancer-controller,cert-manager,external-dns,grafana,homepage,ingress-nginx,k8s-monitoring,karpenter,loki,mailpit,mimir-distributed,oauth2-proxy,pyroscope,tempo,velero},k8s-{cert-manager-certificate-production,cert-manager-clusterissuer-production,karpenter-nodepool,scheduling-priorityclass,storage-snapshot-storageclass-volumesnapshotclass}}.yml}; do
     if [[ -f "${FILE}" ]]; then
       rm -v "${FILE}"
     else

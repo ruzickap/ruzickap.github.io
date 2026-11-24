@@ -139,7 +139,7 @@ Install the required tools:
 - [kubectl](https://kubernetes.io/docs/reference/kubectl/)
 
 ```bash
-mise use --env local opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1 helm@4.2.0
+mise use opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1 helm@4.2.0
 ```
 
 ### Configure AWS Route 53 Domain delegation
@@ -1942,7 +1942,7 @@ export TF_VAR_google_client_secret="${GOOGLE_CLIENT_SECRET}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 mkdir -p "${TMP_DIR}/${CLUSTER_FQDN}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig.conf}"
-mise use --env local opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1
+mise use opentofu@1.12.1 aws@2.35.2 kubectl@1.36.1
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 

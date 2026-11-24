@@ -101,7 +101,7 @@ Install the required tools:
 - [kubectl](https://github.com/kubernetes/kubectl)
 
 ```bash
-mise use --env local aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 helm@4.2.0 velero@1.18.1
 ```
 
 ### Configure AWS Route 53 Domain delegation
@@ -383,7 +383,7 @@ Karpenter.
 ![Karpenter](https://raw.githubusercontent.com/aws/karpenter/efa141bc7276db421980bf6e6483d9856929c1e9/website/static/banner.png){:width="400"}
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/v1.12.1/website/content/en/preview/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
+curl -fsSL https://raw.githubusercontent.com/aws/karpenter-provider-aws/refs/heads/main/website/content/en/v1.13/getting-started/getting-started-with-karpenter/cloudformation.yaml > "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml"
 eval aws cloudformation deploy --stack-name "${CLUSTER_NAME}-karpenter" \
   --template-file "${TMP_DIR}/${CLUSTER_FQDN}/cloudformation-karpenter.yml" \
   --capabilities CAPABILITY_NAMED_IAM \
@@ -543,7 +543,7 @@ following concerns:
   AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver create-resolver-query-log-config \
     --name "${CLUSTER_NAME}-vpc-dns-logs" \
     --destination-arn "${AWS_CLUSTER_LOG_GROUP_ARN}" \
-    --creator-request-id "${CLUSTER_NAME}-$(date +%s)" --query 'ResolverQueryLogConfig.Id' --output text)
+    --creator-request-id "$(cat /proc/sys/kernel/random/uuid)" --query 'ResolverQueryLogConfig.Id' --output text)
 
   aws route53resolver associate-resolver-query-log-config \
     --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
@@ -873,7 +873,6 @@ Resources:
                 StorageClass: STANDARD_IA
           - Id: DeleteOldObjects
             Status: Enabled
-            Prefix: velero/
             ExpirationInDays: 120
       BucketEncryption:
         ServerSideEncryptionConfiguration:
@@ -1030,7 +1029,7 @@ Wait for Velero to sync with the S3 bucket and be ready for backup and restore
 operations:
 
 ```bash
-kubectl wait --namespace velero --for=jsonpath='{.status.lastSyncedTime}' backupstoragelocations/default --timeout=5m
+while [ -z "$(kubectl -n velero get backupstoragelocations default -o jsonpath='{.status.lastSyncedTime}')" ]; do sleep 5; done
 ```
 
 Initiate the restore process for the cert-manager objects if the backup exists
@@ -2202,7 +2201,7 @@ export CLUSTER_FQDN="${CLUSTER_FQDN:-k01.k8s.mylabs.dev}"
 export CLUSTER_NAME="${CLUSTER_FQDN%%.*}"
 export TMP_DIR="${TMP_DIR:-${PWD}/tmp}"
 export KUBECONFIG="${KUBECONFIG:-${TMP_DIR}/${CLUSTER_FQDN}/kubeconfig-${CLUSTER_NAME}.conf}"
-mise use --env local aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 velero@1.18.1
+mise use aws@2.35.2 eksctl@0.227.0 kubectl@1.36.1 velero@1.18.1
 aws eks update-kubeconfig --region "${AWS_REGION}" --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
 ```
 
