@@ -3,7 +3,7 @@ title: Shrink RAID and LVM partition
 author: Petr Ruzicka
 date: 2010-06-11
 description: Shrink ext4, LVM, and RAID1 partitions to replace a disk with a smaller one
-categories: [Linux, Storage]
+categories: [Linux, Storage, linux-old.xvx.cz]
 tags: [raid, lvm, storage]
 ---
 

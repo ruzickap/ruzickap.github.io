@@ -4,7 +4,7 @@ author: Petr Ruzicka
 date: 2026-03-04
 description: Build Amazon EKS with Envoy Gateway deployed using Argo CD
 categories: [Kubernetes, Cloud, Monitoring]
-tags: [amazon-eks, argocd, cert-manager, eks, eksctl, grafana, homepage, envoy-gateway, kubernetes, monitoring, velero, victorialogs, victoriametrics]
+tags: [amazon-eks, argocd, cert-manager, eksctl, grafana, homepage, envoy-gateway, kubernetes, monitoring, velero, victorialogs, victoriametrics]
 image: https://raw.githubusercontent.com/cncf/artwork/8a7776a285f9db6bebd292e5077e410bd0688b55/projects/argo/horizontal/color/argo-horizontal-color.svg
 ---
 
