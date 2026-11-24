@@ -546,7 +546,7 @@ following concerns:
   AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID=$(aws route53resolver create-resolver-query-log-config \
     --name "${CLUSTER_NAME}-vpc-dns-logs" \
     --destination-arn "${AWS_CLUSTER_LOG_GROUP_ARN}" \
-    --creator-request-id "$(cat /proc/sys/kernel/random/uuid)" --query 'ResolverQueryLogConfig.Id' --output text)
+    --creator-request-id "${CLUSTER_NAME}-$(date +%s)" --query 'ResolverQueryLogConfig.Id' --output text)
 
   aws route53resolver associate-resolver-query-log-config \
     --resolver-query-log-config-id "${AWS_CLUSTER_ROUTE53_RESOLVER_QUERY_LOG_CONFIG_ID}" \
