@@ -1425,7 +1425,7 @@ spec:
   name: ${CLUSTER_NAME}
   region: ${AWS_REGION}
   accountId: "${AWS_ACCOUNT_ID}"
-  adminRoleARN: "${AWS_ROLE_TO_ASSUME%/*}/admin"
+  adminRoleARN: "arn:aws:iam::${AWS_ACCOUNT_ID}:role/admin"
   s3BucketName: ${CLUSTER_FQDN}
   tags:
     owner: ${MY_EMAIL}
