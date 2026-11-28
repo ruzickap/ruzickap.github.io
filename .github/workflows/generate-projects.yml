@@ -21,7 +21,7 @@ jobs:
           persist-credentials: false
 
       - name: Install rumdl
-        uses: rvben/rumdl@ba563d6780c6119bd526c869a730b492c1ad54e5 # v0.3.5
+        uses: rvben/rumdl@8c360f36fec04dc001084f05b52d739b6ff66764 # v0.3.6
         with:
           install-only: true
           # renovate: datasource=github-releases depName=rvben/rumdl
